@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Trend - PLN Power Inspect</title>
+    <!-- Standard Dashboard Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --pln-blue: #003B8E;
+            --pln-blue-mid: #1A5CB5;
+            --pln-blue-light: #EAF1FB;
+            --pln-yellow: #F7A800;
+            --surface: #F5F7FA;
+            --card: #FFFFFF;
+            --border: #DDE3EE;
+            --text-primary: #1A2035;
+            --text-secondary: #5B6480;
+            --text-hint: #9BA5C0;
+            --sidebar-w: 64px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            
+            --success: #10B981;
+            --success-bg: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-bg: #FEF3C7;
+            
+            /* Fasa Colors */
+            --fasa-r: #EF4444; /* Red */
+            --fasa-s: #F59E0B; /* Yellow/Orange */
+            --fasa-t: #10B981; /* Green or Black, usually Black/Blue, let's use standard chart colors */
+            --fasa-t: #003B8E; /* Pln blue */
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--pln-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 12px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--pln-yellow);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .nav-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+
+        .nav-icon.active {
+            background: rgba(247, 168, 0, 0.2);
+            color: var(--pln-yellow);
+        }
+
+        /* MAIN LAYOUT */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 9;
+        }
+
+        .topbar-left .page-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .topbar-right .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--pln-blue-light);
+            color: var(--pln-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 32px;
+            flex: 1;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* FILTER FORM SECTION */
+        .filter-section {
+            margin-top: 20px;
+            margin-bottom: 32px;
+        }
+
+        .quick-search-wrapper {
+            max-width: 600px;
+            margin: 0 auto 32px auto;
+            text-align: center;
+        }
+
+        .quick-search-wrapper label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .quick-search-wrapper label span {
+            color: var(--pln-blue-mid);
+            font-weight: 600;
+        }
+
+        .search-input-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input-container input {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-primary);
+            background: var(--card);
+        }
+
+        .search-input-container input:focus {
+            outline: none;
+            border-color: var(--pln-blue);
+        }
+
+        .search-input-container svg {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--pln-blue-mid);
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-primary);
+            font-family: inherit;
+            background: var(--card);
+            width: 100%;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--pln-blue);
+        }
+        
+        .date-range-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: var(--pln-blue);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--pln-blue-mid);
+        }
+
+        /* CUSTOM TOOLTIP FOR DATE INFO */
+        .info-tooltip-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: help;
+        }
+        
+        .info-tooltip-container .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-tooltip-container .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        
+        .info-tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .tooltip-text ul {
+            margin: 0;
+            padding-left: 16px;
+            margin-top: 4px;
+        }
+
+        /* TABLE CARD STYLING */
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            display: block;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: #FAFBFC;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 16px 24px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            color: var(--pln-blue);
+            background: var(--card);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--pln-blue);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 24px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 360px;
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--card);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead th {
+            background: #FAFBFC;
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            border-top: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active { background: var(--success-bg); color: var(--success); }
+        .badge-draft { background: var(--warning-bg); color: var(--warning); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="logo">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="#F7A800" />
+                <path d="M8 22V10l8 6 8-6v12" stroke="#003B8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <div class="nav-icon active" title="Dashboard Trend">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-left"><div class="page-title">Monitoring Inspeksi</div></div>
+            <div class="topbar-right">
+                <div class="user-profile">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 13px;">Ardan Test</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">Administrator</div>
+                    </div>
+                    <div class="avatar">AT</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Dashboard Trend Hasil Inspeksi</h1>
+                <p style="color: var(--text-secondary); font-size: 13px;">Dashboard Trend Hasil Inspeksi</p>
+            </div>
+
+            <div class="filter-section">
+                <!-- Quick Search -->
+                <div class="quick-search-wrapper">
+                    <label>Pencarian Cepat <span>Gardu Induk</span></label>
+                    <div class="search-input-container">
+                        <input type="text" placeholder="Masukkan Nama Gardu Induk">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                </div>
+
+                <!-- Grid Form 3 Columns -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Regional</label>
+                        <select class="form-control"><option>TSJ</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kantor Induk</label>
+                        <select class="form-control"><option>UITJBB</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Pelaksana</label>
+                        <select class="form-control"><option>UPT CAWANG</option></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ULTG</label>
+                        <select class="form-control"><option>ULTG MAMPANG</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Gardu Induk</label>
+                        <select class="form-control"><option>GIS 150KV ABADI GUNA PAPAN</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Aset</label>
+                        <select class="form-control"><option>Circuit Breaker</option></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Aset</label>
+                        <select class="form-control"><option>Circuit Breaker - ABB - 502806927-10000-E08-Q0 - RST</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Parameter Inspeksi</label>
+                        <select class="form-control"><option>Thermovisi Body Aset</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 4px;">
+                            Tanggal Inspeksi (17 hari) 
+                            <div class="info-tooltip-container">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--pln-blue-mid);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                <div class="tooltip-text">
+                                    <strong>Maksimal Filter:</strong>
+                                    <ul>
+                                        <li>IL 1: 3 Bulan</li>
+                                        <li>IL 2: 1 Tahun</li>
+                                        <li>IL 3 dan Kondisional: Tidak ada maksimal rentang</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </label>
+                        <div class="date-range-group">
+                            <div style="position: relative;">
+                                <input type="text" class="form-control" value="01 Juni 2026">
+                                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-hint); cursor: pointer;">✕</span>
+                            </div>
+                            <div style="position: relative;">
+                                <input type="text" class="form-control" value="17 Juni 2026">
+                                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-hint); cursor: pointer;">✕</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="btn-primary" onclick="document.getElementById('result-section').style.display='block'">CARI DATA</button>
+                </div>
+            </div>
+
+            <!-- RESULT SECTION (TABLE CARD) -->
+            <div class="table-card" id="result-section" style="display: none;">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="openTab(event, 'tab-numerik')">Parameter Kuantitatif (Grafik)</button>
+                    <button class="tab-btn" onclick="openTab(event, 'tab-visual')">Detail Inspeksi Visual (Teks)</button>
+                </div>
+
+                <!-- Tab 1 -->
+                <div id="tab-numerik" class="tab-content active">
+                    <h3 style="font-size: 15px; margin-bottom: 16px;">Trend: Thermovisi Body Aset</h3>
+                    <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nomor WO</th>
+                                    <th>Tanggal</th>
+                                    <th>Suhu Fasa R</th>
+                                    <th>Suhu Fasa S</th>
+                                    <th>Suhu Fasa T</th>
+                                    <th>Selisih Suhu (ΔT)</th>
+                                    <th>Kondisi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>INS202600883600</td>
+                                    <td>15 Juni 2026</td>
+                                    <td>35.2 °C</td>
+                                    <td>36.1 °C</td>
+                                    <td>35.8 °C</td>
+                                    <td>0.9 °C</td>
+                                    <td><span class="badge badge-active">2 - Good</span></td>
+                                </tr>
+                                <tr>
+                                    <td>INS202600883601</td>
+                                    <td>16 Juni 2026</td>
+                                    <td>36.0 °C</td>
+                                    <td>37.5 °C</td>
+                                    <td>36.8 °C</td>
+                                    <td>1.5 °C</td>
+                                    <td><span class="badge badge-active">2 - Good</span></td>
+                                </tr>
+                                <tr>
+                                    <td>INS202600883602</td>
+                                    <td>17 Juni 2026</td>
+                                    <td>37.1 °C</td>
+                                    <td>40.2 °C</td>
+                                    <td>38.0 °C</td>
+                                    <td>3.1 °C</td>
+                                    <td><span class="badge badge-draft">3 - Normal</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2 -->
+                <div id="tab-visual" class="tab-content">
+                    <h3 style="font-size: 15px; margin-bottom: 16px;">Detail Pemeriksaan Visual</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nomor WO</th>
+                                    <th>Parameter</th>
+                                    <th>Tanggal</th>
+                                    <th>Catatan / Temuan (Teks)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>INS202600883600</td>
+                                    <td>Lubang Kabel</td>
+                                    <td>15 Juni 2026</td>
+                                    <td>Kondisi lubang kabel tertutup rapat.</td>
+                                    <td><span class="badge badge-active">Aman</span></td>
+                                </tr>
+                                <tr>
+                                    <td>INS202600883605</td>
+                                    <td>Kondisi Sekering</td>
+                                    <td>16 Juni 2026</td>
+                                    <td>Terdapat sedikit debu di sekitar terminal.</td>
+                                    <td><span class="badge badge-draft">Perlu Perhatian</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+
+    // Chart.js Setup with Multi-line & Custom Tooltip
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        
+        // Mock data
+        const labels = ['13 Jun', '14 Jun', '15 Jun', '16 Jun', '17 Jun'];
+        const dataR = [34.5, 34.8, 35.2, 36.0, 37.1];
+        const dataS = [35.0, 35.5, 36.1, 37.5, 40.2];
+        const dataT = [34.2, 35.0, 35.8, 36.8, 38.0];
+        const dataDelta = [0.8, 0.7, 0.9, 1.5, 3.1];
+        const conditions = ['2 - Good', '2 - Good', '2 - Good', '2 - Good', '3 - Normal']; // Mapping for points
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Suhu Fasa R',
+                        data: dataR,
+                        borderColor: '#EF4444',
+                        backgroundColor: '#EF4444',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        kondisiData: conditions
+                    },
+                    {
+                        label: 'Suhu Fasa S',
+                        data: dataS,
+                        borderColor: '#F59E0B',
+                        backgroundColor: '#F59E0B',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        kondisiData: conditions
+                    },
+                    {
+                        label: 'Suhu Fasa T',
+                        data: dataT,
+                        borderColor: '#003B8E', // PLN Blue
+                        backgroundColor: '#003B8E',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        kondisiData: conditions
+                    },
+                    {
+                        label: 'Selisih Suhu (ΔT)',
+                        data: dataDelta,
+                        borderColor: '#64748B', // Slate gray
+                        backgroundColor: '#64748B',
+                        borderWidth: 2,
+                        borderDash: [5, 5], // Dashed line to differentiate
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.3,
+                        kondisiData: conditions
+                    }
+                ]
+            },
+            options: {
+                responsive: true, 
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { family: "'Inter', sans-serif", size: 13 },
+                            usePointStyle: true,
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        titleFont: { family: "'Inter', sans-serif", size: 14, weight: 'bold' },
+                        bodyFont: { family: "'Inter', sans-serif", size: 13 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        boxPadding: 6,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' °C';
+                                }
+                                return label;
+                            },
+                            afterBody: function(context) {
+                                // Add Condition/Skala to tooltip
+                                const dataIndex = context[0].dataIndex;
+                                const condition = context[0].dataset.kondisiData[dataIndex];
+                                return '\nStatus: ' + condition;
+                            }
+                        }
+                    }
+                },
+                scales: { 
+                    y: { 
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Suhu (°C)',
+                            font: { family: "'Inter', sans-serif" }
+                        },
+                        grid: { color: '#EAF1FB' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

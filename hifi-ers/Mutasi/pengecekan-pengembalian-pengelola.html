@@ -1,0 +1,2743 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Pengecekan Pengembalian Pengelola - PLN</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --pln-blue: #0A58CA;
+  --pln-blue-mid: #0d6efd;
+  --pln-blue-light: #E7F1FF;
+  --pln-yellow: #F7A800;
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --surface: #F1F5F9;
+  --border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-hint: #94A3B8;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --sidebar-w: 64px;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --success: #16A34A;
+  --success-light: #DCFCE7;
+  --warning: #D97706;
+  --warning-light: #FEF3C7;
+  
+  /* Additional colors for chips */
+  --chip-proses-bg: #FFF7ED; --chip-proses-text: #C2410C; --chip-proses-dot: #F97316;
+  --chip-kirim-bg: #EFF6FF; --chip-kirim-text: #1D4ED8; --chip-kirim-dot: #3B82F6;
+  --chip-tunggu-bg: #FEFCE8; --chip-tunggu-text: #854D0E; --chip-tunggu-dot: #EAB308;
+  --chip-review-bg: #FDF4FF; --chip-review-text: #7E22CE; --chip-review-dot: #A855F7;
+  --chip-approval-bg: #F0FDF4; --chip-approval-text: #166534; --chip-approval-dot: #22C55E;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .page-title, .section-label, .card-title, .logo span {
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* LAYOUT */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: rgba(10, 30, 60, 0.95);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 8px;
+  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+}
+
+.sidebar .logo {
+  width: 40px;
+  height: 40px;
+  background: var(--pln-yellow);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 10px rgba(247, 168, 0, 0.3);
+  transition: transform 0.2s;
+}
+.sidebar .logo:hover {
+  transform: scale(1.05);
+}
+.sidebar .logo span {
+  color: #003B8E;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.sidebar .nav-item, .nav-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 4px;
+}
+.sidebar .nav-item:hover, .nav-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.sidebar .nav-item.active, .nav-icon.active {
+  background: var(--pln-blue);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+}
+.sidebar .nav-item svg, .nav-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* MAIN CONTENT */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: calc(100% - var(--sidebar-w));
+}
+
+/* TOPBAR */
+.topbar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+.back-btn:hover {
+  background: var(--surface);
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.breadcrumb {
+  font-size: 12px;
+  color: var(--text-hint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.breadcrumb a {
+  color: var(--pln-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.breadcrumb a:hover {
+  color: var(--pln-blue-mid);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-log {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--pln-blue);
+  background: var(--card);
+  color: var(--pln-blue);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(10, 88, 202, 0.05);
+}
+.btn-log:hover {
+  background: var(--pln-blue);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(10, 88, 202, 0.2);
+}
+.log-badge {
+  background: var(--pln-yellow);
+  color: #7A5200;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 2px 8px;
+  min-width: 22px;
+  text-align: center;
+}
+.btn-log:hover .log-badge {
+  background: #fff;
+}
+
+/* CONTENT AREA */
+.content {
+  padding: 32px;
+  flex: 1;
+  padding-bottom: 100px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+/* CARDS & SECTIONS */
+.card, .section-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  margin-bottom: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover, .section-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.section-card {
+  padding: 24px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 16px;
+  background: var(--pln-blue);
+  border-radius: 2px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(248, 250, 252, 0.5);
+}
+
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-wrap input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px 10px 40px;
+  font-size: 13px;
+  width: 280px;
+  outline: none;
+  color: var(--text-primary);
+  background: var(--card);
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+.search-wrap input:focus {
+  border-color: var(--pln-blue);
+  box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.1);
+  width: 320px;
+}
+.search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-hint);
+  transition: color 0.2s;
+}
+.search-wrap input:focus + .search-icon,
+.search-wrap:focus-within .search-icon {
+  color: var(--pln-blue);
+}
+
+.btn-add {
+  background: var(--pln-blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.25);
+}
+.btn-add:hover {
+  background: var(--pln-blue-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(10, 88, 202, 0.35);
+}
+
+/* FORMS */
+.form-row {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.cols-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.cols-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.field-val, input, select, textarea {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  background: #F8FAFC;
+  min-height: 36px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.field-val:focus-within, .field-val:focus {
+  border-color: var(--pln-blue);
+  box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.1);
+  background: var(--card);
+}
+.field-val.muted {
+  color: var(--text-hint);
+  font-style: italic;
+}
+.field-val.textarea {
+  min-height: 100px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  resize: vertical;
+}
+.section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+/* RADIO & CHECKBOX */
+.radio-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--pln-blue);
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.radio-dot::after {
+  content: ''; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--pln-blue);
+}
+.radio-off {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: inline-flex; flex-shrink: 0; background: var(--card);
+  transition: border-color 0.2s;
+}
+.radio-off:hover { border-color: #CBD5E1; }
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.radio-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  background: var(--card);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.radio-opt:hover {
+  border-color: var(--pln-blue);
+}
+.radio-opt input[type="radio"] {
+  accent-color: var(--pln-blue);
+  width: 15px;
+  height: 15px;
+  margin: 0;
+}
+/* For checked state if structured differently, or using :has if supported */
+.radio-opt:has(input[type="radio"]:checked) {
+  border-color: var(--pln-blue);
+  background: var(--pln-blue-light);
+  color: var(--pln-blue);
+}
+
+.checkbox-custom {
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer; font-size: 14px; color: var(--text-primary);
+}
+.checkbox-custom input {
+  width: 18px; height: 18px; cursor: pointer; accent-color: var(--pln-blue);
+}
+
+/* DOC TRIGGER & DROP */
+.doc-trigger {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--pln-blue);
+  background: var(--pln-blue-light);
+  color: var(--pln-blue);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.2s;
+}
+.doc-trigger:hover {
+  background: #D4E8F8;
+}
+.doc-trigger svg {
+  width: 18px;
+  height: 18px;
+}
+
+.doc-display {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.2s;
+}
+.doc-display:hover {
+  border-color: var(--pln-blue);
+  color: var(--pln-blue);
+  background: var(--pln-blue-light);
+}
+.doc-display svg {
+  width: 18px;
+  height: 18px;
+}
+.doc-count-chip {
+  background: var(--pln-blue-light);
+  color: var(--pln-blue);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.doc-drop {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 32px 20px; text-align: center;
+  background: var(--card); cursor: pointer; transition: all 0.2s;
+}
+.doc-drop:hover {
+  border-color: var(--pln-blue); background: var(--pln-blue-light);
+}
+
+/* DOC OVERLAY MODAL */
+.doc-overlay-backdrop {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px); z-index: 300; display: none; opacity: 0; transition: opacity 0.3s;
+}
+.doc-overlay-backdrop.open { display: block; opacity: 1; }
+
+.doc-overlay-panel {
+  position: fixed; top: 0; right: 0; width: 50%; height: 100vh;
+  background: var(--card); z-index: 301; display: flex; flex-direction: column;
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.doc-overlay-backdrop.open .doc-overlay-panel {
+  transform: translateX(0);
+}
+
+.doc-cat-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  background: #FAFBFC; display: flex; align-items: center; justify-content: space-between;
+}
+.doc-cat-badge {
+  background: var(--pln-blue-light); color: var(--pln-blue);
+  border-radius: 12px; padding: 2px 10px; font-size: 11.5px; font-weight: 600;
+}
+.doc-file-item {
+  display: flex; align-items: center; gap: 10px; padding: 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--card); transition: all 0.2s;
+}
+.doc-file-item:hover { border-color: var(--pln-blue); box-shadow: 0 2px 8px rgba(10, 88, 202, 0.05); }
+.doc-file-icon {
+  width: 32px; height: 32px; border-radius: 6px; background: var(--pln-blue-light); color: var(--pln-blue);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+/* TABLES */
+.table-container {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+thead tr {
+  background: #F8FAFC;
+}
+th {
+  padding: 14px 20px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #F1F5F9;
+  color: var(--text-primary);
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: transform 0.2s, box-shadow 0.2s; }
+tbody tr:hover td {
+  background: #FAFBFC;
+}
+tbody tr:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  transform: translateY(-1px);
+  position: relative; z-index: 2;
+}
+
+/* CHIPS & TAGS */
+.unit-tag {
+  display: inline-block;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 2px 0;
+}
+.dest-tag {
+  font-size: 11px; color: var(--text-hint); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.chip-proses { background: var(--chip-proses-bg); color: var(--chip-proses-text); }
+.chip-proses .chip-dot { background: var(--chip-proses-dot); }
+
+.chip-kirim { background: var(--chip-kirim-bg); color: var(--chip-kirim-text); }
+.chip-kirim .chip-dot { background: var(--chip-kirim-dot); }
+
+.chip-tunggu { background: var(--chip-tunggu-bg); color: var(--chip-tunggu-text); }
+.chip-tunggu .chip-dot { background: var(--chip-tunggu-dot); }
+
+.chip-review { background: var(--chip-review-bg); color: var(--chip-review-text); }
+.chip-review .chip-dot { background: var(--chip-review-dot); }
+
+.chip-approval { background: var(--chip-approval-bg); color: var(--chip-approval-text); }
+.chip-approval .chip-dot { background: var(--chip-approval-dot); }
+
+.chip-terima {
+  background: var(--pln-blue-light); color: var(--pln-blue);
+  border: 1px solid #BFDBFE;
+}
+
+/* STATUS PILLS & TOOLTIP */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.s-srm { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
+.s-srm .status-dot { background: #D97706; }
+
+.s-msb { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+.s-msb .status-dot { background: #16A34A; }
+
+.s-rej { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+.s-rej .status-dot { background: #DC2626; }
+
+.tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  margin-left: 6px;
+}
+.tooltip-icon {
+  background: none; border: none; color: var(--text-hint);
+  cursor: pointer; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s; padding: 0;
+}
+.tooltip-icon:hover { color: var(--pln-blue); }
+.tooltip-box {
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px);
+  background: #1E293B; color: #F8FAFC;
+  padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 400;
+  width: max-content; max-width: 220px; line-height: 1.5; white-space: normal;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  visibility: hidden; opacity: 0; transition: all 0.2s;
+  z-index: 100;
+  pointer-events: none;
+  text-align: left;
+}
+.tooltip-box::after {
+  content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+  border-width: 5px; border-style: solid;
+  border-color: #1E293B transparent transparent transparent;
+}
+.tooltip-wrap.show .tooltip-box, .tooltip-wrap:hover .tooltip-box {
+  visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-4px);
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+thead tr {
+  background: #F8FAFC;
+}
+th {
+  padding: 14px 20px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #F1F5F9;
+  color: var(--text-primary);
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: transform 0.2s, box-shadow 0.2s; }
+tbody tr:hover td {
+  background: #FAFBFC;
+}
+tbody tr:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  transform: translateY(-1px);
+  position: relative; z-index: 2;
+}
+
+/* CHIPS & TAGS */
+.unit-tag {
+  display: inline-block;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 2px 0;
+}
+.dest-tag {
+  font-size: 11px; color: var(--text-hint); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.chip-proses { background: var(--chip-proses-bg); color: var(--chip-proses-text); }
+.chip-proses .chip-dot { background: var(--chip-proses-dot); }
+
+.chip-kirim { background: var(--chip-kirim-bg); color: var(--chip-kirim-text); }
+.chip-kirim .chip-dot { background: var(--chip-kirim-dot); }
+
+.chip-tunggu { background: var(--chip-tunggu-bg); color: var(--chip-tunggu-text); }
+.chip-tunggu .chip-dot { background: var(--chip-tunggu-dot); }
+
+.chip-review { background: var(--chip-review-bg); color: var(--chip-review-text); }
+.chip-review .chip-dot { background: var(--chip-review-dot); }
+
+.chip-approval { background: var(--chip-approval-bg); color: var(--chip-approval-text); }
+.chip-approval .chip-dot { background: var(--chip-approval-dot); }
+
+.tipe-satuan {
+  background: #E0F2FE; color: #0369A1; border-radius: 6px;
+  padding: 4px 10px; font-size: 11px; font-weight: 700; border: 1px solid #BAE6FD;
+}
+.tipe-set {
+  background: #FCE7F3; color: #BE185D; border-radius: 6px;
+  padding: 4px 10px; font-size: 11px; font-weight: 700; border: 1px solid #FBCFE8;
+}
+
+/* ACTION BUTTONS */
+.action-btn, .aksi-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  padding: 6px;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+}
+.action-btn:hover, .aksi-btn:hover {
+  background: var(--pln-blue);
+  color: #fff;
+  border-color: var(--pln-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(10, 88, 202, 0.2);
+}
+
+/* PAGINATION */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  background: #FAFBFC;
+}
+.pag-info {
+  font-size: 13px; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 8px;
+}
+.pag-info select {
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 4px 8px; font-size: 13px; color: var(--text-primary);
+  outline: none; cursor: pointer;
+}
+.pag-btns {
+  display: flex; gap: 6px; align-items: center;
+}
+.pag-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border); background: #fff; border-radius: 8px;
+  font-size: 13px; cursor: pointer; color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; font-weight: 500;
+}
+.pag-btn.active {
+  background: var(--pln-blue); color: #fff; border-color: var(--pln-blue);
+  box-shadow: 0 4px 8px rgba(10, 88, 202, 0.25); font-weight: 600;
+}
+.pag-btn:hover:not(.active) {
+  background: var(--surface); border-color: #CBD5E1; color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+/* FOOTER FORMS */
+.form-footer {
+  position: fixed; bottom: 0; left: var(--sidebar-w); right: 0;
+  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border); padding: 16px 32px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 16px;
+  z-index: 80; box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+}
+.btn-reject-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 24px; border-radius: var(--radius-sm);
+  border: 1px solid var(--danger); background: var(--danger-light); color: var(--danger);
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-reject-footer:hover {
+  background: var(--danger); color: #fff; transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+.btn-approve-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 24px; border-radius: var(--radius-sm); border: none;
+  background: var(--pln-blue); color: #fff; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-approve-footer:hover {
+  background: var(--pln-blue-mid); transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.3);
+}
+
+/* ACCORDION */
+.acc-group {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  margin-bottom: 16px; overflow: hidden; background: var(--card);
+  transition: box-shadow 0.2s;
+}
+.acc-group:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+.acc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; background: #FAFBFC; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.2s;
+}
+.acc-header:hover { background: #F1F5F9; }
+.acc-header-left { display: flex; align-items: center; gap: 12px; }
+.acc-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.acc-icon { width: 20px; height: 20px; color: var(--text-secondary); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.acc-group.open .acc-icon { transform: rotate(180deg); }
+.acc-body { padding: 20px; }
+
+/* FILE LIST */
+.doc-file-list { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.doc-file-item {
+  display: flex; align-items: center; padding: 12px 16px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--card); transition: box-shadow 0.2s;
+}
+.doc-file-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.doc-file-item svg { width: 20px; height: 20px; color: var(--pln-blue); flex-shrink: 0; margin-right: 12px; }
+.doc-file-info { flex: 1; min-width: 0; }
+.doc-file-name { font-size: 13px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-file-meta { font-size: 11px; color: var(--text-hint); margin-top: 4px; }
+.doc-file-remove {
+  width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--surface);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); transition: all 0.2s;
+}
+.doc-file-remove:hover { background: var(--danger-light); color: var(--danger); transform: scale(1.05); }
+
+/* MISC */
+.val-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.overlay-backdrop {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px); z-index: 300; display: none; opacity: 0; transition: opacity 0.3s;
+}
+.overlay-backdrop.open { display: block; opacity: 1; }
+.side-panel {
+  position: fixed; top: 0; right: 0; width: 50%; height: 100vh;
+  background: var(--card); z-index: 301; display: flex; flex-direction: column;
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.overlay-backdrop.open .side-panel { transform: translateX(0); }
+
+/* EXTENDED FORMS (Direct children of .field) */
+.field input:not([type="radio"]):not([type="checkbox"]), .field select, .field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--surface);
+  min-height: 36px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+/* SELECT / COMBOBOX CUSTOM ARROW */
+.field select, .unit-sel {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 36px;
+}
+
+/* DATE PICKER ICON (NATIVE) */
+.field input[type="date"] {
+  position: relative;
+  padding-right: 36px;
+}
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.field input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* CUSTOM DATE PICKER (DIV) */
+.date-picker {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+}
+.date-picker svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.field input:not([type="radio"]):not([type="checkbox"]):focus, .field select:focus, .field textarea:focus {
+  border-color: var(--pln-blue);
+  box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.1);
+  background: var(--card);
+}
+.field input:not([type="radio"]):not([type="checkbox"]):disabled, .field select:disabled, .field textarea:disabled {
+  background: var(--surface) !important;
+  color: var(--text-hint) !important;
+  cursor: not-allowed !important;
+}
+
+/* RADIO OPTIONS */
+.radio-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.radio-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--card);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.radio-opt:hover {
+  border-color: var(--pln-blue-mid);
+  background: var(--pln-blue-light);
+}
+.radio-opt.selected {
+  border-color: var(--pln-blue);
+  background: var(--pln-blue-light);
+  color: var(--pln-blue);
+  font-weight: 600;
+}
+.radio-opt input {
+  accent-color: var(--pln-blue);
+  cursor: pointer;
+}
+
+/* BUTTONS */
+.view-stock-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.view-stock-btn:hover {
+  background: var(--card);
+  border-color: var(--pln-blue);
+  color: var(--pln-blue);
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover:not(:disabled) {
+  background: var(--danger-light);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-submit {
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--pln-blue);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-submit:hover:not(:disabled) {
+  background: var(--pln-blue-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.3);
+}
+
+.btn-log {
+  white-space: nowrap;
+}
+
+.preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FEF3C7;
+  color: #D97706;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #FDE68A;
+}
+.preview-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.edit-input {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+}
+.edit-input:focus {
+  border-color: var(--pln-blue);
+}
+
+.btn-tambah-unit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px dashed var(--pln-blue);
+  background: var(--pln-blue-light);
+  color: var(--pln-blue);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-tambah-unit:hover {
+  background: #d4e8f8;
+}
+
+.btn-footer-simpan {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--pln-blue);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-footer-simpan:hover {
+  background: var(--pln-blue-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 88, 202, 0.3);
+}
+
+.karantina-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.karantina-table th {
+  background: #F8FAFC;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.karantina-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: middle;
+  font-size: 13px;
+}
+.qty-input {
+  width: 60px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 13px;
+  outline: none;
+}
+.qty-input:focus {
+  border-color: var(--pln-blue);
+}
+.btn-evidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-evidence:hover {
+  background: var(--card);
+  border-color: var(--pln-blue);
+  color: var(--pln-blue);
+}
+
+/* UNIT SELECT */
+.unit-sel-wrap {
+  position: relative;
+  width: 100%;
+}
+.unit-sel {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--card);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.unit-sel:focus {
+  border-color: var(--pln-blue);
+}
+
+.doc-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px dashed var(--pln-blue);
+  border-radius: var(--radius-sm);
+  background: var(--pln-blue-light);
+  color: var(--pln-blue);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.2s;
+}
+.doc-trigger:hover {
+  background: #D4E8F8;
+}
+.doc-trigger svg, .doc-drop svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* STOCK STANDBY MODAL / PANELS */
+.ss-backdrop {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px); z-index: 300; display: none; opacity: 0; transition: opacity 0.3s;
+}
+.ss-backdrop.open { display: block; opacity: 1; }
+
+.ss-panel {
+  position: fixed; top: 0; right: 0; width: 60%; height: 100vh;
+  background: var(--card); z-index: 301; display: flex; flex-direction: column;
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ss-backdrop.open + .ss-panel, .ss-panel.open, body.ss-open .ss-panel {
+  transform: translateX(0);
+}
+
+.ss-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+}
+.ss-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.ss-title-badge { background: var(--pln-blue-light); color: var(--pln-blue); padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+.ss-close { background: none; border: none; cursor: pointer; color: var(--text-secondary); transition: color 0.2s; }
+.ss-close:hover { color: var(--danger); }
+
+.ss-toolbar { padding: 16px 24px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); background: #FAFBFC; }
+.ss-search { position: relative; flex: 1; display: flex; align-items: center; }
+.ss-search-ico { position: absolute; left: 12px; color: var(--text-hint); }
+.ss-search input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px 8px 36px; outline: none; transition: border-color 0.2s; font-size: 13px; }
+.ss-search input:focus { border-color: var(--pln-blue); }
+.btn-log {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--pln-blue-light); color: var(--pln-blue);
+  border: 1px solid #BFDBFE; border-radius: var(--radius-sm);
+  padding: 8px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-log:hover { background: #D4E8F8; border-color: var(--pln-blue); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(10,88,202,0.05); }
+.btn-log svg { width: 16px; height: 16px; }
+
+.btn-ubah-data {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--pln-blue); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  padding: 8px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-ubah-data:hover { background: #0B65E6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(10, 88, 202, 0.3); }
+.btn-ubah-data svg { width: 16px; height: 16px; }
+
+.ss-filter-bar { display: none; padding: 16px 24px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
+.ss-filter-bar.open { display: flex; }
+
+</style>
+
+</head>
+
+<body>
+
+  <nav class="sidebar">
+    <div class="logo">
+      <svg viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="6" fill="#F7A800" />
+        <path d="M8 22V10l8 6 8-6v12" stroke="#003B8E" stroke-width="2.2" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </div>
+    <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+      </svg></div>
+    <div class="nav-icon active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg></div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="back-btn" onclick="history.back()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+          Kembali
+        </button>
+        <div style="width:1px;height:20px;background:var(--border)"></div>
+        <div>
+          <div class="page-title">Pengecekan Pengembalian REQ202600000245 (Pengelola)</div>
+          <div class="breadcrumb">
+            <a href="#">Pengembalian Peminjaman</a>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <span>Pengecekan Pengembalian Pengelola</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-log" onclick="openLog()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12h6M9 16h6M9 8h4M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+          </svg>
+          Log Mutasi <span class="log-badge">5</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- INFORMASI MUTASI -->
+      <div class="section-card">
+        <div class="section-label">Informasi Mutasi</div>
+        <div class="form-row cols-4">
+          <div class="field">
+            <label>Nomor Mutasi</label>
+            <div class="field-val readonly">REQ202600000245</div>
+          </div>
+          <div class="field">
+            <label>Tipe Peminjaman</label>
+            <div class="radio-group" style="padding: 4px;">
+              <label class="radio-label">
+                <input type="radio" name="tipe-peminjaman" value="1set" checked onchange="switchTipePeminjaman('1set')">
+                1 Set
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="tipe-peminjaman" value="satuan" onchange="switchTipePeminjaman('satuan')">
+                Satuan
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Tanggal Estimasi Pengecekan</label>
+            <div class="field-val readonly">Minggu, 01 Maret 2026</div>
+          </div>
+          <div class="field">
+            <label>Tanggal Estimasi Pengiriman</label>
+            <div class="field-val readonly">Minggu, 08 Maret 2026</div>
+          </div>
+        </div>
+
+        <div class="form-row cols-4" style="margin-top: 24px;">
+          <div class="field">
+            <label>Tipe Pengembalian</label>
+            <div class="field-val readonly">Sebagian</div>
+          </div>
+          <div class="field">
+            <label>Peminjam</label>
+            <div class="field-val readonly">UPT KENDARI</div>
+          </div>
+          <div class="field">
+            <label>Lampiran Surat Jalan</label>
+            <button class="doc-trigger" type="button"
+              style="background:#EFF6FF;color:var(--pln-blue);border:1px solid #BFDBFE">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Lihat File
+            </button>
+          </div>
+          <div class="field">
+            <label>Lampiran BA Pengembalian</label>
+            <button class="doc-trigger" type="button"
+              style="background:#EFF6FF;color:var(--pln-blue);border:1px solid #BFDBFE">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Lihat File
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PENERIMAAN BARANG -->
+      <div class="section-card" id="section-penerimaan">
+        <div class="section-label">Fase 1: Penerimaan Barang</div>
+        <div
+          style="padding: 16px; background: #FFFBEB; border: 1px solid #FEF3C7; border-radius: var(--radius-sm); margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"
+            style="flex-shrink: 0; margin-top: 2px;">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <div>
+            <div style="font-weight: 600; color: #92400E; font-size: 13.5px;">Barang Belum Diterima</div>
+            <div style="font-size: 12.5px; color: #B45309; margin-top: 2px;">Silakan input tanggal penerimaan fisik
+              barang terlebih dahulu untuk membuka form Karantina Komponen di bawah.</div>
+          </div>
+        </div>
+
+        <div class="form-row cols-3">
+          <div class="field">
+            <label>Tanggal Penerimaan Fisik <span style="color:#DC2626">*</span></label>
+            <input type="date" id="tgl-penerimaan" required>
+            <div id="error-penerimaan" style="font-size: 11px; color: #DC2626; display: none; margin-top: 4px;">Tanggal
+              penerimaan wajib diisi.</div>
+          </div>
+          <div class="field" style="justify-content: flex-start; padding-top: 27px;">
+            <button id="btn-terima" class="btn-submit" onclick="konfirmasiPenerimaan()"
+              style="width: fit-content; height: 38px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              Konfirmasi Penerimaan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARANTINA KOMPONEN -->
+      <div class="section-card" id="section-karantina" style="opacity: 0.5; pointer-events: none; position: relative;">
+        <!-- Overlay Locker -->
+        <div id="karantina-locker"
+          style="position: absolute; inset: 0; z-index: 5; background: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center;">
+        </div>
+
+        <div class="section-label">Fase 2: Karantina Komponen</div>
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+          Tentukan kondisi setiap komponen yang dikembalikan. Total kuantitas (Normal + Rusak + Hilang) harus sesuai
+          dengan total barang yang dikembalikan.
+        </div>
+
+        <!-- Accordion Set 1 -->
+        <div id="view-1set">
+          <div class="acc-container">
+            <div class="acc-header" onclick="toggleAcc('acc1', this)">
+              <div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--pln-blue);">Set 1 - Tower Solution New</div>
+                <div style="font-size: 12px; color: var(--text-hint); margin-top: 2px;">Template ERS Tension 150kV</div>
+              </div>
+              <svg class="acc-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--pln-blue)"
+                stroke-width="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+            <div id="acc1" class="acc-content">
+              <table class="karantina-table">
+                <thead>
+                  <tr>
+                    <th>Kategori</th>
+                    <th>Section</th>
+                    <th>Komponen</th>
+                    <th>Unit Pengelola</th>
+                    <th style="text-align: center;">Dikembalikan</th>
+                    <th style="text-align: center;">Normal</th>
+                    <th style="text-align: center;">Rusak</th>
+                    <th style="text-align: center;">Hilang</th>
+                    <th>Waktu Karantina</th>
+                    <th style="text-align: center;">Evidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span
+                        style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; white-space: nowrap;">Komponen
+                        Utama</span>
+                    </td>
+                    <td>
+                      <div style="font-size: 12px; color: var(--text-secondary);">Column Section</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600; color: var(--text-primary);">Column Section Anchor</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 12px; color: var(--text-hint);">-</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <div style="font-size: 16px; font-weight: 700; color: var(--pln-blue);">5</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item1" data-total="5" min="0" value="5"
+                        oninput="validateRow('item1')">
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item1" data-total="5" min="0" value="0"
+                        oninput="validateRow('item1')">
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item1" data-total="5" min="0" value="0"
+                        oninput="validateRow('item1')">
+                    </td>
+                    <td>
+                      <input type="datetime-local">
+                    </td>
+                    <td style="text-align: center;">
+                      <button type="button" class="btn-evidence" onclick="openEvidence(this, 'Komponen')"
+                        title="Unggah Evidence">
+                        Evidence
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span
+                        style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; white-space: nowrap;">Komponen
+                        Utama</span>
+                    </td>
+                    <td>
+                      <div style="font-size: 12px; color: var(--text-secondary);">Foundation Section</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600; color: var(--text-primary);">Base Plate</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 12px; color: var(--text-hint);">-</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <div style="font-size: 16px; font-weight: 700; color: var(--pln-blue);">2</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item2" data-total="2" min="0" value="2"
+                        oninput="validateRow('item2')">
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item2" data-total="2" min="0" value="0"
+                        oninput="validateRow('item2')">
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item2" data-total="2" min="0" value="0"
+                        oninput="validateRow('item2')">
+                    </td>
+                    <td>
+                      <input type="datetime-local">
+                    </td>
+                    <td style="text-align: center;">
+                      <button type="button" class="btn-evidence" onclick="openEvidence(this, 'Komponen')"
+                        title="Unggah Evidence">
+                        Evidence
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Accordion Set 2 -->
+          <div class="acc-container">
+            <div class="acc-header" onclick="toggleAcc('acc2', this)">
+              <div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--pln-blue);">Set 2 - Tower Solution New</div>
+                <div style="font-size: 12px; color: var(--text-hint); margin-top: 2px;">Template ERS Suspension 150kV
+                </div>
+              </div>
+              <svg class="acc-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--pln-blue)"
+                stroke-width="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+            <div id="acc2" class="acc-content">
+              <table class="karantina-table">
+                <thead>
+                  <tr>
+                    <th>Kategori</th>
+                    <th>Section</th>
+                    <th>Komponen</th>
+                    <th>Unit Pengelola</th>
+                    <th style="text-align: center;">Dikembalikan</th>
+                    <th style="text-align: center;">Normal</th>
+                    <th style="text-align: center;">Rusak</th>
+                    <th style="text-align: center;">Hilang</th>
+                    <th>Waktu Karantina</th>
+                    <th style="text-align: center;">Evidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span
+                        style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; white-space: nowrap;">Alat
+                        Kerja Utama</span>
+                    </td>
+                    <td>
+                      <div style="font-size: 12px; color: var(--text-hint);">-</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600; color: var(--text-primary);">Palu 5 kg</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 12px; color: var(--text-hint);">-</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <div style="font-size: 16px; font-weight: 700; color: var(--pln-blue);">12</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item3" data-total="12" min="0" value="12"
+                        oninput="validateRow('item3')">
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item3" data-total="12" min="0" value="0"
+                        oninput="validateRow('item3')">
+                    </td>
+                    <td style="text-align: center;">
+                      <input type="number" class="qty-input" data-group="item3" data-total="12" min="0" value="0"
+                        oninput="validateRow('item3')">
+                    </td>
+                    <td>
+                      <input type="datetime-local">
+                    </td>
+                    <td style="text-align: center;">
+                      <button type="button" class="btn-evidence" onclick="openEvidence(this, 'Komponen')"
+                        title="Unggah Evidence">
+                        Evidence
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- View Satuan -->
+      <div id="view-satuan"
+        style="display:none; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
+        <table class="karantina-table">
+          <thead>
+            <tr>
+              <th>Kategori</th>
+              <th>Section</th>
+              <th>Komponen</th>
+              <th>Unit Pengelola</th>
+              <th style="text-align: center;">Dikembalikan</th>
+              <th style="text-align: center;">Normal</th>
+              <th style="text-align: center;">Rusak</th>
+              <th style="text-align: center;">Hilang</th>
+              <th>Waktu Karantina</th>
+              <th style="text-align: center;">Evidence</th>
+            </tr>
+          </thead>
+          <tbody style="background: #fff;">
+            <tr>
+              <td>
+                <span
+                  style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; white-space: nowrap;">Komponen
+                  Utama</span>
+              </td>
+              <td>
+                <div style="font-size: 12px; color: var(--text-secondary);">Column Section</div>
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--text-primary);">Column Section Anchor</div>
+              </td>
+              <td>
+                <div style="font-size: 12px; color: var(--text-secondary);">P3BSUL / UPT MANADO</div>
+              </td>
+              <td style="text-align: center;">
+                <div style="font-size: 16px; font-weight: 700; color: var(--pln-blue);">5</div>
+              </td>
+              <td style="text-align: center;">
+                <input type="number" class="qty-input" data-group="sat-item1" data-total="5" min="0" value="5"
+                  oninput="validateRow('sat-item1')">
+              </td>
+              <td style="text-align: center;">
+                <input type="number" class="qty-input" data-group="sat-item1" data-total="5" min="0" value="0"
+                  oninput="validateRow('sat-item1')">
+              </td>
+              <td style="text-align: center;">
+                <input type="number" class="qty-input" data-group="sat-item1" data-total="5" min="0" value="0"
+                  oninput="validateRow('sat-item1')">
+              </td>
+              <td>
+                <input type="datetime-local">
+              </td>
+              <td style="text-align: center;">
+                <button type="button" class="btn-evidence" onclick="openEvidence(this, 'Column Section Anchor')"
+                  title="Unggah Evidence">
+                  Evidence
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span
+                  style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; white-space: nowrap;">Komponen
+                  Utama</span>
+              </td>
+              <td>
+                <div style="font-size: 12px; color: var(--text-secondary);">Foundation Section</div>
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--text-primary);">Base Plate</div>
+              </td>
+              <td>
+                <div style="font-size: 12px; color: var(--text-secondary);">P3BSUL / UPT MANADO</div>
+              </td>
+              <td style="text-align: center;">
+                <div style="font-size: 16px; font-weight: 700; color: var(--pln-blue);">2</div>
+              </td>
+              <td style="text-align: center;">
+                <input type="number" class="qty-input" data-group="sat-item2" data-total="2" min="0" value="2"
+                  oninput="validateRow('sat-item2')">
+              </td>
+              <td style="text-align: center;">
+                <input type="number" class="qty-input" data-group="sat-item2" data-total="2" min="0" value="0"
+                  oninput="validateRow('sat-item2')">
+              </td>
+              <td style="text-align: center;">
+                <input type="number" class="qty-input" data-group="sat-item2" data-total="2" min="0" value="0"
+                  oninput="validateRow('sat-item2')">
+              </td>
+              <td>
+                <input type="datetime-local">
+              </td>
+              <td style="text-align: center;">
+                <button type="button" class="btn-evidence" onclick="openEvidence(this, 'Base Plate')"
+                  title="Unggah Evidence">
+                  Evidence
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+  </div>
+
+  </main>
+
+  <footer class="form-footer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="btn-selesai" class="btn-submit" disabled onclick="openSelesaiModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+          <polyline points="17 21 17 13 7 13 7 21" />
+          <polyline points="7 3 7 8 15 8" />
+        </svg>
+        Selesaikan Pengecekan
+      </button>
+    </div>
+  </footer>
+  </div>
+
+  <!-- EVIDENCE OVERLAY -->
+  <div id="evidence-backdrop" style="position:fixed;inset:0;background:rgba(10,20,50,.35);z-index:400;display:none"
+    onclick="closeEvidence()"></div>
+  <div id="evidence-panel"
+    style="position:fixed;top:0;right:0;width:400px;height:100vh;background:var(--card);z-index:401;display:flex;flex-direction:column;box-shadow:-6px 0 32px rgba(0,0,0,.16);transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)">
+    <!-- Header -->
+    <div
+      style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px 14px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary)">Evidence</div>
+        <div style="font-size:12px;color:var(--text-hint);margin-top:3px" id="evidence-comp-name">Nama Komponen</div>
+      </div>
+      <button onclick="closeEvidence()"
+        style="width:32px;height:32px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary)"
+        onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <!-- Body -->
+    <div style="flex:1;overflow-y:auto;padding:24px">
+      <div
+        style="border:1.5px dashed var(--border);border-radius:var(--radius-md);padding:24px;text-align:center;cursor:pointer;background:#F8FAFC;transition:all 0.2s"
+        onclick="document.getElementById('evidence-input').click()"
+        onmouseover="this.style.borderColor='var(--pln-blue)';this.style.background='var(--pln-blue-light)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.background='#F8FAFC'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--pln-blue)" stroke-width="2"
+          style="margin-bottom:8px">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <div style="font-size:13px;font-weight:600;color:var(--pln-blue)">Klik untuk Unggah Foto/Dokumen</div>
+        <div style="font-size:11px;color:var(--text-hint);margin-top:4px">Bisa mengunggah lebih dari 1 file (JPG, PNG,
+          PDF)</div>
+        <input type="file" id="evidence-input" multiple style="display:none" onchange="handleEvidenceUpload(event)"
+          accept="image/*,.pdf">
+      </div>
+      <div id="evidence-preview-container" style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <!-- Previews go here -->
+      </div>
+    </div>
+    <!-- Footer -->
+    <div
+      style="padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;flex-shrink:0">
+      <button onclick="closeEvidence()" class="btn-submit" style="width:100%">Simpan Evidence</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Modal Logic ---
+    function openSelesaiModal() {
+      document.getElementById('selesai-backdrop').style.display = 'flex';
+    }
+    function closeSelesaiModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('selesai-backdrop').style.display = 'none';
+    }
+    function confirmSelesai() {
+      document.getElementById('selesai-backdrop').style.display = 'none';
+      alert('Data pengecekan pengembalian berhasil disimpan.');
+      // Proceed to list or next flow
+    }
+
+    // --- Evidence Overlay Logic ---
+    let currentEvidenceBtn = null;
+
+    function openEvidence(btn, compName) {
+      currentEvidenceBtn = btn;
+      document.getElementById('evidence-comp-name').innerText = compName;
+      document.getElementById('evidence-preview-container').innerHTML = ''; // clear preview
+      document.getElementById('evidence-input').value = ''; // clear file selection
+      document.getElementById('evidence-backdrop').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('evidence-panel').style.transform = 'translateX(0)';
+      }, 10);
+    }
+
+    function closeEvidence() {
+      document.getElementById('evidence-panel').style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        document.getElementById('evidence-backdrop').style.display = 'none';
+      }, 280);
+
+      if (document.getElementById('evidence-preview-container').children.length > 0) {
+        currentEvidenceBtn.style.color = '#16A34A';
+        currentEvidenceBtn.style.borderColor = '#16A34A';
+        currentEvidenceBtn.style.background = '#F0FDF4';
+      }
+    }
+
+    function handleEvidenceUpload(event) {
+      const container = document.getElementById('evidence-preview-container');
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        const div = document.createElement('div');
+        div.style.position = 'relative';
+        div.style.border = '1px solid var(--border)';
+        div.style.borderRadius = 'var(--radius-sm)';
+        div.style.overflow = 'hidden';
+        div.style.aspectRatio = '1 / 1';
+        div.style.background = '#f1f5f9';
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            div.innerHTML = `
+              <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">
+              <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;padding:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${file.name}</div>
+              <button onclick="this.parentElement.remove()" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:4px;background:rgba(220,38,38,0.9);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+              </button>
+            `;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          div.innerHTML = `
+            <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-secondary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+              <div style="font-size:10px;margin-top:8px;padding:0 8px;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${file.name}</div>
+            </div>
+            <button onclick="this.parentElement.remove()" style="position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:4px;background:rgba(220,38,38,0.9);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+            </button>
+          `;
+        }
+        container.appendChild(div);
+      }
+      event.target.value = '';
+    }
+
+    // --- UI Interactions ---
+
+    function switchTipePeminjaman(mode) {
+      document.getElementById('view-1set').style.display = (mode === '1set') ? 'block' : 'none';
+      document.getElementById('view-satuan').style.display = (mode === 'satuan') ? 'block' : 'none';
+    }
+
+    function konfirmasiPenerimaan() {
+      const tglInput = document.getElementById('tgl-penerimaan');
+      const errorMsg = document.getElementById('error-penerimaan');
+
+      if (!tglInput.value) {
+        tglInput.classList.add('input-error');
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      tglInput.classList.remove('input-error');
+      errorMsg.style.display = 'none';
+
+      // Lock Penerimaan section (make it look success/completed)
+      tglInput.disabled = true;
+      document.getElementById('btn-terima').disabled = true;
+      document.getElementById('btn-terima').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Barang Diterima';
+      document.getElementById('btn-terima').style.background = '#10B981';
+
+      // Unlock Karantina section
+      const karantinaSec = document.getElementById('section-karantina');
+      karantinaSec.style.opacity = '1';
+      karantinaSec.style.pointerEvents = 'auto';
+      document.getElementById('karantina-locker').style.display = 'none';
+
+      // Enable main submit
+      document.getElementById('btn-selesai').disabled = false;
+
+      // Auto open first accordion
+      const firstAcc = document.getElementById('acc1');
+      const firstHead = firstAcc.previousElementSibling;
+      firstAcc.classList.add('open');
+      firstHead.classList.add('active');
+    }
+
+    function toggleAcc(id, header) {
+      const content = document.getElementById(id);
+      content.classList.toggle('open');
+      header.classList.toggle('active');
+    }
+
+    // --- Validation Logic ---
+
+    function validateRow(groupId) {
+      const inputs = document.querySelectorAll(`.qty-input[data-group="${groupId}"]`);
+      if (inputs.length === 0) return;
+
+      const totalExpected = parseInt(inputs[0].getAttribute('data-total'), 10);
+      let sum = 0;
+
+      inputs.forEach(input => {
+        sum += parseInt(input.value || 0, 10);
+      });
+
+      if (sum !== totalExpected) {
+        inputs.forEach(input => input.classList.add('input-error'));
+        // Could also disable main submit button if errors exist
+        document.getElementById('btn-selesai').disabled = true;
+      } else {
+        inputs.forEach(input => input.classList.remove('input-error'));
+
+        // Re-check all rows to re-enable submit
+        checkAllRowsValid();
+      }
+    }
+
+    function checkAllRowsValid() {
+      const allErrors = document.querySelectorAll('.qty-input.input-error');
+      if (allErrors.length === 0) {
+        document.getElementById('btn-selesai').disabled = false;
+      }
+    }
+  </script>
+
+  <!-- SELESAI MODAL -->
+  <div id="selesai-backdrop"
+    style="position:fixed;inset:0;background:rgba(10,20,50,.35);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)"
+    onclick="closeSelesaiModal(event)">
+    <div
+      style="background:var(--card);width:450px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden"
+      onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div
+        style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div
+            style="width:34px;height:34px;border-radius:50%;background:#E0F2FE;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--pln-blue)" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text-primary)">Selesaikan Pengecekan</div>
+            <div style="font-size:12px;color:var(--text-hint);margin-top:1px">Pengecekan Pengembalian</div>
+          </div>
+        </div>
+        <button onclick="closeSelesaiModal()"
+          style="width:28px;height:28px;border:none;background:none;cursor:pointer;color:var(--text-hint);display:flex;align-items:center;justify-content:center;border-radius:6px"
+          onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='none'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <!-- Modal Body -->
+      <div style="padding:20px">
+        <div
+          style="padding:12px 14px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;display:flex;align-items:flex-start;gap:8px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"
+            style="flex-shrink:0;margin-top:1px">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span style="font-size:12.5px;color:#1E3A8A;line-height:1.4">Apakah Anda yakin ingin menyelesaikan pengecekan?
+            Pastikan data kondisi komponen dan evidence sudah sesuai.</span>
+        </div>
+      </div>
+      <!-- Modal Footer -->
+      <div
+        style="padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:#FAFBFD">
+        <button onclick="closeSelesaiModal()"
+          style="padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff;color:var(--text-secondary);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s"
+          onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='#fff'">Batal</button>
+        <button onclick="confirmSelesai()"
+          style="padding:8px 22px;border-radius:var(--radius-sm);border:none;background:var(--pln-blue);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s"
+          onmouseover="this.style.background='var(--pln-blue-mid)'"
+          onmouseleave="this.style.background='var(--pln-blue)'">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log Mutasi Overlay Backdrop -->
+  <div id="log-backdrop" class="overlay-backdrop" onclick="closeLog()"></div>
+  <!-- Log Mutasi Side Panel -->
+  <div id="log-panel" class="side-panel">
+    <!-- MAIN VIEW -->
+    <div id="log-main-view" style="display:flex;flex-direction:column;height:100%">
+      <!-- Header -->
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary)">Log Mutasi</div>
+          <div style="font-size:12px;color:var(--text-hint);margin-top:2px">Riwayat perubahan data mutasi ini</div>
+        </div>
+        <button onclick="closeLog()"
+          style="width:32px;height:32px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:background .15s"
+          onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='none'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Timeline body -->
+      <div style="flex:1;overflow-y:auto;padding:20px 22px">
+        <!-- ENTRY 14: CURRENT -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#FFF7ED;border:2px dashed #F97316;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Pengecekan Asman Kons Pengelola</div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">Menunggu pengecekan karantina kondisi
+              komponen masuk</div>
+            <div
+              style="margin-top:8px;display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:#FFF7ED;border:1px solid #FED7AA;font-size:11.5px;font-weight:600;color:#C2410C">
+              <span
+                style="width:6px;height:6px;border-radius:50%;background:#F97316;display:inline-block;animation:pulse 1.5s infinite"></span>
+              Status Saat Ini
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 13 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Pengecekan Pengembalian Selesai</div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">26 Feb 2026 · 10:15:20</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Asman Konstruksi</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#166534;padding-top:8px;border-top:1px solid #BBF7D0">Berhasil melakukan
+                pengiriman dan penyiapan komponen</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 12 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Disetujui oleh Manager UPT Peminjam
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">26 Feb 2026 · 09:30:10</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Manager UPT</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 11: REJECTED -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#FEF2F2;border:2px solid #EF4444;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Ditolak Oleh Manager UPT Peminjam
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">26 Feb 2026 · 08:15:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#991B1B">Manager UPT</div>
+                  <div style="font-size:11px;color:#EF4444;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#991B1B;padding-top:8px;border-top:1px solid #FECACA">Mohon pastikan BA
+                Pengembalian sudah ditandatangani kedua belah pihak.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 10 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Pengajuan Pengembalian Dibuat</div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">25 Feb 2026 · 16:45:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Asman PDKB</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 9 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Pengecekan Penerimaan Barang Peminjam
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">10 Feb 2026 · 14:20:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Asman Konstruksi</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#166534;padding-top:8px;border-top:1px solid #BBF7D0">Telah menerima dan
+                melakukan pengecekan barang peminjaman.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 8 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Pengecekan Pengiriman Pengelola</div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">08 Feb 2026 · 10:15:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Asman Konstruksi</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT MANADO</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#166534;padding-top:8px;border-top:1px solid #BBF7D0">Barang telah dicek
+                kondisinya dan dikirim ke peminjam.</div>
+              <div
+                style="margin-top:12px;padding-top:12px;border-top:1px solid #BBF7D0;display:flex;justify-content:flex-end">
+                <button onclick="showLogDetail()"
+                  style="padding:6px 12px;background:#fff;border:1px solid #16A34A;color:#166534;border-radius:4px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s"
+                  onmouseover="this.style.background='#DCFCE7'" onmouseout="this.style.background='#fff'">Lihat
+                  Detail</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 7 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Penyiapan Komponen Selesai</div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">07 Feb 2026 · 13:45:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Asman Logistik</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT MANADO</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 6 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Disetujui oleh Manager UPT Pengelola
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">06 Feb 2026 · 16:20:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">Manager UPT</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT MANADO</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 5 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Disetujui oleh SRM Hartrans Pengelola
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">06 Feb 2026 · 11:10:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">SRM Hartrans</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT MANADO</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 4 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Disetujui oleh MSB Fashar Pengelola
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">06 Feb 2026 · 09:05:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">MSB Fashar</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT MANADO</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#166534;padding-top:8px;border-top:1px solid #BBF7D0">Komponen tersedia
+                dan telah dialokasikan.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 3: REJECTED -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#FEF2F2;border:2px solid #EF4444;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Ditolak Oleh MSB Fashar Pengelola
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">05 Feb 2026 · 14:15:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#991B1B">MSB Fashar</div>
+                  <div style="font-size:11px;color:#EF4444;opacity:.8">UPT MANADO</div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#991B1B;padding-top:8px;border-top:1px solid #FECACA">Stok sedang
+                digunakan, harap pilih alokasi komponen lain yang tersedia.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 2 -->
+        <div style="display:flex;gap:14px;padding-bottom:28px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:#F0FDF4;border:2px solid #16A34A;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div style="width:2px;flex:1;background:var(--border);margin-top:6px;min-height:32px"></div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Disetujui oleh SRM Hartrans Peminjam
+            </div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">05 Feb 2026 · 10:20:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">SRM Hartrans</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY 1 -->
+        <div style="display:flex;gap:14px;position:relative">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+            <div
+              style="width:36px;height:36px;border-radius:50%;background:var(--pln-blue-light);border:2px solid var(--pln-blue);display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--pln-blue)" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="12" y1="18" x2="12" y2="12" />
+                <line x1="9" y1="15" x2="15" y2="15" />
+              </svg>
+            </div>
+          </div>
+          <div style="flex:1;padding-top:6px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Pengajuan Peminjaman Dibuat</div>
+            <div style="font-size:11.5px;color:var(--text-hint);margin-top:2px">05 Feb 2026 · 08:30:00</div>
+            <div
+              style="margin-top:10px;padding:12px 14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div
+                  style="width:28px;height:28px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px;font-weight:600;color:#166534">MSB Fashar</div>
+                  <div style="font-size:11px;color:#16A34A;opacity:.8">UPT KENDARI</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div
+        style="padding:13px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;flex-shrink:0">
+        <button onclick="closeLog()"
+          style="padding:7px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer">Tutup</button>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div id="log-detail-view" style="display:none;flex-direction:column;height:100%">
+      <!-- Detail Header -->
+      <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <button onclick="showLogMain()"
+            style="background:none;border:none;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;padding:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <div style="font-size:12px;color:var(--text-hint);display:flex;align-items:center;gap:4px">
+            <span style="cursor:pointer" onclick="showLogMain()">Log Mutasi</span>
+            <span>/</span>
+            <span style="color:var(--text-primary);font-weight:600">Detail Pengiriman</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary)">Detail Pengiriman</div>
+          <button onclick="closeLog()"
+            style="width:28px;height:28px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:background .15s"
+            onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background='none'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- Detail Body -->
+      <div style="flex:1;overflow-y:auto;padding:0">
+        <div style="overflow-x:auto">
+          <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:12.5px">
+            <thead>
+              <tr style="background:var(--surface);border-bottom:1px solid var(--border)">
+                <th
+                  style="padding:14px 22px;text-align:center;font-weight:600;color:var(--text-secondary);white-space:nowrap;width:40px">
+                  No</th>
+                <th
+                  style="padding:14px 22px;text-align:left;font-weight:600;color:var(--text-secondary);white-space:nowrap">
+                  Unit Peminjam</th>
+                <th
+                  style="padding:14px 22px;text-align:left;font-weight:600;color:var(--text-secondary);white-space:nowrap">
+                  Jenis Komponen</th>
+                <th
+                  style="padding:14px 22px;text-align:left;font-weight:600;color:var(--text-secondary);white-space:nowrap">
+                  Total Dikirim</th>
+                <th
+                  style="padding:14px 22px;text-align:left;font-weight:600;color:var(--text-secondary);white-space:nowrap">
+                  Tanggal Pengiriman</th>
+                <th
+                  style="padding:14px 22px;text-align:left;font-weight:600;color:var(--text-secondary);white-space:nowrap">
+                  Waktu Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border);background:#fff">
+                <td style="padding:14px 22px;text-align:center;color:var(--text-secondary)">1</td>
+                <td style="padding:14px 22px;font-weight:600;color:var(--pln-blue);white-space:nowrap">UPT KENDARI</td>
+                <td style="padding:14px 22px;color:var(--text-primary);white-space:nowrap">
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span
+                        style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--border)"></span>
+                      1 Set
+                    </div>
+                  </div>
+                </td>
+                <td style="padding:14px 22px;color:var(--text-primary);white-space:nowrap">1 Set Tower Solution</td>
+                <td style="padding:14px 22px;color:var(--text-primary);white-space:nowrap">08 Feb 2026</td>
+                <td style="padding:14px 22px;color:var(--text-primary);white-space:nowrap">10:15:00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showLogDetail() {
+      document.getElementById('log-main-view').style.display = 'none';
+      document.getElementById('log-detail-view').style.display = 'flex';
+    }
+    function showLogMain() {
+      document.getElementById('log-detail-view').style.display = 'none';
+      document.getElementById('log-main-view').style.display = 'flex';
+    }
+
+    function openLog() {
+      document.getElementById('log-backdrop').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('log-panel').style.transform = 'translateX(0)';
+      }, 10);
+    }
+    function closeLog() {
+      document.getElementById('log-panel').style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        document.getElementById('log-backdrop').style.display = 'none';
+        showLogMain(); // Reset to main view on close
+      }, 250);
+    }
+  </script>
+</body>
+
+</html>

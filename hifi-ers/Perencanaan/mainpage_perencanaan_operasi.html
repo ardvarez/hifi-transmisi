@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perencanaan Operasi ERS - PLN</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --pln-blue: #0A58CA;
+  --pln-blue-mid: #0d6efd;
+  --pln-blue-light: #E7F1FF;
+  --pln-yellow: #F7A800;
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --surface: #F1F5F9;
+  --border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-hint: #94A3B8;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --sidebar-w: 64px;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --success: #16A34A;
+  --success-light: #DCFCE7;
+  --warning: #D97706;
+  --warning-light: #FEF3C7;
+  
+  /* Additional colors for chips */
+  --chip-proses-bg: #FFF7ED; --chip-proses-text: #C2410C; --chip-proses-dot: #F97316;
+  --chip-kirim-bg: #EFF6FF; --chip-kirim-text: #1D4ED8; --chip-kirim-dot: #3B82F6;
+  --chip-tunggu-bg: #FEFCE8; --chip-tunggu-text: #854D0E; --chip-tunggu-dot: #EAB308;
+  --chip-review-bg: #FDF4FF; --chip-review-text: #7E22CE; --chip-review-dot: #A855F7;
+  --chip-approval-bg: #F0FDF4; --chip-approval-text: #166534; --chip-approval-dot: #22C55E;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .page-title, .section-label, .card-title, .logo span {
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+/* SIDEBAR */
+.sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--pln-blue);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 4px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+}
+.sidebar .logo {
+    width: 36px;
+    height: 36px;
+    background: var(--pln-yellow);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.sidebar .logo svg { width: 22px; height: 22px; }
+.nav-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+.nav-icon:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.nav-icon.active { background: rgba(247, 168, 0, 0.2); color: var(--pln-yellow); }
+.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+
+/* MAIN & TOPBAR */
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 9;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.content { padding: 24px 28px 80px; flex: 1; }
+
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.page-title { font-size: 18px; font-weight: 600; color: var(--text-primary); border-left: 4px solid var(--pln-blue); padding-left: 10px; }
+
+.section-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 16px;
+}
+
+/* TOOLBAR & SEARCH */
+.toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.toolbar-right { display: flex; align-items: center; gap: 10px; }
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-wrap input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px 8px 34px;
+    font-size: 13px;
+    width: 260px;
+    outline: none;
+    color: var(--text-primary);
+    background: var(--card);
+    font-family: inherit;
+    transition: border-color .15s;
+}
+.search-wrap input:focus { border-color: var(--pln-blue); box-shadow: 0 0 0 3px rgba(26, 92, 181, .1); }
+.search-icon { position: absolute; left: 10px; color: var(--text-hint); }
+
+/* BUTTONS */
+.btn-outline {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-outline:hover { background: var(--surface); }
+.btn-submit {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--pln-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-submit:hover { background: var(--pln-blue-mid); }
+.icon-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--pln-blue-light);
+    color: var(--pln-blue);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+.icon-action:hover { background: var(--pln-blue); color: white; }
+
+/* TABLE */
+.table-container {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card);
+}
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+thead th {
+    background: var(--surface);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+    border-right: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+thead th:last-child { border-right: none; }
+tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    border-right: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+tbody td:last-child { border-right: none; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: #fafbfc; }
+
+/* TAGS & CHIPS */
+.unit-tag {
+    display: inline-block;
+    background: var(--surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px 0;
+}
+.tipe-pemasangan {
+    display: inline-block;
+    background: #E0F2FE;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+.chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.chip-green { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; } .chip-green .chip-dot { background: #22C55E; }
+.chip-red { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; } .chip-red .chip-dot { background: #EF4444; }
+.chip-orange { background: #FFF7ED; color: #EA580C; border: 1px solid #FED7AA; } .chip-orange .chip-dot { background: #F97316; }
+.chip-purple { background: #FAF5FF; color: #9333EA; border: 1px solid #E9D5FF; } .chip-purple .chip-dot { background: #A855F7; }
+.chip-blue { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; } .chip-blue .chip-dot { background: #3B82F6; }
+
+/* PAGINATION */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--card);
+}
+.pag-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.pag-info select {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--text-primary);
+    outline: none;
+    background: var(--card);
+}
+.pag-btns {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.pag-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    transition: all .15s;
+}
+.pag-btn.active {
+    background: var(--pln-blue);
+    color: #fff;
+    border-color: var(--pln-blue);
+    font-weight: 600;
+}
+.pag-btn:hover:not(.active) {
+    background: var(--surface);
+    border-color: #cbd5e1;
+}
+
+.text-center { text-align: center; }
+</style>
+
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="logo">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="6" fill="#F7A800" />
+                <path d="M8 22V10l8 6 8-6v12" stroke="#003B8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <div class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+        <div class="nav-icon active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div>
+                <span style="font-weight:500; color:var(--pln-blue);">PLN - ERS Management System</span>
+            </div>
+            <div>
+                Contact us: helpdesk.p@compln.co.id | Security Issue: soc@pln.co.id
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="page-header">
+                <div class="page-title">Perencanaan Operasi ERS</div>
+            </div>
+
+            <div class="section-card" style="padding:0; overflow:hidden;">
+                <div class="toolbar" style="padding:16px 20px; border-bottom:1px solid var(--border); margin:0;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="search-wrap">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input type="text" placeholder="Cari Perencanaan...">
+                        </div>
+                        <button class="btn-outline" onclick="openFilterModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                            Filter
+                        </button>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn-outline">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container" style="border:none; border-radius:0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width:40px">No</th>
+                                <th>Nomor Perencanaan</th>
+                                <th>Unit Induk</th>
+                                <th>Unit Pelaksana</th>
+                                <th>Penghantar</th>
+                                <th>Tower</th>
+                                <th>Tanggal Rencana</th>
+                                <th>Tipe Pemasangan</th>
+                                <th>Status</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000054</span></td>
+                                <td><span class="unit-tag">UIP3BSUL</span></td>
+                                <td><span class="unit-tag">UPT KENDARI</span></td>
+                                <td>TRS 150kV KENDARI</td>
+                                <td>TOWER 14</td>
+                                <td>24 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Tower Kritis</span></td>
+                                <td><span class="chip chip-green"><span class="chip-dot"></span>Selesai</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">2</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000053</span></td>
+                                <td><span class="unit-tag">UIP3BSUL</span></td>
+                                <td><span class="unit-tag">UPT MAKASSAR</span></td>
+                                <td>TRS 150kV MAKASSAR</td>
+                                <td>TOWER 2A</td>
+                                <td>22 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-blue"><span class="chip-dot"></span>Proses Pengembalian</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">3</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000052</span></td>
+                                <td><span class="unit-tag">UIP3BSUL</span></td>
+                                <td><span class="unit-tag">UPT MANADO</span></td>
+                                <td>TRS 150kV MANADO</td>
+                                <td>TOWER 9B</td>
+                                <td>20 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-blue"><span class="chip-dot"></span>Pembongkaran Berlangsung</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">4</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000051</span></td>
+                                <td><span class="unit-tag">UITJBT</span></td>
+                                <td><span class="unit-tag">UPT SEMARANG</span></td>
+                                <td>TRS 500kV UNGARAN</td>
+                                <td>TOWER 11</td>
+                                <td>18 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Tower Kritis</span></td>
+                                <td><span class="chip chip-green"><span class="chip-dot"></span>Tower Beroperasi</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">5</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000050</span></td>
+                                <td><span class="unit-tag">UITJBB</span></td>
+                                <td><span class="unit-tag">UPT GANDUL</span></td>
+                                <td>TRS 500kV GANDUL</td>
+                                <td>TOWER 21</td>
+                                <td>15 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-blue"><span class="chip-dot"></span>Pemasangan Berlangsung</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">6</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000049</span></td>
+                                <td><span class="unit-tag">UITJBM</span></td>
+                                <td><span class="unit-tag">UPT SURABAYA</span></td>
+                                <td>TRS 150kV SURABAYA</td>
+                                <td>TOWER 55</td>
+                                <td>12 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-blue"><span class="chip-dot"></span>Menunggu Perizinan Pemasangan</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">7</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000048</span></td>
+                                <td><span class="unit-tag">UITJBB</span></td>
+                                <td><span class="unit-tag">UPT CAWANG</span></td>
+                                <td>TRS 150kV CAWANG</td>
+                                <td>TOWER 8</td>
+                                <td>10 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-green"><span class="chip-dot"></span>Disetujui</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">8</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000047</span></td>
+                                <td><span class="unit-tag">UIP3BSUM</span></td>
+                                <td><span class="unit-tag">UPT PALEMBANG</span></td>
+                                <td>TRS 275kV PALEMBANG</td>
+                                <td>TOWER 112</td>
+                                <td>05 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Tower Kritis</span></td>
+                                <td><span class="chip chip-red"><span class="chip-dot"></span>Ditolak SRM Hartrans</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">9</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000046</span></td>
+                                <td><span class="unit-tag">UIP3BSUM</span></td>
+                                <td><span class="unit-tag">UPT MEDAN</span></td>
+                                <td>TRS 150kV MEDAN</td>
+                                <td>TOWER 15</td>
+                                <td>03 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Tower Kritis</span></td>
+                                <td><span class="chip chip-orange"><span class="chip-dot"></span>Menunggu Approval SRM Hartrans</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">10</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000045</span></td>
+                                <td><span class="unit-tag">UITJBB</span></td>
+                                <td><span class="unit-tag">UPT CAWANG</span></td>
+                                <td>TRS 150kV CAWANG</td>
+                                <td>TOWER 9</td>
+                                <td>01 Feb 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-red"><span class="chip-dot"></span>Ditolak MSB Fashar</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">11</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000044</span></td>
+                                <td><span class="unit-tag">UITJBT</span></td>
+                                <td><span class="unit-tag">UPT CIREBON</span></td>
+                                <td>TRS 150kV CIREBON</td>
+                                <td>TOWER 44</td>
+                                <td>28 Jan 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-purple"><span class="chip-dot"></span>Menunggu Verifikasi MSB Fashar</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">12</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000043</span></td>
+                                <td><span class="unit-tag">UIP3BSUL</span></td>
+                                <td><span class="unit-tag">UPT KENDARI</span></td>
+                                <td>TRS 150kV KENDARI</td>
+                                <td>TOWER 20</td>
+                                <td>25 Jan 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-purple"><span class="chip-dot"></span>Menunggu Pengecekan Staff UI</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">13</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000042</span></td>
+                                <td><span class="unit-tag">UIP3BSUM</span></td>
+                                <td><span class="unit-tag">UPT PEKANBARU</span></td>
+                                <td>TRS 150kV PEKANBARU</td>
+                                <td>TOWER 33</td>
+                                <td>20 Jan 2026</td>
+                                <td><span class="tipe-pemasangan">Tower Kritis</span></td>
+                                <td><span class="chip chip-red"><span class="chip-dot"></span>Ditolak Manager UPT</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">14</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000041</span></td>
+                                <td><span class="unit-tag">UIP3BSUM</span></td>
+                                <td><span class="unit-tag">UPT JAMBI</span></td>
+                                <td>TRS 150kV JAMBI</td>
+                                <td>TOWER 5</td>
+                                <td>18 Jan 2026</td>
+                                <td><span class="tipe-pemasangan">Tower Kritis</span></td>
+                                <td><span class="chip chip-orange"><span class="chip-dot"></span>Menunggu Persetujuan Manager UPT</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">15</td>
+                                <td><span style="font-family:monospace; font-weight:600; color:var(--pln-blue);">PTE2026000040</span></td>
+                                <td><span class="unit-tag">UIP3BSUL</span></td>
+                                <td><span class="unit-tag">UPT MAKASSAR</span></td>
+                                <td>TRS 150kV MAKASSAR</td>
+                                <td>TOWER 10</td>
+                                <td>15 Jan 2026</td>
+                                <td><span class="tipe-pemasangan">Insidental</span></td>
+                                <td><span class="chip chip-blue"><span class="chip-dot"></span>Draft</span></td>
+                                <td class="text-center">
+                                    <button class="icon-action" onclick="window.location.href='approval-perencanaan-operasi-ers.html'">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <div class="pag-info">
+                        Menampilkan
+                        <select><option>10</option><option>25</option><option>50</option></select>
+                        dari <strong>45 Data</strong>
+                    </div>
+                    <div class="pag-btns">
+                        <button class="pag-btn">&#8249;</button>
+                        <button class="pag-btn active">1</button>
+                        <button class="pag-btn">2</button>
+                        <button class="pag-btn">3</button>
+                        <button class="pag-btn">4</button>
+                        <button class="pag-btn">5</button>
+                        <span style="color:var(--text-hint);font-size:12px;padding:0 4px">...</span>
+                        <button class="pag-btn">5</button>
+                        <button class="pag-btn">&#8250;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER MODAL -->
+    <div id="filterModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: #fff; width: 500px; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column;">
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 15px; font-weight: 600;">Filter Data</h3>
+                <button onclick="closeFilterModal()" style="background: none; border: none; cursor: pointer; color: var(--text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div style="padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="grid-column: span 2;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Nomor Perencanaan</label>
+                    <input type="text" placeholder="Masukkan nomor perencanaan" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Unit Induk</label>
+                    <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: #fff;">
+                        <option value="">Semua Unit Induk</option>
+                        <option>UIP3BSUL</option>
+                        <option>UIP3BSUM</option>
+                        <option>UITJBB</option>
+                        <option>UITJBT</option>
+                        <option>UITJBM</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Unit Pelaksana</label>
+                    <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: #fff;">
+                        <option value="">Semua Unit Pelaksana</option>
+                        <option>UPT KENDARI</option>
+                        <option>UPT MAKASSAR</option>
+                        <option>UPT MANADO</option>
+                        <option>UPT SEMARANG</option>
+                        <option>UPT GANDUL</option>
+                        <option>UPT SURABAYA</option>
+                        <option>UPT CAWANG</option>
+                        <option>UPT PALEMBANG</option>
+                        <option>UPT MEDAN</option>
+                        <option>UPT CIREBON</option>
+                        <option>UPT JAMBI</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Penghantar</label>
+                    <input type="text" placeholder="Nama penghantar" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Tower</label>
+                    <input type="text" placeholder="Nomor tower" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Tanggal Rencana (Dari)</label>
+                    <input type="date" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Tanggal Rencana (Sampai)</label>
+                    <input type="date" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Tipe Pemasangan</label>
+                    <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: #fff;">
+                        <option value="">Semua Tipe</option>
+                        <option>Tower Kritis</option>
+                        <option>Insidental</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Status</label>
+                    <select style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: #fff;">
+                        <option value="">Semua Status</option>
+                        <option>Draft</option>
+                        <option>Menunggu Pengecekan Staff UI</option>
+                        <option>Menunggu Verifikasi MSB Fashar</option>
+                        <option>Menunggu Persetujuan Manager UPT</option>
+                        <option>Menunggu Approval SRM Hartrans</option>
+                        <option>Disetujui</option>
+                        <option>Ditolak</option>
+                        <option>Menunggu Perizinan Pemasangan</option>
+                        <option>Pemasangan Berlangsung</option>
+                        <option>Tower Beroperasi</option>
+                        <option>Pembongkaran Berlangsung</option>
+                        <option>Proses Pengembalian</option>
+                        <option>Selesai</option>
+                    </select>
+                </div>
+            </div>
+            <div style="padding: 16px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: var(--surface);">
+                <button onclick="closeFilterModal()" style="padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer;">Reset</button>
+                <button onclick="closeFilterModal()" style="padding: 8px 16px; border: none; background: var(--pln-blue); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: #fff; cursor: pointer;">Terapkan Filter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openFilterModal() {
+            document.getElementById('filterModal').style.display = 'flex';
+        }
+        function closeFilterModal() {
+            document.getElementById('filterModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

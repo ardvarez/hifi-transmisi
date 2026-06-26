@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard ERS - PLN</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    /* Removed reset */
+
+    /* Removed :root */
+body {}
+
+    /* OVERLAY UNTUK EXPAND CHART & MAP */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+    }
+
+    #overlay.active {
+      display: block;
+    }
+
+    /* OVERLAY UNTUK OFFCANVAS FILTER */
+    #filterOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 10000;
+    }
+
+    #filterOverlay.active {
+      display: block;
+    }
+
+    /* OFFCANVAS FILTER PANEL */
+    .filter-panel {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 340px;
+      height: 100vh;
+      background: #fff;
+      z-index: 10001;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-panel.open {
+      right: 0;
+    }
+
+    .filter-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+    }
+
+    .filter-header h3 {
+      font-size: 16px;
+      margin: 0;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .filter-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .filter-close:hover {
+      color: var(--red);
+    }
+
+    .filter-body { padding: 20px; flex: 1; overflow-y: auto; background: var(--surface); }
+
+    .filter-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      background: var(--surface);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--bg);
+    }
+
+    .form-control:focus {
+      border-color: var(--blue);
+      background: #fff;
+    }
+
+    .btn-reset {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn-apply {
+      flex: 2;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: var(--blue);
+      cursor: pointer;
+      font-weight: 600;
+      color: #fff;
+      transition: background 0.2s;
+    }
+
+    .btn-apply:hover {
+      background: var(--blue-dark);
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+    }
+
+    .pln-logo {
+      width: 40px;
+      height: 40px;
+      background: #003087;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .pln-logo svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--blue);
+      margin-top: 1px;
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .header-contact {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* LAYOUT FULL WIDTH */
+    .main {
+      padding: 20px 24px 32px;
+      width: 100%;
+    }
+
+    /* SECTION HEADER DIBUAT FLEX BIAR TOMBOL SEJAJAR */
+    .sec-header {
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sec-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .sec-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* TOMBOL MAIN FILTER BARU */
+    .btn-filter-main {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-filter-main:hover {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border-color: var(--blue-light);
+    }
+
+    /* STAT CARDS */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: 10px 0 0 10px;
+    }
+
+    .stat-card.blue::before {
+      background: var(--blue);
+    }
+
+    .stat-card.green::before {
+      background: var(--green);
+    }
+
+    .stat-card.red::before {
+      background: var(--red);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.blue {
+      background: var(--blue-light);
+    }
+
+    .stat-icon.green {
+      background: var(--green-light);
+    }
+
+    .stat-icon.red {
+      background: var(--red-light);
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* BASE CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+    }
+
+    .card-body {}
+
+    .card-title-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0;
+    }
+
+    /* EXPAND LOGIC */
+    .card.expandable {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .card.expandable .card-body {}
+
+    .btn-expand {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-expand:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .card.expanded {
+      position: fixed !important;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      width: calc(100vw - 40px);
+      height: calc(100vh - 40px);
+      z-index: 9999;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    /* MAP SECTION */
+    .map-toolbar {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+    }
+
+    .map-outer {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    #map {
+      height: 500px;
+      width: 100%;
+      z-index: 1;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    .card.expanded #map {
+      height: 100% !important;
+      flex: 1;
+    }
+
+    .tab-btn {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 500;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+
+    .tab-btn:not(.active):hover {
+      background: var(--bg);
+    }
+
+    #btnDetail {
+      margin-left: auto;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border-color: var(--blue-light);
+      font-weight: 600;
+    }
+
+    #btnDetail:hover {
+      background: #dbeafe;
+    }
+
+    #btnDetail.open {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
+
+    /* CHARTS ROW */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .card.expanded .chart-wrap {
+      height: 100% !important;
+      min-height: 400px;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend-sq {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* TABLE */
+    .table-section {
+      margin-top: 16px;
+    }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 13px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--blue);
+      background: #fff;
+    }
+
+    .filter-btn {
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--surface);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      transition: all .15s;
+    }
+
+    .filter-btn:hover {
+      background: var(--bg);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table.data-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 1400px;
+    }
+
+    table.data-tbl th {
+      padding: 12px 10px;
+      background: #fff;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11.5px;
+      border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      white-space: nowrap;
+      text-align: left;
+    }
+
+    table.data-tbl th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    table.data-tbl th.sortable:hover {
+      color: var(--blue);
+    }
+
+    table.data-tbl th svg {
+      width: 12px;
+      height: 12px;
+      margin-left: 4px;
+      vertical-align: middle;
+      color: #d1d5db;
+    }
+
+    table.data-tbl td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #f1f3f4;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    table.data-tbl td.num {
+      text-align: center;
+    }
+
+    /* CHIPS & BADGES */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .chip-rencana {
+      background: #f3f4f6;
+      color: #4b5563;
+      border: 1px solid #d1d5db;
+    }
+
+    .chip-terpasang {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .chip-bongkar {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #ffedd5;
+    }
+
+    .chip-selesai {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .chip-outline {
+      background: #f0f9ff;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+      font-weight: 600;
+      border-radius: 4px;
+      padding: 3px 12px;
+    }
+
+    .text-muted {
+      color: var(--muted);
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0 0;
+      margin-top: 8px;
+    }
+
+    .pager-info {
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .pager-select {
+      border: none;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .page-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue-dark);
+      transition: all .15s;
+    }
+
+    .page-btn:hover {
+      background: var(--bg);
+    }
+
+    .page-btn.active {
+      background: var(--blue-dark);
+      color: #fff;
+    }
+
+    /* DONUT CENTER */
+    .donut-wrap {
+      position: relative;
+    }
+
+    .donut-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .donut-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="overlay" onclick="closeExpandedCards()"></div>
+  <div id="filterOverlay" onclick="closeFilterPanel()"></div>
+
+  <div id="filterPanel" class="filter-panel">
+    <div class="filter-header">
+      <h3>Filter Data</h3>
+      <button class="filter-close" onclick="closeFilterPanel()">&times;</button>
+    </div>
+    <div class="filter-body">
+      <div class="form-group">
+        <label class="form-label">Regional</label>
+        <select class="form-control">
+          <option value="">Semua Regional</option>
+          <option>Sumatera</option>
+          <option>Jawa, Madura, Bali</option>
+          <option>Kalimantan</option>
+          <option>Sulawesi, Maluku, Papua</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unit Induk</label>
+        <select class="form-control">
+          <option value="">Semua Unit Induk</option>
+          <option>P3BS</option>
+          <option>UITJBM</option>
+          <option>BABEL</option>
+          <option>NTB</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unit Pelaksana</label>
+        <select class="form-control">
+          <option value="">Semua Unit Pelaksana</option>
+          <option>UPT BANDA ACEH</option>
+          <option>UPT SURABAYA</option>
+          <option>UPT PADANG</option>
+          <option>UPK BANGKA BELITUNG</option>
+          <option>UPT TANJUNG KARANG</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tegangan - Tipe Tower</label>
+        <select class="form-control">
+          <option value="">Semua Tipe Tower</option>
+          <option>70kV Tension</option>
+          <option>70kV Suspension</option>
+          <option>150kV Tension</option>
+          <option>150kV Suspension</option>
+          <option>275kV Tension</option>
+          <option>275kV Suspension</option>
+          <option>500kV Tension</option>
+          <option>500kV Suspension</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-footer">
+      <button class="btn-reset" onclick="closeFilterPanel()">Reset</button>
+      <button class="btn-apply" onclick="closeFilterPanel()">Terapkan</button>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="pln-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Dashboard ERS</div>
+      <div class="header-sub">Ketersediaan ERS</div>
+    </div>
+    <div class="header-right">
+      <span class="header-contact">Contact us: helpdesk.pli@pln.co.id | Security issue: soc@pln.co.id</span>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <div class="sec-header">
+      <div>
+        <div class="sec-title">Data Ketersediaan dan Pemasangan ERS</div>
+        <div class="sec-sub">Menampilkan jumlah ERS berdasarkan ketersediaan dan pemasangan</div>
+      </div>
+
+      <button class="btn-filter-main" onclick="openFilterPanel()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+        </svg>
+        Filter Data
+      </button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#378ADD"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg></div>
+        <div>
+          <div class="stat-num">43</div>
+          <div class="stat-label">Total ERS<br>Terpasang (Set)</div>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#639922"
+            stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg></div>
+        <div>
+          <div class="stat-num">0</div>
+          <div class="stat-label">Total ERS<br>Set ERS Lengkap</div>
+        </div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E24B4A"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg></div>
+        <div>
+          <div class="stat-num">0</div>
+          <div class="stat-label">Total ERS<br>Set ERS Tidak Lengkap</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card expandable" id="cardMap" style="margin-bottom:0">
+      <div class="map-toolbar">
+        <button class="tab-btn map-tab active" onclick="setTab(this,'set')">Set ERS</button>
+        <button class="tab-btn map-tab" onclick="setTab(this,'tower')">Tower Operasi</button>
+
+        <button class="tab-btn" id="btnDetail" onclick="toggleAllPopups()">
+          <svg id="iconDetail" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span id="textDetail">Buka Semua Detail</span>
+        </button>
+
+        <button class="btn-expand" onclick="toggleExpand('cardMap')" style="margin-left:12px;" title="Perbesar Peta">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="map-outer">
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card expandable" id="cardChart1">
+        <div class="card-body">
+          <div class="card-title-wrap">
+            <div class="card-title">ERS Operasi Per Unit</div>
+            <button class="btn-expand" onclick="toggleExpand('cardChart1')" title="Perbesar Grafik"><svg width="15"
+                height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg></button>
+          </div>
+          <div class="legend-row">
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#378ADD"></div>Terpasang
+            </div>
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#639922"></div>Selesai
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="cUnit"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card expandable" id="cardChart2">
+        <div class="card-body">
+          <div class="card-title-wrap">
+            <div class="card-title">Set Lengkap &amp; Tidak</div>
+            <button class="btn-expand" onclick="toggleExpand('cardChart2')" title="Perbesar Grafik"><svg width="15"
+                height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg></button>
+          </div>
+          <div class="legend-row">
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#378ADD"></div>Lengkap
+            </div>
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#EF9F27"></div>Tidak Lengkap
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="cLengkap"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card expandable" id="cardChart3">
+        <div class="card-body">
+          <div class="card-title-wrap">
+            <div class="card-title">Durasi ERS Operasi</div>
+            <button class="btn-expand" onclick="toggleExpand('cardChart3')" title="Perbesar Grafik"><svg width="15"
+                height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg></button>
+          </div>
+          <div class="donut-wrap chart-wrap">
+            <canvas id="cDurasi"></canvas>
+            <div class="donut-center">
+              <div class="donut-num">31</div>
+              <div class="donut-lbl">Total Data</div>
+            </div>
+          </div>
+          <div class="legend-row" style="margin-top:14px;margin-bottom:0;justify-content:center">
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#FAC775"></div>&lt;1 Tahun
+            </div>
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#EF9F27"></div>1-3 Tahun
+            </div>
+            <div class="legend-item">
+              <div class="legend-sq" style="background:#E24B4A"></div>&gt;3 Tahun
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="card" style="box-shadow: none;">
+        <div class="card-body">
+          <div class="card-title" style="font-size:16px;">Detail ERS</div>
+          <div class="table-toolbar">
+            <div class="search-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input class="search-input" type="text" id="searchInput" placeholder="Cari Data..."
+                onkeyup="filterTable()">
+            </div>
+            <button class="filter-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              Filter
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-tbl" id="dataTable">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th class="sortable">Unit Induk <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Unit Pelaksana <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Penghantar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Tower <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">ID Functloc <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Latitude <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Longitude <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Jumlah Set Terpasang <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Merk Terpasang <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Penyebab Pemasangan <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Tanggal Pemasangan <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Rencana Tanggal Pembongkaran <svg viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Keterangan <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                  <th class="sortable">Status <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <polyline points="7 10 12 5 17 10" />
+                      <polyline points="7 14 12 19 17 14" />
+                    </svg></th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr>
+                  <td>1</td>
+                  <td>P3BS</td>
+                  <td>UPT BANDA ACEH</td>
+                  <td>SUTT 150 kV Nagan - Sigli</td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td>4.422167</td>
+                  <td>96.189583</td>
+                  <td>1</td>
+                  <td></td>
+                  <td class="text-muted">-</td>
+                  <td>03 Desember 2023</td>
+                  <td class="text-muted">-</td>
+                  <td>Land subsidence</td>
+                  <td><span class="chip chip-terpasang">Terpasang</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>UITJBM</td>
+                  <td>UPT SURABAYA</td>
+                  <td>SUTT 150 kV Waru - Rungkut #1-2</td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td>-7.34585831</td>
+                  <td>112.7383091</td>
+                  <td>2</td>
+                  <td><span class="chip-outline">TOWER SOLUTION</span></td>
+                  <td>Tower Kritis</td>
+                  <td>01 Desember 2023</td>
+                  <td class="text-muted">-</td>
+                  <td>ASET UIT JBT - PEMANFAATAN EKSTERNAL - Belum ada info rencana bongkar</td>
+                  <td><span class="chip chip-terpasang">Terpasang</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>P3BS</td>
+                  <td>UPT PADANG</td>
+                  <td>SUTT 150 kV Maninjau - Pariaman</td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td>-0.4545603</td>
+                  <td>100.0780901</td>
+                  <td>1</td>
+                  <td><span class="chip-outline">LINDSEY</span></td>
+                  <td>Tanah Longsor</td>
+                  <td>14 Maret 2024</td>
+                  <td class="text-muted">-</td>
+                  <td class="text-muted">-</td>
+                  <td><span class="chip chip-terpasang">Terpasang</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>BABEL</td>
+                  <td>UPK BANGKA BELITUNG</td>
+                  <td>SUTT 150 kV Kenten - Tanjung Api Api</td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td>-2.7754</td>
+                  <td>104.7504</td>
+                  <td>3</td>
+                  <td><span class="chip-outline">LINDSEY</span></td>
+                  <td>Tower Roboh</td>
+                  <td>22 Maret 2023</td>
+                  <td>02 Februari 2025</td>
+                  <td>3 Set (13,13,9 Kolom), dipakai untuk pembangunan 2 ERS.</td>
+                  <td><span class="chip chip-selesai">Selesai</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>NTB</td>
+                  <td>UPT TANJUNG KARANG</td>
+                  <td>SUTT 150 kV Pagelaran - ULUbelu</td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td><span class="chip-outline">-</span></td>
+                  <td>-5.3139244</td>
+                  <td>104.76185</td>
+                  <td>1</td>
+                  <td><span class="chip-outline">LINDSEY</span></td>
+                  <td>Tanah Longsor</td>
+                  <td>07 Juni 2024</td>
+                  <td class="text-muted">-</td>
+                  <td>Longsor</td>
+                  <td><span class="chip chip-terpasang">Terpasang</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span class="pager-info" id="pagerInfo">
+              Menampilkan
+              <select class="pager-select">
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+              </select>
+              dari <b>48</b> Data
+            </span>
+            <div class="page-btns">
+              <button class="page-btn" style="color:var(--muted)">&lsaquo;</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">4</button>
+              <button class="page-btn">5</button>
+              <button class="page-btn">6</button>
+              <button class="page-btn">7</button>
+              <button class="page-btn">8</button>
+              <button class="page-btn">9</button>
+              <button class="page-btn">10</button>
+              <button class="page-btn">&rsaquo;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    // ”€”€ FILTER PANEL LOGIC ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    function openFilterPanel() {
+      document.getElementById('filterPanel').classList.add('open');
+      document.getElementById('filterOverlay').classList.add('active');
+    }
+
+    function closeFilterPanel() {
+      document.getElementById('filterPanel').classList.remove('open');
+      document.getElementById('filterOverlay').classList.remove('active');
+    }
+
+    // ”€”€ EXPAND LOGIC CHART & MAP ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    function toggleExpand(cardId) {
+      const card = document.getElementById(cardId);
+      const overlay = document.getElementById('overlay');
+      const isExpanded = card.classList.contains('expanded');
+
+      closeExpandedCards();
+
+      if (!isExpanded) {
+        card.classList.add('expanded');
+        overlay.classList.add('active');
+        const btnSvg = card.querySelector('.btn-expand svg');
+        if (btnSvg) btnSvg.innerHTML = `<polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line>`;
+
+        setTimeout(() => {
+          if (cardId === 'cardMap') map.invalidateSize();
+          window.dispatchEvent(new Event('resize'));
+        }, 310);
+      }
+    }
+
+    function closeExpandedCards() {
+      const overlay = document.getElementById('overlay');
+      document.querySelectorAll('.card.expanded').forEach(card => {
+        card.classList.remove('expanded');
+        const btnSvg = card.querySelector('.btn-expand svg');
+        if (btnSvg) btnSvg.innerHTML = `<polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line>`;
+
+        if (card.id === 'cardMap') setTimeout(() => map.invalidateSize(), 310);
+      });
+      overlay.classList.remove('active');
+
+      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 310);
+    }
+
+    // ”€”€ MAP INITIALIZATION ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    const map = L.map('map', { zoomControl: true }).setView([-2, 118], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+
+    // ”€”€ ICONS ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    const makeWarehouseIcon = () => L.divIcon({
+      className: '',
+      html: `<div style="background:#378ADD;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><rect x="9" y="13" width="6" height="8" rx="1"/><polyline points="9 22 9 13 15 13 15 22"/>
+    </svg></div>`,
+      iconSize: [38, 38], iconAnchor: [19, 19]
+    });
+
+    const makeClusterIcon = (n) => L.divIcon({
+      className: '',
+      html: `<div style="background:#185FA5;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)">${n}</div>`,
+      iconSize: [34, 34], iconAnchor: [17, 17]
+    });
+
+    // ”€”€ DATA ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    const setErsData = [
+      { name: 'BABEL', lat: -2.1001754, lng: 106.1117171, lengkap: 1, tidakLengkap: 1, operasi: 1 },
+      { name: 'MMU', lat: -3.6986841, lng: 128.1801533, lengkap: 2, tidakLengkap: 1, operasi: 0 },
+      { name: 'NTB', lat: -8.5771556, lng: 116.0817995, lengkap: 3, tidakLengkap: 2, operasi: 4 },
+      { name: 'NTT', lat: -10.155559, lng: 123.633697, lengkap: 1, tidakLengkap: 3, operasi: 2 },
+      { name: 'P3BKAL', lat: -0.0572442, lng: 109.3310352, lengkap: 15, tidakLengkap: 2, operasi: 4 },
+      { name: 'P3BS', lat: 0.501669, lng: 101.4084236, lengkap: 8, tidakLengkap: 4, operasi: 14 },
+      { name: 'P3BSUL', lat: -5.1468992, lng: 119.471138, lengkap: 12, tidakLengkap: 0, operasi: 9 },
+      { name: 'PPB', lat: -2.5428291, lng: 140.7026887, lengkap: 3, tidakLengkap: 1, operasi: 0 },
+      { name: 'UITJBB', lat: -6.3474203, lng: 106.7861222, lengkap: 2, tidakLengkap: 3, operasi: 5 },
+      { name: 'UITJBM', lat: -7.3490366, lng: 112.7072374, lengkap: 2, tidakLengkap: 2, operasi: 7 },
+      { name: 'UITJBT', lat: -6.9505088, lng: 107.6120455, lengkap: 4, tidakLengkap: 3, operasi: 10 }
+    ];
+
+    const towerData = [
+      { lat: 3.5, lng: 96.5, n: 3, lbl: 'Aceh / Sumatera Utara' },
+      { lat: 0.6, lng: 101.5, n: 10, lbl: 'Sumatera Barat' },
+      { lat: -2.8, lng: 104.6, n: 12, lbl: 'Sumatera Selatan' },
+      { lat: 0.5, lng: 114.5, n: 4, lbl: 'Kalimantan' },
+      { lat: -6.9, lng: 107.0, n: 5, lbl: 'Jawa Barat' },
+      { lat: -7.5, lng: 112.5, n: 3, lbl: 'Jawa Timur' },
+      { lat: -8.5, lng: 116.2, n: 5, lbl: 'NTB' },
+      { lat: -1.5, lng: 120.5, n: 4, lbl: 'Sulawesi Tengah' },
+      { lat: -4.5, lng: 122.5, n: 3, lbl: 'Sulawesi Tenggara' }
+    ];
+
+    // ”€”€ BUILD LAYERS ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    const setErsMarkers = [];
+    const setErsLayer = L.layerGroup();
+
+    setErsData.forEach(p => {
+      const popupHtml = `
+    <div style="padding:12px 14px; font-family:'Segoe UI',sans-serif; min-width: 180px;">
+      <div style="font-size:13px;font-weight:700;color:#185FA5;border-bottom:1px solid #e5e7eb;padding-bottom:6px;margin-bottom:8px;">
+        ${p.name}
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px">
+        <span style="color:#6b7280">Set Lengkap</span><b style="color:#111827">${p.lengkap}</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px">
+        <span style="color:#6b7280">Tidak Lengkap</span><b style="color:#111827">${p.tidakLengkap}</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px;">
+        <span style="color:#6b7280">ERS Operasi</span><b style="color:#111827">${p.operasi}</b>
+      </div>
+    </div>`;
+
+      const m = L.marker([p.lat, p.lng], { icon: makeWarehouseIcon() })
+        .bindPopup(popupHtml, { autoClose: false, closeOnClick: false });
+
+      setErsMarkers.push(m);
+      setErsLayer.addLayer(m);
+    });
+    setErsLayer.addTo(map);
+
+    const towerLayer = L.layerGroup();
+    towerData.forEach(p => {
+      L.marker([p.lat, p.lng], { icon: makeClusterIcon(p.n) })
+        .addTo(towerLayer)
+        .bindPopup(`<div style="font-family:'Segoe UI',sans-serif;text-align:center;padding:4px"><b>${p.lbl}</b><br><span style="font-size:12px;">Total Operasi: <b>${p.n}</b></span></div>`);
+    });
+
+    // ”€”€ LEGEND CONTROL ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    const legendCtrl = L.control({ position: 'bottomright' });
+    legendCtrl.onAdd = () => {
+      const d = L.DomUtil.create('div');
+      d.id = 'mapLegend';
+      d.style.cssText = 'background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e5e7eb;font-size:12px;font-family:Segoe UI,sans-serif;color:#374151;box-shadow:0 2px 8px rgba(0,0,0,.08)';
+      d.innerHTML = `
+    <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;color:#6b7280">Legend</div>
+    <div id="legendContent">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;background:#378ADD;border-radius:6px;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><rect x="9" y="13" width="6" height="8" rx="1"/></svg>
+        </div>
+        Terpasang (Set ERS)
+      </div>
+    </div>`;
+      return d;
+    };
+    legendCtrl.addTo(map);
+
+    // ”€”€ TOGGLE ALL POPUPS LOGIC ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    let allPopupsOpen = false;
+    function toggleAllPopups() {
+      if (currentTab !== 'set') return;
+
+      allPopupsOpen = !allPopupsOpen;
+      const btn = document.getElementById('btnDetail');
+      const text = document.getElementById('textDetail');
+      const icon = document.getElementById('iconDetail');
+
+      if (allPopupsOpen) {
+        btn.classList.add('open');
+        text.innerText = 'Tutup Detail';
+        icon.innerHTML = `<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>`;
+        setErsMarkers.forEach(m => m.openPopup());
+      } else {
+        btn.classList.remove('open');
+        text.innerText = 'Buka Semua Detail';
+        icon.innerHTML = `<line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>`;
+        setErsMarkers.forEach(m => m.closePopup());
+      }
+    }
+
+    // ”€”€ TAB SWITCH ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    let currentTab = 'set';
+    function setTab(el, type) {
+      document.querySelectorAll('.map-tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      currentTab = type;
+
+      const btnDetail = document.getElementById('btnDetail');
+      const legendContent = document.getElementById('legendContent');
+
+      if (type === 'tower') {
+        btnDetail.style.display = 'none';
+        setErsLayer.remove();
+        towerLayer.addTo(map);
+        legendContent.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:26px;height:26px;background:#185FA5;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)">N</div>
+          Jumlah Tower Operasi
+        </div>`;
+      } else {
+        btnDetail.style.display = 'flex';
+        towerLayer.remove();
+        setErsLayer.addTo(map);
+        legendContent.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:26px;height:26px;background:#378ADD;border-radius:6px;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><rect x="9" y="13" width="6" height="8" rx="1"/></svg>
+          </div>
+          Terpasang (Set ERS)
+        </div>`;
+      }
+    }
+
+    // ”€”€ CHARTS ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    const gridColor = 'rgba(0,0,0,0.06)';
+    const tickStyle = { font: { size: 11 }, color: '#6b7280' };
+
+    new Chart(document.getElementById('cUnit').getContext('2d'), { type: 'bar', data: { labels: ['BABEL', 'NTB', 'P3BKL', 'P3BS', 'P3BSUL', 'UITJBB'], datasets: [{ label: 'Terpasang', data: [4, 6, 6, 20, 6, 12], backgroundColor: '#378ADD', borderRadius: 4 }, { label: 'Selesai', data: [0, 0, 4, 6, 2, 1], backgroundColor: '#639922', borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: gridColor }, ticks: tickStyle, border: { dash: [3, 3] } }, y: { grid: { display: false }, ticks: tickStyle } }, barPercentage: 0.65, categoryPercentage: 0.8 } });
+    new Chart(document.getElementById('cLengkap').getContext('2d'), { type: 'bar', data: { labels: ['BABEL', 'NTB', 'P3BKL', 'P3BS', 'P3BSUL', 'UITJBB'], datasets: [{ label: 'Lengkap', data: [2, 3, 5, 12, 4, 8], backgroundColor: '#378ADD', borderRadius: 4 }, { label: 'Tidak Lengkap', data: [2, 3, 1, 8, 2, 4], backgroundColor: '#EF9F27', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: tickStyle }, y: { grid: { color: gridColor }, ticks: tickStyle, border: { dash: [3, 3] } } }, barPercentage: 0.65, categoryPercentage: 0.8 } });
+    new Chart(document.getElementById('cDurasi').getContext('2d'), { type: 'doughnut', data: { labels: ['<1 Tahun', '1-3 Tahun', '>3 Tahun'], datasets: [{ data: [8, 12, 11], backgroundColor: ['#FAC775', '#EF9F27', '#E24B4A'], borderWidth: 3, borderColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } } });
+
+    // ”€”€ TABLE SEARCH ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+    function filterTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#tableBody tr');
+      let count = 0;
+      rows.forEach(r => { const match = r.textContent.toLowerCase().includes(q); r.style.display = match ? '' : 'none'; if (match) count++; });
+      document.getElementById('pagerInfo').innerHTML = `Menampilkan <select class="pager-select"><option>5</option><option>10</option><option>20</option></select> dari <b>${count}</b> Data`;
+    }
+  </script>
+</body>
+
+</html>

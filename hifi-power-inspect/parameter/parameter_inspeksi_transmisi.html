@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parameter Inspeksi Transmisi | PLN Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================
+       DESIGN SYSTEM & CSS CUSTOM PROPERTIES
+       ========================================== */
+    :root {
+      --pln-blue: #00A2E2;
+      --pln-blue-dark: #0084BA;
+      --pln-blue-light: #E6F6FD;
+      --pln-yellow: #FFF200;
+      
+      --primary: var(--pln-blue);
+      --primary-hover: var(--pln-blue-dark);
+      --success: #2EC4B6;
+      --danger: #FF5A5F;
+      
+      --bg-app: #F4F7FC;
+      --bg-panel: rgba(255, 255, 255, 0.85);
+      --bg-panel-solid: #ffffff;
+      --bg-sidebar: #0B2545;
+      --bg-input: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      
+      --border-color: #E2E8F0;
+      --border-focus: var(--pln-blue);
+      
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --text-white: #FFFFFF;
+      --text-on-sidebar: #E2E8F0;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 20px 50px rgba(11, 37, 69, 0.08);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      --sidebar-width: 260px;
+    }
+
+    [data-theme="dark"] {
+      --bg-app: #0B132B;
+      --bg-panel: rgba(27, 38, 59, 0.85);
+      --bg-panel-solid: #1B263B;
+      --bg-sidebar: #0D1B2A;
+      --bg-input: #1D2A44;
+      --bg-card: rgba(27, 38, 59, 0.9);
+      
+      --border-color: #334155;
+      --border-focus: #00B4D8;
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-white: #FFFFFF;
+      --text-on-sidebar: #94A3B8;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg-app);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: var(--radius-full); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    .app-container { display: flex; width: 100vw; min-height: 100vh; position: relative; }
+
+    /* Sidebar (Left) */
+    .sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); color: var(--text-on-sidebar); padding: 24px 16px; display: flex; flex-direction: column; flex-shrink: 0; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 12px 24px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 24px; }
+    .brand-logo { width: 38px; height: 38px; background: var(--pln-yellow); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3); }
+    .brand-logo svg { width: 24px; height: 24px; }
+    .brand-name { font-size: 16px; font-weight: 700; color: var(--text-white); line-height: 1.2; }
+    .brand-name span { display: block; font-size: 10px; font-weight: 500; color: var(--pln-blue); }
+    
+    .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .menu-item a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-on-sidebar); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); transition: all var(--transition-fast); }
+    .menu-item a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-white); }
+    .menu-item.active a { background: var(--pln-blue); color: var(--text-white); box-shadow: 0 4px 12px rgba(0, 162, 226, 0.25); }
+    .menu-item svg { width: 20px; height: 20px; opacity: 0.8; }
+    .menu-item.active svg { opacity: 1; }
+    
+    .sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 12px; }
+    .user-profile { display: flex; align-items: center; gap: 12px; padding: 8px 12px; }
+    .user-avatar { width: 40px; height: 40px; background: var(--pln-blue-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--pln-blue); }
+    .user-info { font-size: 13px; }
+    .user-name { font-weight: 600; color: var(--text-white); }
+    .user-role { font-size: 11px; color: var(--text-muted); }
+
+    /* Main Content Area */
+    .main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; position: relative; }
+
+    /* Top Navigation Header */
+    .top-header { background: var(--bg-panel-solid); border-bottom: 1px solid var(--border-color); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 9; backdrop-filter: blur(10px); transition: background-color var(--transition-normal); }
+    .header-left { display: flex; flex-direction: column; gap: 4px; }
+    .header-title-row { display: flex; align-items: center; gap: 12px; }
+    .btn-back-header { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); width: 32px; height: 32px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast); }
+    .btn-back-header:hover { background: var(--border-color); }
+    .btn-back-header svg { width: 16px; height: 16px; }
+    .header-title { font-size: 20px; font-weight: 700; }
+    .breadcrumbs { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+    .breadcrumbs span.separator { opacity: 0.6; }
+    .breadcrumbs span.current { color: var(--primary); font-weight: 500; }
+    
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .theme-toggle { background: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all var(--transition-fast); }
+    .theme-toggle:hover { border-color: var(--primary); background: var(--bg-panel-solid); }
+    .theme-toggle svg { width: 16px; height: 16px; }
+
+    /* Content Layout */
+    .content-body { display: flex; flex-grow: 1; height: calc(100vh - 73px); overflow: hidden; }
+    .form-pane { flex-grow: 1; padding: 32px; overflow-y: auto; display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    /* Stepper UI */
+    .stepper-container { background: var(--bg-panel-solid); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px 40px; margin-bottom: 24px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; position: relative; }
+    .stepper-line { position: absolute; top: 50%; left: 60px; right: 60px; height: 3px; background: var(--border-color); transform: translateY(-50%); z-index: 1; }
+    .stepper-line-progress { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--primary); transition: width var(--transition-normal); }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; background: var(--bg-panel-solid); padding: 0 16px; cursor: pointer; }
+    .step-badge { width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--bg-app); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--text-muted); transition: all var(--transition-normal); }
+    .step-title { font-size: 13px; font-weight: 600; color: var(--text-muted); transition: all var(--transition-normal); }
+    .step-item.active .step-badge { background: var(--primary); border-color: var(--primary); color: var(--text-white); box-shadow: 0 0 0 4px rgba(0, 162, 226, 0.15); }
+    .step-item.active .step-title { color: var(--primary); font-weight: 700; }
+    .step-item.completed .step-badge { background: var(--success); border-color: var(--success); color: var(--text-white); }
+    .step-item.completed .step-title { color: var(--success); }
+
+    /* Form Container */
+    .form-panel-card { background: var(--bg-panel); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-md); flex-grow: 1; display: flex; flex-direction: column; gap: 24px; transition: all var(--transition-normal); min-height: 480px; }
+    [data-theme="dark"] .form-panel-card { border-color: rgba(255,255,255,0.05); }
+    
+    .step-section { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; flex-direction: column; gap: 24px; width: 100%; }
+    .step-section.active { display: flex; opacity: 1; transform: translateY(0); }
+
+    /* Form Components */
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
+    .form-group.col-span-2 { grid-column: span 2; }
+    
+    .form-label { font-size: 13px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+    .form-control { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 16px; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); transition: all var(--transition-fast); outline: none; }
+    .form-control:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(0, 162, 226, 0.15); }
+    .form-control:disabled { background: var(--bg-app); opacity: 0.6; cursor: not-allowed; }
+    select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; padding-right: 40px; }
+
+    .input-addon-group { display: flex; gap: 12px; align-items: center; }
+    .radio-card-group { display: flex; gap: 8px; background: var(--bg-app); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    .radio-card-option { flex-grow: 1; text-align: center; position: relative; }
+    .radio-card-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .radio-card-label { display: block; padding: 8px 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); transition: all var(--transition-fast); }
+    .radio-card-option input[type="radio"]:checked + .radio-card-label { background: var(--bg-panel-solid); color: var(--primary); box-shadow: var(--shadow-sm); }
+
+    /* Toggle Switch */
+    .switch-group { display: flex; align-items: center; gap: 12px; }
+    .switch-label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .3s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--success); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Buttons */
+    .btn-add-item { background: var(--pln-blue-light); border: 1px solid var(--pln-blue); color: var(--pln-blue-dark); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all var(--transition-fast); width: max-content; }
+    .btn-add-item:hover { background: var(--pln-blue); color: var(--text-white); }
+    
+    .btn-sub-uraian { background: var(--pln-blue-light); border: 1px solid var(--pln-blue); color: var(--pln-blue-dark); padding: 6px 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all var(--transition-fast); margin-bottom: 8px; }
+    .btn-sub-uraian:hover { background: var(--pln-blue); color: white; }
+
+    /* Cards dynamic list */
+    .dynamic-list-container { display: flex; flex-direction: column; gap: 20px; }
+    .card-item-container { background: var(--bg-panel-solid); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; position: relative; box-shadow: var(--shadow-sm); animation: slideIn 0.3s ease forwards; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+    .card-item-title { font-size: 14px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .btn-remove-item { background: transparent; border: none; color: var(--danger); cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: var(--radius-sm); transition: all var(--transition-fast); }
+    .btn-remove-item:hover { background: rgba(255, 90, 95, 0.1); }
+    .btn-remove-item svg { width: 16px; height: 16px; }
+
+    /* Modals & Sub-Uraian config */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card { background: var(--bg-panel-solid); border: 1px solid var(--text-main); border-radius: var(--radius-md); padding: 0; overflow: hidden; box-shadow: var(--shadow-lg); transition: transform 0.3s ease; transform: scale(0.95); }
+    .modal-overlay.active .modal-card { transform: scale(1); }
+
+    .inner-menu-list { list-style: none; display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; margin: 0; padding: 0; }
+    .inner-menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-main); border-bottom: 1px solid var(--border-color); transition: all var(--transition-fast); }
+    .inner-menu-item:hover { background: var(--bg-app); }
+    .inner-menu-item.active { background: var(--bg-app); border-left: 4px solid var(--primary); color: var(--primary); padding-left: 12px; }
+    .inner-menu-item .btn-delete-sub { color: inherit; opacity: 0.6; background: transparent; border: none; cursor: pointer; padding: 2px; }
+    .inner-menu-item .btn-delete-sub:hover { opacity: 1; color: var(--danger); }
+    .inner-menu-item .btn-delete-sub svg { width: 14px; height: 14px; }
+    
+    .multiselect-container { position: relative; }
+    .multiselect-select { display: flex; flex-wrap: wrap; gap: 4px; min-height: 45px; padding: 6px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; align-items: center; }
+    .multiselect-tag { background: var(--pln-blue-light); color: var(--primary); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .multiselect-tag svg { width: 12px; height: 12px; cursor: pointer; }
+    .multiselect-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-panel-solid); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-top: 4px; max-height: 200px; overflow-y: auto; z-index: 10; box-shadow: var(--shadow-md); display: none; }
+    .multiselect-option { padding: 10px 16px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: background var(--transition-fast); }
+    .multiselect-option:hover { background: var(--bg-app); }
+    .multiselect-option.selected { color: var(--primary); font-weight: 600; background: var(--pln-blue-light); }
+
+    /* Step 3: Kondisi */
+    .condition-block { background: var(--bg-panel-solid); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: var(--shadow-sm); }
+    .condition-block-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+    .condition-title { font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .comp-table-container { width: 100%; overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-top: 12px; }
+    .comp-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    .comp-table th { background: var(--bg-app); padding: 12px 16px; font-weight: 700; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+    .comp-table td { padding: 10px 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .btn-add-comp { background: var(--bg-app); border: 1px solid var(--border-color); color: var(--primary); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all var(--transition-fast); width: fit-content; margin-top: 10px; }
+    .btn-add-comp:hover { background: var(--border-color); }
+
+    /* Bottom Bar */
+    .bottom-bar { background: var(--bg-panel-solid); border-top: 1px solid var(--border-color); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; bottom: 0; z-index: 9; box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.02); }
+    .btn { padding: 12px 24px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all var(--transition-normal); border: none; outline: none; }
+    .btn-secondary { background: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: var(--border-color); }
+    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: var(--text-white); box-shadow: 0 4px 14px rgba(0, 162, 226, 0.3); }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 162, 226, 0.4); }
+
+    /* Success modal specifically */
+    .modal-icon-success { width: 64px; height: 64px; border-radius: var(--radius-full); background: rgba(46, 196, 182, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
+    .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; text-align: center; }
+    .modal-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; text-align: center; }
+
+    /* Accordion styles */
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      cursor: pointer;
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: background-color var(--transition-fast);
+      user-select: none;
+    }
+    .accordion-header:hover {
+      background: var(--bg-app);
+    }
+    .accordion-content {
+      padding: 24px;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-bottom-left-radius: var(--radius-md);
+      border-bottom-right-radius: var(--radius-md);
+      background: var(--bg-panel);
+    }
+    .accordion-content.active {
+      display: flex;
+    }
+    
+    /* Bobot Badges and select styling */
+    .bobot-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      gap: 6px;
+      width: fit-content;
+    }
+    .bobot-badge-1 { background: rgba(46, 196, 182, 0.15); color: #2EC4B6 !important; }
+    .bobot-badge-2 { background: rgba(0, 162, 226, 0.15); color: #00A2E2 !important; }
+    .bobot-badge-3 { background: rgba(255, 193, 7, 0.15); color: #DDA107 !important; }
+    .bobot-badge-4 { background: rgba(255, 137, 0, 0.15); color: #E07000 !important; }
+    .bobot-badge-5 { background: rgba(255, 90, 95, 0.15); color: #FF5A5F !important; }
+
+    /* Rules Preview Grid */
+    .rules-preview-container {
+      margin-top: 16px;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+    [data-theme="dark"] .rules-preview-container {
+      background: rgba(27, 38, 59, 0.2);
+    }
+    .rules-preview-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rule-chip-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rule-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 8px 12px;
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+    }
+    .rule-filter-badge {
+      font-size: 11px;
+      background: var(--primary);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    /* Split layout inside Atribut modal */
+    .atribut-split-layout {
+      display: flex;
+      flex-grow: 1;
+      height: calc(100% - 60px);
+      overflow: hidden;
+    }
+    
+    .limit-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      text-align: left;
+    }
+    .limit-table th {
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .limit-table td {
+      padding: 8px 16px;
+      background: var(--bg-panel-solid);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    .limit-table tr td:first-child {
+      border-left: 1px solid var(--border-color);
+      border-top-left-radius: var(--radius-sm);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+    .limit-table tr td:last-child {
+      border-right: 1px solid var(--border-color);
+      border-top-right-radius: var(--radius-sm);
+      border-bottom-right-radius: var(--radius-sm);
+    }
+    .range-connector {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 0 4px;
+    }
+
+    /* Right overlay (drawer) style for Atribut Modal */
+    #atribut-modal {
+      justify-content: flex-end;
+      align-items: stretch;
+    }
+    #atribut-modal .modal-card {
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+      border: none;
+      border-left: 1px solid var(--border-color);
+      margin: 0;
+      width: 80%;
+      max-width: 1200px;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #atribut-modal.active .modal-card {
+      transform: translateX(0);
+    }
+
+    /* Custom Number Input / Ticker */
+    .number-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .number-input-group input[type="number"] {
+      padding-right: 32px; /* space for ticker */
+      -moz-appearance: textfield;
+    }
+    .number-input-group input[type="number"]::-webkit-outer-spin-button,
+    .number-input-group input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .ticker-controls {
+      position: absolute;
+      right: 4px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 8px);
+      width: 24px;
+      justify-content: space-between;
+      border-left: 1px solid var(--border-color);
+      padding-left: 4px;
+    }
+    .ticker-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50%;
+      transition: color var(--transition-fast), background var(--transition-fast);
+      border-radius: 2px;
+    }
+    .ticker-btn:hover {
+      color: var(--primary);
+      background: var(--border-color);
+    }
+    .ticker-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="#000" stroke="#000" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="brand-name">PLN PORTAL<span>Inspeksi Transmisi</span></div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item"><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span>Dashboard</span></a></li>
+        <li class="menu-item active"><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg><span>Parameter Inspeksi</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <div class="header-title-row">
+            <button class="btn-back-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h1 class="header-title">Tambah Parameter Baru</h1>
+          </div>
+          <div class="breadcrumbs">
+            <span>Parameter Inspeksi</span> <span class="separator">&gt;</span> <span>Konfigurasi</span> <span class="separator">&gt;</span> <span class="current" id="breadcrumb-step">Step 1: Informasi Umum</span>
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <button class="theme-toggle" id="theme-switcher">
+            <svg id="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <div class="form-pane">
+          
+          <!-- Stepper -->
+          <div class="stepper-container">
+            <div class="stepper-line"><div class="stepper-line-progress" id="stepper-progress"></div></div>
+            <div class="step-item active" onclick="goToStep(1)"><div class="step-badge" id="step-badge-1">1</div><span class="step-title">Umum</span></div>
+            <div class="step-item" onclick="goToStep(2)"><div class="step-badge" id="step-badge-2">2</div><span class="step-title">Uraian</span></div>
+            <div class="step-item" onclick="goToStep(3)"><div class="step-badge" id="step-badge-3">3</div><span class="step-title">Kondisi &amp; Skala</span></div>
+          </div>
+
+          <div class="form-panel-card">
+            
+            <!-- STEP 1: UMUM -->
+            <section class="step-section active" id="step-section-1">
+              <div class="form-grid-4">
+                <div class="form-group col-span-2">
+                  <label class="form-label">Nama Parameter</label>
+                  <input type="text" class="form-control" placeholder="Masukkan nama parameter inspeksi...">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Grup Aset</label>
+                  <select class="form-control">
+                    <option value="" disabled selected>Pilih Grup Aset</option>
+                    <option>Tower &amp; Pondasi</option>
+                    <option>Isolator String</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Jenis Aset</label>
+                  <select class="form-control">
+                    <option value="" disabled selected>Pilih Jenis Aset</option>
+                    <option>Suspension Tower</option>
+                    <option>Suspension Insulator String</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid-4">
+                <div class="form-group">
+                  <label class="form-label">Versi Landasan</label>
+                  <div class="input-addon-group">
+                    <div class="radio-card-group">
+                      <div class="radio-card-option">
+                        <input type="radio" id="landasan-ya" name="versi-landasan" value="Ya" onchange="toggleLandasan(true)">
+                        <label for="landasan-ya" class="radio-card-label">Ya</label>
+                      </div>
+                      <div class="radio-card-option">
+                        <input type="radio" id="landasan-tidak" name="versi-landasan" value="Tidak" checked onchange="toggleLandasan(false)">
+                        <label for="landasan-tidak" class="radio-card-label">Tidak</label>
+                      </div>
+                    </div>
+                    <select id="umum-landasan-select" class="form-control" disabled style="flex-grow: 1;">
+                      <option value="" disabled selected>Versi</option>
+                      <option>SK520</option>
+                      <option>SK2023-V2</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Inspeksi Level</label>
+                  <select class="form-control">
+                    <option value="" disabled selected>Pilih Level</option>
+                    <option>Level 1 (Ground Patrol)</option>
+                    <option>Level 3 (Climbing)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bobot Kondisi</label>
+                  <select class="form-control">
+                    <option value="" disabled selected>Pilih Bobot</option>
+                    <option>4 (Tinggi)</option>
+                    <option>5 (Sangat Tinggi)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sub-sistem</label>
+                  <select class="form-control">
+                    <option value="" disabled selected>Pilih Sub-sistem</option>
+                    <option>Insulator Fittings</option>
+                    <option>Pondasi &amp; Earthing</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label class="form-label">Pelaksana Inspeksi</label>
+                  <select class="form-control">
+                    <option value="" disabled selected>Pilih Pelaksana</option>
+                    <option>Line Inspector</option>
+                    <option>Tim PDKB</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Jenis Alat Uji (Opsional)</label>
+                  <select class="form-control">
+                    <option value="">Tidak Menggunakan Alat Uji</option>
+                    <option>Thermal Imager (Thermovision)</option>
+                  </select>
+                </div>
+                <div class="form-group" style="justify-content: center;">
+                  <div class="switch-group">
+                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                    <div>
+                      <span class="switch-label">Kalkulasi Ke Asset Health Index</span>
+                      <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Jika aktif, berkontribusi langsung pada skor kesehatan aset.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- STEP 2: URAIAN -->
+            <section class="step-section" id="step-section-2">
+              <div style="margin-bottom: 8px;">
+                <h3 style="font-size: 16px; font-weight: 700;">Daftar Uraian Parameter</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Tambahkan uraian pengukuran dan tentukan tipe uraiannya (Satuan atau Beruntun).</p>
+              </div>
+
+              <div id="uraian-list-container" class="dynamic-list-container">
+                <!-- Dynamically generated Uraian cards -->
+              </div>
+              
+              <div style="margin-top: 8px;">
+                <button type="button" class="btn-add-item" onclick="addNewUraian()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  Tambah Uraian Baru
+                </button>
+              </div>
+            </section>
+
+            <!-- STEP 3: KONDISI -->
+            <section class="step-section" id="step-section-3">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div>
+                  <h3 style="font-size: 16px; font-weight: 700;">Konfigurasi Skala Kondisi &amp; Logika Rekomendasi</h3>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Konfigurasikan kondisi pembobotan dan logika rekomendasi pemeliharaan berdasarkan input uraian.</p>
+                </div>
+                <button type="button" class="btn-primary" style="padding: 8px 16px; font-size: 12px; border-radius: var(--radius-sm);" onclick="addNewConditionBlock()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  Tambah Blok Kondisi
+                </button>
+              </div>
+
+              <div id="conditions-container" class="dynamic-list-container">
+                <!-- Condition blocks rendered here -->
+              </div>
+            </section>
+
+          </div>
+
+          <!-- Bottom Nav -->
+          <footer class="bottom-bar">
+            <button class="btn btn-secondary" id="btn-back" onclick="navigateStep(-1)" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              Sebelumnya
+            </button>
+            <button class="btn btn-primary" id="btn-next" onclick="navigateStep(1)">
+              <span>Selanjutnya</span>
+              <svg id="next-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </footer>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL: Sub-Uraian (Beruntun) Configuration -->
+  <div class="modal-overlay" id="sub-uraian-modal">
+    <div class="modal-card" style="max-width: 1200px; width: 95%; height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div style="background: var(--bg-panel-solid); border-bottom: 2px solid var(--text-main); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+        <h2 style="font-size: 16px; font-weight: 700;">Grup Uraian</h2>
+        <button class="btn btn-secondary" onclick="closeSubUraianModal()" style="padding: 6px 12px; font-size: 12px; font-weight: bold; border-color: var(--text-main);">X Tutup</button>
+      </div>
+
+      <!-- Modal Body Group Layout -->
+      <div class="group-layout" style="display: flex; flex-grow: 1; height: calc(100% - 60px); overflow: hidden;">
+        
+        <!-- Inner Sidebar for Sub Uraian Items -->
+        <div class="inner-sidebar" style="width: 250px; border-right: 1px solid var(--border-color); background: var(--bg-panel-solid); border-radius: 0; display: flex; flex-direction: column; padding: 0; border-top: none; border-bottom: none; border-left: none;">
+          <ul class="inner-menu-list" id="modal-sub-menu-list">
+            <!-- Dynamic tabs -->
+          </ul>
+          <div style="border-top: 1px solid var(--border-color); margin-top: auto;">
+            <div class="inner-menu-item" style="cursor: pointer; display: flex; justify-content: space-between; padding: 16px; font-weight: 600; font-size: 13px;" onclick="addNewSubUraian()">
+              <span>Tambah Sub Uraian +</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inner Content Pane -->
+        <div class="inner-content-pane" id="modal-sub-content" style="flex-grow: 1; background: var(--bg-app); padding: 24px; overflow-y: auto;">
+          <!-- Top Controls -->
+          <div style="display: flex; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" style="font-size: 14px;">Sub Uraian</label>
+              <input type="text" id="sub-name-field" class="form-control" style="border: 1px solid var(--text-main);" oninput="updateActiveSubName(this.value)">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label" style="font-size: 14px;">Spesifikasi</label>
+              <div class="multiselect-container">
+                <div class="multiselect-select" id="specs-multiselect" style="border: 1px solid var(--text-main);" onclick="toggleSpecsDropdown()">
+                  <span style="color: var(--text-muted); font-size: 13px;">Pilih Spesifikasi...</span>
+                </div>
+                <div class="multiselect-dropdown" id="specs-dropdown-list">
+                  <!-- Generated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Isian Cards Container -->
+          <div id="sub-uraian-isian-list">
+             <!-- Isian Blocks generated dynamically -->
+          </div>
+
+          <!-- Add Isian Button matching wireframe -->
+          <div style="border: 1px solid var(--text-main); background: white; padding: 12px 16px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;" onclick="addNewSubIsian()" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+            <span style="font-size: 13px; font-weight: 600;">Tambah Uraian</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Atribut & Batasan (Step 3) Configuration -->
+  <div class="modal-overlay" id="atribut-modal">
+    <div class="modal-card" style="max-width: 1300px; width: 95%; height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div style="background: var(--bg-panel-solid); border-bottom: 2px solid var(--border-color); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+        <h2 style="font-size: 16px; font-weight: 700;" id="atribut-modal-title">Konfigurasi Atribut &amp; Batasan</h2>
+        <button class="btn btn-secondary" onclick="closeAtributModal()" style="padding: 6px 12px; font-size: 12px; font-weight: bold; border-color: var(--text-main);">Tutup</button>
+      </div>
+
+      <!-- Modal Body Group Layout -->
+      <div class="atribut-split-layout">
+        
+        <!-- Left Sidebar for Attributes -->
+        <div style="width: 280px; border-right: 1px solid var(--border-color); background: var(--bg-panel-solid); display: flex; flex-direction: column; padding: 0;">
+          <ul class="inner-menu-list" id="modal-atribut-sidebar-list">
+            <!-- Dynamic Attribute Items render here -->
+          </ul>
+          <div style="border-top: 1px solid var(--border-color); margin-top: auto;">
+            <div class="inner-menu-item" style="cursor: pointer; display: flex; justify-content: space-between; padding: 16px; font-weight: 600; font-size: 13px;" onclick="addNewAttributeToModal()">
+              <span>Tambah Atribut +</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Content Pane -->
+        <div style="flex-grow: 1; background: var(--bg-app); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px;">
+          <!-- Top Filter Settings -->
+          <div class="card-item-container" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label class="form-label" style="font-weight: 700;">Nama Konfigurasi Atribut</label>
+              <input type="text" id="modal-attribute-name-input" class="form-control" style="border: 1px solid var(--text-main);" placeholder="Cth: Atribut Tegangan, Atribut Merk..." oninput="updateAttributeName(this.value)">
+            </div>
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 4px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 14px; font-weight: 700; color: var(--primary);">Filter Atribut Aset / Lokasi (Opsional)</div>
+              <button type="button" class="btn btn-add-item" onclick="addNewFilterToActiveAttribute()" style="margin: 0; padding: 6px 12px; font-size: 12px;">
+                + Tambah Kriteria Filter
+              </button>
+            </div>
+            <div id="modal-filters-container" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Dynamic Filter Rows render here -->
+            </div>
+          </div>
+
+          <!-- Dynamic limits or reference data config card -->
+          <div class="card-item-container" style="padding: 24px; flex-grow: 1; display: flex; flex-direction: column; gap: 16px; background: var(--bg-panel-solid);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 14px; font-weight: 700;" id="table-config-title">Konfigurasi Aturan Kondisi</div>
+              <button class="btn btn-add-item" onclick="addNewTableConfigRow()" style="margin: 0;">
+                + Tambah Baris
+              </button>
+            </div>
+            
+            <div id="modal-table-config-container" style="width: 100%; overflow-x: auto; margin-top: 8px;">
+              <!-- Will render either Table of Limits or Table of Reference Mapping -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div style="padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; background: var(--bg-panel-solid); flex-shrink: 0;">
+        <button class="btn btn-secondary" onclick="closeAtributModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveAtributModal()">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal-overlay" id="success-modal">
+    <div class="modal-card" style="max-width: 500px; text-align: center; padding: 32px; border-radius: var(--radius-lg);">
+      <div class="modal-icon-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height:32px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h3 class="modal-title">Konfigurasi Berhasil Disimpan!</h3>
+      <p class="modal-desc">Seluruh form dan logika kondisi berhasil disimpan dan divalidasi dengan baik.</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="btn btn-secondary" onclick="closeSuccessModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP LOGIC -->
+  <script>
+    // State Models
+    let appState = {
+      uraianList: [],
+      kondisiList: []
+    };
+    
+    let currentStep = 1;
+    let activeUraianModalIdx = null;
+    let activeSubUraianIdx = 0;
+
+    const dataReferenceOptions = ["Fasa", "Polaritas", "Kondisi Fisik", "Material", "Sudut Kemiringan", "Nilai Hambatan"];
+    const satuanOptions = ["kV", "Ohm", "Ampere", "Celsius", "dB", "Mm", "Pcs", "Tidak Ada"];
+    const typeIsianOptions = ["Radio Button", "Checkbox", "Dropdown / Select", "Text Input", "Numerical Input"];
+    const assetSpecificationsList = ["Mekanik Penggerak", "Keping Isolator Glass", "Baut Sambungan Struktur", "Kawat Tanah", "Pondasi Beton"];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('theme-switcher').addEventListener('click', toggleTheme);
+      
+      // Initialize with 1 default Uraian
+      addNewUraian();
+      // Initialize with 1 default Kondisi
+      addNewConditionBlock();
+    });
+
+    // Custom Number Input Generator Helper
+    function generateNumberInput(value, placeholder, oninputStr, additionalStyles = "") {
+      return `
+        <div class="number-input-group">
+          <input type="number" step="any" class="form-control" placeholder="${placeholder}" style="${additionalStyles}" value="${value}" oninput="${oninputStr}">
+          <div class="ticker-controls">
+            <button type="button" tabindex="-1" class="ticker-btn" onclick="this.parentNode.previousElementSibling.stepUp(); this.parentNode.previousElementSibling.dispatchEvent(new Event('input'))">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </button>
+            <button type="button" tabindex="-1" class="ticker-btn" onclick="this.parentNode.previousElementSibling.stepDown(); this.parentNode.previousElementSibling.dispatchEvent(new Event('input'))">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Theme logic
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeText = document.getElementById('theme-text');
+      const sunIcon = document.getElementById('sun-icon');
+      if (html.getAttribute('data-theme') === 'light') {
+        html.setAttribute('data-theme', 'dark');
+        themeText.innerText = "Mode Terang";
+        sunIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+      } else {
+        html.setAttribute('data-theme', 'light');
+        themeText.innerText = "Mode Gelap";
+        sunIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+      }
+    }
+
+    function toggleLandasan(enable) {
+      document.getElementById('umum-landasan-select').disabled = !enable;
+    }
+
+    // Navigation
+    function goToStep(step) {
+      if(step === currentStep) return;
+      for (let i = 1; i <= 3; i++) {
+        const item = document.getElementById(`step-badge-${i}`).parentElement;
+        if (i < step) { item.className = "step-item completed"; document.getElementById(`step-badge-${i}`).innerHTML = "&#10003;"; }
+        else if (i === step) { item.className = "step-item active"; document.getElementById(`step-badge-${i}`).innerHTML = i; }
+        else { item.className = "step-item"; document.getElementById(`step-badge-${i}`).innerHTML = i; }
+      }
+      document.getElementById('stepper-progress').style.width = `${((step - 1) / 2) * 100}%`;
+      
+      document.getElementById(`step-section-${currentStep}`).classList.remove('active');
+      setTimeout(() => { document.getElementById(`step-section-${step}`).classList.add('active'); }, 150);
+      
+      currentStep = step;
+      const btnBack = document.getElementById('btn-back');
+      const btnNext = document.getElementById('btn-next');
+      
+      if(step === 1) { btnBack.disabled = true; btnNext.innerHTML = '<span>Selanjutnya</span>...'; }
+      if(step === 2) { btnBack.disabled = false; btnNext.innerHTML = '<span>Selanjutnya</span>...'; renderUraianList(); }
+      if(step === 3) { btnBack.disabled = false; btnNext.innerHTML = '<span>Simpan &amp; Finish</span>'; renderConditionsList(); }
+    }
+    
+    function navigateStep(dir) {
+      const target = currentStep + dir;
+      if (target >= 1 && target <= 3) goToStep(target);
+      else if (target > 3) document.getElementById('success-modal').classList.add('active');
+    }
+    
+    function closeSuccessModal() { document.getElementById('success-modal').classList.remove('active'); }
+
+    // ==========================================
+    // STEP 2: URAIAN LOGIC
+    // ==========================================
+    function addNewUraian() {
+      appState.uraianList.push({
+        type: 'satuan', // or 'beruntun'
+        uraian: "",
+        kodeUraian: "",
+        typeIsian: "Radio Button",
+        refrensiData: "",
+        satuan: "Tidak Ada",
+        batasMinimum: "",
+        batasMaksimum: "",
+        spesifikasi: "",
+        rumus: "",
+        keterangan: "",
+        auto: false,
+        subUraianList: []
+      });
+      if(currentStep === 2) renderUraianList();
+    }
+
+    function removeUraian(idx) {
+      appState.uraianList.splice(idx, 1);
+      renderUraianList();
+    }
+
+    function changeUraianType(idx, newType) {
+      appState.uraianList[idx].type = newType;
+      // If switched to beruntun and no subs exist, initialize one
+      if(newType === 'beruntun' && appState.uraianList[idx].subUraianList.length === 0) {
+         appState.uraianList[idx].subUraianList.push({ name: "Sub Uraian 1", spesifikasi: [], isianList: [] });
+      }
+      renderUraianList();
+    }
+
+    function toggleRumusEnable(checkbox, idx) {
+      const textarea = document.getElementById(`rumus-text-${idx}`);
+      if(textarea) {
+        textarea.disabled = !checkbox.checked;
+        if(!checkbox.checked) textarea.value = '';
+      }
+    }
+
+    function renderUraianList() {
+      const container = document.getElementById('uraian-list-container');
+      container.innerHTML = "";
+      
+      appState.uraianList.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = "card-item-container";
+        
+        let refOpts = `<option value="">Pilih Referensi</option>` + dataReferenceOptions.map(o => `<option value="${o}" ${item.refrensiData===o?'selected':''}>${o}</option>`).join('');
+        let satOpts = satuanOptions.map(o => `<option value="${o}" ${item.satuan===o?'selected':''}>${o}</option>`).join('');
+        let isiOpts = typeIsianOptions.map(o => `<option value="${o}" ${item.typeIsian===o?'selected':''}>${o}</option>`).join('');
+        let specOpts = `<option value="">Pilih Spesifikasi</option>` + assetSpecificationsList.map(o => `<option value="${o}" ${item.spesifikasi===o?'selected':''}>${o}</option>`).join('');
+
+        card.innerHTML = `
+          <div class="card-item-header">
+            <span class="card-item-title">Uraian -</span>
+            ${appState.uraianList.length > 1 ? `<button type="button" class="btn-remove-item" onclick="removeUraian(${idx})">Hapus</button>` : ''}
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            ${item.type === 'beruntun' ? `
+              <div>
+                 <button type="button" class="btn-sub-uraian" onclick="openSubUraianModal(${idx})">
+                    Sub Uraian
+                 </button>
+              </div>
+            ` : ''}
+            <label class="form-label" style="margin-bottom: 4px;">Type Uraian</label>
+            <div class="radio-card-group" style="width: max-content;">
+              <div class="radio-card-option">
+                <input type="radio" id="type-satuan-${idx}" name="type-${idx}" value="satuan" ${item.type === 'satuan' ? 'checked' : ''} onchange="changeUraianType(${idx}, 'satuan')">
+                <label for="type-satuan-${idx}" class="radio-card-label" style="padding: 6px 16px;">Satuan</label>
+              </div>
+              <div class="radio-card-option">
+                <input type="radio" id="type-beruntun-${idx}" name="type-${idx}" value="beruntun" ${item.type === 'beruntun' ? 'checked' : ''} onchange="changeUraianType(${idx}, 'beruntun')">
+                <label for="type-beruntun-${idx}" class="radio-card-label" style="padding: 6px 16px;">Beruntun</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-4" style="margin-bottom: 20px;">
+            <div class="form-group"><label class="form-label">Uraian</label><input type="text" class="form-control" style="border: 1px solid var(--text-main);" value="${item.uraian}" oninput="appState.uraianList[${idx}].uraian = this.value"></div>
+            <div class="form-group"><label class="form-label">Kode Uraian</label><input type="text" class="form-control" style="border: 1px solid var(--text-main);" value="${item.kodeUraian}" oninput="appState.uraianList[${idx}].kodeUraian = this.value"></div>
+            <div class="form-group"><label class="form-label">Type Isian</label><select class="form-control" style="border: 1px solid var(--text-main);" onchange="appState.uraianList[${idx}].typeIsian = this.value">${isiOpts}</select></div>
+            <div class="form-group"><label class="form-label">Refrensi Data</label><select class="form-control" style="border: 1px solid var(--text-main);" onchange="appState.uraianList[${idx}].refrensiData = this.value">${refOpts}</select></div>
+          </div>
+
+          <div class="form-grid-4" style="margin-bottom: 20px;">
+            <div class="form-group"><label class="form-label">Satuan</label><select class="form-control" style="border: 1px solid var(--text-main);" onchange="appState.uraianList[${idx}].satuan = this.value">${satOpts}</select></div>
+            <div class="form-group"><label class="form-label">Batas Minimum</label>${generateNumberInput(item.batasMinimum, '', `appState.uraianList[${idx}].batasMinimum = this.value`, 'border: 1px solid var(--text-main);')}</div>
+            <div class="form-group"><label class="form-label">Batas Maksimum</label>${generateNumberInput(item.batasMaksimum, '', `appState.uraianList[${idx}].batasMaksimum = this.value`, 'border: 1px solid var(--text-main);')}</div>
+            <div class="form-group"><label class="form-label">Spesifikasi</label><select class="form-control" style="border: 1px solid var(--text-main);" onchange="appState.uraianList[${idx}].spesifikasi = this.value">${specOpts}</select></div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label" style="display:flex; gap:8px;"><input type="checkbox" onchange="toggleRumusEnable(this, ${idx})" ${item.rumus !== "" ? "checked" : ""}> Rumus</label>
+              <textarea id="rumus-text-${idx}" class="form-control" style="border: 1px solid var(--text-main);" rows="3" ${item.rumus === "" ? "disabled" : ""} oninput="appState.uraianList[${idx}].rumus = this.value">${item.rumus}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keterangan</label>
+              <textarea class="form-control" style="border: 1px solid var(--text-main);" rows="3" oninput="appState.uraianList[${idx}].keterangan = this.value">${item.keterangan}</textarea>
+            </div>
+            <div class="form-group" style="justify-content:center;">
+               <div class="switch-group"><label class="switch"><input type="checkbox" ${item.auto ? 'checked':''} onchange="appState.uraianList[${idx}].auto = this.checked"><span class="slider"></span></label>
+               <div><span class="switch-label">Auto</span></div></div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ==========================================
+    // MODAL BERUNTUN LOGIC
+    // ==========================================
+    function openSubUraianModal(idx) {
+      activeUraianModalIdx = idx;
+      activeSubUraianIdx = 0;
+      
+      const uraian = appState.uraianList[idx];
+      renderModalSidebar();
+      renderModalContent();
+      document.getElementById('sub-uraian-modal').classList.add('active');
+    }
+
+    function closeSubUraianModal() {
+      document.getElementById('sub-uraian-modal').classList.remove('active');
+      renderUraianList(); 
+    }
+
+    function renderModalSidebar() {
+      const list = appState.uraianList[activeUraianModalIdx].subUraianList;
+      const ul = document.getElementById('modal-sub-menu-list');
+      ul.innerHTML = "";
+      
+      list.forEach((sub, i) => {
+        const li = document.createElement('li');
+        li.className = `inner-menu-item ${i === activeSubUraianIdx ? 'active' : ''}`;
+        li.onclick = () => { activeSubUraianIdx = i; renderModalSidebar(); renderModalContent(); };
+        li.innerHTML = `
+          <span>${sub.name || 'Sub Uraian ' + (i+1)}</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            ${list.length > 1 ? `<button class="btn-delete-sub" onclick="event.stopPropagation(); removeSubUraian(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    function addNewSubUraian() {
+      appState.uraianList[activeUraianModalIdx].subUraianList.push({
+        name: `Sub Uraian ${appState.uraianList[activeUraianModalIdx].subUraianList.length + 1}`, spesifikasi: [], isianList: [{ isian: "", kode: "", typeIsian: "Radio Button", refrensiData: "", satuan: "Tidak Ada", min: "", max: "", rumus: "", keterangan: "" }]
+      });
+      activeSubUraianIdx = appState.uraianList[activeUraianModalIdx].subUraianList.length - 1;
+      renderModalSidebar();
+      renderModalContent();
+    }
+
+    function removeSubUraian(i) {
+      appState.uraianList[activeUraianModalIdx].subUraianList.splice(i, 1);
+      activeSubUraianIdx = Math.max(0, activeSubUraianIdx - 1);
+      renderModalSidebar();
+      renderModalContent();
+    }
+
+    function updateActiveSubName(val) {
+      appState.uraianList[activeUraianModalIdx].subUraianList[activeSubUraianIdx].name = val;
+      renderModalSidebar();
+    }
+
+    function toggleSpecsDropdown() {
+      const d = document.getElementById('specs-dropdown-list');
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleSpecSelection(spec) {
+      const sub = appState.uraianList[activeUraianModalIdx].subUraianList[activeSubUraianIdx];
+      if(sub.spesifikasi.includes(spec)) sub.spesifikasi = sub.spesifikasi.filter(s => s !== spec);
+      else sub.spesifikasi.push(spec);
+      renderModalSpecs();
+    }
+
+    function renderModalSpecs() {
+      const sub = appState.uraianList[activeUraianModalIdx].subUraianList[activeSubUraianIdx];
+      const sel = document.getElementById('specs-multiselect');
+      const drop = document.getElementById('specs-dropdown-list');
+      
+      if(sub.spesifikasi.length === 0) sel.innerHTML = `<span style="color: var(--text-muted); font-size: 13px;">Pilih Spesifikasi...</span>`;
+      else {
+        sel.innerHTML = sub.spesifikasi.map(s => `<span class="multiselect-tag">${s}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" onclick="event.stopPropagation(); toggleSpecSelection('${s}')"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>`).join('');
+      }
+
+      drop.innerHTML = assetSpecificationsList.map(opt => {
+        const checked = sub.spesifikasi.includes(opt);
+        return `<div class="multiselect-option ${checked ? 'selected':''}" onclick="toggleSpecSelection('${opt}')">
+          <span>${opt}</span> ${checked ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:14px;height:14px;"><polyline points="20 6 9 17 4 12"></polyline></svg>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function renderModalContent() {
+      const sub = appState.uraianList[activeUraianModalIdx].subUraianList[activeSubUraianIdx];
+      document.getElementById('sub-name-field').value = sub.name;
+      renderModalSpecs();
+      
+      const isianList = sub.isianList;
+      const c = document.getElementById('sub-uraian-isian-list');
+      c.innerHTML = "";
+      
+      isianList.forEach((item, isianIdx) => {
+        const card = document.createElement('div');
+        card.style.border = "1px solid var(--text-main)";
+        card.style.background = "white";
+        card.style.marginBottom = "24px";
+        card.style.borderRadius = "4px";
+        
+        let refOpts = `<option value="">Pilih Referensi</option>` + dataReferenceOptions.map(o => `<option value="${o}" ${item.refrensiData===o?'selected':''}>${o}</option>`).join('');
+        let satOpts = satuanOptions.map(o => `<option value="${o}" ${item.satuan===o?'selected':''}>${o}</option>`).join('');
+        let isiOpts = typeIsianOptions.map(o => `<option value="${o}" ${item.typeIsian===o?'selected':''}>${o}</option>`).join('');
+
+        card.innerHTML = `
+          <div style="background: #90C2F6; border-bottom: 1px solid var(--text-main); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; color: black;">
+            <span style="font-weight: 700; font-size: 14px;">Isian - ${sub.name} (Baris ${isianIdx+1})</span>
+            ${isianList.length > 1 ? `<button style="background: transparent; border: none; cursor: pointer; color: black; font-weight: bold; font-size: 13px;" onclick="removeSubIsian(${isianIdx})">Hapus X</button>` : ''}
+          </div>
+          <div style="padding: 20px;">
+            <div class="form-grid-4" style="margin-bottom: 20px;">
+              <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Isian</label><input type="text" class="form-control" style="border: 1px solid var(--text-main); border-radius: 4px;" value="${item.isian||''}" oninput="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].isian = this.value"></div>
+              <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Kode Uraian</label><input type="text" class="form-control" style="border: 1px solid var(--text-main); border-radius: 4px;" value="${item.kode||''}" oninput="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].kode = this.value"></div>
+              <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Type Isian</label><select class="form-control" style="border: 1px solid var(--text-main); border-radius: 4px;" onchange="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].typeIsian = this.value">${isiOpts}</select></div>
+              <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Refrensi Data</label><select class="form-control" style="border: 1px solid var(--text-main); border-radius: 4px;" onchange="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].refrensiData = this.value">${refOpts}</select></div>
+            </div>
+            <div class="form-grid-4" style="margin-bottom: 20px;">
+               <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Satuan</label><select class="form-control" style="border: 1px solid var(--text-main); border-radius: 4px;" onchange="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].satuan = this.value">${satOpts}</select></div>
+               <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Batas Minimum</label>${generateNumberInput(item.min||'', '', `appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].min = this.value`, 'border: 1px solid var(--text-main); border-radius: 4px;')}</div>
+               <div class="form-group"><label class="form-label" style="font-size:13px; color:black;">Batas Maksimum</label>${generateNumberInput(item.max||'', '', `appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].max = this.value`, 'border: 1px solid var(--text-main); border-radius: 4px;')}</div>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                 <label class="form-label" style="display:flex;gap:8px;font-size:13px;color:black;"><input type="checkbox" onchange="toggleSubRumusEnable(this, ${isianIdx})" ${item.rumus ? "checked" : ""}> Rumus</label>
+                 <textarea id="sub-rumus-${isianIdx}" class="form-control" rows="3" style="border: 1px solid var(--text-main); border-radius: 4px;" ${!item.rumus ? "disabled" : ""} oninput="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].rumus = this.value">${item.rumus||''}</textarea>
+              </div>
+              <div class="form-group">
+                 <label class="form-label" style="font-size:13px;color:black;">Keterangan</label>
+                 <textarea class="form-control" rows="3" style="border: 1px solid var(--text-main); border-radius: 4px;" oninput="appState.uraianList[${activeUraianModalIdx}].subUraianList[${activeSubUraianIdx}].isianList[${isianIdx}].keterangan = this.value">${item.keterangan||''}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+        c.appendChild(card);
+      });
+    }
+    
+    function toggleSubRumusEnable(chk, idx) {
+      const txt = document.getElementById(`sub-rumus-${idx}`);
+      if(txt) { txt.disabled = !chk.checked; if(!chk.checked) txt.value = ''; }
+    }
+
+    function addNewSubIsian() {
+      appState.uraianList[activeUraianModalIdx].subUraianList[activeSubUraianIdx].isianList.push({
+         isian: "", kode: "", typeIsian: "Radio Button", refrensiData: "", satuan: "Tidak Ada", min: "", max: "", rumus: "", keterangan: ""
+      });
+      renderModalContent();
+    }
+
+    function removeSubIsian(idx) {
+      appState.uraianList[activeUraianModalIdx].subUraianList[activeSubUraianIdx].isianList.splice(idx, 1);
+      renderModalContent();
+    }
+
+    // ==========================================
+    // STEP 3 KONDISI LOGIC
+    // ==========================================
+    let activeKondisiIdx = null;
+    let activeAttributeIdx = 0;
+    let activeAttributesClone = [];
+
+    function getEvaluationTargets() {
+      let targets = [];
+      if (!appState.uraianList) return targets;
+      
+      appState.uraianList.forEach((u, uIdx) => {
+        if (u.type === 'satuan') {
+          targets.push({
+            id: `satuan-${uIdx}`,
+            name: u.uraian || `Uraian ${uIdx + 1} (Satuan)`
+          });
+        } else if (u.type === 'beruntun') {
+          if (u.subUraianList) {
+            u.subUraianList.forEach((sub, subIdx) => {
+              if (sub.isianList) {
+                sub.isianList.forEach((isian, isianIdx) => {
+                  targets.push({
+                    id: `beruntun-${uIdx}-${subIdx}-${isianIdx}`,
+                    name: `${sub.name || `Sub Uraian ${subIdx + 1}`} - ${isian.isian || `Isian ${isianIdx + 1}`}`
+                  });
+                });
+              }
+            });
+          }
+        }
+      });
+      return targets;
+    }
+
+    function getEvaluationTargetOptionsHtml(selectedTargetId) {
+      const targets = getEvaluationTargets();
+      if (targets.length === 0) {
+        return `<option value="" disabled selected>Belum ada Parameter Uraian (Buat di Step 2)</option>`;
+      }
+      return targets.map(t => {
+        return `<option value="${t.id}" ${selectedTargetId === t.id ? 'selected' : ''}>${t.name}</option>`;
+      }).join('');
+    }
+
+    function addNewConditionBlock() {
+      const targets = getEvaluationTargets();
+      const defaultTargetId = targets.length > 0 ? targets[0].id : "";
+      
+      appState.kondisiList.push({
+        id: 'cond-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        componentType: 'norm',
+        targetTargetId: defaultTargetId,
+        activeAccordion: true,
+        attributes: [
+          {
+            name: "Atribut 1",
+            filters: [
+              { bagian: "", prop: "", op: "=", val: "" }
+            ],
+            limits: [
+              { batasBawah: "", opBawah: "", opAtas: "<", batasAtas: "0.4", bobot: "1", rekomendasi: "Lanjutkan pemantauan rutin." },
+              { batasBawah: "0.4", opBawah: ">=", opAtas: "<", batasAtas: "0.5", bobot: "3", rekomendasi: "Jadwalkan inspeksi visual detail." },
+              { batasBawah: "0.5", opBawah: ">=", opAtas: "<", batasAtas: "0.7", bobot: "4", rekomendasi: "Jadwalkan pemeliharaan preventif." },
+              { batasBawah: "0.7", opBawah: ">=", opAtas: "", batasAtas: "", bobot: "5", rekomendasi: "Tindak lanjut segera, lakukan investigasi mendalam." }
+            ],
+            refMappings: [
+              { refValue: "Normal", bobot: "1", rekomendasi: "Lanjutkan pemantauan rutin." },
+              { refValue: "Abnormal", bobot: "4", rekomendasi: "Rencanakan perbaikan dalam waktu dekat." },
+              { refValue: "Kritis", bobot: "5", rekomendasi: "Segera lakukan isolasi dan perbaikan." }
+            ]
+          }
+        ]
+      });
+      if(currentStep === 3) renderConditionsList();
+    }
+
+    function removeCondBlock(idx) { 
+      appState.kondisiList.splice(idx, 1); 
+      renderConditionsList(); 
+    }
+
+    function toggleAccordion(idx) {
+      appState.kondisiList[idx].activeAccordion = !appState.kondisiList[idx].activeAccordion;
+      renderConditionsList();
+    }
+
+    function changeConditionTarget(idx, targetId) {
+      appState.kondisiList[idx].targetTargetId = targetId;
+      renderConditionsList();
+    }
+
+    function changeComponentType(idx, compType) {
+      appState.kondisiList[idx].componentType = compType;
+      renderConditionsList();
+    }
+
+    function getBobotLabel(bobot) {
+      switch (String(bobot)) {
+        case '1': return '1 - Very Good';
+        case '2': return '2 - Good';
+        case '3': return '3 - Fair';
+        case '4': return '4 - Poor';
+        case '5': return '5 - Critical';
+        default: return bobot;
+      }
+    }
+
+    function renderConditionsList() {
+      const container = document.getElementById('conditions-container');
+      container.innerHTML = "";
+      
+      if (appState.kondisiList.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: var(--bg-panel-solid);">
+            Belum ada Blok Kondisi. Klik "Tambah Blok Kondisi" untuk memulai konfigurasi.
+          </div>
+        `;
+        return;
+      }
+
+      appState.kondisiList.forEach((block, idx) => {
+        const blockDiv = document.createElement('div');
+        blockDiv.className = "condition-block-wrapper";
+        blockDiv.style.marginBottom = "16px";
+
+        const targets = getEvaluationTargets();
+        
+        // Sync target if deleted
+        let selectedTarget = targets.find(t => t.id === block.targetTargetId);
+        if (!selectedTarget && targets.length > 0) {
+          block.targetTargetId = targets[0].id;
+          selectedTarget = targets[0];
+        }
+        
+        const targetOptionsHtml = getEvaluationTargetOptionsHtml(block.targetTargetId);
+        const targetName = selectedTarget ? selectedTarget.name : "Parameter Uraian";
+
+        // Generate rules preview
+        let rulesPreviewHtml = "";
+        if (block.attributes && block.attributes.length > 0) {
+          let previewItems = [];
+          block.attributes.forEach((attr) => {
+            let filterStr = "";
+            if (attr.filters && attr.filters.length > 0) {
+              const activeFilters = attr.filters.filter(f => f.prop);
+              if (activeFilters.length > 0) {
+                filterStr = activeFilters.map(f => `(${f.prop} ${f.op} ${f.val})`).join(' & ');
+              }
+            }
+            const badgeStr = filterStr ? `<span class="rule-filter-badge">${filterStr}</span>` : `<span class="rule-filter-badge" style="background:var(--text-muted)">Semua Aset</span>`;
+            
+            if (block.componentType === 'norm') {
+              attr.limits.forEach(lim => {
+                let rangeStr = "";
+                if (lim.batasBawah === "" && lim.batasAtas !== "") {
+                  rangeStr = `${lim.opAtas} ${lim.batasAtas}`;
+                } else if (lim.batasBawah !== "" && lim.batasAtas !== "") {
+                  rangeStr = `${lim.batasBawah} ${lim.opBawah || '>='} ${targetName} ${lim.opAtas || '<'} ${lim.batasAtas}`;
+                } else if (lim.batasBawah !== "" && lim.batasAtas === "") {
+                  rangeStr = `${lim.opBawah} ${lim.batasBawah}`;
+                } else {
+                  rangeStr = "Semua Nilai";
+                }
+                
+                previewItems.push(`
+                  <div class="rule-item">
+                    <div>
+                      ${badgeStr} 
+                      <span><strong>${targetName}</strong> : ${rangeStr}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                      <span class="bobot-badge bobot-badge-${lim.bobot}">${getBobotLabel(lim.bobot)}</span>
+                      <span style="color:var(--text-muted); font-size:12px; font-style:italic;">"${lim.rekomendasi || 'Tanpa Rekomendasi'}"</span>
+                    </div>
+                  </div>
+                `);
+              });
+            } else {
+              attr.refMappings.forEach(map => {
+                previewItems.push(`
+                  <div class="rule-item">
+                    <div>
+                      ${badgeStr}
+                      <span><strong>Kondisi</strong> = "${map.refValue || 'Nilai Kosong'}"</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                      <span class="bobot-badge bobot-badge-${map.bobot}">${getBobotLabel(map.bobot)}</span>
+                      <span style="color:var(--text-muted); font-size:12px; font-style:italic;">"${map.rekomendasi || 'Tanpa Rekomendasi'}"</span>
+                    </div>
+                  </div>
+                `);
+              });
+            }
+          });
+          
+          if (previewItems.length > 0) {
+            rulesPreviewHtml = `
+              <div class="rules-preview-container">
+                <div class="rules-preview-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  Pratinjau Logika &amp; Rekomendasi (${block.attributes.length} Atribut Filter)
+                </div>
+                <div class="rule-chip-group">
+                  ${previewItems.join('')}
+                </div>
+              </div>
+            `;
+          }
+        }
+
+        blockDiv.innerHTML = `
+          <div class="accordion-header" onclick="toggleAccordion(${idx})">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" style="width:16px;height:16px; cursor:pointer;" onclick="event.stopPropagation(); removeCondBlock(${idx})"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span class="condition-title" style="font-weight:700;">Kondisi ${idx + 1}</span>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px; transition: transform var(--transition-fast); transform: ${block.activeAccordion ? 'rotate(180deg)' : 'rotate(0)'};"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="accordion-content ${block.activeAccordion ? 'active' : ''}">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="form-label" style="margin-bottom: 4px;">Pilih Komponen Kondisi</span>
+              <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+                
+                <div style="display:flex; align-items:center; gap:16px; background:var(--bg-app); padding:8px 16px; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+                  <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text-main); margin-bottom:0;">
+                    <input type="radio" name="comp-type-${block.id}" value="norm" ${block.componentType === 'norm' ? 'checked' : ''} onchange="changeComponentType(${idx}, 'norm')">
+                    Batasan dari Norm/Rumus
+                  </label>
+                  <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text-main); margin-bottom:0;">
+                    <input type="radio" name="comp-type-${block.id}" value="ref" ${block.componentType === 'ref' ? 'checked' : ''} onchange="changeComponentType(${idx}, 'ref')">
+                    Referensi Data
+                  </label>
+                </div>
+                
+                <select class="form-control" style="max-width:320px; border:1px solid var(--text-main);" onchange="changeConditionTarget(${idx}, this.value)">
+                  ${targetOptionsHtml}
+                </select>
+                
+                <button type="button" class="btn btn-primary" style="padding:10px 20px; font-size:13px; border-radius:var(--radius-md); margin-left:auto;" onclick="openAtributModal(${idx})">
+                  ATRIBUT (${block.attributes.length})
+                </button>
+              </div>
+            </div>
+            
+            ${rulesPreviewHtml}
+          </div>
+        `;
+        
+        container.appendChild(blockDiv);
+      });
+    }
+
+    // ==========================================
+    // MODAL ATRIBUT LOGIC
+    // ==========================================
+    function openAtributModal(kondisiIdx) {
+      activeKondisiIdx = kondisiIdx;
+      activeAttributeIdx = 0;
+      
+      const block = appState.kondisiList[kondisiIdx];
+      activeAttributesClone = JSON.parse(JSON.stringify(block.attributes));
+      
+      // Migrate existing filters to support 'bagian'
+      activeAttributesClone.forEach(attr => {
+        if (attr.filters) {
+          attr.filters.forEach(f => {
+            if (!f.bagian) {
+              const specProps = ["Tegangan", "Core", "Stack"];
+              const umumProps = ["Merk", "Fasa", "Grup Aset", "Jenis Aset"];
+              if (specProps.includes(f.prop)) {
+                f.bagian = "spesifikasi";
+              } else if (umumProps.includes(f.prop)) {
+                f.bagian = "umum";
+              } else if (f.prop) {
+                f.bagian = "umum";
+              } else {
+                f.bagian = "";
+              }
+            }
+          });
+        }
+      });
+      
+      renderAtributSidebar();
+      renderAtributContent();
+      
+      document.getElementById('atribut-modal').classList.add('active');
+    }
+
+    function closeAtributModal() {
+      document.getElementById('atribut-modal').classList.remove('active');
+    }
+
+    function saveAtributModal() {
+      appState.kondisiList[activeKondisiIdx].attributes = activeAttributesClone;
+      closeAtributModal();
+      renderConditionsList();
+    }
+
+    function renderAtributSidebar() {
+      const list = activeAttributesClone;
+      const ul = document.getElementById('modal-atribut-sidebar-list');
+      ul.innerHTML = "";
+      
+      list.forEach((attr, i) => {
+        const li = document.createElement('li');
+        li.className = `inner-menu-item ${i === activeAttributeIdx ? 'active' : ''}`;
+        li.onclick = () => { activeAttributeIdx = i; renderAtributSidebar(); renderAtributContent(); };
+        
+        let filterSummary = "Tanpa Filter";
+        if (attr.filters && attr.filters.length > 0) {
+          const activeFilters = attr.filters.filter(f => f.prop);
+          if (activeFilters.length > 0) {
+            filterSummary = activeFilters.map(f => `${f.prop}${f.op}${f.val}`).join(' & ');
+          }
+        }
+        
+        li.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:2px; text-align:left;">
+            <span style="font-weight:700;">${attr.name || 'Atribut ' + (i+1)}</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:500;">${filterSummary}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            ${list.length > 1 ? `<button class="btn-delete-sub" onclick="event.stopPropagation(); removeAttributeFromModal(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    function addNewAttributeToModal() {
+      activeAttributesClone.push({
+        name: `Atribut ${activeAttributesClone.length + 1}`,
+        filters: [
+          { bagian: "", prop: "", op: "=", val: "" }
+        ],
+        limits: [
+          { batasBawah: "", opBawah: "", opAtas: "<", batasAtas: "0.4", bobot: "1", rekomendasi: "Lanjutkan pemantauan." },
+          { batasBawah: "0.4", opBawah: ">=", opAtas: "", batasAtas: "", bobot: "5", rekomendasi: "Segera tindak lanjuti." }
+        ],
+        refMappings: [
+          { refValue: "Normal", bobot: "1", rekomendasi: "Lanjutkan pemantauan." }
+        ]
+      });
+      activeAttributeIdx = activeAttributesClone.length - 1;
+      renderAtributSidebar();
+      renderAtributContent();
+    }
+
+    function removeAttributeFromModal(i) {
+      activeAttributesClone.splice(i, 1);
+      activeAttributeIdx = Math.max(0, activeAttributeIdx - 1);
+      renderAtributSidebar();
+      renderAtributContent();
+    }
+
+    function renderFiltersList() {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      const container = document.getElementById('modal-filters-container');
+      container.innerHTML = "";
+
+      if (!attr.filters || attr.filters.length === 0) {
+        attr.filters = [{ bagian: "", prop: "", op: "=", val: "" }];
+      }
+
+      attr.filters.forEach((f, fIdx) => {
+        const row = document.createElement('div');
+        row.className = "filter-row-container";
+        row.style.marginBottom = "12px";
+
+        // Determine property options based on Bagian
+        let propOptionsHtml = '<option value="">-- Pilih Atribut --</option>';
+        if (f.bagian === 'umum') {
+          propOptionsHtml += `
+            <option value="Merk" ${f.prop === 'Merk' ? 'selected' : ''}>Merk</option>
+            <option value="Fasa" ${f.prop === 'Fasa' ? 'selected' : ''}>Fasa</option>
+            <option value="Grup Aset" ${f.prop === 'Grup Aset' ? 'selected' : ''}>Grup Aset</option>
+            <option value="Jenis Aset" ${f.prop === 'Jenis Aset' ? 'selected' : ''}>Jenis Aset</option>
+          `;
+        } else if (f.bagian === 'spesifikasi') {
+          propOptionsHtml += `
+            <option value="Tegangan" ${f.prop === 'Tegangan' ? 'selected' : ''}>Tegangan</option>
+            <option value="Core" ${f.prop === 'Core' ? 'selected' : ''}>Core</option>
+            <option value="Stack" ${f.prop === 'Stack' ? 'selected' : ''}>Stack</option>
+          `;
+        }
+
+        const standardProps = ["Tegangan", "Merk", "Fasa", "Grup Aset", "Jenis Aset", "Core", "Stack"];
+        const isCustomProp = f.prop && !standardProps.includes(f.prop);
+        if (f.bagian) {
+          propOptionsHtml += `<option value="custom" ${isCustomProp ? 'selected' : ''}>+ Tulis Atribut Kustom...</option>`;
+        }
+
+        const selectedPropVal = isCustomProp ? "custom" : f.prop;
+
+        // Render value input or dropdown
+        let valInputHtml = "";
+        const standardBrands = ["ABB", "Siemens", "GE", "Schneider Electric", "Alstom", "Hyundai", "CG Power"];
+        const isCustomBrand = f.prop === 'Merk' && f.val && !standardBrands.includes(f.val);
+        const selectedBrandVal = isCustomBrand ? "custom" : f.val;
+
+        if (f.prop === 'Merk') {
+          valInputHtml = `
+            <select class="form-control" style="border: 1px solid var(--text-main);" onchange="handleFilterBrandChange(${fIdx}, this.value)">
+              <option value="">-- Pilih Merk --</option>
+              <option value="ABB" ${selectedBrandVal === 'ABB' ? 'selected' : ''}>ABB</option>
+              <option value="Siemens" ${selectedBrandVal === 'Siemens' ? 'selected' : ''}>Siemens</option>
+              <option value="GE" ${selectedBrandVal === 'GE' ? 'selected' : ''}>GE (General Electric)</option>
+              <option value="Schneider Electric" ${selectedBrandVal === 'Schneider Electric' ? 'selected' : ''}>Schneider Electric</option>
+              <option value="Alstom" ${selectedBrandVal === 'Alstom' ? 'selected' : ''}>Alstom</option>
+              <option value="Hyundai" ${selectedBrandVal === 'Hyundai' ? 'selected' : ''}>Hyundai</option>
+              <option value="CG Power" ${selectedBrandVal === 'CG Power' ? 'selected' : ''}>CG Power</option>
+              <option value="custom" ${selectedBrandVal === 'custom' ? 'selected' : ''}>+ Tulis Merk Kustom...</option>
+            </select>
+          `;
+        } else {
+          valInputHtml = `
+            <input type="text" class="form-control" placeholder="Masukkan nilai..." style="border: 1px solid var(--text-main);" value="${f.val || ''}" oninput="updateFilterField(${fIdx}, 'val', this.value)">
+          `;
+        }
+
+        row.innerHTML = `
+          <div class="form-grid-5" style="display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 2fr auto; align-items: flex-end; gap: 12px;">
+            <div class="form-group">
+              ${fIdx === 0 ? '<label class="form-label">Bagian</label>' : ''}
+              <select class="form-control" style="border: 1px solid var(--text-main);" onchange="updateFilterBagian(${fIdx}, this.value)">
+                <option value="">-- Pilih Bagian --</option>
+                <option value="umum" ${f.bagian === 'umum' ? 'selected' : ''}>Umum</option>
+                <option value="spesifikasi" ${f.bagian === 'spesifikasi' ? 'selected' : ''}>Spesifikasi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              ${fIdx === 0 ? '<label class="form-label">Atribut</label>' : ''}
+              <select class="form-control" style="border: 1px solid var(--text-main);" ${!f.bagian ? 'disabled' : ''} onchange="handleFilterPropChange(${fIdx}, this.value)">
+                ${propOptionsHtml}
+              </select>
+            </div>
+            <div class="form-group">
+              ${fIdx === 0 ? '<label class="form-label">Notasi</label>' : ''}
+              <select class="form-control" style="border: 1px solid var(--text-main);" onchange="updateFilterField(${fIdx}, 'op', this.value)">
+                <option value="=" ${f.op === '=' ? 'selected' : ''}>=</option>
+                <option value="!=" ${f.op === '!=' ? 'selected' : ''}>!=</option>
+                <option value=">" ${f.op === '>' ? 'selected' : ''}>&gt;</option>
+                <option value=">=" ${f.op === '>=' ? 'selected' : ''}>&gt;=</option>
+                <option value="<" ${f.op === '<' ? 'selected' : ''}>&lt;</option>
+                <option value="<=" ${f.op === '<=' ? 'selected' : ''}>&lt;=</option>
+              </select>
+            </div>
+            <div class="form-group">
+              ${fIdx === 0 ? '<label class="form-label">Nilai</label>' : ''}
+              ${valInputHtml}
+            </div>
+            <div style="margin-bottom: 4px;">
+              ${attr.filters.length > 1 ? `
+                <button class="btn btn-secondary" style="padding:10px; border-radius:var(--radius-md); border-color:var(--danger); color:var(--danger); margin:0;" onclick="deleteFilterFromActiveAttribute(${fIdx})" title="Hapus Kriteria">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              ` : `<div style="width: 38px;"></div>`}
+            </div>
+          </div>
+          <div id="custom-prop-input-container-${fIdx}" style="margin-top: 8px; display: ${selectedPropVal === 'custom' ? 'block' : 'none'};">
+            <input type="text" class="form-control" placeholder="Tulis nama tipe atribut (cth: Merk, Tipe, Lokasi...)" style="border: 1px solid var(--text-main); font-size:12px; padding: 6px 12px; width: 100%;" value="${isCustomProp ? f.prop : ''}" oninput="updateFilterField(${fIdx}, 'prop', this.value)">
+          </div>
+          <div id="custom-brand-input-container-${fIdx}" style="margin-top: 8px; display: ${f.prop === 'Merk' && selectedBrandVal === 'custom' ? 'block' : 'none'};">
+            <input type="text" class="form-control" placeholder="Tulis nama merk kustom (cth: Mitsubishi, Toshiba...)" style="border: 1px solid var(--text-main); font-size:12px; padding: 6px 12px; width: 100%;" value="${isCustomBrand ? f.val : ''}" oninput="updateFilterField(${fIdx}, 'val', this.value)">
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function updateFilterBagian(fIdx, val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      attr.filters[fIdx].bagian = val;
+      attr.filters[fIdx].prop = "";
+      attr.filters[fIdx].val = "";
+      renderFiltersList();
+      renderAtributSidebar();
+    }
+
+    function handleFilterPropChange(fIdx, val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      
+      const isCustom = val === "custom";
+      attr.filters[fIdx].prop = isCustom ? "" : val;
+      attr.filters[fIdx].val = "";
+      
+      renderFiltersList();
+      
+      if (isCustom) {
+        const container = document.getElementById(`custom-prop-input-container-${fIdx}`);
+        if (container) {
+          container.style.display = "block";
+          const input = container.querySelector('input');
+          if (input) input.focus();
+        }
+      }
+      renderAtributSidebar();
+    }
+
+    function handleFilterBrandChange(fIdx, val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      
+      const isCustom = val === "custom";
+      attr.filters[fIdx].val = isCustom ? "" : val;
+      
+      renderFiltersList();
+      
+      if (isCustom) {
+        const container = document.getElementById(`custom-brand-input-container-${fIdx}`);
+        if (container) {
+          container.style.display = "block";
+          const input = container.querySelector('input');
+          if (input) input.focus();
+        }
+      }
+      renderAtributSidebar();
+    }
+
+    function updateFilterField(filterIdx, field, val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      attr.filters[filterIdx][field] = val;
+      renderAtributSidebar();
+    }
+
+    function updateAttributeName(val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      attr.name = val;
+      renderAtributSidebar();
+    }
+
+    function addNewFilterToActiveAttribute() {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      if (!attr.filters) attr.filters = [];
+      attr.filters.push({ prop: "", op: "=", val: "" });
+      renderFiltersList();
+      renderAtributSidebar();
+    }
+
+    function deleteFilterFromActiveAttribute(filterIdx) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+      attr.filters.splice(filterIdx, 1);
+      renderFiltersList();
+      renderAtributSidebar();
+    }
+
+    function getBobotSelectHtml(selectedVal, onChangeStr) {
+      const options = [
+        { val: "1", text: "1 - Very Good" },
+        { val: "2", text: "2 - Good" },
+        { val: "3", text: "3 - Fair" },
+        { val: "4", text: "4 - Poor" },
+        { val: "5", text: "5 - Critical" }
+      ];
+
+      const bgClass = `bobot-badge-${selectedVal}`;
+
+      return `
+        <select class="form-control bobot-badge ${bgClass}" style="border:1px solid var(--text-main); font-weight:700; width:100%; cursor:pointer;" onchange="${onChangeStr}">
+          ${options.map(o => `<option value="${o.val}" class="bobot-badge-${o.val}" style="font-weight:700; background:white; color:black;" ${selectedVal == o.val ? 'selected' : ''}>${o.text}</option>`).join('')}
+        </select>
+      `;
+    }
+
+    function renderAtributContent() {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      if (!attr) return;
+
+      const nameInput = document.getElementById('modal-attribute-name-input');
+      if (nameInput) {
+        nameInput.value = attr.name || '';
+      }
+
+      renderFiltersList();
+
+      const block = appState.kondisiList[activeKondisiIdx];
+      const targets = getEvaluationTargets();
+      const selectedTarget = targets.find(t => t.id === block.targetTargetId);
+      const valueLabelName = selectedTarget ? selectedTarget.name : "Nilai Pengukuran";
+
+      const tableContainer = document.getElementById('modal-table-config-container');
+      tableContainer.innerHTML = "";
+
+      if (block.componentType === 'norm') {
+        document.getElementById('table-config-title').innerText = "Batasan Rentang Nilai (Norm/Rumus)";
+        
+        let tableHtml = `
+          <table class="limit-table">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">No.</th>
+                <th>Batas Bawah</th>
+                <th style="width: 140px;">Notasi Bawah</th>
+                <th style="text-align: center; color: var(--primary); font-weight: 700;">Parameter Evaluasi</th>
+                <th style="width: 140px;">Notasi Atas</th>
+                <th>Batas Atas</th>
+                <th style="width: 200px;">Bobot Kondisi</th>
+                <th>Rekomendasi Tindak Lanjut</th>
+                <th style="width: 90px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        attr.limits.forEach((lim, limIdx) => {
+          const opBawahOpts = `
+            <option value="" ${lim.opBawah === "" ? 'selected' : ''}>None</option>
+            <option value=">" ${lim.opBawah === ">" ? 'selected' : ''}>&gt;</option>
+            <option value=">=" ${lim.opBawah === ">=" ? 'selected' : ''}>&gt;=</option>
+          `;
+          
+          const opAtasOpts = `
+            <option value="" ${lim.opAtas === "" ? 'selected' : ''}>None</option>
+            <option value="<" ${lim.opAtas === "<" ? 'selected' : ''}>&lt;</option>
+            <option value="<=" ${lim.opAtas === "<=" ? 'selected' : ''}>&lt;=</option>
+          `;
+
+          const bobotSelectHtml = getBobotSelectHtml(lim.bobot, `updateLimitRow(${limIdx}, 'bobot', this.value)`);
+
+          tableHtml += `
+            <tr>
+              <td style="text-align: center; font-weight: 700;">${limIdx + 1}</td>
+              <td>
+                ${generateNumberInput(lim.batasBawah, 'Min', `updateLimitRow(${limIdx}, 'batasBawah', this.value)`, 'border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;')}
+              </td>
+              <td>
+                <select class="form-control" style="border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;" onchange="updateLimitRow(${limIdx}, 'opBawah', this.value)">
+                  ${opBawahOpts}
+                </select>
+              </td>
+              <td style="text-align: center; font-size: 13px; font-weight: 700; color: var(--primary);">
+                ${valueLabelName}
+              </td>
+              <td>
+                <select class="form-control" style="border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;" onchange="updateLimitRow(${limIdx}, 'opAtas', this.value)">
+                  ${opAtasOpts}
+                </select>
+              </td>
+              <td>
+                ${generateNumberInput(lim.batasAtas, 'Max', `updateLimitRow(${limIdx}, 'batasAtas', this.value)`, 'border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;')}
+              </td>
+              <td>
+                ${bobotSelectHtml}
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Masukkan rekomendasi..." style="border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;" value="${lim.rekomendasi || ''}" oninput="updateLimitRow(${limIdx}, 'rekomendasi', this.value)">
+              </td>
+              <td style="text-align: center;">
+                <div style="display:flex; align-items:center; justify-content:center; gap:6px;">
+                  <button class="btn btn-secondary" style="padding:6px; border-radius:var(--radius-sm); margin:0;" onclick="copyLimitRow(${limIdx})" title="Salin Baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  </button>
+                  ${attr.limits.length > 1 ? `
+                    <button class="btn btn-secondary" style="padding:6px; border-radius:var(--radius-sm); border-color:var(--danger); color:var(--danger); margin:0;" onclick="deleteLimitRow(${limIdx})" title="Hapus">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+
+        tableHtml += `
+            </tbody>
+          </table>
+        `;
+        tableContainer.innerHTML = tableHtml;
+      } else {
+        document.getElementById('table-config-title').innerText = "Pemetaan Nilai (Referensi Data)";
+        
+        let tableHtml = `
+          <table class="limit-table">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">No.</th>
+                <th>Nilai Pilihan (Hasil Pengukuran User)</th>
+                <th style="width: 200px;">Bobot Kondisi</th>
+                <th>Rekomendasi Tindak Lanjut</th>
+                <th style="width: 80px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        attr.refMappings.forEach((map, mapIdx) => {
+          const bobotSelectHtml = getBobotSelectHtml(map.bobot, `updateRefMappingRow(${mapIdx}, 'bobot', this.value)`);
+
+          tableHtml += `
+            <tr>
+              <td style="text-align: center; font-weight: 700;">${mapIdx + 1}</td>
+              <td>
+                <input type="text" class="form-control" placeholder="Cth: Karat, Retak, Pecah..." style="border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;" value="${map.refValue || ''}" oninput="updateRefMappingRow(${mapIdx}, 'refValue', this.value)">
+              </td>
+              <td>
+                ${bobotSelectHtml}
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Masukkan rekomendasi..." style="border: 1px solid var(--text-main); font-size:13px; padding:6px 10px;" value="${map.rekomendasi || ''}" oninput="updateRefMappingRow(${mapIdx}, 'rekomendasi', this.value)">
+              </td>
+              <td style="text-align: center;">
+                ${attr.refMappings.length > 1 ? `
+                  <button class="btn btn-secondary" style="padding:6px; border-radius:var(--radius-sm); border-color:var(--danger); color:var(--danger); margin:0;" onclick="deleteRefMappingRow(${mapIdx})" title="Hapus">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  </button>
+                ` : '-'}
+              </td>
+            </tr>
+          `;
+        });
+
+        tableHtml += `
+            </tbody>
+          </table>
+        `;
+        tableContainer.innerHTML = tableHtml;
+      }
+    }
+
+    function updateLimitRow(rowIdx, prop, val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      attr.limits[rowIdx][prop] = val;
+      if (prop === 'bobot') {
+        renderAtributContent();
+      }
+    }
+
+    function copyLimitRow(rowIdx) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      const source = attr.limits[rowIdx];
+      const clone = JSON.parse(JSON.stringify(source));
+      attr.limits.splice(rowIdx + 1, 0, clone);
+      renderAtributContent();
+    }
+
+    function deleteLimitRow(rowIdx) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      attr.limits.splice(rowIdx, 1);
+      renderAtributContent();
+    }
+
+    function updateRefMappingRow(rowIdx, prop, val) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      attr.refMappings[rowIdx][prop] = val;
+      if (prop === 'bobot') {
+        renderAtributContent();
+      }
+    }
+
+    function deleteRefMappingRow(rowIdx) {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      attr.refMappings.splice(rowIdx, 1);
+      renderAtributContent();
+    }
+
+    function addNewTableConfigRow() {
+      const attr = activeAttributesClone[activeAttributeIdx];
+      const block = appState.kondisiList[activeKondisiIdx];
+      if (block.componentType === 'norm') {
+        attr.limits.push({
+          batasBawah: "",
+          opBawah: ">=",
+          opAtas: "<",
+          batasAtas: "",
+          bobot: "3",
+          rekomendasi: ""
+        });
+      } else {
+        attr.refMappings.push({
+          refValue: "",
+          bobot: "3",
+          rekomendasi: ""
+        });
+      }
+      renderAtributContent();
+    }
+
+  </script>
+</body>
+</html>
