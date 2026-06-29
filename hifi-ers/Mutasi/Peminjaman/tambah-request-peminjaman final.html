@@ -1486,11 +1486,11 @@ tbody tr:hover {
         <div class="form-row cols-2" style="margin-top:16px;margin-bottom:18px">
           <div class="field">
             <label>Unit Induk Peminjam</label>
-            <input type="text" value="€“" readonly style="background:var(--surface);color:var(--text-secondary)" />
+            <input type="text" id="ui-peminjam" value="P3BS" readonly style="background:var(--surface);color:var(--text-secondary)" />
           </div>
           <div class="field">
             <label>Unit Pelaksana Peminjam <span class="req">*</span></label>
-            <select>
+            <select id="upt-peminjam">
               <option value="" disabled selected>Pilih Unit Pelaksana</option>
             </select>
           </div>
@@ -1571,8 +1571,8 @@ tbody tr:hover {
                   <div class="unit-sel-wrap">
                     <select class="unit-sel" id="gt-lvl3">
                       <option value="" disabled selected>Pilih Unit Level 3</option>
-                      <option>ULTG Cawang</option>
-                      <option>ULTG Gandul</option>
+                      <option>ULTG CITRA RAYA</option>
+                      <option>ULTG ANGKE</option>
                       <option>ULTG Bekasi</option>
                       <option>ULTG Depok</option>
                     </select>
@@ -1582,9 +1582,9 @@ tbody tr:hover {
                   <div class="unit-sel-wrap">
                     <select class="unit-sel" id="gt-lvl4">
                       <option value="" disabled selected>Pilih Unit Level 4</option>
-                      <option>GI Cawang</option>
+                      <option>GI 150KV SINDANG JAYA</option>
                       <option>GI Duri Kosambi</option>
-                      <option>GI Gandul</option>
+                      <option>GI 150KV DADAP</option>
                       <option>GI Kebayoran</option>
                     </select>
                   </div>
@@ -1913,7 +1913,20 @@ tbody tr:hover {
     </div>
   </div>
 
+  <script src="data_unit_hierarchy.js"></script>
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      if (window.unitData && window.unitData['P3BS']) {
+        var uptPeminjamSel = document.getElementById('upt-peminjam');
+        Object.keys(window.unitData['P3BS']).forEach(function(upt) {
+           var opt = document.createElement('option');
+           opt.value = upt;
+           opt.textContent = upt;
+           uptPeminjamSel.appendChild(opt);
+        });
+      }
+    });
+
     /* ”€”€”€ Upload Dokumen Side Panel ”€”€”€ */
     var docFiles = { ba: [], pr: [] };
 
@@ -2037,7 +2050,7 @@ tbody tr:hover {
     /* ••••••••••••••••••••••••••••••••••••••••••••••• */
     var destinasiMode = 'antar_up'; /* 'antar_up' | 'antar_ui' */
 
-    var unitIndukOpts = ['P3BSUL', 'UIW Jawa Barat', 'UIW DKI Jakarta', 'UIW Jawa Tengah', 'UIW Jawa Timur'];
+    var unitIndukOpts = []; // initialized later when unitData is processed
 
     function onDestinasiChange(val) {
       destinasiMode = val || 'antar_up';
@@ -2098,14 +2111,33 @@ tbody tr:hover {
       return '<div class="unit-sel-wrap">' + s + '</div>';
     }
 
-    var uptOpts = ['UPT Jakarta', 'UPT Bandung', 'UPT Surabaya', 'UPT Medan', 'UPT Makassar'];
-    var ultgOpts = ['ULTG Cawang', 'ULTG Gandul', 'ULTG Bekasi', 'ULTG Depok'];
-    var giOpts = ['GI Cawang', 'GI Duri Kosambi', 'GI Gandul', 'GI Kebayoran'];
+    var unitIndukOpts = window.unitData ? Object.keys(window.unitData) : ['P3BSUL', 'UITJBB'];
+
+    var uptToUltg = {};
+    var ultgToGi = {};
+    var allUpts = [];
+    if (window.unitData) {
+      Object.keys(window.unitData).forEach(function(ui) {
+         Object.keys(window.unitData[ui]).forEach(function(upt) {
+            allUpts.push(upt);
+            uptToUltg[upt] = Object.keys(window.unitData[ui][upt]);
+            Object.keys(window.unitData[ui][upt]).forEach(function(ultg) {
+               ultgToGi[ultg] = window.unitData[ui][upt][ultg];
+            });
+         });
+      });
+    }
+
     var gudangOpts = ['Gudang Utama', 'Gudang Transit A', 'Gudang Transit B'];
 
     function setUnitField(id, field, val) {
       var row = unitRows.find(function (r) { return r.id === id });
-      if (row) row[field] = val;
+      if (row) {
+        row[field] = val;
+        if (field === 'upt') { row.ultg = ''; row.gi = ''; }
+        if (field === 'ultg') { row.gi = ''; }
+        renderUnitTable();
+      }
     }
 
     function renderUnitTable() {
@@ -2138,12 +2170,19 @@ tbody tr:hover {
           ? (r.sets ? r.sets.reduce(function (s, x) { return s + x.jumlah }, 0) : 0)
           : (r.accessories ? r.accessories.length : 0);
         var cells = '';
+        var uiPeminjamInput = document.getElementById('ui-peminjam');
+        var uiPeminjam = uiPeminjamInput ? uiPeminjamInput.value : '';
         if (isUI) {
-          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(unitIndukOpts, 'Pilih Unit Induk', r.ui, 'ui', r.id) + '</td>';
+          var filteredUIOpts = unitIndukOpts.filter(function(ui) { return ui !== uiPeminjam; });
+          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(filteredUIOpts, 'Pilih Unit Induk', r.ui, 'ui', r.id) + '</td>';
         } else {
-          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(uptOpts, 'Pilih Unit Pelaksana', r.upt, 'upt', r.id) + '</td>';
-          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(ultgOpts, 'Pilih Unit Level 3', r.ultg, 'ultg', r.id) + '</td>';
-          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(giOpts, 'Pilih Unit Level 4', r.gi, 'gi', r.id) + '</td>';
+          var curUptOpts = window.unitData && window.unitData[uiPeminjam] ? Object.keys(window.unitData[uiPeminjam]) : allUpts;
+          var curUltgOpts = r.upt && uptToUltg[r.upt] ? uptToUltg[r.upt] : [];
+          var curGiOpts = r.ultg && ultgToGi[r.ultg] ? ultgToGi[r.ultg] : [];
+
+          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(curUptOpts, 'Pilih Unit Pelaksana', r.upt, 'upt', r.id) + '</td>';
+          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(curUltgOpts, 'Pilih Unit Level 3', r.ultg, 'ultg', r.id) + '</td>';
+          cells += '<td style="vertical-align:top;padding-top:10px">' + makeUnitSel(curGiOpts, 'Pilih Unit Level 4', r.gi, 'gi', r.id) + '</td>';
         }
         return '<tr>'
           + '<td style="text-align:center;color:var(--text-hint);font-size:12px;vertical-align:middle">' + (i + 1) + '</td>'
@@ -2334,7 +2373,7 @@ tbody tr:hover {
         ]
       },
       {
-        lvl1: 'UIW DKI Jakarta', upt: 'UPT Jakarta', merk: 'TOWER SOLUTION', template: 'TOWER SOLUTION - 150KV TENSION',
+        lvl1: 'UITJBB', upt: 'UPT DURIKOSAMBI', merk: 'TOWER SOLUTION', template: 'TOWER SOLUTION - 150KV TENSION',
         totalSet: 3, lengkap: 2, tidakLengkap: 1,
         sets: [{ no: 1, kondisi: 'Lengkap', tersedia: 1 }, { no: 2, kondisi: 'Tidak Lengkap', tersedia: 1 }, { no: 3, kondisi: 'Lengkap', tersedia: 1 }],
         komponen: [
@@ -2507,10 +2546,10 @@ tbody tr:hover {
         },
         'UPT Bogor': { 'ULTG Bogor': ['GI Bogor Baru', 'GI Sentul'] }
       },
-      'UIW DKI Jakarta': {
-        'UPT Jakarta': {
-          'ULTG Cawang': ['GI Cawang', 'GI Duri Kosambi'],
-          'ULTG Gandul': ['GI Gandul', 'GI Kebayoran']
+      'UITJBB': {
+        'UPT DURIKOSAMBI': {
+          'ULTG CITRA RAYA': ['GI 150KV SINDANG JAYA', 'GI Duri Kosambi'],
+          'ULTG ANGKE': ['GI 150KV DADAP', 'GI Kebayoran']
         },
         'UPT Bekasi': { 'ULTG Bekasi': ['GI Bekasi', 'GI Cikarang'] }
       },
@@ -2520,13 +2559,13 @@ tbody tr:hover {
 
     /* ”€”€ Sample stock data ”€”€ */
     var vsStockData = [
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Jakarta', lvl3: 'ULTG Cawang', lvl4: 'GI Cawang', merk: 'ABB', kategori: 'Proteksi', section: 'Bay 150kV', komponen: 'Circuit Breaker 150kV', stock: 4 },
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Jakarta', lvl3: 'ULTG Cawang', lvl4: 'GI Cawang', merk: 'Siemens', kategori: 'Transformator', section: 'Bay 500kV', komponen: 'Power Transformer', stock: 1 },
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Jakarta', lvl3: 'ULTG Cawang', lvl4: 'GI Duri Kosambi', merk: 'ABB', kategori: 'Proteksi', section: 'Bay 150kV', komponen: 'Current Transformer', stock: 3 },
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Jakarta', lvl3: 'ULTG Gandul', lvl4: 'GI Gandul', merk: 'GE', kategori: 'Switchgear', section: 'Bay 20kV', komponen: 'Generator Breaker', stock: 0 },
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Jakarta', lvl3: 'ULTG Gandul', lvl4: 'GI Kebayoran', merk: 'Schneider', kategori: 'Kontrol', section: 'Panel Kontrol', komponen: 'Protection Relay', stock: 6 },
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Bekasi', lvl3: 'ULTG Bekasi', lvl4: 'GI Bekasi', merk: 'Mitsubishi', kategori: 'Switchgear', section: 'Bay 150kV', komponen: 'SF6 Circuit Breaker', stock: 2 },
-      { lvl1: 'UIW DKI Jakarta', lvl2: 'UPT Bekasi', lvl3: 'ULTG Bekasi', lvl4: 'GI Cikarang', merk: 'ABB', kategori: 'Proteksi', section: 'Bay 150kV', komponen: 'Disconnecting Switch', stock: 7 },
+      { lvl1: 'UITJBB', lvl2: 'UPT DURIKOSAMBI', lvl3: 'ULTG CITRA RAYA', lvl4: 'GI 150KV SINDANG JAYA', merk: 'ABB', kategori: 'Proteksi', section: 'Bay 150kV', komponen: 'Circuit Breaker 150kV', stock: 4 },
+      { lvl1: 'UITJBB', lvl2: 'UPT DURIKOSAMBI', lvl3: 'ULTG CITRA RAYA', lvl4: 'GI 150KV SINDANG JAYA', merk: 'Siemens', kategori: 'Transformator', section: 'Bay 500kV', komponen: 'Power Transformer', stock: 1 },
+      { lvl1: 'UITJBB', lvl2: 'UPT DURIKOSAMBI', lvl3: 'ULTG CITRA RAYA', lvl4: 'GI Duri Kosambi', merk: 'ABB', kategori: 'Proteksi', section: 'Bay 150kV', komponen: 'Current Transformer', stock: 3 },
+      { lvl1: 'UITJBB', lvl2: 'UPT DURIKOSAMBI', lvl3: 'ULTG ANGKE', lvl4: 'GI 150KV DADAP', merk: 'GE', kategori: 'Switchgear', section: 'Bay 20kV', komponen: 'Generator Breaker', stock: 0 },
+      { lvl1: 'UITJBB', lvl2: 'UPT DURIKOSAMBI', lvl3: 'ULTG ANGKE', lvl4: 'GI Kebayoran', merk: 'Schneider', kategori: 'Kontrol', section: 'Panel Kontrol', komponen: 'Protection Relay', stock: 6 },
+      { lvl1: 'UITJBB', lvl2: 'UPT Bekasi', lvl3: 'ULTG Bekasi', lvl4: 'GI Bekasi', merk: 'Mitsubishi', kategori: 'Switchgear', section: 'Bay 150kV', komponen: 'SF6 Circuit Breaker', stock: 2 },
+      { lvl1: 'UITJBB', lvl2: 'UPT Bekasi', lvl3: 'ULTG Bekasi', lvl4: 'GI Cikarang', merk: 'ABB', kategori: 'Proteksi', section: 'Bay 150kV', komponen: 'Disconnecting Switch', stock: 7 },
       { lvl1: 'UIW Jawa Barat', lvl2: 'UPT Bandung', lvl3: 'ULTG Bandung', lvl4: 'GI Bandung Selatan', merk: 'Siemens', kategori: 'Transformator', section: 'Bay 500kV', komponen: 'Lightning Arrester', stock: 9 },
       { lvl1: 'UIW Jawa Barat', lvl2: 'UPT Bandung', lvl3: 'ULTG Bandung', lvl4: 'GI Cibatu', merk: 'ABB', kategori: 'Switchgear', section: 'Bay 150kV', komponen: 'Bus Bar', stock: 5 },
       { lvl1: 'UIW Jawa Barat', lvl2: 'UPT Bandung', lvl3: 'ULTG Cimahi', lvl4: 'GI Cimahi', merk: 'GE', kategori: 'Proteksi', section: 'Bay 20kV', komponen: 'Surge Arrester', stock: 0 },
@@ -2923,7 +2962,7 @@ tbody tr:hover {
             <option>UIW Jawa Barat</option>
             <option>UIW Jawa Tengah</option>
             <option>UIW Jawa Timur</option>
-            <option>UIW DKI Jakarta</option>
+            <option>UITJBB</option>
           </select>
         </div>
         <div class="field" id="f-lvl2-wrap">
