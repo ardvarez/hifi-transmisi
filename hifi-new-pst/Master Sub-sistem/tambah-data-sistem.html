@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Master Sub-sistem – Tambah Data – PLN</title>
+    <title>Master Sistem – Tambah Data – PLN</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
@@ -641,7 +641,45 @@
             margin-bottom: 8px;
         }
     
-        
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--pln-blue);
+            background: var(--surface);
+        }
+
+        .tab-btn.active {
+            color: var(--pln-blue);
+            font-weight: 600;
+            border-bottom-color: var(--pln-blue);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
         /* SUCCESS MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.open { display: flex; opacity: 1; }
@@ -672,9 +710,9 @@
                 </button>
                 <div style="width:1px;height:20px;background:var(--border)"></div>
                 <div>
-                    <div class="page-title">Master Sub-sistem</div>
+                    <div class="page-title">Master Sistem</div>
                     <div class="breadcrumb">
-                        <a href="#">Master Sub-sistem</a>
+                        <a href="#">Master Sistem</a>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M9 18l6-6-6-6" />
@@ -691,125 +729,50 @@
         <!-- CONTENT -->
         <main class="content">
             <div class="section-card">
-                <div class="section-label">Informasi Sub-sistem</div>
+                <div class="section-label">Informasi Sistem</div>
 
                 <div class="form-row cols-2">
                     <div class="field">
-                        <label>Sistem <span style="color:var(--danger)">*</span></label>
-                        <select id="sistem" onchange="onSistemChange()">
-                            <option value="" disabled selected>Pilih Sistem</option>
-                            <option value="Sistem Jamali">Sistem Jamali</option>
-                            <option value="Sistem Sumatera">Sistem Sumatera</option>
-                        </select>
-                        <div class="help-text">Pilih sistem yang menaungi sub-sistem ini</div>
+                        <label>Nama Sistem <span style="color:var(--danger)">*</span></label>
+                        <input type="text" id="nama-sistem" placeholder="Masukkan Nama Sistem" />
+                        <div class="help-text">Ketikkan nama sistem</div>
                     </div>
 
                     <div class="field">
-                        <label>UP2B / UPT <span style="color:var(--danger)">*</span></label>
-                        <select id="up2b" disabled>
-                            <option value="" disabled selected>Pilih UP2B / UPT</option>
+                        <label>UNIT INDUK P2B <span style="color:var(--danger)">*</span></label>
+                        <select id="unit-induk">
+                            <option value="" disabled selected>Pilih Unit Induk</option>
+                            <option value="UIP2B Jamali">UIP2B Jamali</option>
+                            <option value="UIP2B Sumatera">UIP2B Sumatera</option>
+                            <option value="UIP2B Kalimantan">UIP2B Kalimantan</option>
+                            <option value="UIP2B Sulawesi">UIP2B Sulawesi</option>
                         </select>
-                        <div class="help-text">Menyesuaikan dari hirarki sistem yang dipilih</div>
+                        <div class="help-text">Pilih unit induk P2B</div>
                     </div>
 
                     <div class="field">
-                        <label>Nama Sub-sistem <span style="color:var(--danger)">*</span></label>
-                        <input type="text" id="nama-subsistem" placeholder="Masukkan Nama Sub-sistem" />
-                        <div class="help-text">Ketikkan nama sub-sistem</div>
+                        <label>Unit Pembangkitan <span style="color:var(--danger)">*</span></label>
+                        <select id="unit-pembangkitan" onchange="onUnitPembangkitanChange()">
+                            <option value="" disabled selected>Pilih Unit Pembangkitan</option>
+                            <option value="Unit Pembangkitan Suralaya">Unit Pembangkitan Suralaya</option>
+                            <option value="Unit Pembangkitan Paiton">Unit Pembangkitan Paiton</option>
+                            <option value="Unit Pembangkitan Tanjung Jati">Unit Pembangkitan Tanjung Jati</option>
+                        </select>
+                        <div class="help-text">Pilih unit pembangkitan (parent)</div>
                     </div>
-                </div>
 
-                
-                <div class="section-label" style="margin-top: 32px;">Kriteria N-1 (Mandatory)</div>
-                <div id="n-1">
-                    <div class="form-row cols-2">
-                        <div class="field">
-                            <label>Jenis Kriteria N-1 <span style="color:var(--danger)">*</span></label>
-                            <select id="jenis-kriteria-n1" onchange="onJenisKriteriaChange('n1')">
-                                <option value="" disabled selected>Pilih Jenis Kriteria</option>
-                                <option value="TRAFO">TRAFO</option>
-                                <option value="PEMBANGKIT">PEMBANGKIT</option>
-                                <option value="PENGHANTAR">PENGHANTAR</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-parent-n1">Data Parent N-1 <span style="color:var(--danger)">*</span></label>
-                            <select id="parent-n1" onchange="onParentChange('n1')" disabled>
-                                <option value="" disabled selected>Pilih Data Parent</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-child-n1">Kriteria N-1 <span style="color:var(--danger)">*</span></label>
-                            <select id="kriteria-n1" onchange="onChildChange('n1')" disabled>
-                                <option value="" disabled selected>Pilih Kriteria</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Kapasitas N-1 <span style="color:var(--danger)">*</span></label>
-                            <input type="number" id="kapasitas-n1" placeholder="Masukkan Kapasitas" />
-                        </div>
+                    <div class="field">
+                        <label>Pembangkit Terbesar <span style="color:var(--danger)">*</span></label>
+                        <select id="pembangkit-terbesar" onchange="onPembangkitChange()" disabled>
+                            <option value="" disabled selected>Pilih Pembangkit</option>
+                        </select>
+                        <div class="help-text">Pembangkit terbesar (Parent 1, Pembangkit)</div>
                     </div>
-                </div>
-
-                <div class="section-label" style="margin-top: 32px;">Kriteria N-1-1 (Opsional)</div>
-                <div id="n-1-1">
-                    <div class="form-row cols-2">
-                        <div class="field">
-                            <label>Jenis Kriteria N-1-1</label>
-                            <select id="jenis-kriteria-n11" onchange="onJenisKriteriaChange('n11')">
-                                <option value="" disabled selected>Pilih Jenis Kriteria</option>
-                                <option value="TRAFO">TRAFO</option>
-                                <option value="PEMBANGKIT">PEMBANGKIT</option>
-                                <option value="PENGHANTAR">PENGHANTAR</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-parent-n11">Data Parent N-1-1</label>
-                            <select id="parent-n11" onchange="onParentChange('n11')" disabled>
-                                <option value="" disabled selected>Pilih Data Parent</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-child-n11">Kriteria N-1-1</label>
-                            <select id="kriteria-n11" onchange="onChildChange('n11')" disabled>
-                                <option value="" disabled selected>Pilih Kriteria</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Kapasitas N-1-1</label>
-                            <input type="number" id="kapasitas-n11" placeholder="Masukkan Kapasitas" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-label" style="margin-top: 32px;">Kriteria N-2 (Opsional)</div>
-                <div id="n-2">
-                    <div class="form-row cols-2">
-                        <div class="field">
-                            <label>Jenis Kriteria N-2</label>
-                            <select id="jenis-kriteria-n2" onchange="onJenisKriteriaChange('n2')">
-                                <option value="" disabled selected>Pilih Jenis Kriteria</option>
-                                <option value="TRAFO">TRAFO</option>
-                                <option value="PEMBANGKIT">PEMBANGKIT</option>
-                                <option value="PENGHANTAR">PENGHANTAR</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-parent-n2">Data Parent N-2</label>
-                            <select id="parent-n2" onchange="onParentChange('n2')" disabled>
-                                <option value="" disabled selected>Pilih Data Parent</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-child-n2">Kriteria N-2</label>
-                            <select id="kriteria-n2" onchange="onChildChange('n2')" disabled>
-                                <option value="" disabled selected>Pilih Kriteria</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Kapasitas N-2</label>
-                            <input type="number" id="kapasitas-n2" placeholder="Masukkan Kapasitas" />
-                        </div>
+                    
+                    <div class="field">
+                        <label>Kapasitas <span style="color:var(--danger)">*</span></label>
+                        <input type="number" id="kapasitas" placeholder="Masukkan Kapasitas" />
+                        <div class="help-text">Kapasitas sistem (dalam MW)</div>
                     </div>
                 </div>
             </div>
@@ -868,141 +831,66 @@
     </div>
     
     <script>
-        const up2bData = {
-            "Sistem Jamali": ["UP2B DKI Jakarta", "UP2B Jawa Barat", "UP2B Jawa Tengah", "UPT Jakarta", "UPT Banten"],
-            "Sistem Sumatera": ["UP2B Sumatera Utara", "UP2B Sumatera Selatan", "UPT Medan", "UPT Palembang"]
+        const pembangkitData = {
+            "Unit Pembangkitan Suralaya": [
+                { name: "PLTU Suralaya 1", kapasitas: 400 },
+                { name: "PLTU Suralaya 2", kapasitas: 400 },
+                { name: "PLTU Suralaya 3", kapasitas: 600 }
+            ],
+            "Unit Pembangkitan Paiton": [
+                { name: "PLTU Paiton 1", kapasitas: 815 },
+                { name: "PLTU Paiton 2", kapasitas: 815 }
+            ],
+            "Unit Pembangkitan Tanjung Jati": [
+                { name: "PLTU Tanjung Jati B", kapasitas: 660 }
+            ]
         };
 
-        function onSistemChange() {
-            const sistemSelect = document.getElementById('sistem').value;
-            const up2bSelect = document.getElementById('up2b');
+        function onUnitPembangkitanChange() {
+            const unit = document.getElementById('unit-pembangkitan').value;
+            const pembangkitSelect = document.getElementById('pembangkit-terbesar');
+            const kapasitasInput = document.getElementById('kapasitas');
             
-            up2bSelect.innerHTML = '<option value="" disabled selected>Pilih UP2B / UPT</option>';
-            if (sistemSelect && up2bData[sistemSelect]) {
-                up2bData[sistemSelect].forEach(item => {
-                    const opt = document.createElement("option");
-                    opt.value = item;
-                    opt.textContent = item;
-                    up2bSelect.appendChild(opt);
-                });
-                up2bSelect.disabled = false;
-            } else {
-                up2bSelect.disabled = true;
-            }
-        }
-
-        
-        const hierarchyData = {
-            "TRAFO": {
-                labelParent: "Data GI",
-                labelChild: "Data Bay Trafo",
-                parents: ["GI Cawang", "GI Gandul", "GI Kembangan"],
-                children: {
-                    "GI Cawang": [{name: "Bay Trafo 1 Cawang", cap: 150}, {name: "Bay Trafo 2 Cawang", cap: 150}],
-                    "GI Gandul": [{name: "Bay Trafo 1 Gandul", cap: 500}],
-                    "GI Kembangan": [{name: "Bay Trafo 1 Kembangan", cap: 500}]
-                }
-            },
-            "PEMBANGKIT": {
-                labelParent: "Unit Pembangkitan",
-                labelChild: "Pembangkit",
-                parents: ["Unit Pembangkitan Suralaya", "Unit Pembangkitan Paiton"],
-                children: {
-                    "Unit Pembangkitan Suralaya": [{name: "PLTU Suralaya 1", cap: 400}, {name: "PLTU Suralaya 2", cap: 400}],
-                    "Unit Pembangkitan Paiton": [{name: "PLTU Paiton 1", cap: 815}]
-                }
-            },
-            "PENGHANTAR": {
-                labelParent: "Data GI",
-                labelChild: "Data Bay Line/Penghantar",
-                parents: ["GI Cawang", "GI Gandul", "GI Kembangan"],
-                children: {
-                    "GI Cawang": [{name: "Bay Line Cawang-Priok", cap: 300}, {name: "Bay Line Cawang-Muara Karang", cap: 300}],
-                    "GI Gandul": [{name: "Bay Line Gandul-Muara Karang", cap: 300}],
-                    "GI Kembangan": [{name: "Bay Line Kembangan-Duri Kosambi", cap: 300}]
-                }
-            }
-        };
-
-        function onJenisKriteriaChange(suffix) {
-            const jenis = document.getElementById('jenis-kriteria-' + suffix).value;
-            const parentSelect = document.getElementById('parent-' + suffix);
-            const kriteriaSelect = document.getElementById('kriteria-' + suffix);
-            const kapasitasInput = document.getElementById('kapasitas-' + suffix);
-            
-            const labelParent = document.getElementById('label-parent-' + suffix);
-            const labelChild = document.getElementById('label-child-' + suffix);
-
-            parentSelect.innerHTML = '<option value="" disabled selected>Pilih Data Parent</option>';
-            kriteriaSelect.innerHTML = '<option value="" disabled selected>Pilih Kriteria</option>';
+            pembangkitSelect.innerHTML = '<option value="" disabled selected>Pilih Pembangkit</option>';
             kapasitasInput.value = '';
-            
-            if (jenis && hierarchyData[jenis]) {
-                labelParent.innerHTML = hierarchyData[jenis].labelParent + (suffix === 'n1' ? ' <span style="color:var(--danger)">*</span>' : '');
-                labelChild.innerHTML = hierarchyData[jenis].labelChild + (suffix === 'n1' ? ' <span style="color:var(--danger)">*</span>' : '');
-                
-                hierarchyData[jenis].parents.forEach(item => {
-                    const opt = document.createElement("option");
-                    opt.value = item;
-                    opt.textContent = item;
-                    parentSelect.appendChild(opt);
-                });
-                parentSelect.disabled = false;
-                kriteriaSelect.disabled = true;
-            } else {
-                parentSelect.disabled = true;
-                kriteriaSelect.disabled = true;
-            }
-        }
 
-        function onParentChange(suffix) {
-            const jenis = document.getElementById('jenis-kriteria-' + suffix).value;
-            const parentVal = document.getElementById('parent-' + suffix).value;
-            const kriteriaSelect = document.getElementById('kriteria-' + suffix);
-            const kapasitasInput = document.getElementById('kapasitas-' + suffix);
-            
-            kriteriaSelect.innerHTML = '<option value="" disabled selected>Pilih Kriteria</option>';
-            kapasitasInput.value = '';
-            
-            if (jenis && parentVal && hierarchyData[jenis].children[parentVal]) {
-                hierarchyData[jenis].children[parentVal].forEach(item => {
+            if (unit && pembangkitData[unit]) {
+                pembangkitData[unit].forEach(item => {
                     const opt = document.createElement("option");
                     opt.value = item.name;
                     opt.textContent = item.name;
-                    opt.dataset.kapasitas = item.cap;
-                    kriteriaSelect.appendChild(opt);
+                    opt.dataset.kapasitas = item.kapasitas;
+                    pembangkitSelect.appendChild(opt);
                 });
-                kriteriaSelect.disabled = false;
+                pembangkitSelect.disabled = false;
             } else {
-                kriteriaSelect.disabled = true;
+                pembangkitSelect.disabled = true;
             }
         }
-        
-        function onChildChange(suffix) {
-            const kriteriaSelect = document.getElementById('kriteria-' + suffix);
-            const kapasitasInput = document.getElementById('kapasitas-' + suffix);
-            const selectedOption = kriteriaSelect.options[kriteriaSelect.selectedIndex];
+
+        function onPembangkitChange() {
+            const pembangkitSelect = document.getElementById('pembangkit-terbesar');
+            const kapasitasInput = document.getElementById('kapasitas');
+            const selectedOption = pembangkitSelect.options[pembangkitSelect.selectedIndex];
             
             if(selectedOption && selectedOption.dataset.kapasitas) {
                 kapasitasInput.value = selectedOption.dataset.kapasitas;
             }
         }
 
-function closeSuccessModal() {
+        function closeSuccessModal() {
             document.getElementById('successModal').classList.remove('open');
             window.parent.location.hash = 'page=' + encodeURIComponent('../hifi-new-pst/Master Sub-sistem/mainpage-osl.html');
         }
 
         function submitData() {
-            const sistem = document.getElementById('sistem').value;
-            const nama = document.getElementById('nama-subsistem').value;
-
-            if (!sistem || !nama) {
-                alert("Mohon lengkapi Sistem dan Nama Sub-sistem.");
+            const nama = document.getElementById('nama-sistem').value;
+            const unit = document.getElementById('unit-induk').value;
+            if(!nama || !unit) {
+                alert('Harap isi Nama Sistem dan Unit Induk');
                 return;
             }
-
-            document.getElementById('successDesc').innerText = "Data Sub-sistem " + nama + " berhasil ditambahkan!";
+            document.getElementById('successDesc').innerText = 'Data Sistem ' + nama + ' berhasil ditambahkan!';
             document.getElementById('successModal').classList.add('open');
         }
     </script>

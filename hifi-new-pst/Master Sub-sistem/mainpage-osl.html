@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Master Sub-sistem – Tambah Data – PLN</title>
+    <title>Master OSL – PLN</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
@@ -642,15 +642,63 @@
         }
     
         
-        /* SUCCESS MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-        .modal-overlay.open { display: flex; opacity: 1; }
-        .modal-card { background: var(--card); padding: 32px; border-radius: var(--radius-lg); width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transform: scale(0.95); transition: transform 0.3s; }
-        .modal-overlay.open .modal-card { transform: scale(1); }
-        .modal-icon-success { width: 64px; height: 64px; background: #DCFCE7; color: #15803D; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
-        .modal-title { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
-        .modal-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-    
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--pln-blue);
+            background: var(--surface);
+        }
+
+        .tab-btn.active {
+            color: var(--pln-blue);
+            font-weight: 600;
+            border-bottom-color: var(--pln-blue);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* TABLE */
+        .table-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th { background: var(--surface); padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        tbody td { padding: 14px 16px; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tbody tr:hover { background: #f8fafc; }
+        tbody tr:last-child td { border-bottom: none; }
+        
+        /* ACTION ICONS */
+        .action-group { display: flex; gap: 8px; align-items: center; }
+        .action-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--pln-blue); cursor: pointer; transition: 0.2s; }
+        .action-btn:hover { background: var(--pln-blue-light); border-color: var(--pln-blue); }
+
+        /* SEARCH BOX */
+        .search-box { position: relative; width: 300px; }
+        .search-box input { width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none; }
+        .search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-hint); }
 </style>
 </head>
 
@@ -662,24 +710,15 @@
         <!-- TOPBAR -->
         <header class="topbar">
             <div class="topbar-left">
-                <button class="back-btn" onclick="history.back()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5">
-                        <path d="M19 12H5" />
-                        <path d="M12 19l-7-7 7-7" />
-                    </svg>
-                    Kembali
-                </button>
-                <div style="width:1px;height:20px;background:var(--border)"></div>
                 <div>
-                    <div class="page-title">Master Sub-sistem</div>
+                    <div class="page-title">Master OSL</div>
                     <div class="breadcrumb">
-                        <a href="#">Master Sub-sistem</a>
+                        <a href="#">Master OSL</a>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M9 18l6-6-6-6" />
                         </svg>
-                        <span>Tambah Data</span>
+                        <span>Mainpage</span>
                     </div>
                 </div>
             </div>
@@ -690,135 +729,105 @@
 
         <!-- CONTENT -->
         <main class="content">
-            <div class="section-card">
-                <div class="section-label">Informasi Sub-sistem</div>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openTab('sistem', this)">Data Sistem</button>
+                <button class="tab-btn" onclick="openTab('subsistem', this)">Data Sub-sistem</button>
+            </div>
 
-                <div class="form-row cols-2">
-                    <div class="field">
-                        <label>Sistem <span style="color:var(--danger)">*</span></label>
-                        <select id="sistem" onchange="onSistemChange()">
-                            <option value="" disabled selected>Pilih Sistem</option>
-                            <option value="Sistem Jamali">Sistem Jamali</option>
-                            <option value="Sistem Sumatera">Sistem Sumatera</option>
-                        </select>
-                        <div class="help-text">Pilih sistem yang menaungi sub-sistem ini</div>
+            <div id="sistem" class="tab-pane active section-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+                <div class="toolbar" style="display:flex; justify-content:space-between; margin-bottom: 16px;">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="Cari data sistem...">
                     </div>
-
-                    <div class="field">
-                        <label>UP2B / UPT <span style="color:var(--danger)">*</span></label>
-                        <select id="up2b" disabled>
-                            <option value="" disabled selected>Pilih UP2B / UPT</option>
-                        </select>
-                        <div class="help-text">Menyesuaikan dari hirarki sistem yang dipilih</div>
-                    </div>
-
-                    <div class="field">
-                        <label>Nama Sub-sistem <span style="color:var(--danger)">*</span></label>
-                        <input type="text" id="nama-subsistem" placeholder="Masukkan Nama Sub-sistem" />
-                        <div class="help-text">Ketikkan nama sub-sistem</div>
-                    </div>
+                    <a href="tambah-data-sistem.html" class="btn-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Tambah Data
+                    </a>
                 </div>
-
-                
-                <div class="section-label" style="margin-top: 32px;">Kriteria N-1 (Mandatory)</div>
-                <div id="n-1">
-                    <div class="form-row cols-2">
-                        <div class="field">
-                            <label>Jenis Kriteria N-1 <span style="color:var(--danger)">*</span></label>
-                            <select id="jenis-kriteria-n1" onchange="onJenisKriteriaChange('n1')">
-                                <option value="" disabled selected>Pilih Jenis Kriteria</option>
-                                <option value="TRAFO">TRAFO</option>
-                                <option value="PEMBANGKIT">PEMBANGKIT</option>
-                                <option value="PENGHANTAR">PENGHANTAR</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-parent-n1">Data Parent N-1 <span style="color:var(--danger)">*</span></label>
-                            <select id="parent-n1" onchange="onParentChange('n1')" disabled>
-                                <option value="" disabled selected>Pilih Data Parent</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-child-n1">Kriteria N-1 <span style="color:var(--danger)">*</span></label>
-                            <select id="kriteria-n1" onchange="onChildChange('n1')" disabled>
-                                <option value="" disabled selected>Pilih Kriteria</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Kapasitas N-1 <span style="color:var(--danger)">*</span></label>
-                            <input type="number" id="kapasitas-n1" placeholder="Masukkan Kapasitas" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-label" style="margin-top: 32px;">Kriteria N-1-1 (Opsional)</div>
-                <div id="n-1-1">
-                    <div class="form-row cols-2">
-                        <div class="field">
-                            <label>Jenis Kriteria N-1-1</label>
-                            <select id="jenis-kriteria-n11" onchange="onJenisKriteriaChange('n11')">
-                                <option value="" disabled selected>Pilih Jenis Kriteria</option>
-                                <option value="TRAFO">TRAFO</option>
-                                <option value="PEMBANGKIT">PEMBANGKIT</option>
-                                <option value="PENGHANTAR">PENGHANTAR</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-parent-n11">Data Parent N-1-1</label>
-                            <select id="parent-n11" onchange="onParentChange('n11')" disabled>
-                                <option value="" disabled selected>Pilih Data Parent</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-child-n11">Kriteria N-1-1</label>
-                            <select id="kriteria-n11" onchange="onChildChange('n11')" disabled>
-                                <option value="" disabled selected>Pilih Kriteria</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Kapasitas N-1-1</label>
-                            <input type="number" id="kapasitas-n11" placeholder="Masukkan Kapasitas" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-label" style="margin-top: 32px;">Kriteria N-2 (Opsional)</div>
-                <div id="n-2">
-                    <div class="form-row cols-2">
-                        <div class="field">
-                            <label>Jenis Kriteria N-2</label>
-                            <select id="jenis-kriteria-n2" onchange="onJenisKriteriaChange('n2')">
-                                <option value="" disabled selected>Pilih Jenis Kriteria</option>
-                                <option value="TRAFO">TRAFO</option>
-                                <option value="PEMBANGKIT">PEMBANGKIT</option>
-                                <option value="PENGHANTAR">PENGHANTAR</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-parent-n2">Data Parent N-2</label>
-                            <select id="parent-n2" onchange="onParentChange('n2')" disabled>
-                                <option value="" disabled selected>Pilih Data Parent</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label id="label-child-n2">Kriteria N-2</label>
-                            <select id="kriteria-n2" onchange="onChildChange('n2')" disabled>
-                                <option value="" disabled selected>Pilih Kriteria</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Kapasitas N-2</label>
-                            <input type="number" id="kapasitas-n2" placeholder="Masukkan Kapasitas" />
-                        </div>
+                <div class="table-card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;">No</th>
+                                    <th>Nama Sistem</th>
+                                    <th>Unit Induk P2B</th>
+                                    <th>Pembangkit Terbesar</th>
+                                    <th>Kapasitas (MW)</th>
+                                    <th style="text-align: center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center;">1</td>
+                                    <td>Sistem Jamali</td>
+                                    <td>UIP2B Jamali</td>
+                                    <td>PLTU Suralaya 1</td>
+                                    <td>400</td>
+                                    <td>
+                                        <div class="action-group" style="justify-content: center;">
+                                            <button class="action-btn" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-</main>
 
-        <!-- FOOTER -->
-        <footer class="form-footer">
-            <button class="btn-submit" onclick="submitData()">SIMPAN</button>
-        </footer>
+            <div id="subsistem" class="tab-pane section-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+                <div class="toolbar" style="display:flex; justify-content:space-between; margin-bottom: 16px;">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="Cari data sub-sistem...">
+                    </div>
+                    <a href="tambah-data-sub-sistem.html" class="btn-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Tambah Data
+                    </a>
+                </div>
+                <div class="table-card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;">No</th>
+                                    <th>Sistem</th>
+                                    <th>Induk Pengatur Beban</th>
+                                    <th>UP2B / UPT</th>
+                                    <th>Nama Sub-sistem</th>
+                                    <th>N-1</th>
+                                    <th>N-1-1</th>
+                                    <th>N-2</th>
+                                    <th style="text-align: center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center;">1</td>
+                                    <td>Sistem Jamali</td>
+                                    <td>UIP2B Jamali</td>
+                                    <td>UP2B DKI Jakarta</td>
+                                    <td>Subsistem A</td>
+                                    <td>Bay Trafo 1 Cawang <br/><small style="color:var(--text-hint)">TRAFO (150 MW)</small></td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>
+                                        <div class="action-group" style="justify-content: center;">
+                                            <button class="action-btn" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        
     </div>
 
     <!-- NOTES FEATURE -->
@@ -852,158 +861,16 @@
         </ul>
     </div>
 
-    
-    <!-- SUCCESS MODAL -->
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-card">
-            <div class="modal-icon-success">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-            <h3 class="modal-title">Berhasil Disimpan!</h3>
-            <p class="modal-desc" id="successDesc">Data berhasil ditambahkan.</p>
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button class="btn-submit" onclick="closeSuccessModal()">OK, Kembali</button>
-            </div>
-        </div>
-    </div>
-    
     <script>
-        const up2bData = {
-            "Sistem Jamali": ["UP2B DKI Jakarta", "UP2B Jawa Barat", "UP2B Jawa Tengah", "UPT Jakarta", "UPT Banten"],
-            "Sistem Sumatera": ["UP2B Sumatera Utara", "UP2B Sumatera Selatan", "UPT Medan", "UPT Palembang"]
-        };
-
-        function onSistemChange() {
-            const sistemSelect = document.getElementById('sistem').value;
-            const up2bSelect = document.getElementById('up2b');
+        function openTab(tabId, element) {
+            const panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(pane => pane.classList.remove('active'));
             
-            up2bSelect.innerHTML = '<option value="" disabled selected>Pilih UP2B / UPT</option>';
-            if (sistemSelect && up2bData[sistemSelect]) {
-                up2bData[sistemSelect].forEach(item => {
-                    const opt = document.createElement("option");
-                    opt.value = item;
-                    opt.textContent = item;
-                    up2bSelect.appendChild(opt);
-                });
-                up2bSelect.disabled = false;
-            } else {
-                up2bSelect.disabled = true;
-            }
-        }
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
 
-        
-        const hierarchyData = {
-            "TRAFO": {
-                labelParent: "Data GI",
-                labelChild: "Data Bay Trafo",
-                parents: ["GI Cawang", "GI Gandul", "GI Kembangan"],
-                children: {
-                    "GI Cawang": [{name: "Bay Trafo 1 Cawang", cap: 150}, {name: "Bay Trafo 2 Cawang", cap: 150}],
-                    "GI Gandul": [{name: "Bay Trafo 1 Gandul", cap: 500}],
-                    "GI Kembangan": [{name: "Bay Trafo 1 Kembangan", cap: 500}]
-                }
-            },
-            "PEMBANGKIT": {
-                labelParent: "Unit Pembangkitan",
-                labelChild: "Pembangkit",
-                parents: ["Unit Pembangkitan Suralaya", "Unit Pembangkitan Paiton"],
-                children: {
-                    "Unit Pembangkitan Suralaya": [{name: "PLTU Suralaya 1", cap: 400}, {name: "PLTU Suralaya 2", cap: 400}],
-                    "Unit Pembangkitan Paiton": [{name: "PLTU Paiton 1", cap: 815}]
-                }
-            },
-            "PENGHANTAR": {
-                labelParent: "Data GI",
-                labelChild: "Data Bay Line/Penghantar",
-                parents: ["GI Cawang", "GI Gandul", "GI Kembangan"],
-                children: {
-                    "GI Cawang": [{name: "Bay Line Cawang-Priok", cap: 300}, {name: "Bay Line Cawang-Muara Karang", cap: 300}],
-                    "GI Gandul": [{name: "Bay Line Gandul-Muara Karang", cap: 300}],
-                    "GI Kembangan": [{name: "Bay Line Kembangan-Duri Kosambi", cap: 300}]
-                }
-            }
-        };
-
-        function onJenisKriteriaChange(suffix) {
-            const jenis = document.getElementById('jenis-kriteria-' + suffix).value;
-            const parentSelect = document.getElementById('parent-' + suffix);
-            const kriteriaSelect = document.getElementById('kriteria-' + suffix);
-            const kapasitasInput = document.getElementById('kapasitas-' + suffix);
-            
-            const labelParent = document.getElementById('label-parent-' + suffix);
-            const labelChild = document.getElementById('label-child-' + suffix);
-
-            parentSelect.innerHTML = '<option value="" disabled selected>Pilih Data Parent</option>';
-            kriteriaSelect.innerHTML = '<option value="" disabled selected>Pilih Kriteria</option>';
-            kapasitasInput.value = '';
-            
-            if (jenis && hierarchyData[jenis]) {
-                labelParent.innerHTML = hierarchyData[jenis].labelParent + (suffix === 'n1' ? ' <span style="color:var(--danger)">*</span>' : '');
-                labelChild.innerHTML = hierarchyData[jenis].labelChild + (suffix === 'n1' ? ' <span style="color:var(--danger)">*</span>' : '');
-                
-                hierarchyData[jenis].parents.forEach(item => {
-                    const opt = document.createElement("option");
-                    opt.value = item;
-                    opt.textContent = item;
-                    parentSelect.appendChild(opt);
-                });
-                parentSelect.disabled = false;
-                kriteriaSelect.disabled = true;
-            } else {
-                parentSelect.disabled = true;
-                kriteriaSelect.disabled = true;
-            }
-        }
-
-        function onParentChange(suffix) {
-            const jenis = document.getElementById('jenis-kriteria-' + suffix).value;
-            const parentVal = document.getElementById('parent-' + suffix).value;
-            const kriteriaSelect = document.getElementById('kriteria-' + suffix);
-            const kapasitasInput = document.getElementById('kapasitas-' + suffix);
-            
-            kriteriaSelect.innerHTML = '<option value="" disabled selected>Pilih Kriteria</option>';
-            kapasitasInput.value = '';
-            
-            if (jenis && parentVal && hierarchyData[jenis].children[parentVal]) {
-                hierarchyData[jenis].children[parentVal].forEach(item => {
-                    const opt = document.createElement("option");
-                    opt.value = item.name;
-                    opt.textContent = item.name;
-                    opt.dataset.kapasitas = item.cap;
-                    kriteriaSelect.appendChild(opt);
-                });
-                kriteriaSelect.disabled = false;
-            } else {
-                kriteriaSelect.disabled = true;
-            }
-        }
-        
-        function onChildChange(suffix) {
-            const kriteriaSelect = document.getElementById('kriteria-' + suffix);
-            const kapasitasInput = document.getElementById('kapasitas-' + suffix);
-            const selectedOption = kriteriaSelect.options[kriteriaSelect.selectedIndex];
-            
-            if(selectedOption && selectedOption.dataset.kapasitas) {
-                kapasitasInput.value = selectedOption.dataset.kapasitas;
-            }
-        }
-
-function closeSuccessModal() {
-            document.getElementById('successModal').classList.remove('open');
-            window.parent.location.hash = 'page=' + encodeURIComponent('../hifi-new-pst/Master Sub-sistem/mainpage-osl.html');
-        }
-
-        function submitData() {
-            const sistem = document.getElementById('sistem').value;
-            const nama = document.getElementById('nama-subsistem').value;
-
-            if (!sistem || !nama) {
-                alert("Mohon lengkapi Sistem dan Nama Sub-sistem.");
-                return;
-            }
-
-            document.getElementById('successDesc').innerText = "Data Sub-sistem " + nama + " berhasil ditambahkan!";
-            document.getElementById('successModal').classList.add('open');
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
         }
     </script>
 </body>
