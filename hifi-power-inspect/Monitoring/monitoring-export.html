@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Export - PLN Power Inspect</title>
+    <!-- Standard Dashboard Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --pln-blue: #003B8E;
+            --pln-blue-mid: #1A5CB5;
+            --pln-blue-light: #EAF1FB;
+            --pln-yellow: #F7A800;
+            --surface: #F5F7FA;
+            --card: #FFFFFF;
+            --border: #DDE3EE;
+            --text-primary: #1A2035;
+            --text-secondary: #5B6480;
+            --sidebar-w: 64px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            
+            --success: #10B981;
+            --success-bg: #D1FAE5;
+            --danger: #EF4444;
+            --danger-bg: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-bg: #FEF3C7;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--pln-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 12px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sidebar .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--pln-yellow);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .nav-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+
+        .nav-icon.active {
+            background: rgba(247, 168, 0, 0.2);
+            color: var(--pln-yellow);
+        }
+
+        /* MAIN LAYOUT */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 9;
+        }
+
+        .topbar-left .page-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .topbar-right .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--pln-blue-light);
+            color: var(--pln-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 32px;
+            flex: 1;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* FILTER FORM SECTION */
+        .filter-section {
+            margin-top: 20px;
+            margin-bottom: 32px;
+            background: var(--card);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-primary);
+            font-family: inherit;
+            background: var(--card);
+            width: 100%;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--pln-blue);
+        }
+
+        .btn-primary {
+            background: var(--pln-blue);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--pln-blue-mid);
+        }
+        
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+        
+        .btn-download {
+            background: var(--pln-blue-light);
+            color: var(--pln-blue);
+            border-color: rgba(26,92,181,0.2);
+        }
+        .btn-download:hover {
+            background: var(--pln-blue);
+            color: white;
+        }
+        
+        .btn-reload {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border-color: rgba(245,158,11,0.2);
+        }
+        .btn-reload:hover {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-error {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border-color: rgba(239,68,68,0.2);
+        }
+        .btn-error:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* TABLE CARD STYLING */
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead th {
+            background: #FAFBFC;
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: var(--success-bg); color: var(--success); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); }
+        
+        .notes-section {
+            background: #FFFBEB;
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        .notes-section h4 {
+            color: #92400E;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .notes-section ul {
+            padding-left: 20px;
+            color: #92400E;
+            font-size: 13px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="logo">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="#F7A800" />
+                <path d="M8 22V10l8 6 8-6v12" stroke="#003B8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <div class="nav-icon active" title="Monitoring Export">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-left"><div class="page-title">Monitoring Export</div></div>
+            <div class="topbar-right">
+                <div class="user-profile">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 13px;">Super Admin</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">Super Administrator</div>
+                    </div>
+                    <div class="avatar">SA</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Monitoring Proses Export</h1>
+                <p style="color: var(--text-secondary); font-size: 13px;">Pantau status proses export data dari berbagai menu</p>
+            </div>
+            
+            <div class="notes-section">
+                <h4>Notes Kebutuhan:</h4>
+                <ul>
+                    <li>Menampilkan Menu dan bagiannya ketika di export</li>
+                    <li>Menampilkan Filter, User, Waktu Mulai, Waktu Selesai, dan Status</li>
+                    <li>Aksi berupa Download (jika sukses) atau Reload (jika gagal) untuk mencoba kembali</li>
+                    <li>Khusus untuk gagal pada user super admin, terdapat aksi tambahan untuk melihat status error</li>
+                </ul>
+            </div>
+
+            <div class="filter-section">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Menu / Modul</label>
+                        <select class="form-control">
+                            <option value="">Semua Menu</option>
+                            <option>Dashboard Trend</option>
+                            <option>Laporan Inspeksi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select class="form-control">
+                            <option value="">Semua Status</option>
+                            <option>Selesai</option>
+                            <option>Proses</option>
+                            <option>Gagal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Selesai</label>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="btn-primary">TERAPKAN FILTER</button>
+                </div>
+            </div>
+
+            <!-- RESULT SECTION (TABLE CARD) -->
+            <div class="table-card">
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Menu & Bagian</th>
+                                <th>User</th>
+                                <th>Filter Export</th>
+                                <th>Waktu Mulai</th>
+                                <th>Waktu Selesai</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600;">Dashboard Trend</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">Parameter Kuantitatif (Grafik & Tren)</div>
+                                </td>
+                                <td>Ardan Test</td>
+                                <td><span style="font-size: 12px; color: var(--text-secondary);">UITJBB, UPT CAWANG...</span></td>
+                                <td>01 Jul 2026 09:10:00</td>
+                                <td>01 Jul 2026 09:10:45</td>
+                                <td><span class="badge badge-success">Selesai</span></td>
+                                <td style="text-align: right;">
+                                    <button class="btn-action btn-download">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                        Download
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600;">Laporan Inspeksi</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">Rekapitulasi Bulanan</div>
+                                </td>
+                                <td>Budi Admin</td>
+                                <td><span style="font-size: 12px; color: var(--text-secondary);">Bulan: Juni 2026</span></td>
+                                <td>01 Jul 2026 09:05:10</td>
+                                <td>-</td>
+                                <td><span class="badge badge-warning">Proses</span></td>
+                                <td style="text-align: right;">
+                                    <span style="font-size: 12px; color: var(--text-secondary); font-style: italic;">Memproses...</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600;">Data Master Aset</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">Semua Gardu Induk</div>
+                                </td>
+                                <td>Super Admin</td>
+                                <td><span style="font-size: 12px; color: var(--text-secondary);">Regional: TSJ</span></td>
+                                <td>01 Jul 2026 08:30:00</td>
+                                <td>01 Jul 2026 08:31:05</td>
+                                <td><span class="badge badge-danger">Gagal</span></td>
+                                <td style="text-align: right;">
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                        <!-- Aksi khusus Super Admin: Lihat Error -->
+                                        <button class="btn-action btn-error" title="Lihat Status Error (Khusus Super Admin)" onclick="alert('Error Details:\nTimeout Exception: Unable to fetch data from database after 60s.\nLine: 405 in ExportService.php')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                            Log Error
+                                        </button>
+                                        <!-- Aksi Reload untuk mencoba kembali -->
+                                        <button class="btn-action btn-reload" title="Coba Kembali">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                            Reload
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
