@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring - Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar Utilities */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24; /* PLN Yellow */
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb; /* PLN Blue */
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-header {
+            padding: 24px 32px 0 32px;
+            background: var(--bg-surface);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-item {
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-item:hover {
+            color: var(--text-main);
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 24px 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            padding-left: 8px;
+        }
+
+        .search-box i {
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: var(--bg-surface);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+        
+        .btn-outline-primary {
+            background: var(--bg-surface);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover, .btn-outline-primary:hover {
+            background: #f8fafc;
+        }
+
+        /* Table Container */
+        .table-container {
+            flex: 1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            min-width: 2000px; /* Force horizontal scroll */
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+            background: var(--bg-surface);
+        }
+
+        tr:hover td {
+            background: #f1f5f9;
+        }
+
+        /* Sticky Aksi Column for Daftar AHI */
+        #table-daftar-ahi th:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 11;
+            border-left: 1px solid var(--border-color);
+        }
+
+        #table-daftar-ahi td:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 2;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            font-weight: 600;
+        }
+        .status-operasi { color: var(--success); }
+        
+        .ahi-fair { color: var(--warning); font-weight: 600; }
+        .ahi-empty { color: var(--text-muted); }
+
+        .ahi-poor { color: #ef4444; font-weight: 600; }
+        .ahi-good { color: #10b981; font-weight: 600; }
+        .ahi-critical { color: #8b5cf6; font-weight: 600; }
+
+        /* Action Button */
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            width: 800px;
+            max-height: 90vh;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-close {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+            margin-top: 24px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+        }
+        .form-control:disabled {
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .page-item {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .page-item:hover {
+            background: #eff6ff;
+        }
+
+        .page-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .page-item.disabled {
+            color: var(--text-muted);
+            cursor: not-allowed;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top System Bar -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-server-line"></i> Server Training
+        </div>
+        <div class="right">
+            Contact us: helpdesk.pi@iconpln.co.id | Security Issue: soc@pln.co.id
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-flashlight-fill"></i>
+            <span>PLN</span>
+        </div>
+        <div class="menu-item"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item"><i class="ri-line-chart-line"></i></div>
+        <div class="menu-item"><i class="ri-settings-4-line"></i></div>
+        <div class="menu-item active"><i class="ri-table-alt-line"></i></div>
+        <div class="menu-item"><i class="ri-focus-2-line"></i></div>
+        <div class="menu-item"><i class="ri-file-list-3-line"></i></div>
+        <div class="menu-item"><i class="ri-team-line"></i></div>
+        <div class="menu-item"><i class="ri-customer-service-2-line"></i></div>
+        <div class="menu-item"><i class="ri-filter-3-line"></i></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Monitoring</h1>
+            <p class="page-subtitle">Monitoring AHI & Kualitas Data</p>
+            
+            <div class="tabs">
+                <div class="tab-item active" onclick="switchTab(0)">Daftar AHI</div>
+                <div class="tab-item" onclick="switchTab(1)">AHI per Jenis Aset</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" placeholder="Cari Aset">
+                    </div>
+                    <button class="btn btn-primary" onclick="openFilterModal()">
+                        <i class="ri-filter-3-fill"></i> Filter
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-outline-primary">
+                        <i class="ri-file-excel-2-line"></i> Export Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Daftar AHI -->
+            <div class="table-container" id="table-daftar-ahi">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th style="min-width: 250px;">Nama Aset</th>
+                            <th>Jenis Aset</th>
+                            <th>Status Aset</th>
+                            <th>Fungsi</th>
+                            <th>Tipe Aset</th>
+                            <th>Daya</th>
+                            <th>Tegangan</th>
+                            <th>Tahun Buat</th>
+                            <th>Tahun Operasi</th>
+                            <th>Status Usia</th>
+                            <th>Unit Induk</th>
+                            <th>Unit Pelaksana</th>
+                            <th>ULTG</th>
+                            <th>Gardu Induk</th>
+                            <th>Bay</th>
+                            <th>Penempatan</th>
+                            <th>AHI</th>
+                            <th>Jumlah Parameter Pemicu</th>
+                            <th>Jumlah Sub Sistem Pemicu</th>
+                            <th>Kualitas Data</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555000000219</div>
+                                <div style="color: #64748b;">Potential Transformer - TRENCH ITALIA - 20005958 - S</div>
+                            </td>
+                            <td>Potential Transformer</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>TCVT 170/5</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2012</td>
+                            <td>2013</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>BUSBAR A 150kV</td>
+                            <td>BUSBAR A</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon" onclick="window.location.href='monitoring-ahi-detail.html'"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555000000001</div>
+                                <div style="color: #64748b;">Busbar Differential (87B) - SIEMENS - B11200005040 - RST</div>
+                            </td>
+                            <td>Busbar Differential (87B)</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>7SS5220</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2017</td>
+                            <td>2018</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>BUSBAR A 150kV</td>
+                            <td>BUSBAR A</td>
+                            <td class="ahi-fair">3 - Fair</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>88.67%</td>
+                            <td><button class="btn-icon" onclick="window.location.href='monitoring-ahi-detail.html'"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555000000223</div>
+                                <div style="color: #64748b;">Potential Transformer - TRENCH - 20005960 - S</div>
+                            </td>
+                            <td>Potential Transformer</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>TCVT 170/5</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2015</td>
+                            <td>2023</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>BUSBAR B 150kV</td>
+                            <td>BUSBAR B</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon" onclick="window.location.href='monitoring-ahi-detail.html'"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>
+                                <div style="font-weight: 500;">2336715555550000021</div>
+                                <div style="color: #64748b;">Substation Rectifier - BORRI - 121432 - RST</div>
+                            </td>
+                            <td>Substation Rectifier</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1300/322</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>2017</td>
+                            <td>2018</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>GEDUNG</td>
+                            <td>PROTEKSI</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon" onclick="window.location.href='monitoring-ahi-detail.html'"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>
+                                <div style="font-weight: 500;">2436715555550000222</div>
+                                <div style="color: #64748b;">Substation Battery - SAFT - BAT0010 - RST</div>
+                            </td>
+                            <td>Substation Battery</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>SBLE 300-2</td>
+                            <td>-</td>
+                            <td>110 kV</td>
+                            <td>2016</td>
+                            <td>2017</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>GEDUNG</td>
+                            <td>PROTEKSI</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon" onclick="window.location.href='monitoring-ahi-detail.html'"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555550000216</div>
+                                <div style="color: #64748b;">Current Transformer - ABB - AJ22120033 - R</div>
+                            </td>
+                            <td>Current Transformer</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>IBT 170</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2022</td>
+                            <td>2023</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>KOPEL BUS 150kV</td>
+                            <td>KOPEL BUS B</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon" onclick="window.location.href='monitoring-ahi-detail.html'"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555550000216</div>
+                                <div style="color: #64748b;">Current Transformer - ABB - HSE-888X455 - R</div>
+                            </td>
+                            <td>Current Transformer</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>IMB 170</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2014</td>
+                            <td>2023</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>KOPEL BUS 150kV</td>
+                            <td>KOPEL BUS A</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555550000217</div>
+                                <div style="color: #64748b;">Current Transformer - ABB - HSE-888X999 - S</div>
+                            </td>
+                            <td>Current Transformer</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>IMB 170</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2020</td>
+                            <td>2023</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>KOPEL BUS 150kV</td>
+                            <td>KOPEL BUS A</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>
+                                <div style="font-weight: 500;">5438715555550000331</div>
+                                <div style="color: #64748b;">Over Current Relay - SIEMENS - B11300053919 - RSTN</div>
+                            </td>
+                            <td>Over Current Relay</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>SIPROTEC 7SJ84</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2022</td>
+                            <td>2023</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>KOPEL BUS 150kV</td>
+                            <td>OCR, PANEL PROTEKSI RELAY BAY KOPEL</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>
+                                <div style="font-weight: 500;">1338715555550000220</div>
+                                <div style="color: #64748b;">Current Transformer - ABB - AJ22010120 - S</div>
+                            </td>
+                            <td>Current Transformer</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>IBT 170</td>
+                            <td>-</td>
+                            <td>150 kV</td>
+                            <td>2022</td>
+                            <td>2023</td>
+                            <td>-</td>
+                            <td>UITJDM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KALISARI</td>
+                            <td>KOPEL BUS 150kV</td>
+                            <td>KOPEL BUS B</td>
+                            <td class="ahi-empty">-</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0%</td>
+                            <td><button class="btn-icon"><i class="ri-search-eye-line"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table AHI Per Jenis Aset -->
+            <div class="table-container" id="table-jenis-aset" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">No.</th>
+                            <th rowspan="2">Jenis Aset</th>
+                            <th rowspan="2">Merk</th>
+                            <th rowspan="2">Tipe</th>
+                            <th rowspan="2">Phasa</th>
+                            <th rowspan="2">Status</th>
+                            <th rowspan="2">Fungsi</th>
+                            <th rowspan="2">Techidentno</th>
+                            <th rowspan="2">Daya</th>
+                            <th rowspan="2">Tegangan</th>
+                            <th rowspan="2">Tahun Buat</th>
+                            <th rowspan="2">Tahun Operasi</th>
+                            <th rowspan="2">Status Usia</th>
+                            <th rowspan="2">Unit Induk</th>
+                            <th rowspan="2">Unit Pelaksana</th>
+                            <th rowspan="2">ULTG</th>
+                            <th rowspan="2">GI</th>
+                            <th rowspan="2">Bay</th>
+                            <th rowspan="2">Penempatan</th>
+                            <th rowspan="2">AHI</th>
+                            <th colspan="2" style="text-align: center; border-left: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">Pemeriksaan level minyak maintank (AHI)</th>
+                        </tr>
+                        <tr>
+                            <th style="border-left: 1px solid var(--border-color);">Level minyak</th>
+                            <th>ACETYLEN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Power Transformer</td>
+                            <td>TDEK</td>
+                            <td>SALOCR-60000</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1131844264200000001</td>
+                            <td>0</td>
+                            <td>KV 150</td>
+                            <td>1993</td>
+                            <td>2000</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV SURABAYA SELATAN</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>0</td>
+                            <td class="ahi-poor">4 - Poor</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>0.0 D</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Power Transformer</td>
+                            <td>UNINDO</td>
+                            <td>TTUB150/30000</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1131844364300000001</td>
+                            <td>0</td>
+                            <td>KV 150</td>
+                            <td>1991</td>
+                            <td>1992</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV UJUNG</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>BAY TRAFO 1</td>
+                            <td class="ahi-fair">3 - Fair</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Power Transformer</td>
+                            <td>UNINDO</td>
+                            <td>MPT</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1133114414410000001</td>
+                            <td>-</td>
+                            <td>KV 150</td>
+                            <td>2018</td>
+                            <td>2020</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GIS 150kV GEMBONG</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>BAY TRAFO 2</td>
+                            <td class="ahi-poor">4 - Poor</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Power Transformer</td>
+                            <td>ABB</td>
+                            <td>12KZ4691B222400</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1133114264260000003</td>
+                            <td>-</td>
+                            <td>KV 150</td>
+                            <td>2016</td>
+                            <td>2017</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV SURABAYA SELATAN</td>
+                            <td>TRF#3 150/22 kV</td>
+                            <td>BAY TRF#3 150/22kV</td>
+                            <td class="ahi-good">2 - Good</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Power Transformer</td>
+                            <td>XD SAKTI INDONESIA</td>
+                            <td>SFZ-60000/150</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1133114324320000028</td>
+                            <td>-</td>
+                            <td>KV 150</td>
+                            <td>2018</td>
+                            <td>2020</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV SUKOLILO</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>BAY TRAFO 1</td>
+                            <td class="ahi-critical">5 - Critical</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Power Transformer</td>
+                            <td>PAUWELS TRAFO ASIA</td>
+                            <td>ONF-60/2/5</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1131844434430000002</td>
+                            <td>0</td>
+                            <td>KV 150</td>
+                            <td>1996</td>
+                            <td>1998</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV WONOKROMO</td>
+                            <td>TRF#2 150/20 kV</td>
+                            <td>BAY TRAFO 2</td>
+                            <td class="ahi-fair">3 - Fair</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Power Transformer</td>
+                            <td>B&D TRANSFORMER</td>
+                            <td>FX-060-FCHB</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1133114244240000003</td>
+                            <td>60</td>
+                            <td>KV 150</td>
+                            <td>2019</td>
+                            <td>2021</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GIS 150kV SIMPANG</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>0</td>
+                            <td class="ahi-good">2 - Good</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Power Transformer</td>
+                            <td>XD SAKTI INDONESIA</td>
+                            <td>SFZ-60000/150</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1133114394390000001</td>
+                            <td>60</td>
+                            <td>KV 150</td>
+                            <td>2018</td>
+                            <td>2021</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GIS 150kV KUPANG</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>BAY TRF#1 150/20kV</td>
+                            <td class="ahi-good">2 - Good</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Power Transformer</td>
+                            <td>UNINDO</td>
+                            <td>N RANGE</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1131844394390000001</td>
+                            <td>-</td>
+                            <td>KV 150</td>
+                            <td>2011</td>
+                            <td>2012</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GIS 150kV KUPANG</td>
+                            <td>TRF#2 150/20 kV</td>
+                            <td>BAY TRF#2 150/20kV</td>
+                            <td class="ahi-good">2 - Good</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Power Transformer</td>
+                            <td>UNINDO</td>
+                            <td>TTUB150/30000</td>
+                            <td>RST</td>
+                            <td class="status-operasi">Operasi</td>
+                            <td>-</td>
+                            <td>1131844364300000001</td>
+                            <td>0</td>
+                            <td>KV 150</td>
+                            <td>1994</td>
+                            <td>1995</td>
+                            <td>-</td>
+                            <td>UITJBM</td>
+                            <td>UPT SURABAYA</td>
+                            <td>ULTG SURABAYA UTARA</td>
+                            <td>GI 150kV KREMBANGAN</td>
+                            <td>TRF#1 150/20 kV</td>
+                            <td>BAY TRAFO 1</td>
+                            <td class="ahi-poor">4 - Poor</td>
+                            <td style="border-left: 1px solid var(--border-color);">-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div>Menampilkan 
+                    <select style="border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 4px; outline: none;">
+                        <option>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select>
+                    dari <strong>5368</strong> Data
+                </div>
+                <div class="pagination-controls">
+                    <div class="page-item disabled"><i class="ri-arrow-left-s-line"></i></div>
+                    <div class="page-item active">1</div>
+                    <div class="page-item">2</div>
+                    <div class="page-item">3</div>
+                    <div class="page-item">4</div>
+                    <div class="page-item">5</div>
+                    <div class="page-item">6</div>
+                    <div class="page-item">7</div>
+                    <div class="page-item">8</div>
+                    <div class="page-item">9</div>
+                    <div class="page-item">10</div>
+                    <div class="page-item disabled" style="width: auto;">...</div>
+                    <div class="page-item">537</div>
+                    <div class="page-item"><i class="ri-arrow-right-s-line"></i></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentTab = 0;
+
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            const tabs = document.querySelectorAll('.tab-item');
+            tabs.forEach((tab, index) => {
+                if (index === tabIndex) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            if (tabIndex === 0) {
+                document.getElementById('table-daftar-ahi').style.display = 'block';
+                document.getElementById('table-jenis-aset').style.display = 'none';
+            } else {
+                document.getElementById('table-daftar-ahi').style.display = 'none';
+                document.getElementById('table-jenis-aset').style.display = 'block';
+            }
+        }
+
+        function openFilterModal() {
+            if (currentTab === 0) {
+                document.getElementById('filter-daftar-ahi').style.display = 'grid';
+                document.getElementById('filter-jenis-aset').style.display = 'none';
+            } else {
+                document.getElementById('filter-daftar-ahi').style.display = 'none';
+                document.getElementById('filter-jenis-aset').style.display = 'grid';
+            }
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filterModal').classList.remove('active');
+        }
+    </script>
+
+    <!-- Filter Modal -->
+    <div class="modal-overlay" id="filterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="ri-filter-3-line" style="font-size: 18px;"></i>
+                    <span style="font-size: 16px; font-weight: 600;">Filter</span>
+                </div>
+                <i class="ri-close-line modal-close" onclick="closeFilterModal()"></i>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <span style="font-size: 14px;">Pencarian Cepat <span style="color: var(--primary); font-weight: 600;">Gardu Induk</span></span>
+                    <div class="search-box" style="margin: 8px auto 0 auto; max-width: 400px; justify-content: space-between;">
+                        <input type="text" placeholder="Cari Gardu Induk">
+                        <i class="ri-search-line" style="color: var(--primary);"></i>
+                    </div>
+                </div>
+
+                <div class="form-grid" id="filter-daftar-ahi">
+                    <div class="form-group">
+                        <label>Regional</label>
+                        <select class="form-control" disabled>
+                            <option>TSJ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kantor Induk (Opsional)</label>
+                        <select class="form-control" disabled>
+                            <option>UITJBM</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unit Pelaksana (Opsional)</label>
+                        <select class="form-control" disabled>
+                            <option>UPT SURABAYA</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ULTG (Optional)</label>
+                        <select class="form-control" disabled>
+                            <option>ULTG SURABAYA UTARA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GI/GIS (Optional)</label>
+                        <select class="form-control">
+                            <option value="">Pilih GI/GIS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bay (Optional)</label>
+                        <select class="form-control" disabled>
+                            <option value=""></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Skor AHI</label>
+                        <select class="form-control">
+                            <option value="">Pilih Skor AHI</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Aset</label>
+                        <select class="form-control">
+                            <option value="">Pilih Status Aset</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jenis Asset (Optional)</label>
+                        <select class="form-control">
+                            <option value="">Pilih Jenis Asset</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Merk Asset (Optional)</label>
+                        <select class="form-control">
+                            <option value="">Pilih Merk Asset</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Anomali (Opsional)</label>
+                        <div style="display:flex; gap:12px;">
+                            <button class="btn-outline" style="flex:1; justify-content:center; color: #d97706; border-color:var(--border-color); font-weight: 600;">Ya</button>
+                            <button class="btn-outline" style="flex:1; justify-content:center; color: #d97706; border-color:var(--border-color); font-weight: 600;">Tidak</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipe (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Tipe">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Penempatan (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Penempatan">
+                    </div>
+                    <div class="form-group">
+                        <label>Techidentno (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Techidentno">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fungsi Relay (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Fungsi Relay">
+                    </div>
+                </div>
+
+                <div class="form-grid" id="filter-jenis-aset" style="display: none;">
+                    <div class="form-group">
+                        <label>Jenis Aset</label>
+                        <select class="form-control">
+                            <option>Power Transformer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Parameter</label>
+                        <select class="form-control">
+                            <option>Keasaman, Level Minyak OLTC, (+25 lainnya)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parameter AHI (Opsional)</label>
+                        <div style="display:flex; gap:12px;">
+                            <button class="btn-outline" style="flex:1; justify-content:center; color: #d97706; border-color:var(--border-color); font-weight: 600;">Ya</button>
+                            <button class="btn-outline" style="flex:1; justify-content:center; color: #d97706; border-color:var(--border-color); font-weight: 600;">Tidak</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Regional (Opsional)</label>
+                        <select class="form-control" disabled>
+                            <option>TSJ</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kantor Induk (Opsional)</label>
+                        <select class="form-control" disabled>
+                            <option>UITJBM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Pelaksana (Opsional)</label>
+                        <select class="form-control" disabled>
+                            <option>UPT SURABAYA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ULTG (Optional)</label>
+                        <select class="form-control" disabled>
+                            <option>ULTG SURABAYA UTARA</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>GI/GIS (Optional)</label>
+                        <select class="form-control">
+                            <option value="">Pilih GI/GIS</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bay (Optional)</label>
+                        <select class="form-control" disabled>
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Anomali (Opsional)</label>
+                        <div style="display:flex; gap:12px;">
+                            <button class="btn-outline" style="flex:1; justify-content:center; color: #d97706; border-color:var(--border-color); font-weight: 600;">Ya</button>
+                            <button class="btn-outline" style="flex:1; justify-content:center; color: #d97706; border-color:var(--border-color); font-weight: 600;">Tidak</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Merk (Optional)</label>
+                        <select class="form-control">
+                            <option value="">Pilih Merk</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipe (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Tipe">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Penempatan (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Penempatan">
+                    </div>
+                    <div class="form-group">
+                        <label>Techidentno (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Techidentno">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fungsi Relay (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Fungsi Relay">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="color:var(--danger); background: transparent; font-weight:600;" onclick="closeFilterModal()">RESET</button>
+                <button class="btn btn-primary" onclick="closeFilterModal()">CARI DATA</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
