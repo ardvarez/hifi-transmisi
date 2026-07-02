@@ -190,9 +190,13 @@
         /* Main Content Styling */
         .main-content {
             flex: 1;
-            padding: 32px;
+            padding: 0;
             overflow-y: auto;
             position: relative;
+        }
+
+        #defaultDashboard {
+            padding: 32px;
         }
 
         .top-nav {
@@ -215,7 +219,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            width: 300px;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
         .search-bar input {
@@ -356,6 +361,12 @@
         </div>
 
         <div class="sidebar-menu">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <i class="ri-search-line" style="color: var(--text-muted);"></i>
+                <input type="text" placeholder="Search modules, features..." onkeyup="filterSidebar()">
+            </div>
+
             <!-- Module: hifi-ers -->
             <div class="menu-section">
                 <div class="menu-section-title">HiFi ERS</div>
@@ -628,21 +639,6 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Top Navigation -->
-        <nav class="top-nav fade-in">
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <div class="search-bar">
-                    <i class="ri-search-line" style="color: var(--text-muted);"></i>
-                    <input type="text" placeholder="Search modules, features..." onkeyup="filterSidebar()">
-                </div>
-            </div>
-            <div class="user-profile">
-                <i class="ri-notification-3-line" style="font-size: 20px; color: var(--text-muted); margin-right: 12px; cursor: pointer;"></i>
-                <div class="avatar">AD</div>
-                <span>Admin User</span>
-            </div>
-        </nav>
-
         <div id="defaultDashboard">
             <!-- Dashboard Content -->
             <div class="dashboard-header fade-in delay-1">
@@ -677,13 +673,25 @@
             </div>
         </div>
 
-        <iframe name="contentFrame" id="contentFrame" src="" style="width: 100%; height: 80vh; border: none; border-radius: 16px; background: var(--glass-bg); display: none; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px);"></iframe>
+        <iframe name="contentFrame" id="contentFrame" src="" style="width: 100%; height: 100vh; border: none; border-radius: 0; background: var(--glass-bg); display: none; box-shadow: none; backdrop-filter: none;"></iframe>
     </main>
+
+    <!-- Floating Toggle Button for when sidebar is collapsed -->
+    <button id="floatingToggle" onclick="toggleSidebar()" style="position: fixed; top: 16px; left: 16px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); font-size: 24px; cursor: pointer; display: none; align-items: center; justify-content: center; padding: 8px; border-radius: 8px; z-index: 1000; backdrop-filter: blur(10px); transition: background 0.2s;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='var(--glass-bg)'">
+        <i class="ri-menu-line"></i>
+    </button>
 
     <script>
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
+            const floatingBtn = document.getElementById('floatingToggle');
             sidebar.classList.toggle('collapsed');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                floatingBtn.style.display = 'flex';
+            } else {
+                floatingBtn.style.display = 'none';
+            }
         }
 
         function toggleSubmenu(element) {
