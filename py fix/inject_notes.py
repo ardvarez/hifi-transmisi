@@ -11,7 +11,7 @@ notes_snippet = """
       .notes-fab {
         position: fixed;
         bottom: 24px;
-        right: 24px;
+        left: 88px;
         width: 56px;
         height: 56px;
         background: var(--pln-blue, #0A58CA);
@@ -32,7 +32,7 @@ notes_snippet = """
       .notes-panel {
         position: fixed;
         bottom: 90px;
-        right: 24px;
+        left: 88px;
         width: 320px;
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(12px);
