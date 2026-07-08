@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Critical GI - Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar Utilities */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24; /* PLN Yellow */
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb; /* PLN Blue */
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-header {
+            padding: 24px 32px 16px 32px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 24px 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            padding-left: 8px;
+        }
+
+        .search-box i {
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: var(--bg-surface);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+        
+        .btn-outline-primary {
+            background: var(--bg-surface);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover, .btn-outline-primary:hover {
+            background: #f8fafc;
+        }
+
+        /* Table Container */
+        .table-container {
+            flex: 1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+            background: var(--bg-surface);
+        }
+
+        tr:hover td {
+            background: #f1f5f9;
+        }
+
+        th:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 11;
+            border-left: 1px solid var(--border-color);
+        }
+
+        td:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 2;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Action Button */
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .page-item {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .page-item:hover {
+            background: #eff6ff;
+        }
+
+        .page-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .page-item.disabled {
+            color: var(--text-muted);
+            cursor: not-allowed;
+            background: transparent;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Top System Bar -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-server-line"></i> Server Training
+        </div>
+        <div class="right">
+            Contact us: helpdesk.pi@iconpln.co.id | Security Issue: soc@pln.co.id
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-flashlight-fill"></i>
+            <span>PLN</span>
+        </div>
+        <div class="menu-item"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item"><i class="ri-line-chart-line"></i></div>
+        <div class="menu-item active"><i class="ri-settings-4-line"></i></div>
+        <div class="menu-item"><i class="ri-table-alt-line"></i></div>
+        <div class="menu-item"><i class="ri-focus-2-line"></i></div>
+        <div class="menu-item"><i class="ri-file-list-3-line"></i></div>
+        <div class="menu-item"><i class="ri-team-line"></i></div>
+        <div class="menu-item"><i class="ri-customer-service-2-line"></i></div>
+        <div class="menu-item"><i class="ri-filter-3-line"></i></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Master Critical GI</h1>
+            <p class="page-subtitle">Manajemen Data Gardu Induk Kritis</p>
+        </div>
+
+        <div class="content-area">
+            <!-- Filter / Hierarki -->
+            <div style="display: flex; gap: 16px; margin-bottom: 16px; background: var(--bg-surface); padding: 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Unit Induk</label>
+                    <select class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: #f1f5f9; color: var(--text-muted); outline: none;" disabled>
+                        <option>UITJBT</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">UPT</label>
+                    <select class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none; background: #ffffff;">
+                        <option value="">Semua UPT</option>
+                        <option>UPT BANDUNG</option>
+                        <option>UPT CIREBON</option>
+                        <option>UPT KARAWANG</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">ULTG</label>
+                    <select class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none; background: #ffffff;">
+                        <option value="">Semua ULTG</option>
+                        <option>ULTG BANDUNG SELATAN</option>
+                        <option>ULTG CIREBON UTARA</option>
+                        <option>ULTG KARAWANG BARAT</option>
+                        <option>ULTG KARAWANG TIMUR</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Gardu Induk</label>
+                    <select class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none; background: #ffffff;">
+                        <option value="">Semua Gardu Induk</option>
+                        <option>GI 150kV UJUNG BERUNG</option>
+                        <option>GI 150kV CIGERELENG</option>
+                        <option>GI 150kV SUNJAYARAGI</option>
+                        <option>GI 150kV KOSAMBI</option>
+                        <option>GI 150kV TELUK JAMBE</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" placeholder="Cari di tabel...">
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-outline-primary" onclick="window.location.href='critical-gi-detail.html'">
+                        <i class="ri-edit-2-line"></i> Ubah Batch
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="ri-file-upload-line"></i> Import
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Unit Induk</th>
+                            <th>UPT</th>
+                            <th>ULTG</th>
+                            <th>Gardu Induk</th>
+                            <th>Tier</th>
+                            <th>Criticality GI</th>
+                            <th>Keterangan</th>
+                            <th style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>UITJBT</td>
+                            <td>UPT BANDUNG</td>
+                            <td>ULTG BANDUNG SELATAN</td>
+                            <td>GI 150kV UJUNG BERUNG</td>
+                            <td>Tier 1</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <div style="display: flex; justify-content: center; gap: 8px;">
+                                    <button class="btn-icon" title="Ubah"><i class="ri-edit-line"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>UITJBT</td>
+                            <td>UPT BANDUNG</td>
+                            <td>ULTG BANDUNG SELATAN</td>
+                            <td>GI 150kV CIGERELENG</td>
+                            <td>Tier 1</td>
+                            <td><span style="color: var(--danger); font-weight: 600;">Sangat Tinggi</span></td>
+                            <td>Perlu penanganan segera</td>
+                            <td>
+                                <div style="display: flex; justify-content: center; gap: 8px;">
+                                    <button class="btn-icon" title="Ubah"><i class="ri-edit-line"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>UITJBT</td>
+                            <td>UPT CIREBON</td>
+                            <td>ULTG CIREBON UTARA</td>
+                            <td>GI 150kV SUNJAYARAGI</td>
+                            <td>Tier 2</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <div style="display: flex; justify-content: center; gap: 8px;">
+                                    <button class="btn-icon" title="Ubah"><i class="ri-edit-line"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>UITJBT</td>
+                            <td>UPT KARAWANG</td>
+                            <td>ULTG KARAWANG TIMUR</td>
+                            <td>GI 150kV KOSAMBI</td>
+                            <td>Tier 3</td>
+                            <td><span style="color: var(--warning); font-weight: 600;">Tinggi</span></td>
+                            <td>Kapasitas hampir penuh</td>
+                            <td>
+                                <div style="display: flex; justify-content: center; gap: 8px;">
+                                    <button class="btn-icon" title="Ubah"><i class="ri-edit-line"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>UITJBT</td>
+                            <td>UPT KARAWANG</td>
+                            <td>ULTG KARAWANG BARAT</td>
+                            <td>GI 150kV TELUK JAMBE</td>
+                            <td>Tier 2</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <div style="display: flex; justify-content: center; gap: 8px;">
+                                    <button class="btn-icon" title="Ubah"><i class="ri-edit-line"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info">Menampilkan 1 hingga 5 dari 5 entri</div>
+                <div class="pagination-controls">
+                    <div class="page-item disabled"><i class="ri-arrow-left-s-line"></i></div>
+                    <div class="page-item active">1</div>
+                    <div class="page-item disabled"><i class="ri-arrow-right-s-line"></i></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

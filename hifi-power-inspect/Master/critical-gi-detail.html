@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubah Batch Critical GI - Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar Utilities */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-header {
+            padding: 24px 32px 16px 32px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border-radius: 8px;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+        }
+
+        /* Accordion Styling */
+        details {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        summary {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            list-style: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+            border-radius: 8px;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary:hover {
+            background: #f1f5f9;
+        }
+
+        details[open] > summary {
+            border-bottom-color: var(--border-color);
+        }
+
+        summary::before {
+            content: "\f270"; /* ri-arrow-right-s-line */
+            font-family: 'remixicon';
+            margin-right: 12px;
+            transition: transform 0.2s;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        details[open] > summary::before {
+            transform: rotate(90deg);
+        }
+
+        .accordion-content {
+            padding: 20px;
+        }
+
+        /* Nested Accordion for ULTG */
+        .accordion-ultg {
+            border: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+            box-shadow: none;
+        }
+        
+        .accordion-ultg summary {
+            background: #ffffff;
+            font-size: 14px;
+            color: #334155;
+            padding: 12px 16px;
+        }
+
+        .accordion-ultg summary:hover {
+            background: #f8fafc;
+        }
+
+        .accordion-ultg .accordion-content {
+            padding: 16px;
+            background: #f8fafc;
+            display: block;
+        }
+
+        /* GI Card */
+        .gi-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-bottom: 12px;
+        }
+        .gi-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .gi-header {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gi-header::before {
+            content: "\f2a8"; /* ri-building-4-line */
+            font-family: 'remixicon';
+            font-weight: normal;
+        }
+
+        .gi-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Radio buttons styling */
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            height: 35px; /* match input height */
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        /* Bottom Actions */
+        .bottom-actions {
+            padding: 16px 32px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: var(--bg-surface);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Top System Bar -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-server-line"></i> Server Training
+        </div>
+        <div class="right">
+            Contact us: helpdesk.pi@iconpln.co.id | Security Issue: soc@pln.co.id
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-flashlight-fill"></i>
+            <span>PLN</span>
+        </div>
+        <div class="menu-item"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item"><i class="ri-line-chart-line"></i></div>
+        <div class="menu-item active"><i class="ri-settings-4-line"></i></div>
+        <div class="menu-item"><i class="ri-table-alt-line"></i></div>
+        <div class="menu-item"><i class="ri-focus-2-line"></i></div>
+        <div class="menu-item"><i class="ri-file-list-3-line"></i></div>
+        <div class="menu-item"><i class="ri-team-line"></i></div>
+        <div class="menu-item"><i class="ri-customer-service-2-line"></i></div>
+        <div class="menu-item"><i class="ri-filter-3-line"></i></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <a href="critical-gi.html" class="back-btn" title="Kembali"><i class="ri-arrow-left-line"></i></a>
+            <div>
+                <h1 class="page-title">Ubah Batch Critical GI</h1>
+                <p class="page-subtitle">Perbarui data Tier, Criticality, dan Keterangan Gardu Induk secara batch (Unit Induk: UITJBT)</p>
+            </div>
+        </div>
+
+        <div class="content-area">
+            
+            <!-- UPT BANDUNG -->
+            <details open>
+                <summary>UPT BANDUNG</summary>
+                <div class="accordion-content">
+                    
+                    <!-- ULTG BANDUNG SELATAN -->
+                    <details class="accordion-ultg" open>
+                        <summary>ULTG BANDUNG SELATAN</summary>
+                        <div class="accordion-content">
+                            
+                            <!-- GI Item 1 -->
+                            <div class="gi-card">
+                                <div class="gi-header">GI 150kV UJUNG BERUNG</div>
+                                <div class="gi-form-grid">
+                                    <div class="form-group">
+                                        <label>Tier (Opsional)</label>
+                                        <select class="form-control">
+                                            <option value="">- Pilih Tier -</option>
+                                            <option value="1" selected>Tier 1</option>
+                                            <option value="2">Tier 2</option>
+                                            <option value="3">Tier 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Criticality GI (Opsional)</label>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_ujung_berung" value="Tinggi"> Tinggi
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_ujung_berung" value="Sangat Tinggi"> Sangat Tinggi
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Keterangan (Opsional)</label>
+                                        <input type="text" class="form-control" placeholder="Tambahkan keterangan jika perlu...">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- GI Item 2 -->
+                            <div class="gi-card">
+                                <div class="gi-header">GI 150kV CIGERELENG</div>
+                                <div class="gi-form-grid">
+                                    <div class="form-group">
+                                        <label>Tier (Opsional)</label>
+                                        <select class="form-control">
+                                            <option value="">- Pilih Tier -</option>
+                                            <option value="1" selected>Tier 1</option>
+                                            <option value="2">Tier 2</option>
+                                            <option value="3">Tier 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Criticality GI (Opsional)</label>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_cigereleng" value="Tinggi"> Tinggi
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_cigereleng" value="Sangat Tinggi" checked> Sangat Tinggi
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Keterangan (Opsional)</label>
+                                        <input type="text" class="form-control" value="Perlu penanganan segera" placeholder="Tambahkan keterangan jika perlu...">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                </div>
+            </details>
+            
+            <!-- UPT CIREBON -->
+            <details open>
+                <summary>UPT CIREBON</summary>
+                <div class="accordion-content">
+                    
+                    <!-- ULTG CIREBON UTARA -->
+                    <details class="accordion-ultg" open>
+                        <summary>ULTG CIREBON UTARA</summary>
+                        <div class="accordion-content">
+                            
+                            <!-- GI Item 3 -->
+                            <div class="gi-card">
+                                <div class="gi-header">GI 150kV SUNJAYARAGI</div>
+                                <div class="gi-form-grid">
+                                    <div class="form-group">
+                                        <label>Tier (Opsional)</label>
+                                        <select class="form-control">
+                                            <option value="">- Pilih Tier -</option>
+                                            <option value="1">Tier 1</option>
+                                            <option value="2" selected>Tier 2</option>
+                                            <option value="3">Tier 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Criticality GI (Opsional)</label>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_sunjayaragi" value="Tinggi"> Tinggi
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_sunjayaragi" value="Sangat Tinggi"> Sangat Tinggi
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Keterangan (Opsional)</label>
+                                        <input type="text" class="form-control" placeholder="Tambahkan keterangan jika perlu...">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </details>
+                    
+                </div>
+            </details>
+            
+            <!-- UPT KARAWANG -->
+            <details open>
+                <summary>UPT KARAWANG</summary>
+                <div class="accordion-content">
+                    
+                    <!-- ULTG KARAWANG TIMUR -->
+                    <details class="accordion-ultg" open>
+                        <summary>ULTG KARAWANG TIMUR</summary>
+                        <div class="accordion-content">
+                            <!-- GI Item 4 -->
+                            <div class="gi-card">
+                                <div class="gi-header">GI 150kV KOSAMBI</div>
+                                <div class="gi-form-grid">
+                                    <div class="form-group">
+                                        <label>Tier (Opsional)</label>
+                                        <select class="form-control">
+                                            <option value="">- Pilih Tier -</option>
+                                            <option value="1">Tier 1</option>
+                                            <option value="2">Tier 2</option>
+                                            <option value="3" selected>Tier 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Criticality GI (Opsional)</label>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_kosambi" value="Tinggi" checked> Tinggi
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_kosambi" value="Sangat Tinggi"> Sangat Tinggi
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Keterangan (Opsional)</label>
+                                        <input type="text" class="form-control" value="Kapasitas hampir penuh" placeholder="Tambahkan keterangan jika perlu...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                    
+                    <!-- ULTG KARAWANG BARAT -->
+                    <details class="accordion-ultg" open>
+                        <summary>ULTG KARAWANG BARAT</summary>
+                        <div class="accordion-content">
+                            <!-- GI Item 5 -->
+                            <div class="gi-card">
+                                <div class="gi-header">GI 150kV TELUK JAMBE</div>
+                                <div class="gi-form-grid">
+                                    <div class="form-group">
+                                        <label>Tier (Opsional)</label>
+                                        <select class="form-control">
+                                            <option value="">- Pilih Tier -</option>
+                                            <option value="1">Tier 1</option>
+                                            <option value="2" selected>Tier 2</option>
+                                            <option value="3">Tier 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Criticality GI (Opsional)</label>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_teluk_jambe" value="Tinggi"> Tinggi
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="crit_teluk_jambe" value="Sangat Tinggi"> Sangat Tinggi
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Keterangan (Opsional)</label>
+                                        <input type="text" class="form-control" placeholder="Tambahkan keterangan jika perlu...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                    
+                </div>
+            </details>
+
+        </div>
+        
+        <!-- Bottom Actions -->
+        <div class="bottom-actions">
+            <button class="btn btn-outline" onclick="window.location.href='critical-gi.html'">Batal</button>
+            <button class="btn btn-primary" onclick="alert('Data berhasil disimpan!'); window.location.href='critical-gi.html'">
+                <i class="ri-save-3-line"></i> Simpan
+            </button>
+        </div>
+    </main>
+</body>
+</html>
