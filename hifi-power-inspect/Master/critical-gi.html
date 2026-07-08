@@ -345,6 +345,88 @@
             cursor: not-allowed;
             background: transparent;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            width: 500px;
+            max-height: 90vh;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .modal-close {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f8fafc;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 32px 24px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+        .upload-icon {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .upload-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
         
     </style>
 </head>
@@ -436,7 +518,7 @@
                     <button class="btn btn-outline-primary" onclick="window.location.href='critical-gi-detail.html'">
                         <i class="ri-edit-2-line"></i> Ubah Batch
                     </button>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary" onclick="openModal()">
                         <i class="ri-file-upload-line"></i> Import
                     </button>
                 </div>
@@ -549,5 +631,54 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal Import -->
+    <div class="modal-overlay" id="modalImport">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Import Data Critical GI</div>
+                <i class="ri-close-line modal-close" onclick="closeModal()"></i>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 8px;">Unduh Template</label>
+                    <button class="btn btn-outline-primary" style="width: 100%; justify-content: center;" onclick="alert('Template berhasil diunduh')">
+                        <i class="ri-download-2-line"></i> Download Template Excel
+                    </button>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Gunakan template ini untuk mengisi data secara massal sebelum melakukan import.</p>
+                </div>
+                
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid var(--primary); padding: 12px 16px; border-radius: 6px; display: flex; gap: 12px; align-items: flex-start;">
+                    <i class="ri-information-line" style="color: var(--primary); font-size: 18px; margin-top: -2px;"></i>
+                    <p style="font-size: 12px; color: #1e3a8a; line-height: 1.5; margin: 0;">
+                        <strong>Perhatian:</strong> Pastikan Anda menggunakan template dari aplikasi untuk mengimport data. File dengan format yang berbeda akan ditolak.
+                    </p>
+                </div>
+
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 8px;">Unggah File</label>
+                    <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
+                        <i class="ri-upload-cloud-2-line upload-icon"></i>
+                        <div class="upload-text">Klik atau seret file ke sini untuk mengunggah</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Format didukung: .xls, .xlsx</div>
+                        <input type="file" id="fileUpload" style="display: none;" accept=".xls,.xlsx" onchange="alert('File siap diunggah: ' + this.files[0].name)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+                <button class="btn btn-primary" onclick="alert('Data berhasil diimport'); closeModal()">Import Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('modalImport').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('modalImport').classList.remove('active');
+        }
+    </script>
 </body>
 </html>
