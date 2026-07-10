@@ -494,21 +494,42 @@
 
         // Initialize Cards
         function renderCards() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const actionParam = urlParams.get('action');
+            const retryPeriod = urlParams.get('period');
+
             listContainer.innerHTML = '';
             syncData.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'sync-card waiting';
-                card.id = `card-${item.id}`;
-                card.innerHTML = `
-                    <div class="icon-wrapper">
-                        <i class="far fa-clock"></i>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-title">${item.title}</div>
-                        <div class="card-subtitle">${item.count}</div>
-                        <div class="badge">Menunggu</div>
-                    </div>
-                `;
+                
+                if (actionParam === 'retry' && item.id != retryPeriod) {
+                    card.className = 'sync-card success';
+                    card.id = `card-${item.id}`;
+                    card.innerHTML = `
+                        <div class="icon-wrapper">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-subtitle">${item.count}</div>
+                            <div class="badge">Selesai</div>
+                        </div>
+                    `;
+                } else {
+                    card.className = 'sync-card waiting';
+                    card.id = `card-${item.id}`;
+                    card.innerHTML = `
+                        <div class="icon-wrapper">
+                            <i class="far fa-clock"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-subtitle">${item.count}</div>
+                            <div class="badge">Menunggu</div>
+                        </div>
+                    `;
+                }
+                
                 listContainer.appendChild(card);
             });
         }
@@ -528,8 +549,17 @@
             const isFailScenario = document.querySelector('input[name="scenario"]:checked').value === 'failed';
             let hasFailure = false;
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const actionParam = urlParams.get('action');
+            const retryPeriod = urlParams.get('period');
+
             for (let i = 0; i < syncData.length; i++) {
                 const item = syncData[i];
+                
+                // If we are in retry mode and this is not the item to retry, skip processing
+                if (actionParam === 'retry' && item.id != retryPeriod) {
+                    continue;
+                }
                 const card = document.getElementById(`card-${item.id}`);
                 const iconWrap = card.querySelector('.icon-wrapper');
                 const badge = card.querySelector('.badge');
@@ -603,10 +633,11 @@
             }, 2000);
         }
 
-        // Auto start if retry
+        // Auto start if retry or auto
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('action') === 'retry') {
+            const actionParam = urlParams.get('action');
+            if (actionParam === 'retry' || actionParam === 'auto') {
                 const successRadio = document.querySelector('input[name="scenario"][value="success"]');
                 if(successRadio) successRadio.checked = true;
                 setTimeout(startSync, 500); 
