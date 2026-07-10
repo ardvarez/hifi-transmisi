@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --text-main: #333333;
+            --text-muted: #7b8595;
+            --border-color: #e5eaf2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #e0e5ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 480px; 
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 481px) {
+            .mobile-container {
+                height: 850px;
+                max-height: 90vh;
+                border-radius: 32px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            }
+        }
+
+        .app-header {
+            padding: 20px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-color);
+        }
+        
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .header-name { font-weight: 700; font-size: 16px; color: var(--text-main); margin-bottom: 4px; }
+        .header-sub { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
+        
+        .header-actions { display: flex; gap: 12px; }
+        .action-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notif-dot {
+            display: none;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .search-container {
+            padding: 10px 20px 20px;
+            background-color: var(--bg-color);
+        }
+        .search-box {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        .search-box input {
+            border: none; outline: none; flex: 1; font-size: 14px; color: var(--text-main);
+        }
+        .search-box i { color: var(--text-muted); }
+
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 100px;
+        }
+        
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .task-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .task-title { font-weight: 700; font-size: 14px; color: var(--text-main); margin-bottom: 4px; }
+        .task-status { font-size: 13px; color: var(--text-main); font-weight: 500; }
+        .task-status.active { color: var(--primary-blue); }
+        .progress-circle {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #f4f6fb;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600; color: var(--text-muted);
+            border: 2px solid #e5eaf2;
+        }
+        
+        .task-stats {
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+        .stat-row {
+            display: flex; justify-content: space-between; font-size: 13px;
+            margin-bottom: 8px; color: var(--text-muted);
+        }
+        .stat-row span:last-child { font-weight: 600; color: var(--text-main); }
+
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: white;
+            display: flex; justify-content: space-around;
+            padding: 12px 0 20px;
+            border-top: 1px solid var(--border-color);
+            border-radius: 20px 20px 0 0;
+            z-index: 10;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-muted); font-size: 11px; font-weight: 500; gap: 4px;
+            cursor: pointer;
+        }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: var(--primary-blue); }
+
+        /* Notification Flag */
+        .notif-flag {
+            position: absolute;
+            top: -100px;
+            left: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            z-index: 20;
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 4px solid #ef4444;
+        }
+        .notif-flag.show {
+            top: 20px;
+        }
+        .notif-icon {
+            color: #ef4444;
+            font-size: 20px;
+            margin-top: 2px;
+        }
+        .notif-content {
+            flex: 1;
+        }
+        .notif-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .notif-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .notif-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 14px;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        
+        <!-- Notification Flag -->
+        <div id="notifFlag" class="notif-flag">
+            <div class="notif-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="notif-content">
+                <div class="notif-title">Jadwal Belum Tersinkron</div>
+                <div class="notif-desc">Terdapat beberapa jadwal inspeksi yang belum disinkronisasi ke server.</div>
+            </div>
+            <button class="notif-close" onclick="closeNotif()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-title-group">
+                <div class="header-name">ardan.test</div>
+                <div class="header-sub">ULTG SURABAYA UTARA</div>
+            </div>
+            <div class="header-actions">
+                <div class="action-btn" id="btnNotification">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notifDot" class="notif-dot"></span>
+                </div>
+                <div class="action-btn"><i class="fa-solid fa-arrow-rotate-right"></i></div>
+                <div class="action-btn" onclick="goToSync()"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" placeholder="Cari ..." disabled>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-sliders" style="margin-left: 12px;"></i>
+            </div>
+        </div>
+
+        <!-- List Content -->
+        <div class="app-content">
+            <div class="task-card">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GI 150KV KALISARI</div>
+                        <div class="task-status">Mulai</div>
+                    </div>
+                    <div class="progress-circle">0/4</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Wo</span><span>2</span></div>
+                    <div class="stat-row" style="margin-bottom:0;"><span>Asset Inspeksi</span><span>4</span></div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GIS 150KV WONOKROMO</div>
+                        <div class="task-status">Mulai</div>
+                    </div>
+                    <div class="progress-circle">0/5</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Wo</span><span>1</span></div>
+                    <div class="stat-row" style="margin-bottom:0;"><span>Asset Inspeksi</span><span>5</span></div>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GI 150KV SURABAYA SELATAN</div>
+                        <div class="task-status">Mulai</div>
+                    </div>
+                    <div class="progress-circle">0/3</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Wo</span><span>3</span></div>
+                    <div class="stat-row" style="margin-bottom:0;"><span>Asset Inspeksi</span><span>3</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active"><i class="fa-solid fa-house"></i><span>Inspeksi</span></div>
+            <div class="nav-item"><i class="fa-solid fa-cube"></i><span>Asset</span></div>
+            <div class="nav-item"><i class="fa-regular fa-clipboard"></i><span>CBM</span></div>
+            <div class="nav-item"><i class="fa-regular fa-user"></i><span>Akun</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Check for URL query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+
+        if (status === 'failed') {
+            // Notification logic only for failed sync trigger
+            setTimeout(() => {
+                const notifFlag = document.getElementById('notifFlag');
+                const notifDot = document.getElementById('notifDot');
+                
+                // Show flag
+                notifFlag.classList.add('show');
+                // Show red dot
+                notifDot.style.display = 'block';
+
+                // Auto-hide flag after 4 seconds to not block UI forever
+                setTimeout(() => {
+                    notifFlag.classList.remove('show');
+                }, 4000);
+
+            }, 5000); // 5 seconds delay
+        }
+
+        function closeNotif() {
+            document.getElementById('notifFlag').classList.remove('show');
+        }
+
+        function goToSync() {
+            window.location.href = 'sync-jadwal.html';
+        }
+    </script>
+</body>
+</html>

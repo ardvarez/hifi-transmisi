@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sinkronisasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #F4F7FB;
+            --white: #FFFFFF;
+            --text-dark: #2D3748;
+            --text-muted: #718096;
+            
+            --success-bg: #F0FDF4;
+            --success-border: #DCFCE7;
+            --success-text: #166534;
+            --success-badge-bg: #DCFCE7;
+            
+            --warning-bg: #FFF7ED;
+            --warning-border: #FFEDD5;
+            --warning-text: #9A3412;
+            --warning-badge-bg: #FFEDD5;
+            
+            --waiting-bg: #FFFFFF;
+            --waiting-border: #E2E8F0;
+            --waiting-icon-bg: #F7FAFC;
+            --waiting-icon: #3182CE;
+            --waiting-badge-text: #3182CE;
+            --waiting-badge-bg: transparent;
+
+            --danger-bg: #FEF2F2;
+            --danger-border: #FEE2E2;
+            --danger-text: #B91C1C;
+            --danger-badge-bg: #FEE2E2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 480px; /* Mobile width cap */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--primary-bg);
+            position: relative;
+        }
+
+        /* Header Section */
+        .header-section {
+            background-color: var(--white);
+            padding: 40px 24px 24px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1A202C;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Main Content List */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            padding-bottom: 40px;
+            /* Hide scrollbar */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Simulation Controls */
+        .simulation-controls {
+            background-color: var(--white);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .simulation-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #4A5568;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .radio-label {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 12px;
+            background-color: #3182CE;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-start:active { background-color: #2B6CB0; }
+        .btn-start:disabled {
+            background-color: #CBD5E0;
+            cursor: not-allowed;
+        }
+
+        /* List Container */
+        .list-container {
+            background-color: var(--white);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Card Styles */
+        .sync-card {
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        /* Status: Waiting */
+        .sync-card.waiting {
+            background-color: var(--waiting-bg);
+            border-color: var(--waiting-border);
+        }
+        .sync-card.waiting .icon-wrapper {
+            background-color: var(--waiting-icon-bg);
+            color: var(--waiting-icon);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .sync-card.waiting .badge {
+            background-color: transparent;
+            color: var(--waiting-badge-text);
+            padding-left: 0;
+            font-weight: 600;
+        }
+
+        /* Status: Warning/Processing */
+        .sync-card.processing {
+            background-color: var(--warning-bg);
+            border-color: var(--warning-border);
+        }
+        .sync-card.processing .icon-wrapper {
+            color: var(--warning-text);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .sync-card.processing .badge {
+            background-color: var(--warning-badge-bg);
+            color: var(--warning-text);
+        }
+
+        /* Status: Success */
+        .sync-card.success {
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+        }
+        .sync-card.success .icon-wrapper {
+            background-color: var(--success-text);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .sync-card.success .badge {
+            background-color: var(--success-badge-bg);
+            color: var(--success-text);
+        }
+
+        /* Status: Danger */
+        .sync-card.danger {
+            background-color: var(--danger-bg);
+            border-color: var(--danger-border);
+        }
+        .sync-card.danger .icon-wrapper {
+            background-color: var(--danger-text);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .sync-card.danger .badge {
+            background-color: var(--danger-badge-bg);
+            color: var(--danger-text);
+        }
+
+        /* Card Content layout */
+        .card-content {
+            flex: 1;
+            padding-top: 4px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #2D3748;
+        }
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Animation for processing */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .icon-spin {
+            animation: spin 1.5s linear infinite;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #38A169;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            width: 90%;
+            max-width: 440px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .toast.show {
+            top: 32px;
+        }
+        .toast i {
+            font-size: 18px;
+        }
+
+        /* Modal Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 360px;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            background: #FEF2F2;
+            color: #DC2626;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 16px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1A202C;
+        }
+        .modal-text {
+            font-size: 14px;
+            color: #4A5568;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn-outline {
+            padding: 14px;
+            background: transparent;
+            color: #4A5568;
+            border: 1px solid #CBD5E0;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline:active {
+            background: #F7FAFC;
+        }
+        .btn-danger {
+            padding: 14px;
+            background: #E53E3E;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-danger:active {
+            background: #C53030;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Toast Success Notification -->
+    <div id="toastSuccess" class="toast">
+        <i class="fas fa-check-circle"></i> Berhasil sinkron data Jadwal
+    </div>
+
+    <!-- Modal Failed Sync -->
+    <div id="modalFailed" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="modal-title">Sinkronisasi Selesai</div>
+            <div class="modal-text">
+                Sinkronisasi sudah selesai, namun terdapat data yang gagal terdownload. Silakan lakukan opsi dibawah.
+            </div>
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="window.location.href='home-mobile.html?status=failed'">Kirim Laporan Gagal</button>
+                <button class="btn-outline" onclick="resetAndStart()">Sinkron Ulang</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header-section">
+            <h1 class="header-title">Sinkronisasi</h1>
+            <p class="header-subtitle">Total 66 Jadwal WO Inspeksi</p>
+        </div>
+
+        <!-- Content List -->
+        <div class="content-scroll">
+            
+            <!-- Controls for simulation -->
+            <div class="simulation-controls">
+                <div class="simulation-title">Simulasi Skenario</div>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="scenario" value="success" checked> Berhasil
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="scenario" value="failed"> Gagal (3 Bulanan)
+                    </label>
+                </div>
+                <button id="btnStart" class="btn-start" onclick="startSync()">Mulai Sinkronisasi</button>
+            </div>
+
+            <div class="list-container" id="syncList">
+                
+                <!-- Cards will be populated and managed by JS -->
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Jadwal
+        const syncData = [
+            { id: 1, title: '2 Mingguan', count: '7 Jadwal WO Inspeksi' },
+            { id: 2, title: '3 Bulanan', count: '1 Jadwal WO Inspeksi', failKey: true },
+            { id: 3, title: 'Tahunan', count: '3 Jadwal WO Inspeksi' },
+            { id: 4, title: 'Harian', count: '28 Jadwal WO Inspeksi' },
+            { id: 5, title: 'Bulanan', count: '9 Jadwal WO Inspeksi' },
+            { id: 6, title: 'Mingguan', count: '18 Jadwal WO Inspeksi' },
+            { id: 7, title: 'Finalisasi data lokal', count: 'Sinkron inspeksi lama, auto-close expired, dan FCM' }
+        ];
+
+        const listContainer = document.getElementById('syncList');
+        const btnStart = document.getElementById('btnStart');
+        const toast = document.getElementById('toastSuccess');
+        const modal = document.getElementById('modalFailed');
+
+        // Initialize Cards
+        function renderCards() {
+            listContainer.innerHTML = '';
+            syncData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'sync-card waiting';
+                card.id = `card-${item.id}`;
+                card.innerHTML = `
+                    <div class="icon-wrapper">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-subtitle">${item.count}</div>
+                        <div class="badge">Menunggu</div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Run on load
+        renderCards();
+
+        // Sync Logic
+        async function startSync() {
+            // Setup UI
+            btnStart.disabled = true;
+            btnStart.textContent = 'Menyinkronkan...';
+            toast.classList.remove('show');
+            modal.classList.remove('show');
+            renderCards(); // Reset UI state
+            
+            const isFailScenario = document.querySelector('input[name="scenario"]:checked').value === 'failed';
+            let hasFailure = false;
+
+            for (let i = 0; i < syncData.length; i++) {
+                const item = syncData[i];
+                const card = document.getElementById(`card-${item.id}`);
+                const iconWrap = card.querySelector('.icon-wrapper');
+                const badge = card.querySelector('.badge');
+                
+                // Set to processing
+                card.className = 'sync-card processing';
+                iconWrap.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i>';
+                badge.textContent = 'Sedang diproses';
+
+                // Scroll to card so user can see it processing
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Wait 1 second to simulate loading
+                await new Promise(r => setTimeout(r, 1200));
+
+                // Determine result
+                if (isFailScenario && item.failKey) {
+                    // Failed
+                    card.className = 'sync-card danger';
+                    iconWrap.innerHTML = '<i class="fas fa-times"></i>';
+                    badge.textContent = 'Gagal sinkron';
+                    hasFailure = true;
+                } else {
+                    // Success
+                    card.className = 'sync-card success';
+                    iconWrap.innerHTML = '<i class="fas fa-check"></i>';
+                    badge.textContent = 'Selesai';
+                }
+            }
+
+            // Finish UI State
+            btnStart.disabled = false;
+            btnStart.textContent = 'Mulai Sinkronisasi';
+
+            // Show notifications
+            if (hasFailure) {
+                modal.classList.add('show');
+            } else {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    // Route to home mobile
+                    window.location.href = 'home-mobile.html';
+                }, 2500);
+            }
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+        }
+
+        function resetAndStart() {
+            closeModal();
+            startSync();
+        }
+
+    </script>
+</body>
+</html>
