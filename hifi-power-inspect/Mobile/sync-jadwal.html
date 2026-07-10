@@ -403,6 +403,15 @@
             background: #C53030;
         }
 
+        /* Page Slide Out Transition */
+        .page-slide-out {
+            animation: slideOutLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-30%); opacity: 0; }
+        }
+
     </style>
 </head>
 <body>
@@ -410,6 +419,11 @@
     <!-- Toast Success Notification -->
     <div id="toastSuccess" class="toast">
         <i class="fas fa-check-circle"></i> Berhasil sinkron data Jadwal
+    </div>
+
+    <!-- Toast Report Notification -->
+    <div id="toastReport" class="toast">
+        <i class="fas fa-check-circle"></i> Berhasil mengirim laporan
     </div>
 
     <!-- Modal Failed Sync -->
@@ -423,7 +437,7 @@
                 Sinkronisasi sudah selesai, namun terdapat data yang gagal terdownload. Silakan lakukan opsi dibawah.
             </div>
             <div class="modal-actions">
-                <button class="btn-danger" onclick="window.location.href='home-mobile.html?status=failed'">Kirim Laporan Gagal</button>
+                <button class="btn-danger" onclick="sendReportAndRoute()">Kirim Laporan Gagal</button>
                 <button class="btn-outline" onclick="resetAndStart()">Sinkron Ulang</button>
             </div>
         </div>
@@ -557,8 +571,8 @@
                 toast.classList.add('show');
                 setTimeout(() => {
                     toast.classList.remove('show');
-                    // Route to home mobile
-                    window.location.href = 'home-mobile.html';
+                    // Route to home mobile with transition
+                    transitionTo('home-mobile.html');
                 }, 2500);
             }
         }
@@ -571,6 +585,33 @@
             closeModal();
             startSync();
         }
+
+        function transitionTo(url) {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 350);
+        }
+
+        function sendReportAndRoute() {
+            closeModal();
+            const toastReport = document.getElementById('toastReport');
+            toastReport.classList.add('show');
+            setTimeout(() => {
+                transitionTo('home-mobile.html?status=failed');
+            }, 2000);
+        }
+
+        // Auto start if retry
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'retry') {
+                const successRadio = document.querySelector('input[name="scenario"][value="success"]');
+                if(successRadio) successRadio.checked = true;
+                setTimeout(startSync, 500); 
+            }
+        };
 
     </script>
 </body>

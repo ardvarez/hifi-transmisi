@@ -41,7 +41,16 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
+
+        @keyframes slideInRight {
+            from { transform: translateX(30%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { animation: slideOutLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30%); opacity: 0; } }
 
         @media (min-width: 481px) {
             .mobile-container {
@@ -220,13 +229,13 @@
     <div class="mobile-container">
         
         <!-- Notification Flag -->
-        <div id="notifFlag" class="notif-flag">
+        <div id="notifFlag" class="notif-flag" onclick="goToNotif()">
             <div class="notif-icon"><i class="fas fa-exclamation-circle"></i></div>
             <div class="notif-content">
                 <div class="notif-title">Jadwal Belum Tersinkron</div>
-                <div class="notif-desc">Terdapat beberapa jadwal inspeksi yang belum disinkronisasi ke server.</div>
+                <div class="notif-desc">Terdapat beberapa jadwal inspeksi yang belum tersinkronisasi dari server.</div>
             </div>
-            <button class="notif-close" onclick="closeNotif()"><i class="fas fa-times"></i></button>
+            <button class="notif-close" onclick="closeNotif(event)"><i class="fas fa-times"></i></button>
         </div>
 
         <!-- Header -->
@@ -236,7 +245,7 @@
                 <div class="header-sub">ULTG SURABAYA UTARA</div>
             </div>
             <div class="header-actions">
-                <div class="action-btn" id="btnNotification">
+                <div class="action-btn" id="btnNotification" onclick="goToNotif()">
                     <i class="fa-regular fa-bell"></i>
                     <span id="notifDot" class="notif-dot"></span>
                 </div>
@@ -329,15 +338,28 @@
                     notifFlag.classList.remove('show');
                 }, 4000);
 
-            }, 5000); // 5 seconds delay
+            }, 2500); // 2.5 seconds delay
         }
 
-        function closeNotif() {
+        function closeNotif(event) {
+            if(event) event.stopPropagation();
             document.getElementById('notifFlag').classList.remove('show');
         }
 
+        function goToNotif() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'notifikasi-mobile.html';
+            }, 350);
+        }
+
         function goToSync() {
-            window.location.href = 'sync-jadwal.html';
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'sync-jadwal.html';
+            }, 350);
         }
     </script>
 </body>
