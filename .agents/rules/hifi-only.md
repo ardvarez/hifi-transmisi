@@ -10,3 +10,4 @@ trigger: always_on
 - Tanyakan Validasi yang perlu diperhatikan
 - Tanyakan user creatornya
 - Buat 1 Tampilan yang seragam untuk semua Hifi
+- Jika ada notes atau validasi tolong buatkan sekalian dengan trigger C:\KERJAAN\Project\hifi-transmisi\py fix\inject_notes.py supaya tidak tertinggal atau kelupaan.
