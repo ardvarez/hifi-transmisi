@@ -2306,14 +2306,14 @@
                         <line x1="12" y1="16" x2="12" y2="12"></line>
                         <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
-                    Standart Default dengan 150kV Tension
+                    <span id="label-ketersediaan-tegangan">Standart Default dengan 150kV Tension</span>
                 </div>
 
                 <div style="display:flex; gap:8px; margin-bottom:16px; align-items:center;">
-                    <button class="sub-tab-btn" style="border-radius:20px; padding:6px 14px;">70 kV</button>
-                    <button class="sub-tab-btn active" style="border-radius:20px; padding:6px 14px;">150 kV</button>
-                    <button class="sub-tab-btn" style="border-radius:20px; padding:6px 14px;">275 kV</button>
-                    <button class="sub-tab-btn" style="border-radius:20px; padding:6px 14px;">500 kV</button>
+                    <button class="sub-tab-btn chip-tegangan" onclick="filterKetersediaan(this, '70kV')" style="border-radius:20px; padding:6px 14px;">70 kV</button>
+                    <button class="sub-tab-btn chip-tegangan active" onclick="filterKetersediaan(this, '150kV')" style="border-radius:20px; padding:6px 14px;">150 kV</button>
+                    <button class="sub-tab-btn chip-tegangan" onclick="filterKetersediaan(this, '275kV')" style="border-radius:20px; padding:6px 14px;">275 kV</button>
+                    <button class="sub-tab-btn chip-tegangan" onclick="filterKetersediaan(this, '500kV')" style="border-radius:20px; padding:6px 14px;">500 kV</button>
                 </div>
 
                 <div class="table-container">
@@ -2327,7 +2327,7 @@
                                 <th class="text-center" style="width:80px">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbody-ketersediaan">
                             <tr>
                                 <td class="text-center">1</td>
                                 <td>Lindsey</td>
@@ -3299,6 +3299,67 @@
             } else {
                 tooltip.style.display = 'none';
             }
+        }
+
+        const dataKetersediaan = {
+            '70kV': [
+                { merk: 'Lindsey', lengkap: '1 Set', tidakLengkap: '0 Set' },
+                { merk: 'Tower Solution', lengkap: '2 Set', tidakLengkap: '1 Set' },
+                { merk: 'SBB', lengkap: '0 Set', tidakLengkap: '1 Set' }
+            ],
+            '150kV': [
+                { merk: 'Lindsey', lengkap: '2 Set', tidakLengkap: '1 Set' },
+                { merk: 'Tower Solution', lengkap: '1 Set', tidakLengkap: '0 Set' },
+                { merk: 'SBB', lengkap: '0 Set', tidakLengkap: '2 Set' }
+            ],
+            '275kV': [
+                { merk: 'Lindsey', lengkap: '0 Set', tidakLengkap: '2 Set' },
+                { merk: 'Tower Solution', lengkap: '3 Set', tidakLengkap: '0 Set' },
+                { merk: 'SBB', lengkap: '1 Set', tidakLengkap: '1 Set' }
+            ],
+            '500kV': [
+                { merk: 'Lindsey', lengkap: '3 Set', tidakLengkap: '1 Set' },
+                { merk: 'Tower Solution', lengkap: '0 Set', tidakLengkap: '0 Set' },
+                { merk: 'SBB', lengkap: '2 Set', tidakLengkap: '0 Set' }
+            ]
+        };
+
+        function filterKetersediaan(btnElement, tegangan) {
+            // Remove active from all chips
+            document.querySelectorAll('.chip-tegangan').forEach(btn => btn.classList.remove('active'));
+            // Add active to clicked
+            btnElement.classList.add('active');
+
+            // Update label
+            document.getElementById('label-ketersediaan-tegangan').innerText = `Standart Default dengan ${tegangan} Tension`;
+
+            // Update table body
+            const tbody = document.getElementById('tbody-ketersediaan');
+            const data = dataKetersediaan[tegangan] || [];
+            
+            let html = '';
+            data.forEach((item, index) => {
+                html += `
+                    <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item.merk}</td>
+                        <td class="text-center" style="color:var(--pln-blue); font-weight:600;">${item.lengkap}</td>
+                        <td class="text-center" style="color:var(--text-secondary);">${item.tidakLengkap}</td>
+                        <td class="text-center">
+                            <button class="btn-outline"
+                                style="padding:0; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px;"
+                                onclick="openSidePanelDetailSet()" title="Detail">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
         }
     </script>
 
