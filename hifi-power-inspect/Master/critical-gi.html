@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Icons (Remix Icons) -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- SheetJS Library for Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -561,11 +563,11 @@
                     <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Gardu Induk</label>
                     <select class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none; background: #ffffff;">
                         <option value="">Semua Gardu Induk</option>
-                        <option>GI 150kV UJUNG BERUNG</option>
-                        <option>GI 150kV CIGERELENG</option>
-                        <option>GI 150kV SUNJAYARAGI</option>
-                        <option>GI 150kV KOSAMBI</option>
-                        <option>GI 150kV TELUK JAMBE</option>
+                        <option>GI 150KV UJUNGBERUNG</option>
+                        <option>GI 150KV CIGERELENG</option>
+                        <option>GI 150KV SUNYARAGI</option>
+                        <option>GI 150KV KOSAMBI</option>
+                        <option>GI 150KV TELUKJAMBE</option>
                     </select>
                 </div>
             </div>
@@ -579,7 +581,7 @@
                     </div>
                 </div>
                 <div class="toolbar-right">
-                    <button class="btn btn-outline-success" onclick="window.location.href='template_critical_gi.xlsx'">
+                    <button class="btn btn-outline-success" onclick="exportTableToExcel()">
                         <i class="ri-file-excel-2-line"></i> Export (Excel)
                     </button>
                     <button class="btn btn-outline-primary" onclick="window.location.href='critical-gi-detail.html'">
@@ -612,7 +614,7 @@
                             <td>UITJBT</td>
                             <td>UPT BANDUNG</td>
                             <td>ULTG BANDUNG SELATAN</td>
-                            <td>GI 150kV UJUNG BERUNG</td>
+                            <td>GI 150KV UJUNGBERUNG</td>
                             <td><span class="badge-crit badge-low">Low</span></td>
                             <td>Kondisi normal</td>
                             <td>
@@ -626,7 +628,7 @@
                             <td>UITJBT</td>
                             <td>UPT BANDUNG</td>
                             <td>ULTG BANDUNG SELATAN</td>
-                            <td>GI 150kV CIGERELENG</td>
+                            <td>GI 150KV CIGERELENG</td>
                             <td><span class="badge-crit badge-high">High</span></td>
                             <td>Perlu penanganan segera</td>
                             <td>
@@ -640,7 +642,7 @@
                             <td>UITJBT</td>
                             <td>UPT CIREBON</td>
                             <td>ULTG CIREBON UTARA</td>
-                            <td>GI 150kV SUNJAYARAGI</td>
+                            <td>GI 150KV SUNYARAGI</td>
                             <td><span class="badge-crit badge-low-moderate">Low Moderate</span></td>
                             <td>Beban mulai meningkat</td>
                             <td>
@@ -654,7 +656,7 @@
                             <td>UITJBT</td>
                             <td>UPT KARAWANG</td>
                             <td>ULTG KARAWANG TIMUR</td>
-                            <td>GI 150kV KOSAMBI</td>
+                            <td>GI 150KV KOSAMBI</td>
                             <td><span class="badge-crit badge-moderate-high">Moderate to High</span></td>
                             <td>Kapasitas hampir penuh</td>
                             <td>
@@ -668,7 +670,7 @@
                             <td>UITJBT</td>
                             <td>UPT KARAWANG</td>
                             <td>ULTG KARAWANG BARAT</td>
-                            <td>GI 150kV TELUK JAMBE</td>
+                            <td>GI 150KV TELUKJAMBE</td>
                             <td><span class="badge-crit badge-moderate">Moderate</span></td>
                             <td>Perlu pemantauan berkala</td>
                             <td>
@@ -740,6 +742,50 @@
         }
         function closeModal() {
             document.getElementById('modalImport').classList.remove('active');
+        }
+
+        function exportTableToExcel() {
+            const table = document.querySelector(".table-container table");
+            if (!table) return;
+            
+            const rows = [];
+            
+            // Header row (excluding last column 'Aksi')
+            const headerRow = [];
+            table.querySelectorAll("thead th").forEach((th, index, all) => {
+                if (index < all.length - 1) {
+                    headerRow.push(th.innerText.trim());
+                }
+            });
+            rows.push(headerRow);
+            
+            // Body rows (excluding last column 'Aksi')
+            table.querySelectorAll("tbody tr").forEach(tr => {
+                const rowData = [];
+                const cells = tr.querySelectorAll("td");
+                cells.forEach((td, index) => {
+                    if (index < cells.length - 1) {
+                        rowData.push(td.innerText.trim());
+                    }
+                });
+                rows.push(rowData);
+            });
+
+            if (typeof XLSX !== 'undefined') {
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Master Critical GI");
+                XLSX.writeFile(wb, "Master_Critical_GI.xlsx");
+            } else {
+                let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.map(val => `"${val}"`).join(",")).join("\n");
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "Master_Critical_GI.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
     </script>
 
