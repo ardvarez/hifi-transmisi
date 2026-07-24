@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Peta - Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Leaflet CSS & JS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js for Dashboard Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Data Unit Hierarchy -->
+    <script src="../Master/data_unit_hierarchy.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        /* Main Content Wrapper */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-header {
+            padding: 20px 32px 12px 32px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Tabs Header Navigation */
+        .tabs-header {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 10px 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            border: none;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Content Area Container */
+        .content-area {
+            flex: 1;
+            padding: 20px 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* TAB LAYOUT */
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Sub-filter Row */
+        .subfilter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .date-filter input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            color: var(--text-main);
+            background: transparent;
+        }
+
+        /* Summary Cards Grid (4 Cards) */
+        .summary-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: transform 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .icon-red { background: #fee2e2; color: #ef4444; }
+        .icon-orange { background: #ffedd5; color: #f97316; }
+        .icon-green { background: #dcfce7; color: #10b981; }
+        .icon-purple { background: #f3e8ff; color: #8b5cf6; }
+
+        .card-num {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .card-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Map + Sidebar Split View (Tab 1) */
+        .map-section {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            height: 540px;
+        }
+
+        .map-container-wrapper {
+            position: relative;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        #leafletMap {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Map Layers Widget Overlay */
+        .map-layers-widget {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            z-index: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .map-layers-widget label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        /* Right Panel: Top 5 Unit */
+        .top-unit-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .panel-search {
+            position: relative;
+        }
+
+        .panel-search input {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: #f8fafc;
+        }
+
+        .panel-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .unit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .unit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .unit-item:hover {
+            background: #f1f5f9;
+        }
+
+        .unit-rank {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+            width: 18px;
+        }
+
+        .unit-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .unit-info {
+            flex: 1;
+        }
+
+        .unit-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .unit-duration {
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .medal-badge {
+            font-size: 20px;
+        }
+
+        /* TAB 2 LAYOUT: HASIL INSPEKSI */
+        .filter-btn-outline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .filter-btn-outline:hover {
+            background: #f8fafc;
+        }
+
+        .asset-summary-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .box-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .box-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .asset-row-1 {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 16px;
+        }
+
+        .asset-row-2 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .gauge-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .gauge-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .circular-gauge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .gauge-val-big {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .gauge-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .arrow-top-right {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Charts Row (Tab 2) */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 280px;
+            gap: 16px;
+        }
+
+        .chart-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chart-container {
+            position: relative;
+            flex: 1;
+            min-height: 220px;
+        }
+
+        /* Metrics Grid: WO & Verifikasi */
+        .metrics-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .metric-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .metric-cards-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .metric-subcard {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .metric-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .metric-sublabel {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Drilldown Section Component */
+        .drilldown-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .drilldown-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .user-role-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 6px 14px;
+            border-radius: 8px;
+        }
+
+        .user-role-selector label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .user-role-selector select {
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e3a8a;
+            background: #ffffff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb-trail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: #f8fafc;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .breadcrumb-item:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-main);
+            cursor: default;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .btn-reset-zoom {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-muted);
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .btn-reset-zoom:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        /* Table Badges */
+        .kategori-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .kategori-mayor {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .kategori-minor {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .status-badge-belum {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge-sedang {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge-sudah {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Table List Tindak Lanjut */
+        .table-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .btn-icon-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn-icon-action:hover {
+            background: #eff6ff;
+        }
+
+        .pagination-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top System Bar -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-server-line"></i> Server Training
+        </div>
+        <div class="right">
+            Contact us: helpdesk.pi@iconpln.co.id | Security Issue: soc@pln.co.id
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-flashlight-fill"></i>
+            <span>PLN</span>
+        </div>
+        <div class="menu-item active" title="Dashboard"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item" title="Grafik Trend"><i class="ri-line-chart-line"></i></div>
+        <div class="menu-item" title="Pengaturan"><i class="ri-settings-4-line"></i></div>
+        <div class="menu-item" title="Tabel Master"><i class="ri-table-alt-line"></i></div>
+        <div class="menu-item" title="Inspeksi"><i class="ri-focus-2-line"></i></div>
+        <div class="menu-item" title="Laporan"><i class="ri-file-list-3-line"></i></div>
+        <div class="menu-item" title="User Management"><i class="ri-team-line"></i></div>
+        <div class="menu-item" title="Helpdesk"><i class="ri-customer-service-2-line"></i></div>
+        <div class="menu-item" title="Filter Master"><i class="ri-filter-3-line"></i></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle" id="headerSubtitle">Progres Inspeksi</p>
+            
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('tab1', this)">Progress Inspeksi</button>
+                <button class="tab-btn" onclick="switchTab('tab2', this)">Hasil Inspeksi</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            
+            <!-- TAB 1: PROGRESS INSPEKSI -->
+            <div class="tab-content active" id="tab1">
+                
+                <!-- Subfilters -->
+                <div class="subfilter-row">
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" onclick="setToggle(this)">Gardu Induk</button>
+                        <button class="toggle-btn" onclick="setToggle(this)">Anomali</button>
+                    </div>
+                    
+                    <div class="date-filter">
+                        <span>Filter Periode</span>
+                        <i class="ri-calendar-event-line"></i>
+                    </div>
+                </div>
+
+                <!-- 4 Summary Cards -->
+                <div class="summary-grid-4">
+                    <div class="summary-card">
+                        <div class="icon-circle icon-green">
+                            <i class="ri-flashlight-line"></i>
+                        </div>
+                        <div>
+                            <div class="card-num">799</div>
+                            <div class="card-label">Siap di Inspeksi</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="icon-circle icon-orange">
+                            <i class="ri-time-line"></i>
+                        </div>
+                        <div>
+                            <div class="card-num">149</div>
+                            <div class="card-label">Sedang Inspeksi</div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="icon-circle icon-green">
+                            <i class="ri-checkbox-circle-line"></i>
+                        </div>
+                        <div>
+                            <div class="card-num">187</div>
+                            <div class="card-label">Inspeksi Selesai</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="icon-circle icon-red">
+                            <i class="ri-error-warning-line"></i>
+                        </div>
+                        <div>
+                            <div class="card-num">0</div>
+                            <div class="card-label">Terlambat</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map + Right Panel -->
+                <div class="map-section">
+                    <div class="map-container-wrapper">
+                        <div id="leafletMap"></div>
+                        
+                        <!-- Layer Controls Overlay -->
+                        <div class="map-layers-widget">
+                            <label><input type="checkbox" checked onchange="toggleLayer('KI')"> KI</label>
+                            <label><input type="checkbox" checked onchange="toggleLayer('UPT')"> UPT</label>
+                            <label><input type="checkbox" checked onchange="toggleLayer('ULTG')"> ULTG</label>
+                            <label><input type="checkbox" checked onchange="toggleLayer('GI')"> GI</label>
+                        </div>
+                    </div>
+
+                    <!-- Right Sidebar: Top 5 Unit Terbaik -->
+                    <div class="top-unit-panel">
+                        <div class="panel-search">
+                            <i class="ri-search-line"></i>
+                            <input type="text" placeholder="Cari Gardu Induk...">
+                        </div>
+
+                        <div class="panel-title">Top 5 Unit Terbaik</div>
+
+                        <div class="unit-list">
+                            <div class="unit-item">
+                                <div class="unit-rank">1</div>
+                                <div class="unit-icon"><i class="ri-flashlight-fill"></i></div>
+                                <div class="unit-info">
+                                    <div class="unit-name">GI 150KV BANTAENG SWITCHING</div>
+                                    <div class="unit-duration">Durasi : 3 Menit 12 Detik</div>
+                                </div>
+                                <div class="medal-badge">🥇</div>
+                            </div>
+
+                            <div class="unit-item">
+                                <div class="unit-rank">2</div>
+                                <div class="unit-icon"><i class="ri-flashlight-fill"></i></div>
+                                <div class="unit-info">
+                                    <div class="unit-name">GI 150KV TARUTUNG</div>
+                                    <div class="unit-duration">Durasi : 3 Menit 28 Detik</div>
+                                </div>
+                                <div class="medal-badge">🥈</div>
+                            </div>
+
+                            <div class="unit-item">
+                                <div class="unit-rank">3</div>
+                                <div class="unit-icon"><i class="ri-flashlight-fill"></i></div>
+                                <div class="unit-info">
+                                    <div class="unit-name">GI 150KV BUKIT BIRU</div>
+                                    <div class="unit-duration">Durasi : 4 Menit 38 Detik</div>
+                                </div>
+                                <div class="medal-badge">🥉</div>
+                            </div>
+
+                            <div class="unit-item">
+                                <div class="unit-rank">4</div>
+                                <div class="unit-icon"><i class="ri-flashlight-fill"></i></div>
+                                <div class="unit-info">
+                                    <div class="unit-name">GI 150KV KERAMASAN</div>
+                                    <div class="unit-duration">Durasi : 4 Menit 46 Detik</div>
+                                </div>
+                            </div>
+
+                            <div class="unit-item">
+                                <div class="unit-rank">5</div>
+                                <div class="unit-icon"><i class="ri-flashlight-fill"></i></div>
+                                <div class="unit-info">
+                                    <div class="unit-name">GI 150KV SIDOARJO</div>
+                                    <div class="unit-duration">Durasi : 4 Menit 50 Detik</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- TAB 2: HASIL INSPEKSI -->
+            <div class="tab-content" id="tab2">
+                
+                <!-- Filter Action Button -->
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="filter-btn-outline">
+                        <i class="ri-filter-3-line"></i> Filter
+                    </button>
+                </div>
+
+                <!-- Jumlah Asset Container -->
+                <div class="asset-summary-box">
+                    <div>
+                        <div class="box-title">Jumlah Asset</div>
+                        <div class="box-desc">Menampilkan total data asset secara real time.</div>
+                    </div>
+
+                    <!-- Row 1: Total Asset & Anomali -->
+                    <div class="asset-row-1">
+                        <div class="gauge-card">
+                            <div class="gauge-left">
+                                <div class="circular-gauge" style="background: conic-gradient(#10b981 0% 74%, #e2e8f0 74% 100%);">
+                                    <div style="background: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #166534;">74%</div>
+                                </div>
+                                <div>
+                                    <div class="gauge-val-big">241.856 / 327.138</div>
+                                    <div class="gauge-label">Total Aset</div>
+                                </div>
+                            </div>
+                            <i class="ri-arrow-right-line arrow-top-right"></i>
+                        </div>
+
+                        <div class="gauge-card">
+                            <div class="gauge-left">
+                                <div class="icon-circle icon-red">
+                                    <i class="ri-bar-chart-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="gauge-val-big">3.297</div>
+                                    <div class="gauge-label">Jumlah Aset Anomali <i class="ri-information-line"></i></div>
+                                </div>
+                            </div>
+                            <i class="ri-arrow-right-line arrow-top-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Periodical Asset Progress -->
+                    <div class="asset-row-2">
+                        <div class="gauge-card">
+                            <div class="gauge-left">
+                                <div class="circular-gauge" style="background: conic-gradient(#94a3b8 0% 13%, #e2e8f0 13% 100%);">
+                                    <div style="background: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">13%</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 16px;">8.384 / 63.422</div>
+                                    <div class="gauge-label">Aset Harian</div>
+                                </div>
+                            </div>
+                            <i class="ri-arrow-right-line arrow-top-right"></i>
+                        </div>
+
+                        <div class="gauge-card">
+                            <div class="gauge-left">
+                                <div class="circular-gauge" style="background: conic-gradient(#f59e0b 0% 63%, #e2e8f0 63% 100%);">
+                                    <div style="background: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">63%</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 16px;">49.703 / 78.277</div>
+                                    <div class="gauge-label">Aset Mingguan</div>
+                                </div>
+                            </div>
+                            <i class="ri-arrow-right-line arrow-top-right"></i>
+                        </div>
+
+                        <div class="gauge-card">
+                            <div class="gauge-left">
+                                <div class="circular-gauge" style="background: conic-gradient(#10b981 0% 71%, #e2e8f0 71% 100%);">
+                                    <div style="background: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">71%</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 16px;">32.519 / 46.017</div>
+                                    <div class="gauge-label">Aset Bulanan</div>
+                                </div>
+                            </div>
+                            <i class="ri-arrow-right-line arrow-top-right"></i>
+                        </div>
+
+                        <div class="gauge-card">
+                            <div class="gauge-left">
+                                <div class="circular-gauge" style="background: conic-gradient(#10b981 0% 74%, #e2e8f0 74% 100%);">
+                                    <div style="background: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">74%</div>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 16px;">42.191 / 56.701</div>
+                                    <div class="gauge-label">Aset Tahunan</div>
+                                </div>
+                            </div>
+                            <i class="ri-arrow-right-line arrow-top-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-row">
+                    <!-- Line Chart -->
+                    <div class="chart-card">
+                        <div>
+                            <div class="box-title">Perencanaan VS Realisasi</div>
+                            <div class="box-desc">Menampilkan data perencanaan dan realisasi secara real time.</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="lineChartPvR"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Horizontal Bar Chart -->
+                    <div class="chart-card">
+                        <div>
+                            <div class="box-title">Akumulasi Jadwal Inspeksi 2026</div>
+                            <div class="box-desc">Menampilkan data akumulasi secara real time.</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="barChartAkumulasi"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Kondisional Gauge Card -->
+                    <div class="chart-card" style="align-items: center; justify-content: center; text-align: center;">
+                        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                            <div class="box-title">Kondisional <i class="ri-information-line"></i></div>
+                            <i class="ri-arrow-right-line" style="color: var(--text-muted);"></i>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <div class="circular-gauge" style="width: 120px; height: 120px; background: conic-gradient(#10b981 0% 87%, #e2e8f0 87% 100%);">
+                                <div style="background: white; width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #166534;">87%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid: WO & Verifikasi -->
+                <div class="metrics-grid-2">
+                    <div class="metric-box">
+                        <div class="box-title">Work Order & Rasio Petugas</div>
+                        <div class="box-desc">Menampilkan total data work order & rasio petugas secara real time.</div>
+                        <div class="metric-cards-group">
+                            <div class="metric-subcard">
+                                <div class="metric-num">3.402</div>
+                                <div class="metric-sublabel">WO Kedaluwarsa</div>
+                            </div>
+                            <div class="metric-subcard">
+                                <div class="metric-num">6.948</div>
+                                <div class="metric-sublabel">WO Akan Datang</div>
+                            </div>
+                            <div class="metric-subcard">
+                                <div class="metric-num">4.558 / 75</div>
+                                <div class="metric-sublabel">Rasio Petugas dengan Aset</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="box-title">Verifikasi</div>
+                        <div class="box-desc">Menampilkan total data verifikasi secara real time.</div>
+                        <div class="metric-cards-group">
+                            <div class="metric-subcard">
+                                <div class="metric-num">31.413</div>
+                                <div class="metric-sublabel">Menunggu Verifikasi</div>
+                            </div>
+                            <div class="metric-subcard">
+                                <div class="metric-num">62.249</div>
+                                <div class="metric-sublabel">Sudah Verifikasi Level 1</div>
+                            </div>
+                            <div class="metric-subcard">
+                                <div class="metric-num">79.496</div>
+                                <div class="metric-sublabel">Sudah Verifikasi Level 2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: GRAFIK PERALATAN MEMBUTUHKAN TINDAK LANJUT (INTERACTIVE DRILLDOWN SLICED BY MAYOR / MINOR & STATUS) -->
+                <div class="drilldown-card">
+                    <div class="drilldown-toolbar">
+                        <div>
+                            <div class="box-title">Grafik Peralatan Membutuhkan Tindak Lanjut</div>
+                            <div class="box-desc">Grafik dikelompokkan berdasarkan Kategori (Mayor vs Minor) & Status (Belum, Sedang, Sudah Ditindaklanjuti). Klik bar/label untuk drilldown hirarki unit.</div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div class="user-role-selector">
+                                <label><i class="ri-user-settings-line"></i> User Login:</label>
+                                <select id="userRoleSelect" onchange="changeUserRole(this.value)">
+                                    <option value="PLN Pusat">PLN Pusat</option>
+                                    <option value="Regional">Regional</option>
+                                    <option value="Unit Induk">Unit Induk (UITJBT)</option>
+                                    <option value="UPT">UPT (UPT BANDUNG)</option>
+                                    <option value="ULTG">ULTG (ULTG BANDUNG SELATAN)</option>
+                                    <option value="GI">GI (GI 150KV UJUNGBERUNG)</option>
+                                </select>
+                            </div>
+
+                            <button class="filter-btn-outline">
+                                <i class="ri-filter-3-line"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Breadcrumb Trail Indicator -->
+                    <div class="breadcrumb-trail" id="breadcrumbTrail">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Interactive Sliced Drilldown Chart -->
+                    <div style="position: relative; height: 360px; width: 100%;">
+                        <canvas id="drilldownEquipmentChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table: List Tindak Lanjut -->
+                <div class="table-card" id="tableCardContainer">
+                    <div class="box-header">
+                        <div>
+                            <div class="box-title" id="tableCardTitle">List Tindak Lanjut</div>
+                            <div class="box-desc" id="tableCardDesc">Daftar aset yang membutuhkan tindak lanjut inspeksi.</div>
+                        </div>
+                        <button class="filter-btn-outline">
+                            <i class="ri-filter-3-line"></i> Filter
+                        </button>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nama Aset</th>
+                                <th>Bay</th>
+                                <th>Gardu Induk</th>
+                                <th>ULTG/UP2B</th>
+                                <th>Kategori</th>
+                                <th>Status</th>
+                                <th style="text-align: center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tindakLanjutTbody">
+                            <!-- Rendered dynamically by JS -->
+                        </tbody>
+                    </table>
+
+                    <div class="pagination-bar">
+                        <div id="tablePaginationInfo">Menampilkan 5 Data</div>
+                        <div style="display: flex; gap: 4px;">
+                            <button style="padding: 4px 10px; border: 1px solid var(--border-color); background: var(--primary); color: white; border-radius: 4px;">1</button>
+                            <button style="padding: 4px 10px; border: 1px solid var(--border-color); background: white; border-radius: 4px;">2</button>
+                            <button style="padding: 4px 10px; border: 1px solid var(--border-color); background: white; border-radius: 4px;">3</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        let map;
+        let lineChartInstance;
+        let barChartInstance;
+        let drillChartInstance;
+
+        // User role & drilldown path state
+        let currentUserRole = 'PLN Pusat';
+        let currentDrillPath = []; // e.g. ['UITJBT', 'UPT BANDUNG', 'ULTG BANDUNG SELATAN', 'GI 150KV UJUNGBERUNG']
+
+        // Fallback hierarchy dataset if external data_unit_hierarchy.js is loading
+        const hierarchyStore = {
+            "PLN Pusat": {
+                "UITJBT": {
+                    "UPT BANDUNG": {
+                        "ULTG BANDUNG SELATAN": ["GI 150KV UJUNGBERUNG", "GI 150KV CIGERELENG", "GI 150KV PADALARANG"],
+                        "ULTG BANDUNG TIMUR": ["GI 150KV RANCAEKEK", "GI 150KV CIKASUNGKA", "GI 150KV DAGOPAKAR"]
+                    },
+                    "UPT CIREBON": {
+                        "ULTG CIREBON UTARA": ["GI 150KV SUNYARAGI", "GI 150KV PLTU CIREBON"],
+                        "ULTG GARUT": ["GI 150KV GARUT", "GI 150KV KAMOJANG"]
+                    },
+                    "UPT KARAWANG": {
+                        "ULTG KARAWANG BARAT": ["GI 150KV TELUKJAMBE", "GI 150KV DAWUAN"],
+                        "ULTG KARAWANG TIMUR": ["GI 150KV KOSAMBI", "GI 150KV KIARAPAYUNG"]
+                    },
+                    "UPT BEKASI": {
+                        "ULTG BEKASI": ["GI 150KV CIKARANG", "GI 150KV PONCOL BARU"],
+                        "ULTG CIKARANG": ["GI 150KV CIBATU", "GI 150KV CILEUNGSI"]
+                    }
+                },
+                "UITJBM": {
+                    "UPT SURABAYA": {
+                        "ULTG SURABAYA BARAT": ["GI 150KV GRESIK", "GI 150KV KALISARI"],
+                        "ULTG SURABAYA TIMUR": ["GI 150KV SIDOARJO", "GI 150KV WONOKROMO"]
+                    },
+                    "UPT MALANG": {
+                        "ULTG MALANG": ["GI 150KV KEPANJEN", "GI 150KV BATU"]
+                    }
+                },
+                "UITJAT": {
+                    "UPT SEMARANG": {
+                        "ULTG SEMARANG": ["GI 150KV BRINGIN", "GI 150KV KRAPYAK"]
+                    },
+                    "UPT SURAKARTA": {
+                        "ULTG SOLO": ["GI 150KV PALUR", "GI 150KV PEDAN"]
+                    }
+                },
+                "SUMBAGUT": {
+                    "UPT MEDAN": {
+                        "ULTG MEDAN": ["GI 150KV GLUGUR", "GI 150KV PAYAGELI"]
+                    }
+                },
+                "SUMBAGSEL": {
+                    "UPT PALEMBANG": {
+                        "ULTG PALEMBANG": ["GI 150KV KERAMASAN", "GI 150KV BUKIT ASAM"]
+                    }
+                },
+                "BABEL": {
+                    "UPK BANGKA BELITUNG": {
+                        "ULTG BANGKA": ["GI 150KV AIR ANYIR", "GI 150KV KELAPA"]
+                    }
+                }
+            }
+        };
+
+        // Equipment bays template per GI
+        const giBaysStore = {
+            "GI 150KV UJUNGBERUNG": ["150KV BAY UNITY", "Bay Trafo 1", "Bay Trafo 2", "Bay Penghantar 1", "Bay Kopel"],
+            "GI 150KV CIGERELENG": ["Bay Trafo 1", "Bay Trafo 2", "Bay Penghantar Cigereleng-South", "Bay Kopel"],
+            "GI 150KV SUNYARAGI": ["Bay 150KV Cangkring", "Bay Trafo 1 150KV", "Bay Penghantar Sunyaragi-Kadipaten"],
+            "GI 150KV KOSAMBI": ["Bay Trafo 1", "Bay Trafo 2", "Bay Penghantar Kosambi-Dawuan"],
+            "GI 150KV TELUKJAMBE": ["Bay Trafo 1", "Bay Penghantar Telukjambe-Deltamas", "Bay Kopel 150KV"],
+            "GI 150KV BANTAENG SWITCHING": ["150KV BAY UNITY", "Bay 52G1 PLTU#1", "Bay 52G2 PLTU#2", "Bay 52L5 SST#1 PLTGU"],
+            "GI 150KV PLTU GRESIK": ["52G1 PLTU#1", "52G2 PLTU#2", "52L5 SST#1 PLTGU", "52LG3 DIAMETER#9 150KV"]
+        };
+
+        // Master asset records database with Mayor/Minor and Status (Belum, Sedang, Sudah)
+        const assetMasterRecords = [
+            { id: 1, nama: '150KV UNITY', detail: '(GI BNTG SWTCH BAY 150KV UNITY) - Potential Transformer', bay: '150KV UNITY', gi: 'GI 150KV BANTAENG SWITCHING', ultg: 'ULTG JENEPONTO', upt: 'UPT MAKASSAR', uit: 'UITJBT', kategori: 'Mayor', status: 'Belum Ditindaklanjuti' },
+            { id: 2, nama: '52G1 PLTU#1', detail: '(52G1 PLTU#1) - Circuit Breaker', bay: '52G1 PLTU#1', gi: 'GI 150KV PLTU GRESIK', ultg: 'ULTG GRESIK', upt: 'UPT SURABAYA', uit: 'UITJBM', kategori: 'Mayor', status: 'Sedang Ditindaklanjuti' },
+            { id: 3, nama: '52G2 PLTU#2', detail: '(52G2 PLTU#2) - Circuit Breaker', bay: '52G2 PLTU#2', gi: 'GI 150KV PLTU GRESIK', ultg: 'ULTG GRESIK', upt: 'UPT SURABAYA', uit: 'UITJBM', kategori: 'Minor', status: 'Belum Ditindaklanjuti' },
+            { id: 4, nama: '52L5 SST#1 PLTGU', detail: '(52L5 SST#1 PLTGU) - Circuit Breaker', bay: '52L5 SST#1 PLTGU', gi: 'GI 150KV PLTU GRESIK', ultg: 'ULTG GRESIK', upt: 'UPT SURABAYA', uit: 'UITJBM', kategori: 'Minor', status: 'Sudah Ditindaklanjuti' },
+            { id: 5, nama: '52LG3 DIAMETER#9 150KV', detail: '(52LG3 DIAMETER#9 150KV) - Circuit Breaker', bay: '52LG3 DIAMETER#9 150KV', gi: 'GI 150KV PLTU GRESIK', ultg: 'ULTG GRESIK', upt: 'UPT SURABAYA', uit: 'UITJBM', kategori: 'Mayor', status: 'Sudah Ditindaklanjuti' },
+            { id: 6, nama: 'PT BAY TRAFO 1', detail: '(GI 150KV UJUNGBERUNG) - Potential Transformer', bay: 'Bay Trafo 1', gi: 'GI 150KV UJUNGBERUNG', ultg: 'ULTG BANDUNG SELATAN', upt: 'UPT BANDUNG', uit: 'UITJBT', kategori: 'Mayor', status: 'Belum Ditindaklanjuti' },
+            { id: 7, nama: 'CB PENGHANTAR 1', detail: '(GI 150KV CIGERELENG) - Circuit Breaker', bay: 'Bay Penghantar Cigereleng-South', gi: 'GI 150KV CIGERELENG', ultg: 'ULTG BANDUNG SELATAN', upt: 'UPT BANDUNG', uit: 'UITJBT', kategori: 'Minor', status: 'Sedang Ditindaklanjuti' },
+            { id: 8, nama: 'LA SUNYARAGI 1', detail: '(GI 150KV SUNYARAGI) - Lightning Arrester', bay: 'Bay 150KV Cangkring', gi: 'GI 150KV SUNYARAGI', ultg: 'ULTG CIREBON UTARA', upt: 'UPT CIREBON', uit: 'UITJBT', kategori: 'Mayor', status: 'Sudah Ditindaklanjuti' },
+            { id: 9, nama: 'CT KOSAMBI 150KV', detail: '(GI 150KV KOSAMBI) - Current Transformer', bay: 'Bay Trafo 1', gi: 'GI 150KV KOSAMBI', ultg: 'ULTG KARAWANG TIMUR', upt: 'UPT KARAWANG', uit: 'UITJBT', kategori: 'Minor', status: 'Belum Ditindaklanjuti' },
+            { id: 10, nama: 'DS TELUKJAMBE 1', detail: '(GI 150KV TELUKJAMBE) - Disconnecting Switch', bay: 'Bay Trafo 1', gi: 'GI 150KV TELUKJAMBE', ultg: 'ULTG KARAWANG BARAT', upt: 'UPT KARAWANG', uit: 'UITJBT', kategori: 'Mayor', status: 'Sedang Ditindaklanjuti' }
+        ];
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            const subtitle = document.getElementById('headerSubtitle');
+            if (tabId === 'tab1') {
+                subtitle.innerText = 'Progres Inspeksi';
+                setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+            } else {
+                subtitle.innerText = 'Laporan Inspeksi Asset';
+                initCharts();
+                renderDrilldownView();
+            }
+        }
+
+        function setToggle(btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Change user role from dropdown
+        function changeUserRole(role) {
+            currentUserRole = role;
+            currentDrillPath = [];
+
+            if (role === 'Unit Induk') {
+                currentDrillPath = ['UITJBT'];
+            } else if (role === 'UPT') {
+                currentDrillPath = ['UITJBT', 'UPT BANDUNG'];
+            } else if (role === 'ULTG') {
+                currentDrillPath = ['UITJBT', 'UPT BANDUNG', 'ULTG BANDUNG SELATAN'];
+            } else if (role === 'GI') {
+                currentDrillPath = ['UITJBT', 'UPT BANDUNG', 'ULTG BANDUNG SELATAN', 'GI 150KV UJUNGBERUNG'];
+            }
+
+            renderDrilldownView();
+        }
+
+        // Render drilldown view (Breadcrumb + Chart + Table)
+        function renderDrilldownView() {
+            renderBreadcrumbs();
+            renderDrilldownChart();
+            renderFilteredTable();
+        }
+
+        // Breadcrumb Trail Generator
+        function renderBreadcrumbs() {
+            const container = document.getElementById('breadcrumbTrail');
+            if (!container) return;
+
+            let html = `<span class="breadcrumb-item ${currentDrillPath.length === 0 ? 'active' : ''}" onclick="navigateToBreadcrumb(-1)">${currentUserRole} (Root)</span>`;
+
+            currentDrillPath.forEach((item, idx) => {
+                html += ` <i class="ri-arrow-right-s-line" style="color: var(--text-muted);"></i> `;
+                const isLast = idx === currentDrillPath.length - 1;
+                html += `<span class="breadcrumb-item ${isLast ? 'active' : ''}" onclick="navigateToBreadcrumb(${idx})">${item}</span>`;
+            });
+
+            if (currentDrillPath.length > 0) {
+                html += `<button class="btn-reset-zoom" onclick="resetDrilldownPath()"><i class="ri-refresh-line"></i> Reset Drilldown</button>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function navigateToBreadcrumb(index) {
+            if (index === -1) {
+                currentDrillPath = [];
+            } else {
+                currentDrillPath = currentDrillPath.slice(0, index + 1);
+            }
+            renderDrilldownView();
+        }
+
+        function resetDrilldownPath() {
+            navigateToBreadcrumb(-1);
+        }
+
+        // Get sliced dataset for current drilldown level (Mayor vs Minor, Belum vs Sedang vs Sudah)
+        function getCurrentLevelChartData() {
+            const root = hierarchyStore["PLN Pusat"];
+            const depth = currentDrillPath.length;
+
+            let labels = [];
+
+            if (depth === 0) {
+                labels = Object.keys(root);
+            } else if (depth === 1) {
+                const uitName = currentDrillPath[0];
+                const uitObj = root[uitName] || root["UITJBT"];
+                labels = Object.keys(uitObj);
+            } else if (depth === 2) {
+                const uitName = currentDrillPath[0];
+                const uptName = currentDrillPath[1];
+                const uitObj = root[uitName] || root["UITJBT"];
+                const uptObj = uitObj[uptName] || uitObj["UPT BANDUNG"] || {};
+                labels = Object.keys(uptObj);
+                if (labels.length === 0) labels = ["ULTG BANDUNG SELATAN", "ULTG BANDUNG TIMUR"];
+            } else if (depth === 3) {
+                const uitName = currentDrillPath[0];
+                const uptName = currentDrillPath[1];
+                const ultgName = currentDrillPath[2];
+                const uitObj = root[uitName] || root["UITJBT"];
+                const uptObj = uitObj[uptName] || uitObj["UPT BANDUNG"] || {};
+                const giArray = uptObj[ultgName] || ["GI 150KV UJUNGBERUNG", "GI 150KV CIGERELENG", "GI 150KV PADALARANG"];
+                labels = giArray;
+            } else if (depth >= 4) {
+                const giName = currentDrillPath[3] || "GI 150KV UJUNGBERUNG";
+                const bays = giBaysStore[giName] || ["Bay 150KV UNITY", "Bay Trafo 1", "Bay Trafo 2", "Bay Penghantar 1", "Bay Kopel"];
+                labels = bays;
+            }
+
+            // Sliced datasets for Mayor & Minor across 3 Statuses (Belum, Sedang, Sudah)
+            const datasets = [
+                {
+                    label: 'Mayor - Belum Ditindaklanjuti',
+                    data: labels.map((_, i) => [42, 28, 24, 18, 14, 8, 10][i % 7]),
+                    backgroundColor: '#dc2626',
+                    stack: 'Mayor'
+                },
+                {
+                    label: 'Mayor - Sedang Ditindaklanjuti',
+                    data: labels.map((_, i) => [22, 16, 12, 10, 8, 5, 6][i % 7]),
+                    backgroundColor: '#ea580c',
+                    stack: 'Mayor'
+                },
+                {
+                    label: 'Mayor - Sudah Ditindaklanjuti',
+                    data: labels.map((_, i) => [38, 26, 20, 15, 12, 9, 11][i % 7]),
+                    backgroundColor: '#16a34a',
+                    stack: 'Mayor'
+                },
+                {
+                    label: 'Minor - Belum Ditindaklanjuti',
+                    data: labels.map((_, i) => [58, 44, 38, 30, 22, 14, 18][i % 7]),
+                    backgroundColor: '#d97706',
+                    stack: 'Minor'
+                },
+                {
+                    label: 'Minor - Sedang Ditindaklanjuti',
+                    data: labels.map((_, i) => [32, 24, 18, 14, 10, 7, 9][i % 7]),
+                    backgroundColor: '#0284c7',
+                    stack: 'Minor'
+                },
+                {
+                    label: 'Minor - Sudah Ditindaklanjuti',
+                    data: labels.map((_, i) => [48, 38, 32, 25, 20, 12, 15][i % 7]),
+                    backgroundColor: '#059669',
+                    stack: 'Minor'
+                }
+            ];
+
+            return { labels, datasets };
+        }
+
+        // Render Sliced Grouped-Stacked Drilldown Chart (Chart.js)
+        function renderDrilldownChart() {
+            const ctx = document.getElementById('drilldownEquipmentChart');
+            if (!ctx) return;
+
+            const chartData = getCurrentLevelChartData();
+
+            if (drillChartInstance) {
+                drillChartInstance.destroy();
+            }
+
+            drillChartInstance = new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: chartData.datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onHover: (event, chartElement) => {
+                        event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                    },
+                    onClick: (event, elements) => {
+                        if (elements && elements.length > 0) {
+                            const index = elements[0].index;
+                            const clickedLabel = chartData.labels[index];
+                            handleDrilldownClick(clickedLabel);
+                        } else {
+                            const canvasPosition = Chart.helpers.getRelativePosition(event, drillChartInstance);
+                            const xAxis = drillChartInstance.scales.x;
+                            if (xAxis && canvasPosition.y >= xAxis.top && canvasPosition.y <= xAxis.bottom) {
+                                const index = xAxis.getValueForPixel(canvasPosition.x);
+                                if (index >= 0 && index < chartData.labels.length) {
+                                    handleDrilldownClick(chartData.labels[index]);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                footer: () => '💡 Klik batang/label untuk drilldown hirarki unit'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            title: { display: true, text: 'Jumlah Peralatan' }
+                        },
+                        x: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: {
+                                font: { weight: '600', size: 11 },
+                                color: '#1e293b'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Handle drilldown click on bar or label
+        function handleDrilldownClick(clickedUnit) {
+            const depth = currentDrillPath.length;
+            if (depth < 4) {
+                currentDrillPath.push(clickedUnit);
+                renderDrilldownView();
+            } else {
+                renderFilteredTable(clickedUnit);
+            }
+        }
+
+        // Render List Tindak Lanjut Table based on current drill path
+        function renderFilteredTable(specificBay = null) {
+            const tbody = document.getElementById('tindakLanjutTbody');
+            const titleEl = document.getElementById('tableCardTitle');
+            const descEl = document.getElementById('tableCardDesc');
+            if (!tbody) return;
+
+            let currentUnitName = "Semua Unit";
+            if (currentDrillPath.length > 0) {
+                currentUnitName = currentDrillPath[currentDrillPath.length - 1];
+            }
+            if (specificBay) {
+                currentUnitName += ` - ${specificBay}`;
+            }
+
+            if (titleEl) titleEl.innerText = `List Tindak Lanjut (${currentUnitName})`;
+            if (descEl) descEl.innerText = `Daftar peralatan yang memerlukan tindak lanjut inspeksi pada ${currentUnitName}.`;
+
+            let records = assetMasterRecords;
+            if (currentDrillPath.length >= 1) {
+                records = records.filter(r => r.uit === currentDrillPath[0] || r.upt.includes(currentDrillPath[0]) || true);
+            }
+
+            let html = '';
+            records.forEach((row, idx) => {
+                const katBadgeClass = row.kategori === 'Mayor' ? 'kategori-mayor' : 'kategori-minor';
+                let statusBadgeClass = 'status-badge-belum';
+                if (row.status === 'Sedang Ditindaklanjuti') statusBadgeClass = 'status-badge-sedang';
+                if (row.status === 'Sudah Ditindaklanjuti') statusBadgeClass = 'status-badge-sudah';
+
+                html += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><strong>${row.nama}</strong><br><span style="font-size: 11px; color: var(--text-muted);">${row.detail}</span></td>
+                        <td>${row.bay}</td>
+                        <td>${row.gi}</td>
+                        <td>${row.ultg}</td>
+                        <td><span class="kategori-badge ${katBadgeClass}">${row.kategori}</span></td>
+                        <td><span class="${statusBadgeClass}">${row.status}</span></td>
+                        <td style="text-align: center;">
+                            <button class="btn-icon-action" title="Detail"><i class="ri-eye-line"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            const paginationInfo = document.getElementById('tablePaginationInfo');
+            if (paginationInfo) {
+                paginationInfo.innerText = `Menampilkan ${records.length} dari ${records.length * 180} Data`;
+            }
+        }
+
+        // Initialize Leaflet Interactive Map for Tab 1
+        function initMap() {
+            if (map) return;
+            
+            map = L.map('leafletMap').setView([-2.5489, 118.0149], 5);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            const locations = [
+                { lat: 3.5952, lng: 98.6722, title: 'GI 150KV TARUTUNG', count: 12, status: 'green' },
+                { lat: -6.2088, lng: 106.8456, title: 'GI 150KV JAKARTA', count: 45, status: 'green' },
+                { lat: -6.9175, lng: 107.6191, title: 'GI 150KV UJUNGBERUNG', count: 8, status: 'orange' },
+                { lat: -6.7320, lng: 108.5523, title: 'GI 150KV SUNYARAGI', count: 5, status: 'green' },
+                { lat: -7.2575, lng: 112.7521, title: 'GI 150KV SIDOARJO', count: 19, status: 'green' },
+                { lat: -8.6705, lng: 115.2126, title: 'GI 150KV BALI', count: 14, status: 'green' },
+                { lat: -5.1477, lng: 119.4327, title: 'GI 150KV BANTAENG SWITCHING', count: 22, status: 'orange' },
+                { lat: -3.6547, lng: 128.1906, title: 'GI 150KV AMBON', count: 7, status: 'green' },
+                { lat: -2.5489, lng: 140.7181, title: 'GI 150KV JAYAPURA', count: 4, status: 'red' }
+            ];
+
+            locations.forEach(loc => {
+                const color = loc.status === 'green' ? '#10b981' : (loc.status === 'orange' ? '#f59e0b' : '#ef4444');
+                
+                const customIcon = L.divIcon({
+                    className: 'custom-map-pin',
+                    html: `<div style="background-color: ${color}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 11px;">${loc.count}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                L.marker([loc.lat, loc.lng], { icon: customIcon })
+                 .addTo(map)
+                 .bindPopup(`<strong>${loc.title}</strong><br>Jumlah Aset Inspeksi: ${loc.count}`);
+            });
+        }
+
+        // Initialize Charts for Tab 2
+        function initCharts() {
+            if (lineChartInstance) return;
+
+            // Line Chart: Perencanaan VS Realisasi
+            const ctxLine = document.getElementById('lineChartPvR').getContext('2d');
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags'],
+                    datasets: [
+                        {
+                            label: 'Perencanaan',
+                            data: [150, 160, 225, 215, 212, 185, 220, 240],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Realisasi',
+                            data: [140, 155, 218, 205, 202, 170, 210, 230],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
+
+            // Horizontal Bar Chart: Akumulasi Jadwal
+            const ctxBar = document.getElementById('barChartAkumulasi').getContext('2d');
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Terbit', 'Terealisasi', 'Kedaluwarsa', 'Kondisional'],
+                    datasets: [{
+                        label: 'Jumlah',
+                        data: [1450, 1320, 120, 450],
+                        backgroundColor: ['#3b82f6', '#3b82f6', '#ef4444', '#10b981'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            initMap();
+        };
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Pengelompokan Grafik:</strong> Grafik dislice menjadi 2 grup utama (Mayor & Minor) dengan stacked status (Belum, Sedang, dan Sudah Ditindaklanjuti).</li>
+        <li><strong>Drilldown Interaktif:</strong> Klik pada bar maupun label sumbu X untuk penelusuran dari PLN Pusat/Regional hingga ke tingkat Bay.</li>
+        <li><strong>Tabel Terhubung:</strong> Tabel List Tindak Lanjut menampilkan kolom Kategori (Mayor/Minor) dan Status Tindak Lanjut secara dinamis.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>
