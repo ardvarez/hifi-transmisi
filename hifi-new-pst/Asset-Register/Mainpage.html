@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aset Register – PLN HiFi</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --pln-blue: #0A58CA;
+      --pln-blue-mid: #0d6efd;
+      --pln-blue-light: #E7F1FF;
+      --pln-yellow: #F7A800;
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --surface: #F1F5F9;
+      --border: #E2E8F0;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-hint: #94A3B8;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --sidebar-w: 64px;
+      --danger: #DC2626;
+      --danger-light: #FEE2E2;
+      --success: #16A34A;
+      --success-light: #DCFCE7;
+      --warning: #D97706;
+      --warning-light: #FEF3C7;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, h6, .page-title, .card-title, .logo span, .modal-header h3 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: rgba(10, 30, 60, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 8px;
+      flex-shrink: 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+    }
+
+    .sidebar .logo {
+      width: 40px;
+      height: 40px;
+      background: var(--pln-yellow);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 10px rgba(247, 168, 0, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .sidebar .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .sidebar .logo span {
+      color: #003B8E;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar .nav-item {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 4px;
+    }
+
+    .sidebar .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .sidebar .nav-item.active {
+      background: var(--pln-blue);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+    }
+
+    .sidebar .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-w));
+    }
+
+    /* HEADER BANNER */
+    .header-banner {
+      background: #EBF3FF;
+      border-bottom: 1px solid #D0E2FF;
+      padding: 6px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .header-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: var(--pln-blue);
+    }
+
+    .header-banner-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .topbar-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--text-hint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .breadcrumb a {
+      color: var(--pln-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* CONTENT BODY */
+    .content-body {
+      padding: 24px 32px;
+      flex: 1;
+    }
+
+    /* TABS */
+    .tabs-container {
+      display: flex;
+      gap: 24px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 4px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--pln-blue);
+    }
+
+    .tab-btn.active {
+      color: var(--pln-blue);
+      border-bottom-color: var(--pln-blue);
+    }
+
+    /* CARD FILTER */
+    .filter-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-label .req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-control {
+      width: 100%;
+      height: 38px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: var(--card);
+      border: 1px solid #CBD5E1;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--pln-blue);
+      box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.15);
+    }
+
+    .form-control:disabled, .form-control[readonly] {
+      background: #F1F5F9;
+      color: var(--text-secondary);
+      cursor: not-allowed;
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--danger);
+      background-color: #FFF5F5;
+    }
+
+    .invalid-feedback {
+      font-size: 11px;
+      color: var(--danger);
+      margin-top: 2px;
+      display: none;
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--pln-blue);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(10, 88, 202, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #0849A6;
+      box-shadow: 0 4px 10px rgba(10, 88, 202, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--card);
+      border-color: #CBD5E1;
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: #94A3B8;
+    }
+
+    .btn-outline-primary {
+      background: transparent;
+      border-color: var(--pln-blue);
+      color: var(--pln-blue);
+    }
+
+    .btn-outline-primary:hover {
+      background: var(--pln-blue-light);
+    }
+
+    /* TOOLBAR ROW */
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 16px;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .search-box {
+      position: relative;
+      width: 320px;
+    }
+
+    .search-box input {
+      padding-left: 36px;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-hint);
+    }
+
+    /* TABLE */
+    .table-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      overflow-y: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .table th {
+      background: #F8FAFC;
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .table tbody tr:hover {
+      background: #F1F5F9;
+    }
+
+    /* CHIPS / BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: var(--warning-light);
+      color: var(--warning);
+    }
+
+    .badge-danger {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .badge-info {
+      background: var(--pln-blue-light);
+      color: var(--pln-blue);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-hint);
+    }
+
+    .empty-state svg {
+      margin-bottom: 12px;
+      color: #94A3B8;
+    }
+
+    .empty-state h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    /* MODAL OVERLAY & CONTAINER */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 960px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-hint);
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: var(--danger);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      background: var(--surface);
+    }
+
+    /* FORM SECTION LABELS */
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pln-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .upload-box {
+      border: 2px dashed #CBD5E1;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+      background: #F8FAFC;
+      transition: all 0.2s;
+    }
+
+    .upload-box:hover {
+      border-color: var(--pln-blue);
+      background: var(--pln-blue-light);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">
+        <span>PLN</span>
+      </div>
+      <div class="nav-item active" title="Aset Register">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+      </div>
+      <div class="nav-item" title="Master Data">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+      </div>
+      <div class="nav-item" title="Settings">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="nav-item" title="User Profile">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- HEADER BANNER -->
+      <div class="header-banner">
+        <div class="header-banner-left">
+          <span>🖥️ Server Training</span>
+        </div>
+        <div class="header-banner-right">
+          <span>Contact us: helpdesk.pi@iconpln.co.id</span>
+          <span>|</span>
+          <span>Security Issue: soc@pln.co.id</span>
+        </div>
+      </div>
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="breadcrumb">
+            <a href="#">Aset Register</a>
+            <span>/</span>
+            <span id="breadcrumbCurrent">Data Aset</span>
+          </div>
+          <h1 class="page-title">Aset Register</h1>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" onclick="openCreateModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+            TAMBAH DATA
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <div class="content-body">
+        <!-- TABS -->
+        <div class="tabs-container">
+          <button class="tab-btn active" id="mainTabDataAset" onclick="switchMainTab('data')">Data Aset</button>
+          <button class="tab-btn" id="mainTabPengajuanAset" onclick="switchMainTab('pengajuan')">Pengajuan Aset</button>
+        </div>
+
+        <!-- FILTER CARD -->
+        <div class="filter-card">
+          <div class="filter-grid">
+            <div class="form-group">
+              <label class="form-label">Kantor Induk</label>
+              <select class="form-control" id="filterKantorInduk" onchange="onKantorIndukChange(this.value)">
+                <option value="">Pilih Kantor Induk</option>
+                <option value="UIT JBB">UIT JBB – Unit Induk Transmisi Jawa Bagian Barat</option>
+                <option value="UIT JBT">UIT JBT – Unit Induk Transmisi Jawa Bagian Tengah</option>
+                <option value="UIT JBN">UIT JBN – Unit Induk Transmisi Jawa Bagian (Timur &amp; Bali)</option>
+                <option value="UIT SBU">UIT SBU – Unit Induk Transmisi Sumatera Bagian Utara</option>
+                <option value="UIT SBS">UIT SBS – Unit Induk Transmisi Sumatera Bagian Selatan</option>
+                <option value="UIP SUL">UIP SUL – Unit Induk Pembangunan Sulawesi</option>
+                <option value="UIP SULMAPA">UIP SULMAPA – Unit Induk Pembangunan Sulawesi Maluku Papua</option>
+                <option value="UIP KAL">UIP KAL – Unit Induk Pembangunan Kalimantan</option>
+                <option value="UIP SBU">UIP SBU – Unit Induk Pembangunan Sumatera Bagian Utara</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Level 2</label>
+              <select class="form-control" id="filterUnitLevel2" onchange="onUnitLevel2Change(this.value)">
+                <option value="">Pilih Unit Level 2</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Level 3</label>
+              <select class="form-control" id="filterUnitLevel3" onchange="onUnitLevel3Change(this.value)">
+                <option value="">Pilih Unit Level 3</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Level 4</label>
+              <select class="form-control" id="filterUnitLevel4" onchange="onUnitLevel4Change(this.value)">
+                <option value="">Pilih Unit Level 4</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Level 5</label>
+              <select class="form-control" id="filterUnitLevel5">
+                <option value="">Pilih Unit Level 5</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Aset</label>
+              <select class="form-control" id="filterJenisAset">
+                <option value="">Pilih Jenis Aset</option>
+                <option value="Air Bushing">Air Bushing</option>
+                <option value="Transformator">Transformator</option>
+                <option value="PMT">PMT (Pemutus Tenaga)</option>
+                <option value="PMS">PMS (Pemisah)</option>
+                <option value="Current Transformer">Current Transformer (CT)</option>
+                <option value="Potential Transformer">Potential Transformer (PT)</option>
+                <option value="Lightning Arrester">Lightning Arrester (LA)</option>
+              </select>
+            </div>
+          </div>
+          <!-- VALIDATION ALERT -->
+          <div id="filterValidationAlert" style="display:none; background:#FEE2E2; border:1px solid #FCA5A5; border-radius:8px; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#DC2626; display:none; align-items:center; gap:8px;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span>Harap pilih minimal <strong>Kantor Induk</strong> atau <strong>Jenis Aset</strong> sebelum mencari data.</span>
+          </div>
+          <div class="filter-actions">
+            <button class="btn btn-outline-primary" onclick="applyFilter()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+              CARI ASET
+            </button>
+          </div>
+        </div>
+
+        <!-- TOOLBAR ROW -->
+        <div class="toolbar-row">
+          <div class="toolbar-left">
+            <div class="search-box">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+              <input type="text" class="form-control" id="searchInput" placeholder="Cari Aset..." onkeyup="filterTable()">
+            </div>
+            <button class="btn btn-secondary" onclick="toggleFilterCard()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+              Filter
+            </button>
+            <button class="btn btn-secondary" onclick="alert('Export data aset ke Excel / CSV berhasil!')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+              Data
+            </button>
+          </div>
+        </div>
+
+        <!-- DATA TABLE VIEW -->
+        <div class="table-container" id="viewDataAset">
+          <table class="table" id="assetTable">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Techidentno</th>
+                <th>NIA</th>
+                <th>Jenis Aset</th>
+                <th>Kantor Induk</th>
+                <th>Unit Level 2</th>
+                <th>Unit Level 3</th>
+                <th>Unit Level 4</th>
+                <th>Unit Level 5</th>
+                <th>Merk</th>
+                <th>Tipe</th>
+                <th>Serial ID</th>
+                <th>Phasa</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Sample Data Row 1 -->
+              <tr>
+                <td>1</td>
+                <td><strong>TECH-2026-001</strong></td>
+                <td>NIA-889021</td>
+                <td>Air Bushing</td>
+                <td>UIT JBB</td>
+                <td>UPT CAWANG</td>
+                <td>ULTG CAWANG</td>
+                <td>GI Cawang 150kV</td>
+                <td>Bay Trafo 1</td>
+                <td>A-EBERLE</td>
+                <td>Test Type</td>
+                <td>SN-99812</td>
+                <td>R</td>
+                <td><span class="badge badge-success">Operasi</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="viewDetail('TECH-2026-001')">Detail</button>
+                </td>
+              </tr>
+              <!-- Sample Data Row 2 -->
+              <tr>
+                <td>2</td>
+                <td><strong>TECH-2026-002</strong></td>
+                <td>NIA-889022</td>
+                <td>Transformator</td>
+                <td>UIT JBT</td>
+                <td>UPT Bandung</td>
+                <td>ULTG Bandung Selatan</td>
+                <td>GI Bandung 150kV</td>
+                <td>Bay Trafo 2</td>
+                <td>ABB</td>
+                <td>TR-150kV</td>
+                <td>SN-44512</td>
+                <td>3 Phase</td>
+                <td><span class="badge badge-success">Operasi</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="viewDetail('TECH-2026-002')">Detail</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PENGAJUAN ASET TABLE VIEW -->
+        <div class="table-container" id="viewPengajuanAset" style="display: none;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>No. Pengajuan</th>
+                <th>Tanggal Pengajuan</th>
+                <th>Techidentno</th>
+                <th>NIA</th>
+                <th>Jenis Aset</th>
+                <th>Kantor Induk</th>
+                <th>Unit Level 2</th>
+                <th>Unit Level 3</th>
+                <th>Unit Level 4</th>
+                <th>Unit Level 5</th>
+                <th>Merk</th>
+                <th>Tipe</th>
+                <th>Serial ID</th>
+                <th>Phasa</th>
+                <th>Pemohon</th>
+                <th>PIC</th>
+                <th>Status Pengajuan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBodyPengajuan">
+              <tr>
+                <td>1</td>
+                <td><strong>REQ-2026-089</strong></td>
+                <td>2026-07-26</td>
+                <td>TECH-2026-089</td>
+                <td>NIA-001234</td>
+                <td>Air Bushing</td>
+                <td>UIT JBB</td>
+                <td>UPT CAWANG</td>
+                <td>ULTG MAMPANG</td>
+                <td>GI MAMPANG 150kV</td>
+                <td>Bay Trafo 1</td>
+                <td>A-EBERLE</td>
+                <td>ABF-150</td>
+                <td>SN-99812</td>
+                <td>RST</td>
+                <td>Budi Santoso</td>
+                <td>Asman ULTG</td>
+                <td><span class="badge badge-warning">Menunggu Disetujui Tingkat 1</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="alert('Detail Pengajuan: REQ-2026-089\nStatus: Menunggu Approval Manager UPT')">Detail</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><strong>REQ-2026-075</strong></td>
+                <td>2026-07-20</td>
+                <td>TECH-2026-075</td>
+                <td>NIA-005678</td>
+                <td>Current Transformer</td>
+                <td>UIP SUL</td>
+                <td>UPT MAKASSAR</td>
+                <td>ULTG PANAKKUKANG</td>
+                <td>GI PANAKKUKANG 150kV</td>
+                <td>Bay Trafo 2</td>
+                <td>ABB</td>
+                <td>CT-150kV</td>
+                <td>SN-44512</td>
+                <td>RST</td>
+                <td>Ahmad Dahlan</td>
+                <td>TL ULTG</td>
+                <td><span class="badge badge-success">Disetujui</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="alert('Detail Pengajuan: REQ-2026-075\nStatus: Disetujui')">Detail</button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><strong>REQ-2026-061</strong></td>
+                <td>2026-07-15</td>
+                <td>TECH-2026-061</td>
+                <td>NIA-009012</td>
+                <td>PMT (Pemutus Tenaga)</td>
+                <td>UIT JBT</td>
+                <td>UPT BANDUNG</td>
+                <td>ULTG BANDUNG SELATAN</td>
+                <td>GI BANDUNG SELATAN 150kV</td>
+                <td>Bay Line Bandung-Cimahi</td>
+                <td>SIEMENS</td>
+                <td>3AQ1</td>
+                <td>SN-77301</td>
+                <td>R</td>
+                <td>Eko Prasetyo</td>
+                <td>Staff UPT</td>
+                <td><span class="badge" style="background:#FEE2E2;color:#DC2626;">Ditolak Tingkat 1</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="alert('Detail Pengajuan: REQ-2026-061\nStatus: Ditolak – Dokumen tidak lengkap')">Detail</button>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><strong>REQ-2026-055</strong></td>
+                <td>2026-07-10</td>
+                <td>–</td>
+                <td>–</td>
+                <td>Transformator</td>
+                <td>UIT JBB</td>
+                <td>UPT BOGOR</td>
+                <td>ULTG DEPOK</td>
+                <td>GI DEPOK 150kV</td>
+                <td>Bay Trafo 1</td>
+                <td>TRAFO PT</td>
+                <td>TR-150/20kV</td>
+                <td>SN-11290</td>
+                <td>3 Phase</td>
+                <td>Siti Rahayu</td>
+                <td>TL GI</td>
+                <td><span class="badge" style="background:#EFF6FF;color:#2563EB;">Draft</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="alert('Detail Pengajuan: REQ-2026-055\nStatus: Draft – Belum disubmit')">Detail</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+          <h4>Tidak ada data</h4>
+          <p>Maaf, Data Anda belum tersedia</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- CREATE ASSET MODAL -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="breadcrumb" style="margin:0;">
+            <a href="#">Aset Register</a>
+            <span>/</span>
+            <span>Tambah Data</span>
+          </div>
+          <h3 id="modalTitle">Tambah Data ( Air Bushing )</h3>
+        </div>
+        <button class="close-btn" onclick="closeCreateModal()">&times;</button>
+      </div>
+
+      <!-- MODAL TABS -->
+      <div style="padding: 0 24px; border-bottom: 1px solid var(--border); display: flex; gap: 16px; background: var(--surface);">
+        <button class="tab-btn active" id="tabUmumBtn" onclick="switchFormTab('umum')">Umum</button>
+        <button class="tab-btn" id="tabSpesifikasiBtn" onclick="switchFormTab('spesifikasi')">Spesifikasi</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="assetForm">
+          <!-- TAB 1: UMUM -->
+          <div id="tabUmumContent">
+            <!-- LOKASI ASET -->
+            <div class="form-section-title">Lokasi Aset</div>
+            <div class="filter-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+              <div class="form-group">
+                <label class="form-label">Unit Level 1<span class="req">*</span></label>
+                <select class="form-control" id="inputUnitLevel1">
+                  <option value="">Pilih Unit Level 1</option>
+                  <option value="UIP SUL" selected>UIP SUL</option>
+                  <option value="UIT JBB">UIT JBB</option>
+                  <option value="UIT JBT">UIT JBT</option>
+                </select>
+                <div class="invalid-feedback" id="errUnitLevel1">Unit Level 1 wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Unit Level 2</label>
+                <select class="form-control" id="inputUnitLevel2">
+                  <option value="">Pilih Unit Level 2</option>
+                  <option value="UPT Makassar">UPT Makassar</option>
+                  <option value="UPT CAWANG">UPT CAWANG</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Unit Level 3</label>
+                <select class="form-control" id="inputUnitLevel3">
+                  <option value="">Pilih Unit Level 3</option>
+                  <option value="ULTG Panakkukang">ULTG Panakkukang</option>
+                  <option value="ULTG CAWANG">ULTG CAWANG</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Unit Level 4</label>
+                <select class="form-control" id="inputUnitLevel4">
+                  <option value="">Pilih Unit Level 4</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Unit Level 5</label>
+                <select class="form-control" id="inputUnitLevel5">
+                  <option value="">Pilih Unit Level 5</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Penempatan<span class="req">*</span></label>
+                <input type="text" class="form-control" id="inputPenempatan" placeholder="Masukkan Penempatan" value="Gardu Induk Panakkukang">
+                <div class="invalid-feedback" id="errPenempatan">Penempatan wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kepemilikan<span class="req">*</span></label>
+                <select class="form-control" id="inputKepemilikan">
+                  <option value="">Pilih Kepemilikan</option>
+                  <option value="PLN Unit Pembangunan" selected>PLN Unit Pembangunan</option>
+                  <option value="PLN Penyaluran">PLN Penyaluran</option>
+                </select>
+                <div class="invalid-feedback" id="errKepemilikan">Kepemilikan wajib diisi</div>
+              </div>
+            </div>
+
+            <!-- IDENTITAS ASET -->
+            <div class="form-section-title">Identitas Aset</div>
+            <div class="filter-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+              <div class="form-group">
+                <label class="form-label">Jenis Aset<span class="req">*</span></label>
+                <select class="form-control" id="inputJenisAset" onchange="updateModalTitle(this.value)">
+                  <option value="">Pilih Jenis Aset</option>
+                  <option value="Air Bushing" selected>Air Bushing</option>
+                  <option value="Transformator">Transformator</option>
+                  <option value="PMT">PMT</option>
+                </select>
+                <div class="invalid-feedback" id="errJenisAset">Jenis Aset wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Merk<span class="req">*</span></label>
+                <select class="form-control" id="inputMerk">
+                  <option value="">Pilih Merk</option>
+                  <option value="A-EBERLE" selected>A-EBERLE</option>
+                  <option value="ABB">ABB</option>
+                  <option value="SIEMENS">SIEMENS</option>
+                </select>
+                <div class="invalid-feedback" id="errMerk">Merk wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status<span class="req">*</span></label>
+                <select class="form-control" id="inputStatus">
+                  <option value="">Pilih Status</option>
+                  <option value="Operasi" selected>Operasi</option>
+                  <option value="Standby">Standby</option>
+                  <option value="Maintenance">Maintenance</option>
+                </select>
+                <div class="invalid-feedback" id="errStatus">Status wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Techidentno</label>
+                <input type="text" class="form-control" value="Generate By System" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">NIA</label>
+                <input type="text" class="form-control" value="Generate By System" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tipe Aset<span class="req">*</span></label>
+                <input type="text" class="form-control" id="inputTipeAset" placeholder="Masukkan Tipe Aset" value="Test Type">
+                <div class="invalid-feedback" id="errTipeAset">Tipe Aset wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phasa<span class="req">*</span></label>
+                <select class="form-control" id="inputPhasa">
+                  <option value="">Pilih Phasa</option>
+                  <option value="R" selected>R</option>
+                  <option value="S">S</option>
+                  <option value="T">T</option>
+                  <option value="3 Phase">3 Phase</option>
+                </select>
+                <div class="invalid-feedback" id="errPhasa">Phasa wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Serial ID (Optional)</label>
+                <input type="text" class="form-control" id="inputSerialId" placeholder="Masukkan Serial ID" value="SN-99823">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Negara Buatan<span class="req">*</span></label>
+                <select class="form-control" id="inputNegara">
+                  <option value="">Pilih Negara Buatan</option>
+                  <option value="AFGHANISTAN">AFGHANISTAN</option>
+                  <option value="INDONESIA" selected>INDONESIA</option>
+                  <option value="GERMANY">GERMANY</option>
+                  <option value="JAPAN">JAPAN</option>
+                </select>
+                <div class="invalid-feedback" id="errNegara">Negara Buatan wajib diisi</div>
+              </div>
+            </div>
+
+            <!-- USIA ASET -->
+            <div class="form-section-title">Usia Aset & Upload Files</div>
+            <div class="filter-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+              <div class="form-group">
+                <label class="form-label">Tanggal Awal Operasi<span class="req">*</span></label>
+                <input type="date" class="form-control" id="inputTglAwal" value="2026-07-27">
+                <div class="invalid-feedback" id="errTglAwal">Tanggal Awal Operasi wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tanggal Akhir Operasi</label>
+                <input type="date" class="form-control" id="inputTglAkhir">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tahun Dibuat<span class="req">*</span></label>
+                <input type="number" class="form-control" id="inputTahunDibuat" placeholder="YYYY" value="2024">
+                <div class="invalid-feedback" id="errTahunDibuat">Tahun Dibuat wajib diisi</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Usia Operasi</label>
+                <input type="text" class="form-control" value="0 Tahun" readonly>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Usia Aset</label>
+                <input type="text" class="form-control" value="2 Tahun" readonly>
+              </div>
+              <div class="form-group" style="justify-content: flex-end;">
+                <button type="button" class="btn btn-outline-primary" style="height:38px;" onclick="openUploadModal()">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                  Upload File Aset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: SPESIFIKASI -->
+          <div id="tabSpesifikasiContent" style="display: none;">
+            <div class="form-section-title">Spesifikasi Detail Aset</div>
+            <div class="filter-grid" style="grid-template-columns: repeat(3, 1fr);">
+              <div class="form-group">
+                <label class="form-label">Tegangan Nominal (kV)</label>
+                <input type="text" class="form-control" placeholder="Contoh: 150 kV" value="150 kV">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Arus Nominal (A)</label>
+                <input type="text" class="form-control" placeholder="Contoh: 2000 A" value="2000 A">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Standar Manufaktur</label>
+                <input type="text" class="form-control" placeholder="Contoh: IEC 60137" value="IEC 60137">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCreateModal()">Batal</button>
+        <button class="btn btn-primary" onclick="handleFormNext()">SELANJUTNYA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD FILE MODAL -->
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal-card" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3>Upload File</h3>
+        <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- FOTO NAMEPLATE -->
+        <div style="margin-bottom: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label class="form-label">Foto Nameplate<span class="req">*</span></label>
+            <span class="invalid-feedback" id="errFotoNameplate" style="display:inline; margin:0;">Foto Name Plate tidak boleh kosong</span>
+          </div>
+          <div class="upload-box">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--pln-blue); margin-bottom:6px;"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <div style="font-size:12px; font-weight:600; color:var(--text-primary);" id="fileNameplateText">Belum ada file dipilih</div>
+            <div style="margin-top:8px;">
+              <input type="file" id="fileInputNameplate" style="display:none;" onchange="onFileSelected('Nameplate', this)">
+              <button class="btn btn-secondary" style="padding:4px 12px; font-size:11px;" onclick="document.getElementById('fileInputNameplate').click()">PILIH FOTO</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOTO ASET -->
+        <div style="margin-bottom: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label class="form-label">Foto Aset<span class="req">*</span></label>
+            <span class="invalid-feedback" id="errFotoAset" style="display:inline; margin:0;">Foto Aset tidak boleh kosong</span>
+          </div>
+          <div class="upload-box">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--pln-blue); margin-bottom:6px;"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <div style="font-size:12px; font-weight:600; color:var(--text-primary);" id="fileAsetText">Belum ada file dipilih</div>
+            <div style="margin-top:8px;">
+              <input type="file" id="fileInputAset" style="display:none;" onchange="onFileSelected('Aset', this)">
+              <button class="btn btn-secondary" style="padding:4px 12px; font-size:11px;" onclick="document.getElementById('fileInputAset').click()">PILIH FOTO</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DOKUMEN ASET -->
+        <div>
+          <label class="form-label" style="margin-bottom:8px; display:block;">Dokumen Aset (Optional)</label>
+          <div class="upload-box">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-hint); margin-bottom:6px;"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div style="font-size:12px; font-weight:600; color:var(--text-primary);" id="fileDokumenText">Belum ada file dipilih</div>
+            <div style="margin-top:8px;">
+              <input type="file" id="fileInputDokumen" style="display:none;" onchange="onFileSelected('Dokumen', this)">
+              <button class="btn btn-secondary" style="padding:4px 12px; font-size:11px;" onclick="document.getElementById('fileInputDokumen').click()">PILIH FILE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveUpload()">Simpan Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="modal-card" style="max-width: 420px; text-align: center;">
+      <div class="modal-header">
+        <h3>Konfirmasi PIN</h3>
+        <button class="close-btn" onclick="closePinModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom: 12px;">
+          Masukkan PIN / Token transaksi Anda untuk menyelesaikan pendaftaran aset.
+        </p>
+        <div style="font-size: 11px; color: var(--pln-blue); font-weight: 600; background: var(--pln-blue-light); padding: 6px 12px; border-radius: 6px; display: inline-block; margin-bottom: 16px;">
+          Token default: 111111
+        </div>
+        <div class="form-group" style="align-items: center;">
+          <input type="password" class="form-control" id="pinInput" placeholder="Masukkan Token (e.g. 111111)" style="width: 240px; text-align: center; font-size: 18px; letter-spacing: 4px;" value="111111">
+          <div class="invalid-feedback" id="errPin" style="display:none;">PIN / Token tidak valid!</div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="btn btn-secondary" onclick="closePinModal()">Batal</button>
+        <button class="btn btn-primary" onclick="submitPin()">VERIFIKASI & SIMPAN</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let uploadedFiles = {
+      Nameplate: false,
+      Aset: false,
+      Dokumen: false
+    };
+
+    function switchMainTab(tab) {
+      if (tab === 'data') {
+        document.getElementById('mainTabDataAset').classList.add('active');
+        document.getElementById('mainTabPengajuanAset').classList.remove('active');
+        document.getElementById('viewDataAset').style.display = 'block';
+        document.getElementById('viewPengajuanAset').style.display = 'none';
+        document.getElementById('breadcrumbCurrent').innerText = 'Data Aset';
+      } else {
+        document.getElementById('mainTabPengajuanAset').classList.add('active');
+        document.getElementById('mainTabDataAset').classList.remove('active');
+        document.getElementById('viewPengajuanAset').style.display = 'block';
+        document.getElementById('viewDataAset').style.display = 'none';
+        document.getElementById('breadcrumbCurrent').innerText = 'Pengajuan Aset';
+      }
+    }
+
+    function toggleFilterCard() {
+      const card = document.querySelector('.filter-card');
+      card.style.display = card.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function updateModalTitle(val) {
+      document.getElementById('modalTitle').innerText = `Tambah Data ( ${val || 'Air Bushing'} )`;
+    }
+
+    function openCreateModal() {
+      document.getElementById('createModal').classList.add('active');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('createModal').classList.remove('active');
+    }
+
+    function switchFormTab(tabName) {
+      if (tabName === 'umum') {
+        document.getElementById('tabUmumBtn').classList.add('active');
+        document.getElementById('tabSpesifikasiBtn').classList.remove('active');
+        document.getElementById('tabUmumContent').style.display = 'block';
+        document.getElementById('tabSpesifikasiContent').style.display = 'none';
+      } else {
+        document.getElementById('tabSpesifikasiBtn').classList.add('active');
+        document.getElementById('tabUmumBtn').classList.remove('active');
+        document.getElementById('tabSpesifikasiContent').style.display = 'block';
+        document.getElementById('tabUmumContent').style.display = 'none';
+      }
+    }
+
+    function openUploadModal() {
+      document.getElementById('uploadModal').classList.add('active');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.remove('active');
+    }
+
+    function saveUpload() {
+      uploadedFiles.Nameplate = true;
+      uploadedFiles.Aset = true;
+      closeUploadModal();
+      document.getElementById('errFotoNameplate').style.display = 'none';
+      document.getElementById('errFotoAset').style.display = 'none';
+    }
+
+    function onFileSelected(type, input) {
+      if (input.files && input.files[0]) {
+        uploadedFiles[type] = true;
+        document.getElementById(`file${type}Text`).innerText = `✓ ${input.files[0].name}`;
+        document.getElementById(`file${type}Text`).style.color = 'var(--success)';
+        const err = document.getElementById(`errFoto${type}`);
+        if (err) err.style.display = 'none';
+      }
+    }
+
+    function handleFormNext() {
+      let isValid = true;
+
+      const reqFields = [
+        { id: 'inputUnitLevel1', errId: 'errUnitLevel1' },
+        { id: 'inputPenempatan', errId: 'errPenempatan' },
+        { id: 'inputKepemilikan', errId: 'errKepemilikan' },
+        { id: 'inputJenisAset', errId: 'errJenisAset' },
+        { id: 'inputMerk', errId: 'errMerk' },
+        { id: 'inputStatus', errId: 'errStatus' },
+        { id: 'inputTipeAset', errId: 'errTipeAset' },
+        { id: 'inputPhasa', errId: 'errPhasa' },
+        { id: 'inputNegara', errId: 'errNegara' },
+        { id: 'inputTglAwal', errId: 'errTglAwal' },
+        { id: 'inputTahunDibuat', errId: 'errTahunDibuat' },
+      ];
+
+      reqFields.forEach(item => {
+        const el = document.getElementById(item.id);
+        const errEl = document.getElementById(item.errId);
+        if (!el.value || el.value.trim() === '') {
+          el.classList.add('is-invalid');
+          if (errEl) errEl.style.display = 'block';
+          isValid = false;
+        } else {
+          el.classList.remove('is-invalid');
+          if (errEl) errEl.style.display = 'none';
+        }
+      });
+
+      if (!isValid) {
+        alert('Mohon lengkapi seluruh kolom wajib bertanda bintang (*)');
+        return;
+      }
+
+      if (!uploadedFiles.Nameplate || !uploadedFiles.Aset) {
+        openUploadModal();
+        if (!uploadedFiles.Nameplate) document.getElementById('errFotoNameplate').style.display = 'inline';
+        if (!uploadedFiles.Aset) document.getElementById('errFotoAset').style.display = 'inline';
+        return;
+      }
+
+      openPinModal();
+    }
+
+    function openPinModal() {
+      document.getElementById('pinModal').classList.add('active');
+    }
+
+    function closePinModal() {
+      document.getElementById('pinModal').classList.remove('active');
+    }
+
+    function submitPin() {
+      const pin = document.getElementById('pinInput').value;
+      if (pin === '111111' || pin === '1234' || pin.length > 0) {
+        closePinModal();
+        closeCreateModal();
+
+        const tbody = document.getElementById('tableBody');
+        const count = tbody.children.length + 1;
+        const jenis = document.getElementById('inputJenisAset').value;
+        const kantor = document.getElementById('inputUnitLevel1').value;
+        const unit2 = document.getElementById('inputUnitLevel2').value || 'UPT CAWANG';
+        const unit3 = document.getElementById('inputUnitLevel3').value || 'ULTG CAWANG';
+        const merk = document.getElementById('inputMerk').value;
+        const tipe = document.getElementById('inputTipeAset').value;
+        const serial = document.getElementById('inputSerialId').value || 'SN-' + Math.floor(Math.random()*90000+10000);
+        const phasa = document.getElementById('inputPhasa').value;
+        const status = document.getElementById('inputStatus').value;
+
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td>${count}</td>
+          <td><strong>TECH-2026-${String(count).padStart(3, '0')}</strong></td>
+          <td>NIA-889${count+20}</td>
+          <td>${jenis}</td>
+          <td>${kantor}</td>
+          <td>${unit2}</td>
+          <td>${unit3}</td>
+          <td>GI Cawang 150kV</td>
+          <td>Bay Trafo 1</td>
+          <td>${merk}</td>
+          <td>${tipe}</td>
+          <td>${serial}</td>
+          <td>${phasa}</td>
+          <td><span class="badge badge-success">${status}</span></td>
+          <td>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="viewDetail('TECH-2026-${String(count).padStart(3, '0')}')">Detail</button>
+          </td>
+        `;
+        tbody.prepend(newRow);
+
+        alert('✨ Data Aset Berhasil Ditambahkan!');
+      } else {
+        document.getElementById('errPin').style.display = 'block';
+      }
+    }
+
+    function filterTable() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#tableBody tr');
+      let visibleCount = 0;
+
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        if (text.includes(q)) {
+          r.style.display = '';
+          visibleCount++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+
+      document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    // =============================================
+    // UNIT HIERARCHY DATA
+    // =============================================
+    const unitHierarchy = {
+      'UIT JBB': {
+        label: 'UIT JBB – Unit Induk Transmisi Jawa Bagian Barat',
+        upt: {
+          'UPT CAWANG': {
+            ultg: ['ULTG CAWANG', 'ULTG MAMPANG', 'ULTG KARET', 'GUDANG P3B JB APP CAWANG', 'LAB. P3B JB APP CAWANG', 'MARKAS PDKB CAWANG JARINGAN', 'GUDANG SEMI TERTUTUP CAWANG', 'GUDANG TERTUTUP KARET'],
+            gi: {
+              'ULTG CAWANG': ['GI CAWANG 500kV', 'GI CAWANG 150kV', 'GI GANDUL'],
+              'ULTG MAMPANG': ['GI MAMPANG 150kV', 'GI CIGANJUR', 'GI PESANGGRAHAN'],
+              'ULTG KARET': ['GI KARET 150kV', 'GI SENAYAN', 'GI GAMBIR', 'GI KEDOYA']
+            },
+            bay: {
+              'GI CAWANG 500kV': ['Bay Trafo 500/150 #1', 'Bay Trafo 500/150 #2', 'Bay Line SUTT 500kV'],
+              'GI CAWANG 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Cawang-Mampang', 'Bay Line Cawang-Karet'],
+              'GI MAMPANG 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Mampang-Cawang'],
+              'GI KARET 150kV': ['Bay Trafo 1', 'Bay Line Karet-Cawang', 'Bay Bus-Section']
+            }
+          },
+          'UPT BOGOR': {
+            ultg: ['ULTG DEPOK', 'ULTG BOGOR', 'ULTG BEKASI', 'GUDANG UPT BOGOR'],
+            gi: {
+              'ULTG DEPOK': ['GI DEPOK 150kV', 'GI CITAYAM', 'GI SAWANGAN'],
+              'ULTG BOGOR': ['GI BOGOR 150kV', 'GI CIBINONG'],
+              'ULTG BEKASI': ['GI BEKASI 150kV', 'GI HARAPAN BARU']
+            },
+            bay: {
+              'GI DEPOK 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Depok-Cawang'],
+              'GI BOGOR 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          },
+          'UPT DURI KOSAMBI': {
+            ultg: ['ULTG DURI KOSAMBI', 'ULTG BALARAJA', 'ULTG TANGERANG'],
+            gi: {
+              'ULTG DURI KOSAMBI': ['GI DURI KOSAMBI 150kV', 'GI KEMBANGAN'],
+              'ULTG BALARAJA': ['GI BALARAJA 150kV', 'GI TIGARAKSA'],
+              'ULTG TANGERANG': ['GI TANGERANG 150kV', 'GI JATIUWUNG']
+            },
+            bay: {
+              'GI DURI KOSAMBI 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Duri-Kembangan']
+            }
+          },
+          'UPT BALI': {
+            ultg: ['ULTG BALI UTARA', 'ULTG BALI SELATAN', 'GUDANG UPT BALI'],
+            gi: {
+              'ULTG BALI UTARA': ['GI KAPAL 150kV', 'GI PEMECUTAN'],
+              'ULTG BALI SELATAN': ['GI PESANGGARAN 150kV', 'GI SANUR', 'GI NUSA DUA']
+            },
+            bay: {
+              'GI KAPAL 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI PESANGGARAN 150kV': ['Bay Trafo 1', 'Bay Line Pesanggaran-Sanur']
+            }
+          }
+        }
+      },
+      'UIT JBT': {
+        label: 'UIT JBT – Unit Induk Transmisi Jawa Bagian Tengah',
+        upt: {
+          'UPT BANDUNG': {
+            ultg: ['ULTG BANDUNG SELATAN', 'ULTG BANDUNG UTARA', 'ULTG CIMAHI'],
+            gi: {
+              'ULTG BANDUNG SELATAN': ['GI BANDUNG SELATAN 500kV', 'GI BANDUNG SELATAN 150kV', 'GI BUAH BATU'],
+              'ULTG BANDUNG UTARA': ['GI BANDUNG UTARA 150kV', 'GI LEMBANG'],
+              'ULTG CIMAHI': ['GI CIMAHI 150kV', 'GI PADALARANG']
+            },
+            bay: {
+              'GI BANDUNG SELATAN 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Trafo 3'],
+              'GI BANDUNG UTARA 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          },
+          'UPT CIREBON': {
+            ultg: ['ULTG CIREBON', 'ULTG TASIKMALAYA', 'ULTG PURWOKERTO'],
+            gi: {
+              'ULTG CIREBON': ['GI CIREBON 150kV', 'GI KANCI', 'GI PLUMBON'],
+              'ULTG TASIKMALAYA': ['GI TASIKMALAYA 150kV', 'GI SINGAPARNA'],
+              'ULTG PURWOKERTO': ['GI PURWOKERTO 150kV', 'GI AJIBARANG']
+            },
+            bay: {
+              'GI CIREBON 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Cirebon-Kanci']
+            }
+          },
+          'UPT SEMARANG': {
+            ultg: ['ULTG SEMARANG BARAT', 'ULTG SEMARANG TIMUR', 'ULTG UNGARAN'],
+            gi: {
+              'ULTG SEMARANG BARAT': ['GI KRAPYAK 150kV', 'GI TAMBAKLOROK'],
+              'ULTG SEMARANG TIMUR': ['GI SRONDOL 150kV', 'GI PUDAK PAYUNG'],
+              'ULTG UNGARAN': ['GI UNGARAN 150kV', 'GI BAWEN', 'GITET UNGARAN 500kV']
+            },
+            bay: {
+              'GI KRAPYAK 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GITET UNGARAN 500kV': ['Bay Trafo 500/150 #1', 'Bay Trafo 500/150 #2']
+            }
+          },
+          'UPT YOGYAKARTA': {
+            ultg: ['ULTG YOGYAKARTA', 'ULTG KLATEN', 'ULTG BANTUL'],
+            gi: {
+              'ULTG YOGYAKARTA': ['GI WATES 150kV', 'GI GEJAYAN'],
+              'ULTG KLATEN': ['GI KLATEN 150kV', 'GI PRAMBANAN'],
+              'ULTG BANTUL': ['GI BANTUL 150kV', 'GI SEDAYU']
+            },
+            bay: {
+              'GI WATES 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI KLATEN 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          }
+        }
+      },
+      'UIT JBN': {
+        label: 'UIT JBN – Unit Induk Transmisi Jawa Bagian (Timur & Bali)',
+        upt: {
+          'UPT SURABAYA': {
+            ultg: ['ULTG KRIAN', 'ULTG SURABAYA SELATAN', 'ULTG SURABAYA UTARA'],
+            gi: {
+              'ULTG KRIAN': ['GI KRIAN 500kV', 'GI KRIAN 150kV', 'GI DRIYOREJO'],
+              'ULTG SURABAYA SELATAN': ['GI SAWAHAN 150kV', 'GI NGAGEL', 'GI RUNGKUT'],
+              'ULTG SURABAYA UTARA': ['GI KENJERAN 150kV', 'GI KREMBANGAN']
+            },
+            bay: {
+              'GI KRIAN 500kV': ['Bay Trafo 500/150 #1', 'Bay Trafo 500/150 #2'],
+              'GI SAWAHAN 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          },
+          'UPT MALANG': {
+            ultg: ['ULTG MALANG', 'ULTG KEDIRI', 'ULTG PASURUAN'],
+            gi: {
+              'ULTG MALANG': ['GI MALANG 150kV', 'GI PAKIS', 'GI LAWANG'],
+              'ULTG KEDIRI': ['GI KEDIRI 150kV', 'GI BLITAR'],
+              'ULTG PASURUAN': ['GI PASURUAN 150kV', 'GI GRATI']
+            },
+            bay: {
+              'GI MALANG 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI KEDIRI 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          }
+        }
+      },
+      'UIT SBU': {
+        label: 'UIT SBU – Unit Induk Transmisi Sumatera Bagian Utara',
+        upt: {
+          'UPT MEDAN': {
+            ultg: ['ULTG MEDAN', 'ULTG GLUGUR', 'ULTG DELI TUA'],
+            gi: {
+              'ULTG MEDAN': ['GI GIRIAN 150kV', 'GI SEI ROTAN'],
+              'ULTG GLUGUR': ['GI GLUGUR 150kV', 'GI LABUHAN'],
+              'ULTG DELI TUA': ['GI DELI TUA 150kV', 'GI TITI KUNING']
+            },
+            bay: {
+              'GI GLUGUR 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI DELI TUA 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          },
+          'UPT ACEH': {
+            ultg: ['ULTG BANDA ACEH', 'ULTG LHOKSEUMAWE', 'ULTG LANGSA'],
+            gi: {
+              'ULTG BANDA ACEH': ['GI BANDA ACEH 150kV', 'GI LAMBARO'],
+              'ULTG LHOKSEUMAWE': ['GI LHOKSEUMAWE 150kV', 'GI ARUN'],
+              'ULTG LANGSA': ['GI LANGSA 150kV']
+            },
+            bay: {
+              'GI BANDA ACEH 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          }
+        }
+      },
+      'UIT SBS': {
+        label: 'UIT SBS – Unit Induk Transmisi Sumatera Bagian Selatan',
+        upt: {
+          'UPT PALEMBANG': {
+            ultg: ['ULTG PALEMBANG SELATAN', 'ULTG PALEMBANG UTARA', 'ULTG MUARA ENIM'],
+            gi: {
+              'ULTG PALEMBANG SELATAN': ['GI TALANG RATU 150kV', 'GI BUNGARAN'],
+              'ULTG PALEMBANG UTARA': ['GI BORANG 150kV', 'GI MARIANA'],
+              'ULTG MUARA ENIM': ['GI MUARA ENIM 150kV', 'GI TANJUNG ENIM']
+            },
+            bay: {
+              'GI TALANG RATU 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI BORANG 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          },
+          'UPT LAMPUNG': {
+            ultg: ['ULTG BANDAR LAMPUNG', 'ULTG METRO', 'ULTG LIWA'],
+            gi: {
+              'ULTG BANDAR LAMPUNG': ['GI SUTAMI 150kV', 'GI WAY HALIM', 'GI TELUK BETUNG'],
+              'ULTG METRO': ['GI METRO 150kV', 'GI BUMI MAS'],
+              'ULTG LIWA': ['GI LIWA 150kV']
+            },
+            bay: {
+              'GI SUTAMI 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI WAY HALIM 150kV': ['Bay Trafo 1', 'Bay Trafo 2']
+            }
+          }
+        }
+      },
+      'UIP SUL': {
+        label: 'UIP SUL – Unit Induk Pembangunan Sulawesi',
+        upt: {
+          'UPT MAKASSAR': {
+            ultg: ['ULTG PANAKKUKANG', 'ULTG TELLO', 'ULTG SUNGGUMINASA', 'GUDANG UPT MAKASSAR'],
+            gi: {
+              'ULTG PANAKKUKANG': ['GI PANAKKUKANG 150kV', 'GI SUNGGUMINASA', 'GI MANDAI'],
+              'ULTG TELLO': ['GI TELLO 150kV', 'GI TALLO LAMA'],
+              'ULTG SUNGGUMINASA': ['GI SUNGGUMINASA 150kV', 'GI TAKALAR']
+            },
+            bay: {
+              'GI PANAKKUKANG 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Panakkukang-Tello', 'Bay Bus-Section'],
+              'GI TELLO 150kV': ['Bay Trafo 1', 'Bay Trafo 2', 'Bay Line Tello-Panakkukang'],
+              'GI SUNGGUMINASA 150kV': ['Bay Trafo 1', 'Bay Line Sungguminasa-Takalar']
+            }
+          },
+          'UPT PALU': {
+            ultg: ['ULTG PALU', 'ULTG POSO', 'GUDANG UPT PALU'],
+            gi: {
+              'ULTG PALU': ['GI PALU 150kV', 'GI SILAE', 'GI POBOYA'],
+              'ULTG POSO': ['GI POSO 150kV', 'GI TENTENA']
+            },
+            bay: {
+              'GI PALU 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI POSO 150kV': ['Bay Trafo 1', 'Bay Line Poso-Palu']
+            }
+          },
+          'UPT MANADO': {
+            ultg: ['ULTG MANADO', 'ULTG GORONTALO', 'GUDANG UPT MANADO'],
+            gi: {
+              'ULTG MANADO': ['GI MANADO 150kV', 'GI TOMOHON', 'GI AIRMADIDI'],
+              'ULTG GORONTALO': ['GI GORONTALO 150kV', 'GI MARISA']
+            },
+            bay: {
+              'GI MANADO 150kV': ['Bay Trafo 1', 'Bay Trafo 2'],
+              'GI GORONTALO 150kV': ['Bay Trafo 1', 'Bay Line Gorontalo-Marisa']
+            }
+          }
+        }
+      },
+      'UIP SULMAPA': {
+        label: 'UIP SULMAPA – Unit Induk Pembangunan Sulawesi Maluku Papua',
+        upt: {
+          'UPT AMBON': {
+            ultg: ['ULTG AMBON', 'GUDANG UPT AMBON'],
+            gi: { 'ULTG AMBON': ['GI AMBON 150kV', 'GI PASSO'] },
+            bay: { 'GI AMBON 150kV': ['Bay Trafo 1', 'Bay Trafo 2'] }
+          },
+          'UPT JAYAPURA': {
+            ultg: ['ULTG JAYAPURA', 'ULTG MERAUKE'],
+            gi: {
+              'ULTG JAYAPURA': ['GI JAYAPURA 150kV', 'GI SENTANI'],
+              'ULTG MERAUKE': ['GI MERAUKE 150kV']
+            },
+            bay: { 'GI JAYAPURA 150kV': ['Bay Trafo 1', 'Bay Trafo 2'] }
+          }
+        }
+      },
+      'UIP KAL': {
+        label: 'UIP KAL – Unit Induk Pembangunan Kalimantan',
+        upt: {
+          'UPT PONTIANAK': {
+            ultg: ['ULTG PONTIANAK', 'ULTG SINGKAWANG'],
+            gi: {
+              'ULTG PONTIANAK': ['GI PONTIANAK 150kV', 'GI SIANTAN'],
+              'ULTG SINGKAWANG': ['GI SINGKAWANG 150kV']
+            },
+            bay: { 'GI PONTIANAK 150kV': ['Bay Trafo 1', 'Bay Trafo 2'] }
+          },
+          'UPT BALIKPAPAN': {
+            ultg: ['ULTG BALIKPAPAN', 'ULTG SAMARINDA'],
+            gi: {
+              'ULTG BALIKPAPAN': ['GI BALIKPAPAN 150kV', 'GI SEPINGGAN'],
+              'ULTG SAMARINDA': ['GI SAMARINDA 150kV', 'GI LEMPAKE']
+            },
+            bay: { 'GI BALIKPAPAN 150kV': ['Bay Trafo 1', 'Bay Trafo 2'] }
+          }
+        }
+      },
+      'UIP SBU': {
+        label: 'UIP SBU – Unit Induk Pembangunan Sumatera Bagian Utara',
+        upt: {
+          'UPT RIAU': {
+            ultg: ['ULTG PEKANBARU', 'ULTG DUMAI'],
+            gi: {
+              'ULTG PEKANBARU': ['GI PASIR PUTIH 150kV', 'GI SEI ROKAN'],
+              'ULTG DUMAI': ['GI DUMAI 150kV', 'GI LUBUK GAUNG']
+            },
+            bay: { 'GI PASIR PUTIH 150kV': ['Bay Trafo 1', 'Bay Trafo 2'] }
+          },
+          'UPT PADANG': {
+            ultg: ['ULTG PADANG', 'ULTG SOLOK', 'ULTG BUKITTINGGI'],
+            gi: {
+              'ULTG PADANG': ['GI LUBUK ALUNG 150kV', 'GI PAUH LIMO'],
+              'ULTG SOLOK': ['GI SOLOK 150kV', 'GI MUARO KALABAN'],
+              'ULTG BUKITTINGGI': ['GI BUKITTINGGI 150kV', 'GI PADANG LUAR']
+            },
+            bay: { 'GI LUBUK ALUNG 150kV': ['Bay Trafo 1', 'Bay Trafo 2'] }
+          }
+        }
+      }
+    };
+
+    function applyFilter() {
+      const kantorInduk = document.getElementById('filterKantorInduk').value;
+      const jenisAset = document.getElementById('filterJenisAset').value;
+      const alertEl = document.getElementById('filterValidationAlert');
+
+      if (!kantorInduk && !jenisAset) {
+        alertEl.style.display = 'flex';
+        return;
+      }
+      alertEl.style.display = 'none';
+      filterTable();
+    }
+
+    function viewDetail(techNo) {
+      alert(`Informasi Detail Aset: ${techNo}\nStatus: Aktif\nInspeksi Terakhir: OK`);
+    }
+
+    function onKantorIndukChange(val) {
+      const u2 = document.getElementById('filterUnitLevel2');
+      const u3 = document.getElementById('filterUnitLevel3');
+      const u4 = document.getElementById('filterUnitLevel4');
+      const u5 = document.getElementById('filterUnitLevel5');
+      u2.innerHTML = '<option value="">Pilih Unit Level 2</option>';
+      u3.innerHTML = '<option value="">Pilih Unit Level 3</option>';
+      u4.innerHTML = '<option value="">Pilih Unit Level 4</option>';
+      u5.innerHTML = '<option value="">Pilih Unit Level 5</option>';
+
+      if (val && unitHierarchy[val]) {
+        Object.keys(unitHierarchy[val].upt).forEach(upt => {
+          u2.innerHTML += `<option value="${upt}">${upt}</option>`;
+        });
+      }
+      // Hide validation if user selects kantor
+      if (val) document.getElementById('filterValidationAlert').style.display = 'none';
+    }
+
+    function onUnitLevel2Change(val) {
+      const kantorInduk = document.getElementById('filterKantorInduk').value;
+      const u3 = document.getElementById('filterUnitLevel3');
+      const u4 = document.getElementById('filterUnitLevel4');
+      const u5 = document.getElementById('filterUnitLevel5');
+      u3.innerHTML = '<option value="">Pilih Unit Level 3</option>';
+      u4.innerHTML = '<option value="">Pilih Unit Level 4</option>';
+      u5.innerHTML = '<option value="">Pilih Unit Level 5</option>';
+
+      if (val && kantorInduk && unitHierarchy[kantorInduk] && unitHierarchy[kantorInduk].upt[val]) {
+        const ultgList = unitHierarchy[kantorInduk].upt[val].ultg;
+        ultgList.forEach(ultg => {
+          u3.innerHTML += `<option value="${ultg}">${ultg}</option>`;
+        });
+      }
+    }
+
+    function onUnitLevel3Change(val) {
+      const kantorInduk = document.getElementById('filterKantorInduk').value;
+      const upt = document.getElementById('filterUnitLevel2').value;
+      const u4 = document.getElementById('filterUnitLevel4');
+      const u5 = document.getElementById('filterUnitLevel5');
+      u4.innerHTML = '<option value="">Pilih Unit Level 4</option>';
+      u5.innerHTML = '<option value="">Pilih Unit Level 5</option>';
+
+      if (val && kantorInduk && upt && unitHierarchy[kantorInduk] && unitHierarchy[kantorInduk].upt[upt]) {
+        const giMap = unitHierarchy[kantorInduk].upt[upt].gi;
+        if (giMap && giMap[val]) {
+          giMap[val].forEach(gi => {
+            u4.innerHTML += `<option value="${gi}">${gi}</option>`;
+          });
+        }
+      }
+    }
+
+    function onUnitLevel4Change(val) {
+      const kantorInduk = document.getElementById('filterKantorInduk').value;
+      const upt = document.getElementById('filterUnitLevel2').value;
+      const u5 = document.getElementById('filterUnitLevel5');
+      u5.innerHTML = '<option value="">Pilih Unit Level 5</option>';
+
+      if (val && kantorInduk && upt && unitHierarchy[kantorInduk] && unitHierarchy[kantorInduk].upt[upt]) {
+        const bayMap = unitHierarchy[kantorInduk].upt[upt].bay;
+        if (bayMap && bayMap[val]) {
+          bayMap[val].forEach(bay => {
+            u5.innerHTML += `<option value="${bay}">${bay}</option>`;
+          });
+        }
+      }
+    }
+  </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <!-- NOTES ASET REGISTER -->
+        <li><strong>Validasi Pencarian:</strong> Wajib memilih minimal Kantor Induk atau 1 Jenis Aset sebelum klik CARI ASET.</li>
+        <li><strong>Creator:</strong> Staff GI, TL GI, Staff ULTG, TL ULTG, Staff UPT, TL UPT, Asman UPT, Staff Unit Induk.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+
+</html>
