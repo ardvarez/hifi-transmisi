@@ -228,7 +228,17 @@ body {
   align-items: center;
   gap: 6px;
   background: var(--card);
-  padding: 0 8px;
+  padding: 4px 12px 8px 12px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.step-item:hover {
+  color: var(--pln-blue);
+}
+.step-item:hover .step-label {
+  color: var(--pln-blue);
 }
 .step-icon {
   width: 36px;
@@ -249,6 +259,9 @@ body {
   border-color: var(--success);
   color: var(--success);
 }
+.step-item.active {
+  border-bottom-color: var(--pln-blue);
+}
 .step-item.active .step-icon {
   background: var(--pln-blue-light);
   border-color: var(--pln-blue);
@@ -260,45 +273,48 @@ body {
   font-weight: 600;
   color: var(--text-secondary);
   text-align: center;
+  transition: color 0.2s;
 }
 .step-item.active .step-label {
   color: var(--pln-blue);
+  font-weight: 700;
 }
 
 /* TAB NAVIGATION */
 .tab-bar {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   border-bottom: 2px solid var(--border);
   margin-bottom: 24px;
   overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tab-bar::-webkit-scrollbar {
+  display: none;
 }
 .tab-btn {
-  padding: 12px 20px;
+  padding: 12px 18px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
-  background: none;
+  background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s;
+  transition: color 0.2s, border-color 0.2s;
   white-space: nowrap;
   margin-bottom: -2px;
 }
 .tab-btn:hover {
   color: var(--pln-blue);
-  background: rgba(10, 88, 202, 0.03);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 .tab-btn.active {
   color: var(--pln-blue);
   border-bottom-color: var(--pln-blue);
-  background: var(--card);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 .tab-badge {
   background: var(--pln-blue-light);
@@ -312,14 +328,14 @@ body {
 /* TAB CONTENT */
 .tab-pane {
   display: none;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
 }
 .tab-pane.active {
   display: block;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* CARDS & TABLES */
@@ -508,23 +524,23 @@ tbody tr:hover td { background: #FAFBFC; }
 
         <!-- WORKFLOW STEPPER -->
         <div class="workflow-stepper">
-          <div class="step-item completed">
+          <div class="step-item completed" onclick="switchStep(0, 'tab-peminjaman')">
             <div class="step-icon">✓</div>
             <div class="step-label">1. Permohonan</div>
           </div>
-          <div class="step-item active">
+          <div class="step-item active" onclick="switchStep(1, 'tab-approval')">
             <div class="step-icon">2</div>
             <div class="step-label">2. Approval & Review</div>
           </div>
-          <div class="step-item">
+          <div class="step-item" onclick="switchStep(2, 'tab-pengecekan-pengelola')">
             <div class="step-icon">3</div>
             <div class="step-label">3. Pengecekan & Kirim</div>
           </div>
-          <div class="step-item">
+          <div class="step-item" onclick="switchStep(3, 'tab-penerimaan')">
             <div class="step-icon">4</div>
             <div class="step-label">4. Penerimaan</div>
           </div>
-          <div class="step-item">
+          <div class="step-item" onclick="switchStep(4, 'tab-pengembalian')">
             <div class="step-icon">5</div>
             <div class="step-label">5. Pengembalian</div>
           </div>
@@ -897,7 +913,32 @@ function switchTab(tabId, element) {
   buttons.forEach(btn => btn.classList.remove('active'));
   
   document.getElementById(tabId).classList.add('active');
-  element.classList.add('active');
+  if (element) element.classList.add('active');
+
+  // Sync stepper active underline
+  const stepMap = {
+    'tab-peminjaman': 0,
+    'tab-approval': 1,
+    'tab-pengecekan-pengelola': 2,
+    'tab-penerimaan': 3,
+    'tab-pengembalian': 4
+  };
+  const stepIndex = stepMap[tabId];
+  if (stepIndex !== undefined) {
+    const steps = document.querySelectorAll('.workflow-stepper .step-item');
+    steps.forEach((step, idx) => {
+      if (idx === stepIndex) {
+        step.classList.add('active');
+      } else {
+        step.classList.remove('active');
+      }
+    });
+  }
+}
+
+function switchStep(stepIndex, tabId) {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  switchTab(tabId, tabButtons[stepIndex]);
 }
 </script>
 </body>
