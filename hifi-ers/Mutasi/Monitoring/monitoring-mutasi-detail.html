@@ -1,945 +1,2848 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Detail Monitoring Mutasi ERS</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Monitoring Mutasi ERS</title>
+  <script src="data_unit_hierarchy.js"></script>
+  <script>
+    var currentDestinasi = 'uit';
+    var currentTipe = 'satuan';
 
-:root {
-  --pln-blue: #0A58CA;
-  --pln-blue-mid: #0d6efd;
-  --pln-blue-light: #E7F1FF;
-  --pln-yellow: #F7A800;
-  --bg: #F8FAFC;
-  --card: #FFFFFF;
-  --surface: #F1F5F9;
-  --border: #E2E8F0;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-hint: #94A3B8;
-  --radius-sm: 8px;
-  --radius-lg: 16px;
-  --sidebar-w: 64px;
-  --danger: #DC2626;
-  --danger-light: #FEE2E2;
-  --success: #16A34A;
-  --success-light: #DCFCE7;
-  --warning: #D97706;
-  --warning-light: #FEF3C7;
-  
-  /* Chip Status Colors */
-  --chip-proses-bg: #FFF7ED; --chip-proses-text: #C2410C; --chip-proses-dot: #F97316;
-  --chip-kirim-bg: #EFF6FF; --chip-kirim-text: #1D4ED8; --chip-kirim-dot: #3B82F6;
-  --chip-tunggu-bg: #FEFCE8; --chip-tunggu-text: #854D0E; --chip-tunggu-dot: #EAB308;
-  --chip-review-bg: #FDF4FF; --chip-review-text: #7E22CE; --chip-review-dot: #A855F7;
-  --chip-approval-bg: #F0FDF4; --chip-approval-text: #166534; --chip-approval-dot: #22C55E;
-}
+    function toggleApprovalMode(mode) {
+      const modeUit = document.getElementById('approval-mode-uit');
+      const modeUpt = document.getElementById('approval-mode-upt');
+      const btnUit = document.getElementById('mode-uit-btn');
+      const btnUpt = document.getElementById('mode-upt-btn');
+      if (!modeUit || !modeUpt || !btnUit || !btnUpt) return;
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-}
-
-h1, h2, h3, h4, h5, h6, .page-title, .section-label, .card-title, .logo span {
-  font-family: 'Outfit', sans-serif;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text-primary);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* LAYOUT */
-.layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* SIDEBAR */
-.sidebar {
-  width: var(--sidebar-w);
-  background: rgba(10, 30, 60, 0.95);
-  backdrop-filter: blur(12px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 0;
-  gap: 8px;
-  flex-shrink: 0;
-  position: fixed;
-  left: 0; top: 0; bottom: 0;
-  z-index: 100;
-  box-shadow: 2px 0 15px rgba(0,0,0,0.05);
-}
-.sidebar .logo {
-  width: 40px; height: 40px;
-  background: var(--pln-yellow);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 10px rgba(247, 168, 0, 0.3);
-  transition: transform 0.2s;
-}
-.sidebar .logo:hover { transform: scale(1.05); }
-.sidebar .logo span { color: #003B8E; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; }
-
-.sidebar .nav-item {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: rgba(255, 255, 255, 0.6);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 4px;
-}
-.sidebar .nav-item:hover { background: rgba(255, 255, 255, 0.1); color: #fff; transform: translateY(-2px); }
-.sidebar .nav-item.active { background: var(--pln-blue); color: #fff; box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4); }
-.sidebar .nav-item svg { width: 20px; height: 20px; }
-.sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
-
-/* MAIN CONTENT */
-.main {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-  display: flex; flex-direction: column;
-  min-height: 100vh;
-  width: calc(100% - var(--sidebar-w));
-}
-
-/* TOPBAR */
-.topbar {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 32px;
-  height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 90;
-  font-size: 13px; color: var(--text-secondary);
-}
-.topbar-left { display: flex; align-items: center; gap: 16px; }
-.back-btn {
-  display: flex; align-items: center; gap: 8px;
-  color: var(--text-primary); font-size: 13px; font-weight: 600;
-  cursor: pointer; padding: 8px 14px;
-  border-radius: var(--radius-sm); border: 1px solid var(--border);
-  background: var(--card); text-decoration: none; transition: all 0.2s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-}
-.back-btn:hover { background: var(--surface); border-color: #CBD5E1; transform: translateY(-1px); }
-
-/* CONTENT AREA */
-.content { padding: 32px; flex: 1; padding-bottom: 100px; }
-
-.breadcrumb {
-  font-size: 12px; color: var(--text-hint);
-  display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
-}
-.breadcrumb a { color: var(--pln-blue); text-decoration: none; font-weight: 500; }
-.breadcrumb a:hover { color: var(--pln-blue-mid); }
-
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.page-title { font-size: 20px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.3px; }
-
-/* SUMMARY BANNER */
-.summary-banner {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.summary-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.mutasi-id-badge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.mutasi-id-badge h2 {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--pln-blue);
-  font-family: monospace;
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  background: #F8FAFC;
-  padding: 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-}
-.summary-item label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-hint);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: block;
-  margin-bottom: 4px;
-}
-.summary-item span {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-/* STEPPER WORKFLOW */
-.workflow-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  margin-top: 10px;
-  padding: 0 10px;
-}
-.workflow-stepper::before {
-  content: '';
-  position: absolute;
-  top: 18px;
-  left: 40px;
-  right: 40px;
-  height: 3px;
-  background: var(--border);
-  z-index: 1;
-}
-.step-item {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: var(--card);
-  padding: 4px 12px 8px 12px;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-}
-.step-item:hover {
-  color: var(--pln-blue);
-}
-.step-item:hover .step-label {
-  color: var(--pln-blue);
-}
-.step-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 2px solid var(--border);
-  color: var(--text-hint);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  transition: all 0.3s;
-}
-.step-item.completed .step-icon {
-  background: var(--success-light);
-  border-color: var(--success);
-  color: var(--success);
-}
-.step-item.active {
-  border-bottom-color: var(--pln-blue);
-}
-.step-item.active .step-icon {
-  background: var(--pln-blue-light);
-  border-color: var(--pln-blue);
-  color: var(--pln-blue);
-  box-shadow: 0 0 0 4px rgba(10, 88, 202, 0.15);
-}
-.step-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-align: center;
-  transition: color 0.2s;
-}
-.step-item.active .step-label {
-  color: var(--pln-blue);
-  font-weight: 700;
-}
-
-/* TAB NAVIGATION */
-.tab-bar {
-  display: flex;
-  gap: 4px;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 24px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.tab-bar::-webkit-scrollbar {
-  display: none;
-}
-.tab-btn {
-  padding: 12px 18px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: color 0.2s, border-color 0.2s;
-  white-space: nowrap;
-  margin-bottom: -2px;
-}
-.tab-btn:hover {
-  color: var(--pln-blue);
-}
-.tab-btn.active {
-  color: var(--pln-blue);
-  border-bottom-color: var(--pln-blue);
-}
-.tab-badge {
-  background: var(--pln-blue-light);
-  color: var(--pln-blue);
-  border-radius: 12px;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* TAB CONTENT */
-.tab-pane {
-  display: none;
-  animation: fadeIn 0.2s ease;
-}
-.tab-pane.active {
-  display: block;
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* CARDS & TABLES */
-.card, .section-card {
-  background: var(--card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  padding: 24px;
-  margin-bottom: 24px;
-}
-.section-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.section-label::before {
-  content: '';
-  display: block;
-  width: 4px;
-  height: 16px;
-  background: var(--pln-blue);
-  border-radius: 2px;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-.info-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.info-field label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-.info-val {
-  padding: 10px 14px;
-  background: #F8FAFC;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  color: var(--text-primary);
-  font-weight: 500;
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-}
-
-/* TABLES */
-.table-container { overflow-x: auto; }
-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
-thead tr { background: #F8FAFC; }
-th {
-  padding: 14px 20px; text-align: left; font-weight: 600; color: var(--text-secondary);
-  border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
-}
-td { padding: 14px 20px; border-bottom: 1px solid #F1F5F9; color: var(--text-primary); vertical-align: middle; }
-tbody tr:hover td { background: #FAFBFC; }
-
-/* CHIPS & BADGES */
-.unit-tag {
-  display: inline-block; background: var(--surface); color: var(--text-primary);
-  border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600;
-}
-.dest-tag { font-size: 11px; color: var(--text-hint); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
-.chip-dot { width: 6px; height: 6px; border-radius: 50%; }
-.chip-proses { background: var(--chip-proses-bg); color: var(--chip-proses-text); } .chip-proses .chip-dot { background: var(--chip-proses-dot); }
-.chip-kirim { background: var(--chip-kirim-bg); color: var(--chip-kirim-text); } .chip-kirim .chip-dot { background: var(--chip-kirim-dot); }
-.chip-tunggu { background: var(--chip-tunggu-bg); color: var(--chip-tunggu-text); } .chip-tunggu .chip-dot { background: var(--chip-tunggu-dot); }
-.chip-review { background: var(--chip-review-bg); color: var(--chip-review-text); } .chip-review .chip-dot { background: var(--chip-review-dot); }
-.chip-approval { background: var(--chip-approval-bg); color: var(--chip-approval-text); } .chip-approval .chip-dot { background: var(--chip-approval-dot); }
-.chip-selesai { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); } .chip-selesai .chip-dot { background: var(--text-hint); }
-
-.tipe-satuan { background: #E0F2FE; color: #0369A1; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; border: 1px solid #BAE6FD; }
-.tipe-set { background: #FCE7F3; color: #BE185D; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; border: 1px solid #FBCFE8; }
-
-/* DOC FILE CARD */
-.doc-file-card {
-  display: flex; align-items: center; gap: 14px; padding: 14px 18px;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: var(--card); transition: all 0.2s;
-}
-.doc-file-card:hover { border-color: var(--pln-blue); box-shadow: 0 4px 12px rgba(10, 88, 202, 0.08); }
-.doc-icon {
-  width: 40px; height: 40px; border-radius: 8px; background: var(--pln-blue-light); color: var(--pln-blue);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-
-/* APPROVAL LOG TIMELINE */
-.timeline-list { display: flex; flex-direction: column; gap: 16px; position: relative; padding-left: 24px; }
-.timeline-list::before {
-  content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--border);
-}
-.timeline-item { position: relative; display: flex; flex-direction: column; gap: 4px; }
-.timeline-dot {
-  position: absolute; left: -24px; top: 4px; width: 16px; height: 16px; border-radius: 50%;
-  background: var(--pln-blue); border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--pln-blue-light);
-}
-.timeline-time { font-size: 11px; font-weight: 600; color: var(--text-hint); }
-.timeline-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-.timeline-desc { font-size: 12px; color: var(--text-secondary); background: #F8FAFC; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 4px; }
-
-</style>
-</head>
-<body>
-<div class="layout">
-  <div class="sidebar">
-    <div class="logo"><span>PLN</span></div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
-    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 010 7.75"/></svg></div>
-    <div class="sidebar-bottom">
-      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="12" y1="12" x2="9" y2="12"/></svg></div>
-    </div>
-  </div>
-
-  <div class="main">
-    <div class="topbar">
-      <div class="topbar-left">
-        <a href="mainpage-monitoring-mutasi.html" class="back-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          Kembali ke Monitoring
-        </a>
-      </div>
-      <span>Contact us: helpdesk.p@compln.co.id | Security Issue: soc@pln.co.id</span>
-    </div>
-
-    <div class="content">
-      <div class="breadcrumb">
-        <a href="../../hifi-home/home.html">Mutasi ERS</a> &nbsp;/&nbsp; <a href="mainpage-monitoring-mutasi.html">Monitoring</a> &nbsp;/&nbsp; Detail Mutasi REQ202600000218
-      </div>
-
-      <div class="page-header">
-        <div class="page-title">Detail Monitoring Mutasi ERS</div>
-      </div>
-
-      <!-- SUMMARY BANNER -->
-      <div class="summary-banner">
-        <div class="summary-top">
-          <div class="mutasi-id-badge">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A58CA" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-            <h2>REQ202600000218</h2>
-            <span class="chip chip-proses"><span class="chip-dot"></span>Sedang diproses</span>
-          </div>
-          <div>
-            <span class="jenis-mutasi-tag" style="font-size:12px; padding:6px 14px;">Peminjaman ERS</span>
-          </div>
-        </div>
-
-        <div class="summary-grid">
-          <div class="summary-item">
-            <label>Unit Peminjam</label>
-            <span><span class="unit-tag">P3B5UL</span> UPT MAKASSAR</span>
-          </div>
-          <div class="summary-item">
-            <label>Unit Pengelola</label>
-            <span><span class="unit-tag">UITJBT</span> UPT MANADO</span>
-          </div>
-          <div class="summary-item">
-            <label>Tipe Peminjaman</label>
-            <span><span class="tipe-satuan">Satuan (1 Unit)</span></span>
-          </div>
-          <div class="summary-item">
-            <label>Destinasi</label>
-            <span><span class="dest-tag">ANTAR UNIT INDUK</span></span>
-          </div>
-          <div class="summary-item">
-            <label>Tanggal Permohonan</label>
-            <span>24 Februari 2026</span>
-          </div>
-        </div>
-
-        <!-- WORKFLOW STEPPER -->
-        <div class="workflow-stepper">
-          <div class="step-item completed" onclick="switchStep(0, 'tab-peminjaman')">
-            <div class="step-icon">✓</div>
-            <div class="step-label">1. Permohonan</div>
-          </div>
-          <div class="step-item active" onclick="switchStep(1, 'tab-approval')">
-            <div class="step-icon">2</div>
-            <div class="step-label">2. Approval & Review</div>
-          </div>
-          <div class="step-item" onclick="switchStep(2, 'tab-pengecekan-pengelola')">
-            <div class="step-icon">3</div>
-            <div class="step-label">3. Pengecekan & Kirim</div>
-          </div>
-          <div class="step-item" onclick="switchStep(3, 'tab-penerimaan')">
-            <div class="step-icon">4</div>
-            <div class="step-label">4. Penerimaan</div>
-          </div>
-          <div class="step-item" onclick="switchStep(4, 'tab-pengembalian')">
-            <div class="step-icon">5</div>
-            <div class="step-label">5. Pengembalian</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB BAR NAVIGATION -->
-      <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('tab-peminjaman', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-          1. Informasi Peminjaman
-        </button>
-        <button class="tab-btn" onclick="switchTab('tab-approval', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-          2. Approval & Log Persetujuan
-          <span class="tab-badge">Log 3</span>
-        </button>
-        <button class="tab-btn" onclick="switchTab('tab-pengecekan-pengelola', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-          3. Pengecekan & Pengiriman (Pengelola)
-        </button>
-        <button class="tab-btn" onclick="switchTab('tab-penerimaan', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          4. Penerimaan (Peminjam)
-        </button>
-        <button class="tab-btn" onclick="switchTab('tab-pengembalian', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-          5. Proses Pengembalian
-        </button>
-      </div>
-
-      <!-- TAB 1: INFORMASI PEMINJAMAN -->
-      <div id="tab-peminjaman" class="tab-pane active">
-        <div class="section-card">
-          <div class="section-label">Detail Permohonan Peminjaman</div>
-          <div class="info-grid">
-            <div class="info-field">
-              <label>Nomor Mutasi</label>
-              <div class="info-val" style="font-family:monospace; font-weight:700; color:var(--pln-blue);">REQ202600000218</div>
-            </div>
-            <div class="info-field">
-              <label>Tanggal Pengajuan</label>
-              <div class="info-val">24 Februari 2026</div>
-            </div>
-            <div class="info-field">
-              <label>Unit Peminjam</label>
-              <div class="info-val">P3B5UL - UPT MAKASSAR</div>
-            </div>
-            <div class="info-field">
-              <label>Unit Pengelola Gudang</label>
-              <div class="info-val">UITJBT - UPT MANADO</div>
-            </div>
-            <div class="info-field">
-              <label>Tipe Peminjaman</label>
-              <div class="info-val"><span class="tipe-satuan">Satuan (1 Unit)</span></div>
-            </div>
-            <div class="info-field">
-              <label>Destinasi</label>
-              <div class="info-val"><span class="dest-tag">ANTAR UNIT INDUK</span></div>
-            </div>
-            <div class="info-field" style="grid-column: span 2;">
-              <label>Tujuan & Keterangan Peminjaman</label>
-              <div class="info-val" style="min-height:60px;">Peminjaman darurat ERS untuk perbaikan SUTT 150kV akibat gangguan cuaca ekstrem di Sektor Makassar.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-label">Daftar Peralatan / Asset ERS yang Dipinjam</div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:36px">No.</th>
-                  <th>Kode Material</th>
-                  <th>Nama Barang / Deskripsi ERS</th>
-                  <th>No. Seri / Asset</th>
-                  <th>Jumlah</th>
-                  <th>Satuan</th>
-                  <th>Kondisi Awal</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td style="font-family:monospace">MAT-ERS-2026-001</td>
-                  <td style="font-weight:600">Tower ERS Column Structure 15m</td>
-                  <td style="font-family:monospace">SN-ERS-994821</td>
-                  <td>1</td>
-                  <td>Set</td>
-                  <td><span class="chip" style="background:#F0FDF4; color:#166534">Bagus / Ready</span></td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td style="font-family:monospace">MAT-ERS-2026-042</td>
-                  <td style="font-weight:600">Guy Wire Anchor Assembly Heavy Duty</td>
-                  <td style="font-family:monospace">SN-ANC-883102</td>
-                  <td>4</td>
-                  <td>Pcs</td>
-                  <td><span class="chip" style="background:#F0FDF4; color:#166534">Bagus / Ready</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-label">Dokumen Lampiran & Persyaratan</div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-            <div class="doc-file-card">
-              <div class="doc-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              </div>
-              <div>
-                <div style="font-size:13px; font-weight:600;">Surat_Permohonan_Mutasi.pdf</div>
-                <div style="font-size:11px; color:var(--text-hint);">2.4 MB • Terverifikasi</div>
-              </div>
-            </div>
-            <div class="doc-file-card">
-              <div class="doc-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              </div>
-              <div>
-                <div style="font-size:13px; font-weight:600;">Nota_Dinas_Kebutuhan_Lap.pdf</div>
-                <div style="font-size:11px; color:var(--text-hint);">1.8 MB • Terverifikasi</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: APPROVAL & LOG PERSETUJUAN -->
-      <div id="tab-approval" class="tab-pane">
-        <div class="section-card">
-          <div class="section-label">Status Hierarki Approval & Persetujuan</div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
-            <div style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">1. MANAGER UPT PEMINJAM</span>
-                <span class="chip" style="background:#F0FDF4; color:#166534">Disetujui</span>
-              </div>
-              <div style="font-size:13px; font-weight:600;">Ahmad Fauzi (Manager UPT Makassar)</div>
-              <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Disetujui pada: 24 Feb 2026 09:30 WITA</div>
-              <div style="font-size:12px; color:var(--text-secondary); margin-top:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid var(--border);">"Permohonan disetujui untuk penanganan darurat SUTT."</div>
-            </div>
-
-            <div style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">2. REVIEW SRM TRANSMISI</span>
-                <span class="chip" style="background:#FDF4FF; color:#7E22CE">SRM Review</span>
-              </div>
-              <div style="font-size:13px; font-weight:600;">Budi Santoso (SRM Transmisi UIW)</div>
-              <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Disetujui pada: 24 Feb 2026 11:15 WITA</div>
-              <div style="font-size:12px; color:var(--text-secondary); margin-top:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid var(--border);">"Rekomendasi disetujui, koordinasi pengiriman oleh pengelola gudang."</div>
-            </div>
-
-            <div style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">3. PENGELOLA GUDANG (UITJBT)</span>
-                <span class="chip chip-proses"><span class="chip-dot"></span>Dalam Pengecekan</span>
-              </div>
-              <div style="font-size:13px; font-weight:600;">Rian Hidayat (Supervisor Gudang Manado)</div>
-              <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Status: Sedang melakukan verifikasi kondisi alat</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-label">Histori Audit Trail Log & Transaksi</div>
-          <div class="timeline-list">
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-time">24 Feb 2026 - 11:15 WITA</div>
-              <div class="timeline-title">SRM Review Disetujui</div>
-              <div class="timeline-desc">SRM Transmisi memberikan verifikasi dan catatan persetujuan pinjam antar unit induk.</div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-time">24 Feb 2026 - 09:30 WITA</div>
-              <div class="timeline-title">Approval Manager UPT Peminjam</div>
-              <div class="timeline-desc">Manager UPT Makassar menyetujui draft permohonan REQ202600000218.</div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-time">24 Feb 2026 - 08:00 WITA</div>
-              <div class="timeline-title">Pengajuan Mutasi Dibuat</div>
-              <div class="timeline-desc">Staff Opnis membuat permohonan mutasi peminjaman ERS.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: PENGECEKAN & PENGIRIMAN (PENGELOLA) -->
-      <div id="tab-pengecekan-pengelola" class="tab-pane">
-        <div class="section-card">
-          <div class="section-label">Informasi Pengiriman & Surat Jalan Gudang</div>
-          <div class="info-grid">
-            <div class="info-field">
-              <label>Nomor Surat Jalan</label>
-              <div class="info-val" style="font-family:monospace; font-weight:700;">SJ/GUD-MND/2026/089</div>
-            </div>
-            <div class="info-field">
-              <label>Penyedia Ekspedisi / Kurir</label>
-              <div class="info-val">PLN Logistics / Transportasi Internal</div>
-            </div>
-            <div class="info-field">
-              <label>No. Polisi Kendaraan / Resi</label>
-              <div class="info-val" style="font-family:monospace">DB 8402 AB / RESI-99218</div>
-            </div>
-            <div class="info-field">
-              <label>Tanggal Berangkat Kirim</label>
-              <div class="info-val">25 Februari 2026</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-label">Pengecekan Fisik & Karantina Alat (Pengelola)</div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Komponen / Alat ERS</th>
-                  <th>Jumlah Kirim</th>
-                  <th>Status Karantina</th>
-                  <th>Kondisi Fisik Pengelola</th>
-                  <th>Hasil Pengecekan</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td style="font-weight:600">Tower ERS Column Structure 15m</td>
-                  <td>1 Set</td>
-                  <td><span class="chip" style="background:#F0FDF4; color:#166534">Lolos Karantina</span></td>
-                  <td>Bagus & Lengkap</td>
-                  <td><span class="chip" style="background:#EFF6FF; color:#1D4ED8">Siap Kirim</span></td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td style="font-weight:600">Guy Wire Anchor Assembly Heavy Duty</td>
-                  <td>4 Pcs</td>
-                  <td><span class="chip" style="background:#F0FDF4; color:#166534">Lolos Karantina</span></td>
-                  <td>Bagus & Lengkap</td>
-                  <td><span class="chip" style="background:#EFF6FF; color:#1D4ED8">Siap Kirim</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: PENERIMAAN (PEMINJAM) -->
-      <div id="tab-penerimaan" class="tab-pane">
-        <div class="section-card">
-          <div class="section-label">Status & Berita Acara Penerimaan Barang</div>
-          <div class="info-grid">
-            <div class="info-field">
-              <label>Status Penerimaan</label>
-              <div class="info-val"><span class="chip chip-proses"><span class="chip-dot"></span>Menunggu Kedatangan Barang</span></div>
-            </div>
-            <div class="info-field">
-              <label>Penerima di Site / UPT</label>
-              <div class="info-val">Supervisor Pemeliharaan UPT Makassar</div>
-            </div>
-            <div class="info-field">
-              <label>Tanggal Estimasi Tiba</label>
-              <div class="info-val">26 Februari 2026</div>
-            </div>
-            <div class="info-field">
-              <label>Lokasi Posko Site</label>
-              <div class="info-val">GI Tello 150kV Makassar</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="section-label">Checklist Verifikasi Fisik Saat Diterima</div>
-          <p style="font-size:13px; color:var(--text-hint); font-style:italic; margin-bottom:16px;">*Formulir verifikasi penerimaan barang akan diisi oleh Peminjam setelah fisik alat ERS tiba di lokasi site.</p>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Nama Alat</th>
-                  <th>Jumlah Dikirim</th>
-                  <th>Jumlah Diterima</th>
-                  <th>Kondisi Saat Diterima</th>
-                  <th>Catatan Penerima</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td style="font-weight:600">Tower ERS Column Structure 15m</td>
-                  <td>1 Set</td>
-                  <td>1 Set</td>
-                  <td><span class="chip" style="background:#FEFCE8; color:#854D0E">Menunggu Verifikasi</span></td>
-                  <td>-</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 5: PROSES PENGEMBALIAN -->
-      <div id="tab-pengembalian" class="tab-pane">
-        <div class="section-card">
-          <div class="section-label">Status & Transaksi Pengembalian ERS</div>
-          <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-sm); padding:20px; text-align:center; color:var(--text-secondary);">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" style="margin-bottom:8px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-            <div style="font-size:14px; font-weight:600; color:var(--text-primary);">Tahap Pengembalian Belum Dimulai</div>
-            <div style="font-size:12px; color:var(--text-hint); margin-top:4px;">Proses pengembalian alat dapat diajukan setelah masa peminjaman selesai dan alat dikembalikan ke gudang pengelola.</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- NOTES FEATURE (INJECTED) -->
-<style>
-  .notes-fab {
-    position: fixed; bottom: 24px; left: 88px; width: 56px; height: 56px;
-    background: var(--pln-blue, #0A58CA); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4); z-index: 9999; transition: all 0.3s;
-  }
-  .notes-fab:hover { transform: scale(1.05); background: var(--pln-blue-mid, #0d6efd); }
-  .notes-panel {
-    position: fixed; bottom: 90px; left: 88px; width: 340px;
-    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); z-index: 9998;
-    transform: translateY(20px); opacity: 0; visibility: hidden; transition: all 0.3s ease;
-  }
-  .notes-panel.active { transform: translateY(0); opacity: 1; visibility: visible; }
-  .notes-panel h3 { margin: 0 0 12px 0; font-family: 'Outfit', sans-serif; color: var(--pln-blue, #0A58CA); display: flex; align-items: center; gap: 8px; font-size: 16px; }
-  .notes-panel ul { margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-secondary, #475569); line-height: 1.6; }
-  .notes-panel li { margin-bottom: 8px; }
-</style>
-
-<div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"></circle>
-    <line x1="12" y1="16" x2="12" y2="12"></line>
-    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-  </svg>
-</div>
-
-<div class="notes-panel" id="notesPanel">
-  <h3>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-    Notes & Validasi Detail Mutasi
-  </h3>
-  <ul>
-    <li><strong>User Access:</strong> Dapat diakses oleh semua user yang berkepentingan dengan privilege <code>read</code>.</li>
-    <li><strong>Sistem Tab Process:</strong> Memisahkan 5 tahap utama mutasi: Permohonan, Approval, Pengecekan Pengelola, Penerimaan Peminjam, dan Pengembalian.</li>
-    <li><strong>Workflow Alignment:</strong> Menggabungkan seluruh tampilan dari fitur-fitur di folder Peminjaman dan Pengembalian.</li>
-  </ul>
-</div>
-
-<script>
-function switchTab(tabId, element) {
-  const panes = document.querySelectorAll('.tab-pane');
-  panes.forEach(pane => pane.classList.remove('active'));
-  
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => btn.classList.remove('active'));
-  
-  document.getElementById(tabId).classList.add('active');
-  if (element) element.classList.add('active');
-
-  // Sync stepper active underline
-  const stepMap = {
-    'tab-peminjaman': 0,
-    'tab-approval': 1,
-    'tab-pengecekan-pengelola': 2,
-    'tab-penerimaan': 3,
-    'tab-pengembalian': 4
-  };
-  const stepIndex = stepMap[tabId];
-  if (stepIndex !== undefined) {
-    const steps = document.querySelectorAll('.workflow-stepper .step-item');
-    steps.forEach((step, idx) => {
-      if (idx === stepIndex) {
-        step.classList.add('active');
+      if (mode === 'uit') {
+        modeUit.style.display = 'block';
+        modeUpt.style.display = 'none';
+        btnUit.style.background = '#fff';
+        btnUit.style.color = 'var(--pln-blue, #0A58CA)';
+        btnUit.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        btnUpt.style.background = 'transparent';
+        btnUpt.style.color = '#fff';
+        btnUpt.style.boxShadow = 'none';
       } else {
-        step.classList.remove('active');
+        modeUit.style.display = 'none';
+        modeUpt.style.display = 'block';
+        btnUpt.style.background = '#fff';
+        btnUpt.style.color = 'var(--pln-blue, #0A58CA)';
+        btnUpt.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        btnUit.style.background = 'transparent';
+        btnUit.style.color = '#fff';
+        btnUit.style.boxShadow = 'none';
       }
-    });
-  }
-}
+    }
 
-function switchStep(stepIndex, tabId) {
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  switchTab(tabId, tabButtons[stepIndex]);
-}
-</script>
+    function toggleSimulasiControl(active) {
+      var wrap = document.getElementById('simulasi-controls-wrap');
+      if (wrap) {
+        wrap.style.opacity = active ? '1' : '0.4';
+        wrap.style.pointerEvents = active ? 'auto' : 'none';
+      }
+    }
+
+    function toggleApprovalMode(mode) {
+      var uitDiv = document.getElementById('approval-mode-uit');
+      var uptDiv = document.getElementById('approval-mode-upt');
+      if (mode === 'uit') {
+        if (uitDiv) uitDiv.style.display = 'block';
+        if (uptDiv) uptDiv.style.display = 'none';
+      } else {
+        if (uitDiv) uitDiv.style.display = 'none';
+        if (uptDiv) uptDiv.style.display = 'block';
+      }
+    }
+
+    function setDestinasiSimulasi(dest) {
+      if (currentTipe === '1set' && dest === 'upt') {
+        alert('Tipe peminjaman 1 Set wajib Antar Unit Induk (UIT).');
+        return;
+      }
+
+      currentDestinasi = dest;
+      toggleApprovalMode(dest);
+
+      var btnUit = document.getElementById('sim-dest-uit');
+      var btnUpt = document.getElementById('sim-dest-upt');
+      var tagSummary = document.getElementById('summary-val-dest');
+      var tagTab1 = document.getElementById('tab1-val-dest');
+
+      if (dest === 'uit') {
+        if (btnUit) {
+          btnUit.style.background = '#fff';
+          btnUit.style.color = 'var(--pln-blue)';
+          btnUit.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+        }
+        if (btnUpt) {
+          btnUpt.style.background = 'transparent';
+          btnUpt.style.color = 'var(--text-secondary)';
+          btnUpt.style.boxShadow = 'none';
+        }
+        if (tagSummary) tagSummary.innerHTML = '<span class="dest-tag">ANTAR UNIT INDUK</span>';
+        if (tagTab1) tagTab1.innerHTML = '<span class="dest-tag">ANTAR UNIT INDUK</span>';
+      } else {
+        if (btnUpt) {
+          btnUpt.style.background = '#fff';
+          btnUpt.style.color = 'var(--pln-blue)';
+          btnUpt.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+        }
+        if (btnUit) {
+          btnUit.style.background = 'transparent';
+          btnUit.style.color = 'var(--text-secondary)';
+          btnUit.style.boxShadow = 'none';
+        }
+        if (tagSummary) tagSummary.innerHTML = '<span class="dest-tag">ANTAR UNIT PELAKSANA (UPT)</span>';
+        if (tagTab1) tagTab1.innerHTML = '<span class="dest-tag">ANTAR UNIT PELAKSANA (UPT)</span>';
+      }
+
+      updateUnitTable();
+    }
+
+    function setTipeSimulasi(tipe) {
+      currentTipe = tipe;
+
+      var btnSatuan = document.getElementById('sim-tipe-satuan');
+      var btnSet = document.getElementById('sim-tipe-1set');
+      var btnUpt = document.getElementById('sim-dest-upt');
+
+      if (tipe === '1set') {
+        if (btnSet) {
+          btnSet.style.background = '#fff';
+          btnSet.style.color = '#BE185D';
+          btnSet.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+        }
+        if (btnSatuan) {
+          btnSatuan.style.background = 'transparent';
+          btnSatuan.style.color = 'var(--text-secondary)';
+          btnSatuan.style.boxShadow = 'none';
+        }
+
+        // 1 Set Wajib Antar Unit Induk -> Fallback to UIT & lock UPT option
+        setDestinasiSimulasi('uit');
+        if (btnUpt) {
+          btnUpt.disabled = true;
+          btnUpt.style.opacity = '0.4';
+          btnUpt.style.cursor = 'not-allowed';
+          btnUpt.title = '1 Set Wajib Antar Unit Induk';
+        }
+      } else {
+        if (btnSatuan) {
+          btnSatuan.style.background = '#fff';
+          btnSatuan.style.color = '#0369A1';
+          btnSatuan.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+        }
+        if (btnSet) {
+          btnSet.style.background = 'transparent';
+          btnSet.style.color = 'var(--text-secondary)';
+          btnSet.style.boxShadow = 'none';
+        }
+
+        // Re-enable UPT button
+        if (btnUpt) {
+          btnUpt.disabled = false;
+          btnUpt.style.opacity = '1';
+          btnUpt.style.cursor = 'pointer';
+          btnUpt.title = '';
+        }
+      }
+
+      updateUnitTable();
+    }
+
+    function switchTipePeminjaman(mode) {
+      setTipeSimulasi(mode);
+    }
+
+    function updateUnitTable() {
+      var thead = document.getElementById('unit-thead');
+      var tbody = document.getElementById('unit-tbody');
+      var badgeSummary = document.getElementById('summary-val-tipe');
+      var badgeTab1 = document.getElementById('tab1-val-tipe');
+      var btnSatuan = document.getElementById('btn-tipe-satuan');
+      var btnSet = document.getElementById('btn-tipe-set');
+
+      var isSet = (currentTipe === '1set');
+      var isUit = (currentDestinasi === 'uit');
+
+      if (badgeSummary) badgeSummary.innerHTML = isSet ? '<span class="tipe-set">1 Set</span>' : '<span class="tipe-satuan">Satuan</span>';
+      if (badgeTab1) badgeTab1.innerHTML = isSet ? '<span class="tipe-set">1 Set</span>' : '<span class="tipe-satuan">Satuan</span>';
+      if (btnSatuan && btnSet) {
+        btnSatuan.style.opacity = isSet ? '0.5' : '1';
+        btnSet.style.opacity = isSet ? '1' : '0.5';
+      }
+
+      if (isUit) {
+        /* ANTAR UNIT INDUK: HANYA DUA/TIGA KOLOM UTAMA (NO, UNIT INDUK, TOTAL, STATUS, AKSI) - TANPA UPT, ULTG, GI */
+        var totalHeader = isSet ? 'Total Set' : 'Total Aksesoris';
+        if (thead) {
+          thead.innerHTML = '<tr>'
+            + '<th style="width:44px;text-align:center">No.</th>'
+            + '<th>Unit Induk (Pengelola)</th>'
+            + '<th style="width:140px;text-align:center">' + totalHeader + '</th>'
+            + '<th style="width:200px">Status Alokasi</th>'
+            + '<th style="width:66px;text-align:center">Aksi</th>'
+            + '</tr>';
+        }
+
+        if (tbody) {
+          var val1 = isSet ? '2 Set Tower' : '4 Pcs Tower Wire';
+          var val2 = isSet ? '1 Set Anchor Assembly' : '8 Pcs Anchor Wire';
+          var val3 = isSet ? '1 Set Base Plate' : '2 Pcs Base Plate';
+
+          tbody.innerHTML = '<tr>'
+            + '<td style="text-align:center;color:var(--text-hint);font-size:12px">1</td>'
+            + '<td><div style="font-weight:700;color:var(--text-primary)">UITJBT</div></td>'
+            + '<td style="text-align:center;font-weight:700;color:var(--pln-blue)">' + val1 + '</td>'
+            + '<td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td>'
+            + '<td style="text-align:center">'
+            + '<button onclick="openDetailPanel(\'UITJBT\', \'' + val1 + '\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+            + '</button>'
+            + '</td>'
+            + '</tr>'
+            + '<tr>'
+            + '<td style="text-align:center;color:var(--text-hint);font-size:12px">2</td>'
+            + '<td><div style="font-weight:700;color:var(--text-primary)">UITJBB</div></td>'
+            + '<td style="text-align:center;font-weight:700;color:var(--pln-blue)">' + val2 + '</td>'
+            + '<td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td>'
+            + '<td style="text-align:center">'
+            + '<button onclick="openDetailPanel(\'UITJBB\', \'' + val2 + '\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+            + '</button>'
+            + '</td>'
+            + '</tr>'
+            + '<tr>'
+            + '<td style="text-align:center;color:var(--text-hint);font-size:12px">3</td>'
+            + '<td><div style="font-weight:700;color:var(--text-primary)">UITJBM</div></td>'
+            + '<td style="text-align:center;font-weight:700;color:var(--pln-blue)">' + val3 + '</td>'
+            + '<td><span class="chip chip-tunggu"><span class="chip-dot"></span>Menunggu Persetujuan</span></td>'
+            + '<td style="text-align:center">'
+            + '<button onclick="openDetailPanel(\'UITJBM\', \'' + val3 + '\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+            + '</button>'
+            + '</td>'
+            + '</tr>';
+        }
+      } else {
+        /* ANTAR UNIT PELAKSANA (UPT): MENAMPILKAN UPT, ULTG, GARDU INDUK */
+        if (thead) {
+          thead.innerHTML = '<tr>'
+            + '<th style="width:44px;text-align:center">No.</th>'
+            + '<th>Unit Pelaksana (UPT)</th>'
+            + '<th>Unit Level 3 (ULTG)</th>'
+            + '<th>Unit Level 4 (Gardu Induk)</th>'
+            + '<th style="width:130px;text-align:center">Total Aksesoris</th>'
+            + '<th style="width:200px">Status Alokasi</th>'
+            + '<th style="width:66px;text-align:center">Aksi</th>'
+            + '</tr>';
+        }
+
+        if (tbody) {
+          tbody.innerHTML = '<tr>'
+            + '<td style="text-align:center;color:var(--text-hint);font-size:12px">1</td>'
+            + '<td><div style="font-weight:600">UPT BANDUNG</div></td>'
+            + '<td><div>ULTG BANDUNG TIMUR</div></td>'
+            + '<td><div>GI 150KV UBER</div></td>'
+            + '<td style="text-align:center;font-weight:700;color:var(--pln-blue)">4 Pcs</div></td>'
+            + '<td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td>'
+            + '<td style="text-align:center">'
+            + '<button onclick="openDetailPanel(\'UPT BANDUNG\', \'4 Pcs Aksesoris\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail Aksesoris">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+            + '</button>'
+            + '</td>'
+            + '</tr>'
+            + '<tr>'
+            + '<td style="text-align:center;color:var(--text-hint);font-size:12px">2</td>'
+            + '<td><div style="font-weight:600">UPT CILEGON</div></td>'
+            + '<td><div>ULTG CILEGON</div></td>'
+            + '<td><div>GI 150KV KRAKATAU</div></td>'
+            + '<td style="text-align:center;font-weight:700;color:var(--pln-blue)">8 Pcs Anchor Wire</td>'
+            + '<td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td>'
+            + '<td style="text-align:center">'
+            + '<button onclick="openDetailPanel(\'UPT CILEGON\', \'8 Pcs Anchor Wire\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail Aksesoris">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+            + '</button>'
+            + '</td>'
+            + '</tr>'
+            + '<tr>'
+            + '<td style="text-align:center;color:var(--text-hint);font-size:12px">3</td>'
+            + '<td><div style="font-weight:600">UPT SURABAYA</div></td>'
+            + '<td><div>ULTG SURABAYA BARAT</div></td>'
+            + '<td><div>GI 150KV MANUNGGAL</div></td>'
+            + '<td style="text-align:center;font-weight:700;color:var(--pln-blue)">2 Pcs Base Plate</td>'
+            + '<td><span class="chip chip-tunggu"><span class="chip-dot"></span>Menunggu Persetujuan</span></td>'
+            + '<td style="text-align:center">'
+            + '<button onclick="openDetailPanel(\'UPT SURABAYA\', \'2 Pcs Base Plate\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail Aksesoris">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+            + '</button>'
+            + '</td>'
+            + '</tr>';
+        }
+      }
+    }
+
+    /* Data mappings matching preview-request-peminjaman.html */
+    var setData = {
+      'UITJBT': [
+        { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 3, jumlah: 2, alokasi: 2 },
+        { merk: 'TOWER SOLUTION', kategori: 'Aksesoris ERS', section: 'Guying & Anchor System', kondisi: 'Tidak Lengkap', tersedia: 1, jumlah: 0, alokasi: 0 },
+      ],
+      'UITJBB': [
+        { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 2, jumlah: 1, alokasi: 1 },
+      ],
+      'UITJBM': [
+        { merk: 'TOWER SOLUTION', kategori: 'Pondasi ERS', section: 'Base Plate & Guy Wire', kondisi: 'Lengkap', tersedia: 1, jumlah: 1, alokasi: null },
+      ],
+      'UITJBT - UPT BANDUNG': [
+        { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 3, jumlah: 2, alokasi: 2 },
+      ],
+      'UITJBB - UPT CILEGON': [
+        { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 2, jumlah: 1, alokasi: 1 },
+      ],
+      'UITJBM - UPT SURABAYA': [
+        { merk: 'TOWER SOLUTION', kategori: 'Pondasi ERS', section: 'Base Plate & Guy Wire', kondisi: 'Lengkap', tersedia: 1, jumlah: 1, alokasi: null },
+      ],
+      'UPT BANDUNG': [
+        { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 3, jumlah: 2, alokasi: 2 },
+      ],
+      'UPT CILEGON': [
+        { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 2, jumlah: 1, alokasi: 1 },
+      ],
+      'UPT SURABAYA': [
+        { merk: 'TOWER SOLUTION', kategori: 'Pondasi ERS', section: 'Base Plate & Guy Wire', kondisi: 'Lengkap', tersedia: 1, jumlah: 1, alokasi: null },
+      ],
+    };
+
+    var satuanData = {
+      'UITJBT': [
+        { merk: 'TOWER SOLUTION', kategori: 'Aksesoris ERS', section: 'Rigging & Sling', komponen: '10 FT METAL SLING', stock: '5 Pcs', jumlah: 4 },
+        { merk: 'TOWER SOLUTION', kategori: 'Peralatan Kerja', section: 'Clamp & Tooling', komponen: 'ALIGNMENT TOOL / VISE GRIP', stock: '3 Pcs', jumlah: 2 },
+      ],
+      'UITJBB': [
+        { merk: 'TOWER SOLUTION', kategori: 'Pondasi ERS', section: 'Guying & Anchor', komponen: 'ANCHOR CONSTRUCTION YOKE PLATE', stock: '12 Pcs', jumlah: 8 },
+      ],
+      'UITJBM': [
+        { merk: 'TOWER SOLUTION', kategori: 'Isolator ERS', section: 'Insulator Support', komponen: 'BASE MOUNT FOR INSULATOR POST', stock: '4 Pcs', jumlah: 2 },
+      ],
+      'UITJBT - UPT BANDUNG': [
+        { merk: 'TOWER SOLUTION', kategori: 'Aksesoris ERS', section: 'Rigging & Sling', komponen: '10 FT METAL SLING', stock: '5 Pcs', jumlah: 4 },
+      ],
+      'UITJBB - UPT CILEGON': [
+        { merk: 'TOWER SOLUTION', kategori: 'Pondasi ERS', section: 'Guying & Anchor', komponen: 'ANCHOR CONSTRUCTION YOKE PLATE', stock: '12 Pcs', jumlah: 8 },
+      ],
+      'UITJBM - UPT SURABAYA': [
+        { merk: 'TOWER SOLUTION', kategori: 'Isolator ERS', section: 'Insulator Support', komponen: 'BASE MOUNT FOR INSULATOR POST', stock: '4 Pcs', jumlah: 2 },
+      ],
+      'UPT BANDUNG': [
+        { merk: 'TOWER SOLUTION', kategori: 'Aksesoris ERS', section: 'Rigging & Sling', komponen: '10 FT METAL SLING', stock: '5 Pcs', jumlah: 4 },
+      ],
+      'UPT CILEGON': [
+        { merk: 'TOWER SOLUTION', kategori: 'Pondasi ERS', section: 'Guying & Anchor', komponen: 'ANCHOR CONSTRUCTION YOKE PLATE', stock: '12 Pcs', jumlah: 8 },
+      ],
+      'UPT SURABAYA': [
+        { merk: 'TOWER SOLUTION', kategori: 'Isolator ERS', section: 'Insulator Support', komponen: 'BASE MOUNT FOR INSULATOR POST', stock: '4 Pcs', jumlah: 2 },
+      ],
+    };
+
+    var komponenData = [
+      { nama: '10 FT METAL SLING', mandatory: false, standart: 1, stock: 0, sets: [{ d: 1, s: 0 }, { d: 1, s: 0 }] },
+      { nama: 'ALIGNMENT TOOL / VISE GRIP CLAMP', mandatory: true, standart: 2, stock: 5, sets: [{ d: 2, s: 1 }, { d: 2, s: -1 }] },
+      { nama: 'ANCHOR CONSTRUCTION YOKE PLATE', mandatory: true, standart: 4, stock: 3, sets: [{ d: 4, s: -1 }, { d: 4, s: -5 }] },
+      { nama: 'BASE MOUNT FOR INSULATOR POST', mandatory: true, standart: 1, stock: 1, sets: [{ d: 1, s: 0 }, { d: 1, s: -1 }] },
+      { nama: 'BACKUP PLATE 254X292X12.7 MM', mandatory: false, standart: 0, stock: 100, sets: [{ d: 0, s: 100 }, { d: 0, s: 100 }] },
+      { nama: 'CABLE TIE 200MM', mandatory: false, standart: 5, stock: 50, sets: [{ d: 5, s: 45 }, { d: 5, s: 40 }] },
+      { nama: 'COME-ALONG CLAMP 150KV', mandatory: true, standart: 2, stock: 0, sets: [{ d: 2, s: -2 }, { d: 2, s: -4 }] },
+      { nama: 'DEAD-END CLAMP 150KV ACSR', mandatory: true, standart: 4, stock: 8, sets: [{ d: 4, s: 4 }, { d: 4, s: 0 }] },
+      { nama: 'EXTENSION LINK 150KV', mandatory: false, standart: 2, stock: 6, sets: [{ d: 2, s: 4 }, { d: 2, s: 2 }] },
+      { nama: 'FIBER ROPE 1 INCH (50M)', mandatory: false, standart: 1, stock: 3, sets: [{ d: 1, s: 2 }, { d: 1, s: 1 }] },
+    ];
+
+    function openDetailPanel(unit) {
+      var isSet = currentTipe === '1set';
+
+      var titleEl = document.getElementById('det-panel-title');
+      var subtitleEl = document.getElementById('det-subtitle');
+      if (titleEl) titleEl.textContent = isSet ? 'Detail Set Peminjaman' : 'Detail Aksesoris Peminjaman';
+      if (subtitleEl) subtitleEl.textContent = unit;
+
+      var banner = document.getElementById('det-banner');
+      if (banner) {
+        banner.style.cssText = 'margin:14px 22px 0;padding:10px 14px;border-radius:6px;display:flex;align-items:flex-start;gap:9px;flex-shrink:0;background:var(--pln-blue-light, #EFF6FF);border:1px solid #BFDBFE';
+        banner.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pln-blue)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+          + '<span style="font-size:12px;color:var(--pln-blue-mid, #1D4ED8)">Mode detail – data ' + (isSet ? 'set' : 'aksesoris') + ' rincian pengelola</span>';
+      }
+
+      if (isSet) {
+        var thead = document.getElementById('det-thead');
+        if (thead) {
+          thead.innerHTML = '<tr>'
+            + '<th style="width:36px;text-align:center">No.</th>'
+            + '<th>Merk</th>'
+            + '<th>Kategori</th>'
+            + '<th>Section</th>'
+            + '<th style="width:120px;text-align:center">Kondisi</th>'
+            + '<th style="width:80px;text-align:center">Tersedia</th>'
+            + '<th style="width:90px;text-align:center">Jml. Kebutuhan</th>'
+            + '<th style="width:56px;text-align:center">Aksi</th>'
+            + '</tr>';
+        }
+
+        var rows = setData[unit] || setData['UITJBT'] || [];
+        var tbody = document.getElementById('det-tbody');
+        if (tbody) {
+          tbody.innerHTML = rows.map(function (r, i) {
+            var cond = r.kondisi === 'Lengkap'
+              ? '<span class="chip" style="background:#F0FDF4; color:#166534">Lengkap</span>'
+              : '<span class="chip" style="background:#FEF2F2; color:#991B1B">Tidak Lengkap</span>';
+
+            return '<tr>'
+              + '<td style="text-align:center;color:var(--text-hint);font-size:12px">' + (i + 1) + '</td>'
+              + '<td style="font-size:12.5px;font-weight:500">' + r.merk + '</td>'
+              + '<td style="font-size:12px"><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">' + (r.kategori || 'Struktur ERS') + '</span></td>'
+              + '<td style="font-size:12.5px">' + (r.section || 'Tower Column 15m') + '</td>'
+              + '<td style="text-align:center">' + cond + '</td>'
+              + '<td style="text-align:center;font-weight:600;color:var(--pln-blue)">' + r.tersedia + '</td>'
+              + '<td style="text-align:center;font-weight:600">' + r.jumlah + '</td>'
+              + '<td style="text-align:center">'
+              + '<button onclick="openSetKomponen(\'' + r.merk + '\',\'' + r.kondisi + '\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Detail Komponen Set">'
+              + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+              + '</button>'
+              + '</td>'
+              + '</tr>';
+          }).join('');
+        }
+
+      } else {
+        var thead = document.getElementById('det-thead');
+        if (thead) {
+          thead.innerHTML = '<tr>'
+            + '<th style="width:36px;text-align:center">No.</th>'
+            + '<th>Merk</th>'
+            + '<th>Kategori</th>'
+            + '<th>Section</th>'
+            + '<th>Komponen</th>'
+            + '<th style="width:90px;text-align:center">Stock</th>'
+            + '<th style="width:70px;text-align:center">Jml.</th>'
+            + '</tr>';
+        }
+
+        var acc = satuanData[unit] || satuanData['UITJBT'] || [];
+        var tbody = document.getElementById('det-tbody');
+        if (tbody) {
+          tbody.innerHTML = acc.map(function (a, i) {
+            return '<tr>'
+              + '<td style="text-align:center;color:var(--text-hint);font-size:12px">' + (i + 1) + '</td>'
+              + '<td style="font-size:12.5px;font-weight:500">' + a.merk + '</td>'
+              + '<td style="font-size:12px"><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">' + a.kategori + '</span></td>'
+              + '<td style="font-size:12.5px">' + a.section + '</td>'
+              + '<td style="font-size:12.5px;font-weight:600">' + a.komponen + '</td>'
+              + '<td style="text-align:center;font-size:12.5px;color:var(--pln-blue);font-weight:600">' + a.stock + '</td>'
+              + '<td style="text-align:center;font-size:13px;font-weight:600">' + a.jumlah + '</td>'
+              + '</tr>';
+          }).join('');
+        }
+      }
+
+      var backdrop = document.getElementById('det-backdrop');
+      var panel = document.getElementById('det-panel');
+      if (backdrop && panel) {
+        backdrop.style.display = 'block';
+        setTimeout(function () { backdrop.classList.add('open'); }, 10);
+        panel.style.transform = 'translateX(0)';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeDetailPanel() {
+      var backdrop = document.getElementById('det-backdrop');
+      var panel = document.getElementById('det-panel');
+      if (backdrop && panel) {
+        backdrop.classList.remove('open');
+        panel.style.transform = 'translateX(100%)';
+        setTimeout(function () { backdrop.style.display = 'none'; }, 300);
+        document.body.style.overflow = '';
+      }
+    }
+
+    function openSetKomponen(merk, kondisi) {
+      document.getElementById('sk-merk').textContent = merk;
+      document.getElementById('sk-template').textContent = 'TOWER SOLUTION – 150KV TENSION';
+
+      var setCount = kondisi === 'Lengkap' ? 2 : 1;
+      var setLabels = kondisi === 'Lengkap' ? ['Set 1 – Lengkap', 'Set 2 – Lengkap'] : ['Set 1 – Tidak Lengkap'];
+
+      var setHeaderCols = setLabels.map(function (lbl) {
+        var isLengkap = lbl.indexOf('Tidak') === -1;
+        return '<th class="vs-th" colspan="2" style="text-align:center;background:' + (isLengkap ? '#EFF6FF' : '#FEF2F2') + '">' + lbl + '</th>';
+      }).join('');
+
+      var subCols = setLabels.map(function () {
+        return '<th class="vs-th" style="text-align:center;font-size:11px;width:64px">Digunakan</th>'
+          + '<th class="vs-th" style="text-align:center;font-size:11px;width:64px">Sisa</th>';
+      }).join('');
+
+      document.getElementById('sk-thead').innerHTML =
+        '<tr>'
+        + '<th class="vs-th" style="width:32px;text-align:center">No.</th>'
+        + '<th class="vs-th">Nama Katalog</th>'
+        + '<th class="vs-th" style="text-align:center;width:90px">Standart<br><small style="font-size:10px;font-weight:400">1 Set 150kV</small></th>'
+        + '<th class="vs-th" style="text-align:center;width:80px">Stock<br>Standby</th>'
+        + setHeaderCols
+        + '</tr>'
+        + '<tr><td class="vs-th"></td><td class="vs-th"></td><td class="vs-th"></td><td class="vs-th"></td>' + subCols + '</tr>';
+
+      document.getElementById('sk-tbody').innerHTML = komponenData.map(function (k, i) {
+        var nameStyle = k.mandatory ? 'color:var(--pln-blue);font-weight:600' : '';
+        var rowBg = k.mandatory ? 'background:#EFF6FF' : '';
+        var stockStyle = k.stock === 0 ? 'color:#E02424;font-weight:700'
+          : k.stock <= 3 ? 'color:#D97706;font-weight:600'
+            : 'color:#166534;font-weight:600';
+        var cols = '';
+        for (var s = 0; s < setCount; s++) {
+          var si = k.sets && k.sets[s];
+          var d = si ? si.d : 0;
+          var sisa = si ? si.s : 0;
+          var sisaStyle = sisa < 0
+            ? 'background:#E02424;color:#fff;font-weight:700;border-radius:3px;padding:2px 6px;display:inline-block'
+            : sisa === 0 ? 'color:var(--text-hint)' : 'color:#166534;font-weight:600';
+          cols += '<td class="vs-td" style="text-align:center">' + d + '</td>'
+            + '<td class="vs-td" style="text-align:center"><span style="' + sisaStyle + '">' + sisa + '</span></td>';
+        }
+        return '<tr style="' + rowBg + '">'
+          + '<td class="vs-td" style="text-align:center;color:var(--text-hint)">' + (i + 1) + '</td>'
+          + '<td class="vs-td" style="' + nameStyle + '">' + k.nama + '</td>'
+          + '<td class="vs-td" style="text-align:center">' + k.standart + '</td>'
+          + '<td class="vs-td" style="text-align:center"><span style="' + stockStyle + '">' + k.stock + '</span></td>'
+          + cols
+          + '</tr>';
+      }).join('');
+
+      var backdrop = document.getElementById('sk-backdrop');
+      var panel = document.getElementById('sk-panel');
+      if (backdrop && panel) {
+        backdrop.style.display = 'block';
+        panel.style.transform = 'translateX(0)';
+      }
+    }
+
+    function closeSetKomponen() {
+      var backdrop = document.getElementById('sk-backdrop');
+      var panel = document.getElementById('sk-panel');
+      if (backdrop && panel) {
+        backdrop.style.display = 'none';
+        panel.style.transform = 'translateX(100%)';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      updateUnitTable();
+    });
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    .vs-th {
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .vs-td {
+      padding: 8px 12px;
+      font-size: 12px;
+      border-bottom: 1px solid #F1F5F9;
+      vertical-align: middle;
+    }
+
+    /* SIDE PANEL OVERLAY FOR AKSI DETAIL */
+    .side-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .side-backdrop.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .side-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 520px;
+      max-width: 90vw;
+      height: 100vh;
+      background: var(--card);
+      z-index: 301;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* SWITCH TOGGLE */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #CBD5E1;
+      transition: .3s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked+.slider {
+      background-color: var(--pln-blue);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(18px);
+    }
+
+    :root {
+      --pln-blue: #0A58CA;
+      --pln-blue-mid: #0d6efd;
+      --pln-blue-light: #E7F1FF;
+      --pln-yellow: #F7A800;
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --surface: #F1F5F9;
+      --border: #E2E8F0;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-hint: #94A3B8;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --sidebar-w: 64px;
+      --danger: #DC2626;
+      --danger-light: #FEE2E2;
+      --success: #16A34A;
+      --success-light: #DCFCE7;
+      --warning: #D97706;
+      --warning-light: #FEF3C7;
+
+      /* Chip Status Colors */
+      --chip-proses-bg: #FFF7ED;
+      --chip-proses-text: #C2410C;
+      --chip-proses-dot: #F97316;
+      --chip-kirim-bg: #EFF6FF;
+      --chip-kirim-text: #1D4ED8;
+      --chip-kirim-dot: #3B82F6;
+      --chip-tunggu-bg: #FEFCE8;
+      --chip-tunggu-text: #854D0E;
+      --chip-tunggu-dot: #EAB308;
+      --chip-review-bg: #FDF4FF;
+      --chip-review-text: #7E22CE;
+      --chip-review-dot: #A855F7;
+      --chip-approval-bg: #F0FDF4;
+      --chip-approval-text: #166534;
+      --chip-approval-dot: #22C55E;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .page-title,
+    .section-label,
+    .card-title,
+    .logo span {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* LAYOUT */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: rgba(10, 30, 60, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 8px;
+      flex-shrink: 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar .logo {
+      width: 40px;
+      height: 40px;
+      background: var(--pln-yellow);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 10px rgba(247, 168, 0, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .sidebar .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .sidebar .logo span {
+      color: #003B8E;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar .nav-item {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 4px;
+    }
+
+    .sidebar .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .sidebar .nav-item.active {
+      background: var(--pln-blue);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+    }
+
+    .sidebar .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-w));
+    }
+
+    /* TOPBAR */
+    .topbar {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card);
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .back-btn:hover {
+      background: var(--surface);
+      border-color: #CBD5E1;
+      transform: translateY(-1px);
+    }
+
+    /* CONTENT AREA */
+    .content {
+      padding: 32px;
+      flex: 1;
+      padding-bottom: 100px;
+    }
+
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--text-hint);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .breadcrumb a {
+      color: var(--pln-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--pln-blue-mid);
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    /* SUMMARY BANNER */
+    .summary-banner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .summary-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .mutasi-id-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mutasi-id-badge h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--pln-blue);
+      font-family: monospace;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      background: #F8FAFC;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .summary-item label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-hint);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .summary-item span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* STEPPER WORKFLOW */
+    .workflow-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin-top: 10px;
+      padding: 0 10px;
+    }
+
+    .workflow-stepper::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: var(--border);
+      z-index: 1;
+    }
+
+    .step-item {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      padding: 4px 12px 8px 12px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .step-item:hover {
+      color: var(--pln-blue);
+    }
+
+    .step-item:hover .step-label {
+      color: var(--pln-blue);
+    }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      color: var(--text-hint);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+
+    .step-item.completed .step-icon {
+      background: var(--success-light);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .step-item.completed .step-label {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    /* PROCESSING STATE - Sedang diproses (biru pulse) */
+    .step-item.processing .step-icon {
+      background: var(--pln-blue-light);
+      border-color: var(--pln-blue);
+      color: var(--pln-blue);
+      animation: stepPulse 2s ease-in-out infinite;
+    }
+
+    .step-item.processing .step-label {
+      color: var(--pln-blue);
+      font-weight: 700;
+    }
+
+    @keyframes stepPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(10, 88, 202, 0.3); }
+      50% { box-shadow: 0 0 0 6px rgba(10, 88, 202, 0); }
+    }
+
+    @keyframes stepSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* REJECTED STATE - Ditolak (merah) */
+    .step-item.rejected .step-icon {
+      background: #FEF2F2;
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+
+    .step-item.rejected .step-label {
+      color: #EF4444;
+      font-weight: 700;
+    }
+
+    .step-item.active {
+      border-bottom-color: var(--pln-blue);
+    }
+
+    .step-item.active .step-icon {
+      background: var(--pln-blue-light);
+      border-color: var(--pln-blue);
+      color: var(--pln-blue);
+      box-shadow: 0 0 0 4px rgba(10, 88, 202, 0.15);
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      transition: color 0.2s;
+    }
+
+    .step-item.active .step-label {
+      color: var(--pln-blue);
+      font-weight: 700;
+    }
+
+    /* TAB NAVIGATION */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: var(--pln-blue);
+    }
+
+    .tab-btn.active {
+      color: var(--pln-blue);
+      border-bottom-color: var(--pln-blue);
+    }
+
+    .tab-badge {
+      background: var(--pln-blue-light);
+      color: var(--pln-blue);
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* TAB CONTENT */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* CARDS & TABLES */
+    .card,
+    .section-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 16px;
+      background: var(--pln-blue);
+      border-radius: 2px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .info-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .info-field label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .info-val {
+      padding: 10px 14px;
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* TABLES */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: #F8FAFC;
+    }
+
+    th {
+      padding: 14px 20px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #F1F5F9;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover td {
+      background: #FAFBFC;
+    }
+
+    /* CHIPS & BADGES */
+    .unit-tag {
+      display: inline-block;
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .dest-tag {
+      font-size: 11px;
+      color: var(--text-hint);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .chip-proses {
+      background: var(--chip-proses-bg);
+      color: var(--chip-proses-text);
+    }
+
+    .chip-proses .chip-dot {
+      background: var(--chip-proses-dot);
+    }
+
+    .chip-kirim {
+      background: var(--chip-kirim-bg);
+      color: var(--chip-kirim-text);
+    }
+
+    .chip-kirim .chip-dot {
+      background: var(--chip-kirim-dot);
+    }
+
+    .chip-tunggu {
+      background: var(--chip-tunggu-bg);
+      color: var(--chip-tunggu-text);
+    }
+
+    .chip-tunggu .chip-dot {
+      background: var(--chip-tunggu-dot);
+    }
+
+    .chip-review {
+      background: var(--chip-review-bg);
+      color: var(--chip-review-text);
+    }
+
+    .chip-review .chip-dot {
+      background: var(--chip-review-dot);
+    }
+
+    .chip-approval {
+      background: var(--chip-approval-bg);
+      color: var(--chip-approval-text);
+    }
+
+    .chip-approval .chip-dot {
+      background: var(--chip-approval-dot);
+    }
+
+    .chip-selesai {
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .chip-selesai .chip-dot {
+      background: var(--text-hint);
+    }
+
+    .tipe-satuan {
+      background: #E0F2FE;
+      color: #0369A1;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid #BAE6FD;
+    }
+
+    .tipe-set {
+      background: #FCE7F3;
+      color: #BE185D;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid #FBCFE8;
+    }
+
+    /* DOC FILE CARD */
+    .doc-file-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      transition: all 0.2s;
+    }
+
+    .doc-file-card:hover {
+      border-color: var(--pln-blue);
+      box-shadow: 0 4px 12px rgba(10, 88, 202, 0.08);
+    }
+
+    .doc-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--pln-blue-light);
+      color: var(--pln-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* APPROVAL LOG TIMELINE */
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline-list::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -24px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--pln-blue);
+      border: 3px solid var(--card);
+      box-shadow: 0 0 0 2px var(--pln-blue-light);
+    }
+
+    .timeline-time {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-hint);
+    }
+
+    .timeline-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .timeline-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: #F8FAFC;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="logo"><span>PLN</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg></div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+          <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+        </svg></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+        </svg></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" />
+        </svg></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 010 7.75" />
+        </svg></div>
+      <div class="sidebar-bottom">
+        <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="12" y1="12" x2="9" y2="12" />
+          </svg></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <a href="mainpage-monitoring-mutasi.html" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Kembali ke Monitoring
+          </a>
+        </div>
+        <span>Contact us: helpdesk.p@compln.co.id | Security Issue: soc@pln.co.id</span>
+      </div>
+
+      <div class="content">
+        <div class="breadcrumb">
+          <a href="../../hifi-home/home.html">Mutasi ERS</a> &nbsp;/&nbsp; <a
+            href="mainpage-monitoring-mutasi.html">Monitoring</a> &nbsp;/&nbsp; Detail Mutasi REQ202600000218
+        </div>
+
+        <div class="page-header"
+          style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <div class="page-title">Detail Monitoring Mutasi ERS</div>
+
+          <!-- TOGGLE CONTROL PANEL DENGAN JUDUL CUSTOM -->
+          <div
+            style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:8px 16px; display:flex; align-items:center; gap:16px; box-shadow:0 2px 10px rgba(0,0,0,0.03);">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <label class="switch" style="position:relative; display:inline-block; width:38px; height:20px;">
+                <input type="checkbox" id="toggle-simulasi" onchange="toggleSimulasiControl(this.checked)" checked>
+                <span class="slider"></span>
+              </label>
+              <span style="font-size:13px; font-weight:700; color:var(--pln-blue);">Simulasi Parameter Mutasi</span>
+            </div>
+
+            <!-- CONTROLS CONTAINER (ACTIVE FLUID) -->
+            <div id="simulasi-controls-wrap"
+              style="display:flex; align-items:center; gap:16px; border-left:1px solid var(--border); padding-left:16px; flex-wrap:wrap;">
+              <!-- DESTINASI SELECTOR -->
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">Destinasi:</span>
+                <div
+                  style="display:inline-flex; background:var(--surface); padding:2px; border-radius:20px; border:1px solid var(--border);">
+                  <button id="sim-dest-uit" onclick="setDestinasiSimulasi('uit')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:#fff; color:var(--pln-blue); box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+                    🌐 Antar Unit Induk
+                  </button>
+                  <button id="sim-dest-upt" onclick="setDestinasiSimulasi('upt')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary);">
+                    🏢 Antar UPT (Internal UIT)
+                  </button>
+                </div>
+              </div>
+
+              <!-- TIPE PEMINJAMAN SELECTOR -->
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">Tipe:</span>
+                <div
+                  style="display:inline-flex; background:var(--surface); padding:2px; border-radius:20px; border:1px solid var(--border);">
+                  <button id="sim-tipe-satuan" onclick="setTipeSimulasi('satuan')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:#fff; color:#0369A1; box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+                    Satuan
+                  </button>
+                  <button id="sim-tipe-1set" onclick="setTipeSimulasi('1set')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary);"
+                    title="Wajib Antar Unit Induk">
+                    1 Set <span style="font-size:10px; color:#BE185D;">(Wajib UIT)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUMMARY BANNER -->
+        <div class="summary-banner">
+          <div class="summary-top">
+            <div class="mutasi-id-badge">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A58CA" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <h2>REQ202600000218</h2>
+              <span class="chip chip-proses"><span class="chip-dot"></span>Sedang diproses</span>
+            </div>
+            <div>
+              <span class="jenis-mutasi-tag" style="font-size:12px; padding:6px 14px;">Peminjaman ERS</span>
+            </div>
+          </div>
+
+          <div class="summary-grid">
+            <div class="summary-item">
+              <label>Unit Peminjam</label>
+              <span><span class="unit-tag">P3BS</span> UPT MEDAN</span>
+            </div>
+            <div class="summary-item">
+              <label>Unit Pengelola</label>
+              <span><span class="unit-tag">UITJBT</span> <span class="unit-tag">UITJBB</span> <span
+                  class="unit-tag">UITJBM</span> (3 Unit Induk)</span>
+            </div>
+            <div class="summary-item">
+              <label>Tipe Peminjaman</label>
+              <span id="summary-val-tipe"><span class="tipe-satuan">Satuan</span></span>
+            </div>
+            <div class="summary-item">
+              <label>Destinasi</label>
+              <span id="summary-val-dest"><span class="dest-tag">ANTAR UNIT INDUK</span></span>
+            </div>
+            <div class="summary-item">
+              <label>Tanggal Permohonan</label>
+              <span>24 Februari 2026</span>
+            </div>
+          </div>
+
+          <!-- WORKFLOW STEPPER -->
+          <div class="workflow-stepper">
+            <div class="step-item completed" onclick="switchStep(0, 'tab-peminjaman')">
+              <div class="step-icon">✓</div>
+              <div class="step-label">1. Permohonan</div>
+            </div>
+            <div class="step-item processing active" onclick="switchStep(1, 'tab-approval')">
+              <div class="step-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: stepSpin 1.5s linear infinite;">
+                  <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
+                </svg>
+              </div>
+              <div class="step-label">2. Approval & Review</div>
+            </div>
+            <div class="step-item processing" onclick="switchStep(2, 'tab-pengecekan-pengelola')">
+              <div class="step-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: stepSpin 1.5s linear infinite;">
+                  <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
+                </svg>
+              </div>
+              <div class="step-label">3. Pengecekan & Kirim</div>
+            </div>
+            <div class="step-item rejected" onclick="switchStep(3, 'tab-penerimaan')">
+              <div class="step-icon">✕</div>
+              <div class="step-label">4. Penerimaan</div>
+            </div>
+            <div class="step-item" onclick="switchStep(4, 'tab-pengembalian')">
+              <div class="step-icon">5</div>
+              <div class="step-label">5. Pengembalian</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB BAR NAVIGATION -->
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('tab-peminjaman', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            </svg>
+            1. Informasi Peminjaman
+          </button>
+          <button class="tab-btn" onclick="switchTab('tab-approval', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+            </svg>
+            2. Approval & Log Persetujuan
+            <span class="tab-badge">Log 4</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('tab-pengecekan-pengelola', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            3. Pengecekan & Pengiriman (Pengelola)
+          </button>
+          <button class="tab-btn" onclick="switchTab('tab-penerimaan', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            4. Penerimaan (Peminjam)
+          </button>
+          <button class="tab-btn" onclick="switchTab('tab-pengembalian', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+            5. Proses Pengembalian
+          </button>
+        </div>
+
+        <!-- TAB 1: INFORMASI PEMINJAMAN -->
+        <div id="tab-peminjaman" class="tab-pane active">
+          <div class="section-card">
+            <div class="section-label">Detail Permohonan Peminjaman</div>
+            <div class="info-grid">
+              <div class="info-field">
+                <label>Nomor Mutasi</label>
+                <div class="info-val" style="font-family:monospace; font-weight:700; color:var(--pln-blue);">
+                  REQ202600000218</div>
+              </div>
+              <div class="info-field">
+                <label>Tanggal Pengajuan</label>
+                <div class="info-val">24 Februari 2026</div>
+              </div>
+              <div class="info-field">
+                <label>Unit Peminjam</label>
+                <div class="info-val">P3BS - UPT MEDAN</div>
+              </div>
+              <div class="info-field">
+                <label>Unit Pengelola Gudang</label>
+                <div class="info-val">UITJBT, UITJBB, & UITJBM</div>
+              </div>
+              <div class="info-field">
+                <label>Tipe Peminjaman</label>
+                <div class="info-val" id="tab1-val-tipe"><span class="tipe-satuan">Satuan</span></div>
+              </div>
+              <div class="info-field">
+                <label>Destinasi</label>
+                <div class="info-val" id="tab1-val-dest"><span class="dest-tag">ANTAR UNIT INDUK</span></div>
+              </div>
+              <div class="info-field" style="grid-column: span 2;">
+                <label>Tujuan & Keterangan Peminjaman</label>
+                <div class="info-val" style="min-height:60px;">Peminjaman darurat ERS untuk perbaikan SUTT 150kV akibat
+                  gangguan cuaca ekstrem di Sektor Makassar.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card" style="padding:0;overflow:hidden">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border)">
+              <div class="section-label" style="margin-bottom:0">Unit yang Dituju (Pengelola)</div>
+            </div>
+            <div style="overflow-x:auto">
+              <table id="unit-table" style="min-width:680px">
+                <thead id="unit-thead">
+                  <tr>
+                    <th style="width:44px;text-align:center">No.</th>
+                    <th>Unit Pelaksana (UPT)</th>
+                    <th>Unit Level 3 (ULTG)</th>
+                    <th>Unit Level 4 (Gardu Induk)</th>
+                    <th style="width:130px;text-align:center">Total Aksesoris</th>
+                    <th style="width:200px">Status Alokasi</th>
+                    <th style="width:66px;text-align:center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="unit-tbody">
+                  <tr>
+                    <td style="text-align:center;color:var(--text-hint);font-size:12px">1</td>
+                    <td>
+                      <div style="font-weight:600">UITJBT - UPT BANDUNG</div>
+                    </td>
+                    <td>
+                      <div>ULTG BANDUNG TIMUR</div>
+                    </td>
+                    <td>
+                      <div>GI 150KV UBER</div>
+                    </td>
+                    <td style="text-align:center;font-weight:700;color:var(--pln-blue)">4 Pcs</td>
+                    <td><span class="chip" style="background:#F0FDF4; color:#166534;"><span
+                          class="chip-dot"></span>Alokasi Disetujui</span></td>
+                    <td style="text-align:center">
+                      <button
+                        style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)"
+                        title="Lihat Detail">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center;color:var(--text-hint);font-size:12px">2</td>
+                    <td>
+                      <div style="font-weight:600">UITJBB - UPT CILEGON</div>
+                    </td>
+                    <td>
+                      <div>ULTG CILEGON</div>
+                    </td>
+                    <td>
+                      <div>GI 150KV KRAKATAU</div>
+                    </td>
+                    <td style="text-align:center;font-weight:700;color:var(--pln-blue)">8 Pcs Anchor Wire</td>
+                    <td><span class="chip" style="background:#F0FDF4; color:#166534;"><span
+                          class="chip-dot"></span>Alokasi Disetujui</span></td>
+                    <td style="text-align:center">
+                      <button
+                        style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)"
+                        title="Lihat Detail">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:center;color:var(--text-hint);font-size:12px">3</td>
+                    <td>
+                      <div style="font-weight:600">UITJBM - UPT SURABAYA</div>
+                    </td>
+                    <td>
+                      <div>ULTG SURABAYA BARAT</div>
+                    </td>
+                    <td>
+                      <div>GI 150KV MANUNGGAL</div>
+                    </td>
+                    <td style="text-align:center;font-weight:700;color:var(--pln-blue)">2 Pcs Base Plate</td>
+                    <td><span class="chip chip-tunggu"><span class="chip-dot"></span>Menunggu Persetujuan</span></td>
+                    <td style="text-align:center">
+                      <button
+                        style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)"
+                        title="Lihat Detail">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-label">Dokumen Lampiran & Persyaratan</div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+              <div class="doc-file-card">
+                <div class="doc-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:13px; font-weight:600;">Surat_Permohonan_Mutasi.pdf</div>
+                  <div style="font-size:11px; color:var(--text-hint);">2.4 MB • Terverifikasi</div>
+                </div>
+              </div>
+              <div class="doc-file-card">
+                <div class="doc-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:13px; font-weight:600;">Nota_Dinas_Kebutuhan_Lap.pdf</div>
+                  <div style="font-size:11px; color:var(--text-hint);">1.8 MB • Terverifikasi</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: APPROVAL & LOG PERSETUJUAN -->
+        <div id="tab-approval" class="tab-pane">
+
+          <!-- MODE 1: ANTAR UNIT INDUK (UIT) WORKFLOW (DEFAULT) -->
+          <div id="approval-mode-uit">
+            <div class="section-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div class="section-label" style="margin-bottom:0;">Persetujuan Mutasi Antar Unit Induk (UIT)
+                </div>
+                <span class="chip" style="background:#EFF6FF; color:#1D4ED8; font-weight:700;">📡
+                  3 Unit Pengelola</span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:20px;">
+
+                <!-- STEP 1 CARD -->
+                <div
+                  style="padding:20px; border:1px solid #BFDBFE; border-radius:var(--radius-lg); background:#F0F9FF; position:relative;">
+                  <div
+                    style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                      <span
+                        style="font-size:11px; font-weight:800; color:#0369A1; text-transform:uppercase; letter-spacing:0.5px;">STEP
+                        1 • UNIT PEMINJAM</span>
+                      <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-top:2px;">Approval
+                        SRM Hartrans Unit Peminjam</h4>
+                    </div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">
+                      <span class="chip-dot"></span>Disetujui & Diblast
+                    </span>
+                  </div>
+                  <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:13px; margin-bottom:14px;">
+                    <div><strong style="color:var(--text-secondary);">Pejabat SRM:</strong> Budi Raharjo (SRM Hartrans
+                      UIP3B Sumatera)</div>
+                    <div><strong style="color:var(--text-secondary);">Waktu Persetujuan:</strong> 24 Feb 2026 09:15 WIB
+                    </div>
+                  </div>
+                  <div
+                    style="font-size:12px; color:var(--text-secondary); background:#fff; padding:10px 14px; border-radius:8px; border:1px solid #E0F2FE; margin-bottom:12px;">
+                    💬 <em>"Permohonan peminjaman ERS darurat disetujui. Notifikasi permohonan diblast ke 3 Unit Induk
+                      Pengelola (UITJBT, UITJBB, UITJBM)."</em>
+                  </div>
+                  <div
+                    style="background:#E0F2FE; border:1px dashed #0284C7; padding:10px 14px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                    <div
+                      style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#0369A1;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                      </svg>
+                      Permohonan Diblast ke 3 Unit Induk Pengelola:
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                      <span
+                        style="font-size:11px; background:#fff; color:#0284C7; padding:3px 10px; border-radius:12px; font-weight:700; border:1px solid #BAE6FD;">1.
+                        UITJBT</span>
+                      <span
+                        style="font-size:11px; background:#fff; color:#0284C7; padding:3px 10px; border-radius:12px; font-weight:700; border:1px solid #BAE6FD;">2.
+                        UITJBB</span>
+                      <span
+                        style="font-size:11px; background:#fff; color:#0284C7; padding:3px 10px; border-radius:12px; font-weight:700; border:1px solid #BAE6FD;">3.
+                        UITJBM</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- STEP 2 CARD -->
+                <div
+                  style="padding:20px; border:1px solid #C084FC; border-radius:var(--radius-lg); background:#FAF5FF; position:relative;">
+                  <div
+                    style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                      <span
+                        style="font-size:11px; font-weight:800; color:#7E22CE; text-transform:uppercase; letter-spacing:0.5px;">STEP
+                        2 • KOORDINATOR PENGELOLA</span>
+                      <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-top:2px;">Verifikasi
+                        & Mapping Alokasi MSB Fashar Pengelola</h4>
+                    </div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">
+                      <span class="chip-dot"></span>Alokasi Terverifikasi
+                    </span>
+                  </div>
+                  <div style="font-size:13px; margin-bottom:14px;">
+                    <div><strong style="color:var(--text-secondary);">Verifikator:</strong> Rahmat Kurniawan (MSB Fashar
+                      Pengelola)</div>
+                  </div>
+
+                  <!-- TABLE MAPPING ALOKASI -->
+                  <div
+                    style="background:#fff; border:1px solid #E9D5FF; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div
+                      style="font-size:12px; font-weight:700; color:#6B21A8; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                      <span>Hasil Mapping Ketersediaan & Alokasi Barang ERS (3 Unit Induk):</span>
+                      <span style="font-size:11px; color:var(--text-hint); font-weight:normal;">*Multi-lokasi alokasi
+                        unit (ULTG/Gudang & Gardu Induk)</span>
+                    </div>
+                    <div class="table-container">
+                      <table style="font-size:12px;">
+                        <thead>
+                          <tr style="background:#F3E8FF;">
+                            <th>Kategori</th>
+                            <th>Section</th>
+                            <th>Komponen</th>
+                            <th>Qty Req</th>
+                            <th>Unit Induk Pengelola</th>
+                            <th>Lokasi Alokasi (Gudang ULTG / GI)</th>
+                            <th>Waktu Mapping</th>
+                            <th>Kondisi Stok</th>
+                            <th>Keputusan MSB Fashar</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><span class="chip"
+                                style="background:#F1F5F9; color:#475569; padding:2px 8px; font-size:11px;">Struktur
+                                ERS</span></td>
+                            <td style="font-size:12px; color:var(--text-secondary);">Tower Column 15m</td>
+                            <td style="font-weight:600">Tower ERS Column Structure 15m</td>
+                            <td>2 Set</td>
+                            <td><span class="unit-tag">UITJBT</span> UPT Bandung</td>
+                            <td>
+                              <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span class="unit-tag" style="background:#EFF6FF; color:#1D4ED8; margin:0;">ULTG BANDUNG
+                                  TIMUR (Gudang UPT)</span>
+                                <span class="unit-tag" style="background:#F8FAFC; color:#475569; margin:0;">GI 150KV
+                                  UBER</span>
+                              </div>
+                            </td>
+                            <td style="font-size:11.5px; color:var(--text-secondary); white-space:nowrap;">24 Feb 2026
+                              11:30 WIB</td>
+                            <td><span style="color:#166534; font-weight:600;">Ready (2 Lokasi Unit)</span></td>
+                            <td><span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Alokasi
+                                Disetujui</span></td>
+                          </tr>
+                          <tr>
+                            <td><span class="chip"
+                                style="background:#F1F5F9; color:#475569; padding:2px 8px; font-size:11px;">Aksesoris
+                                ERS</span></td>
+                            <td style="font-size:12px; color:var(--text-secondary);">Guying & Anchor</td>
+                            <td style="font-weight:600">Guy Wire Anchor Assembly Heavy Duty</td>
+                            <td>8 Pcs</td>
+                            <td><span class="unit-tag">UITJBB</span> UPT Cilegon</td>
+                            <td>
+                              <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span class="unit-tag" style="background:#EFF6FF; color:#1D4ED8; margin:0;">ULTG CILEGON
+                                  (Gudang Transit)</span>
+                                <span class="unit-tag" style="background:#F8FAFC; color:#475569; margin:0;">GI 150KV
+                                  KRAKATAU</span>
+                              </div>
+                            </td>
+                            <td style="font-size:11.5px; color:var(--text-secondary); white-space:nowrap;">24 Feb 2026
+                              11:30 WIB</td>
+                            <td><span style="color:#166534; font-weight:600;">Ready (2 Lokasi Unit)</span></td>
+                            <td><span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Alokasi
+                                Disetujui</span></td>
+                          </tr>
+                          <tr>
+                            <td><span class="chip"
+                                style="background:#F1F5F9; color:#475569; padding:2px 8px; font-size:11px;">Pondasi
+                                ERS</span></td>
+                            <td style="font-size:12px; color:var(--text-secondary);">Base Plate & Guy Wire</td>
+                            <td style="font-weight:600">ERS Base Plate Heavy Duty Assembly</td>
+                            <td>2 Set</td>
+                            <td><span class="unit-tag">UITJBM</span> UPT Surabaya</td>
+                            <td>
+                              <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span class="unit-tag" style="background:#EFF6FF; color:#1D4ED8; margin:0;">ULTG
+                                  SURABAYA BARAT (Gudang UPT)</span>
+                                <span class="unit-tag" style="background:#F8FAFC; color:#475569; margin:0;">GI 150KV
+                                  MANUNGGAL</span>
+                              </div>
+                            </td>
+                            <td style="font-size:11.5px; color:var(--text-secondary); white-space:nowrap;">24 Feb 2026
+                              11:30 WIB</td>
+                            <td><span style="color:#166534; font-weight:600;">Ready (2 Lokasi Unit)</span></td>
+                            <td><span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Alokasi
+                                Disetujui</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div
+                    style="font-size:12px; color:var(--text-secondary); background:#fff; padding:10px 14px; border-radius:8px; border:1px solid #E9D5FF;">
+                    💬 <em>"Stok fisik ERS di ketiga Unit Induk Pengelola (UITJBT, UITJBB, UITJBM) siap. Alokasi barang
+                      dipetakan ke lokasi unit spesifik (ULTG/Gudang UPT & GI) sesuai kesiapan masing-masing unit."</em>
+                  </div>
+                </div>
+
+                <!-- STEP 3 CARD -->
+                <div
+                  style="padding:20px; border:1px solid #FED7AA; border-radius:var(--radius-lg); background:#FFF7ED; position:relative;">
+                  <div
+                    style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                      <span
+                        style="font-size:11px; font-weight:800; color:#C2410C; text-transform:uppercase; letter-spacing:0.5px;">STEP
+                        3 • MANAJEMEN PENGELOLA</span>
+                      <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-top:2px;">Approval
+                        Barang Keluar dari SRM Hartrans Pengelola</h4>
+                    </div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">
+                      <span class="chip-dot"></span>Barang Keluar Disetujui
+                    </span>
+                  </div>
+                  <div style="font-size:13px; margin-bottom:14px;">
+                    <div><strong style="color:var(--text-secondary);">Pejabat SRM Coordinator:</strong> Doni Prasetyo
+                      (SRM Hartrans Pengelola)</div>
+                  </div>
+                  <div
+                    style="font-size:12px; color:var(--text-secondary); background:#fff; padding:10px 14px; border-radius:8px; border:1px solid #FFEDD5; margin-bottom:14px;">
+                    💬 <em>"Menyetujui penerbitan Pengajuan barang keluar ERS berdasarkan alokasi MSB Fashar. Notifikasi
+                      Pengajuan diteruskan ke Manager UPT masing-masing Unit Pengelola."</em>
+                  </div>
+
+                  <!-- SUB-CARDS UNTUK EACH UNIT PENGELOLA (HORIZONAL SCROLL IF > 3) -->
+                  <div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin;">
+
+                    <!-- SUB-CARD UITJBT -->
+                    <div
+                      style="background:#fff; border:1px solid #FED7AA; border-radius:var(--radius-sm); padding:14px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBT • UPT
+                          BANDUNG</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Pengajuan
+                          Disetujui</span>
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Target Notifikasi:</strong> Manager UPT Bandung
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Barang Pengajuan:</strong> 2 Set Tower ERS
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        14:20 WIB</div>
+                      <div
+                        style="font-size:11px; background:#FFF7ED; padding:6px 10px; border-radius:6px; border:1px solid #FFEDD5; color:#C2410C;">
+                        Status: Notifikasi Pengajuan Didelegasikan ke UPT Bandung
+                      </div>
+                    </div>
+
+                    <!-- SUB-CARD UITJBB -->
+                    <div
+                      style="background:#fff; border:1px solid #FED7AA; border-radius:var(--radius-sm); padding:14px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBB • UPT
+                          CILEGON</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Pengajuan
+                          Disetujui</span>
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Target Notifikasi:</strong> Manager UPT Cilegon
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Barang Pengajuan:</strong> 8 Pcs Anchor Wire
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        14:20 WIB</div>
+                      <div
+                        style="font-size:11px; background:#FFF7ED; padding:6px 10px; border-radius:6px; border:1px solid #FFEDD5; color:#C2410C;">
+                        Status: Notifikasi Pengajuan Didelegasikan ke UPT Cilegon
+                      </div>
+                    </div>
+
+                    <!-- SUB-CARD UITJBM -->
+                    <div
+                      style="background:#fff; border:1px solid #FED7AA; border-radius:var(--radius-sm); padding:14px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBM • UPT
+                          SURABAYA</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Pengajuan
+                          Disetujui</span>
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Target Notifikasi:</strong> Manager UPT Surabaya
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Barang Pengajuan:</strong> 2 Set Base Plate
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        14:20 WIB</div>
+                      <div
+                        style="font-size:11px; background:#FFF7ED; padding:6px 10px; border-radius:6px; border:1px solid #FFEDD5; color:#C2410C;">
+                        Status: Notifikasi Pengajuan Didelegasikan ke UPT Surabaya
+                      </div>
+                    </div>
+
+                    <!-- SUB-CARD UIP3BS (4TH UNIT FOR H.SCROLL DEMO) -->
+                    <div
+                      style="background:#fff; border:1px solid #FED7AA; border-radius:var(--radius-sm); padding:14px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UIP3BS • UPT
+                          PALEMBANG</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Pengajuan
+                          Disetujui</span>
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Target Notifikasi:</strong> Manager UPT Palembang
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
+                        <strong>Barang Pengajuan:</strong> 1 Set Guy Wire Anchor
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        14:25 WIB</div>
+                      <div
+                        style="font-size:11px; background:#FFF7ED; padding:6px 10px; border-radius:6px; border:1px solid #FFEDD5; color:#C2410C;">
+                        Status: Notifikasi Pengajuan Didelegasikan ke UPT Palembang
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- STEP 4 CARD -->
+                <div
+                  style="padding:20px; border:1px solid #BBF7D0; border-radius:var(--radius-lg); background:#F0FDF4; position:relative;">
+                  <div
+                    style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                      <span
+                        style="font-size:11px; font-weight:800; color:#166534; text-transform:uppercase; letter-spacing:0.5px;">STEP
+                        4 • UPT & LOGISTIK PENGELOLA</span>
+                      <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-top:2px;">
+                        Persetujuan Manager UPT & Pengecekan Asman Logistik Pengelola</h4>
+                    </div>
+                    <span class="chip chip-proses">
+                      <span class="chip-dot"></span>Sedang Berlangsung (2/3 Approved)
+                    </span>
+                  </div>
+
+                  <!-- SUB-CARDS UNTUK EACH UNIT PENGELOLA (HORIZONAL SCROLL IF > 3) -->
+                  <div
+                    style="display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; margin-top:14px; scrollbar-width:thin;">
+
+                    <!-- SUB-CARD UITJBT UPT BANDUNG -->
+                    <div
+                      style="background:#fff; border:1px solid #CBD5E1; border-radius:var(--radius-sm); padding:16px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBT • UPT
+                          BANDUNG</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Setuju (2 Set
+                          Tower)</span>
+                      </div>
+                      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                        <strong>Manager UPT:</strong> Ahmad Fauzi (UPT Bandung)
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        14:50 WIB</div>
+                      <div
+                        style="font-size:11px; background:#F8FAFC; padding:8px; border-radius:6px; border:1px solid var(--border); color:var(--text-secondary); margin-bottom:10px;">
+                        "Stok gudang Bandung aman & diizinkan untuk dipinjamkan."
+                      </div>
+                      <div
+                        style="border-top:1px dashed var(--border); padding-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                        <span style="color:var(--text-secondary); font-weight:600;">Asman Logistik:</span>
+                        <span class="chip" style="background:#EFF6FF; color:#1D4ED8; font-size:10px; padding:2px 8px;">✓
+                          Checked & Siap Kirim</span>
+                      </div>
+                    </div>
+
+                    <!-- SUB-CARD UITJBB UPT CILEGON -->
+                    <div
+                      style="background:#fff; border:1px solid #CBD5E1; border-radius:var(--radius-sm); padding:16px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBB • UPT
+                          CILEGON</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Setuju (8 Pcs
+                          Anchor)</span>
+                      </div>
+                      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                        <strong>Manager UPT:</strong> Syaiful Bahri (UPT Cilegon)
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        15:10 WIB</div>
+                      <div
+                        style="font-size:11px; background:#F8FAFC; padding:8px; border-radius:6px; border:1px solid var(--border); color:var(--text-secondary); margin-bottom:10px;">
+                        "Stok gudang Cilegon terverifikasi lengkap & siap dipinjamkan."
+                      </div>
+                      <div
+                        style="border-top:1px dashed var(--border); padding-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                        <span style="color:var(--text-secondary); font-weight:600;">Asman Logistik:</span>
+                        <span class="chip" style="background:#EFF6FF; color:#1D4ED8; font-size:10px; padding:2px 8px;">✓
+                          Checked & Siap Kirim</span>
+                      </div>
+                    </div>
+
+                    <!-- SUB-CARD UITJBM UPT SURABAYA -->
+                    <div
+                      style="background:#fff; border:1px solid #CBD5E1; border-radius:var(--radius-sm); padding:16px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBM • UPT
+                          SURABAYA</span>
+                        <span class="chip chip-tunggu" style="font-size:11px;">Menunggu Persetujuan</span>
+                      </div>
+                      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                        <strong>Manager UPT:</strong> Bambang H. (UPT Surabaya)
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Status: Melakukan inspeksi
+                        fisik stok gudang</div>
+                      <div
+                        style="font-size:11px; background:#FEFCE8; padding:8px; border-radius:6px; border:1px solid #FEF08A; color:#854D0E; margin-bottom:10px;">
+                        ⏳ Dalam verifikasi fisik base plate sebelum penandatanganan.
+                      </div>
+                      <div
+                        style="border-top:1px dashed var(--border); padding-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                        <span style="color:var(--text-secondary); font-weight:600;">Asman Logistik:</span>
+                        <span style="color:var(--text-hint);">Menunggu Manager UPT</span>
+                      </div>
+                    </div>
+
+                    <!-- SUB-CARD UIP3BS UPT PALEMBANG (4TH UNIT FOR H.SCROLL DEMO) -->
+                    <div
+                      style="background:#fff; border:1px solid #CBD5E1; border-radius:var(--radius-sm); padding:16px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UIP3BS • UPT
+                          PALEMBANG</span>
+                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Setuju (1 Set
+                          Anchor)</span>
+                      </div>
+                      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                        <strong>Manager UPT:</strong> Hendra Wijaya (UPT Palembang)
+                      </div>
+                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
+                        15:20 WIB</div>
+                      <div
+                        style="font-size:11px; background:#F8FAFC; padding:8px; border-radius:6px; border:1px solid var(--border); color:var(--text-secondary); margin-bottom:10px;">
+                        "Stok fisik gudang Palembang terverifikasi lengkap & diizinkan."
+                      </div>
+                      <div
+                        style="border-top:1px dashed var(--border); padding-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                        <span style="color:var(--text-secondary); font-weight:600;">Asman Logistik:</span>
+                        <span class="chip" style="background:#EFF6FF; color:#1D4ED8; font-size:10px; padding:2px 8px;">✓
+                          Checked & Siap Kirim</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODE 2: ANTAR UPT (INTERNAL UIT) WORKFLOW (HIDDEN BY DEFAULT) -->
+            <div id="approval-mode-upt" style="display:none;">
+              <div class="section-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                  <div class="section-label" style="margin-bottom:0;">Workflow Persetujuan Mutasi Antar UPT (Internal
+                    Unit
+                    Induk)</div>
+                  <span class="chip" style="background:#F1F5F9; color:#475569; font-weight:700;">🏢 Internal Single
+                    UIT</span>
+                </div>
+
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+
+                  <div
+                    style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                      <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">1. MANAGER UPT
+                        PEMINJAM</span>
+                      <span class="chip" style="background:#F0FDF4; color:#166534">Disetujui</span>
+                    </div>
+                    <div style="font-size:13px; font-weight:600;">Ahmad Fauzi (Manager UPT Makassar)</div>
+                    <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Disetujui pada: 24 Feb 2026
+                      09:30
+                      WITA</div>
+                    <div
+                      style="font-size:12px; color:var(--text-secondary); margin-top:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid var(--border);">
+                      "Permohonan disetujui untuk pemeliharaan internal UPT."</div>
+                  </div>
+
+                  <div
+                    style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                      <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">2. REVIEW SRM
+                        TRANSMISI</span>
+                      <span class="chip" style="background:#FDF4FF; color:#7E22CE">Disetujui</span>
+                    </div>
+                    <div style="font-size:13px; font-weight:600;">Budi Santoso (SRM Transmisi UIW)</div>
+                    <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Disetujui pada: 24 Feb 2026
+                      11:15
+                      WITA</div>
+                    <div
+                      style="font-size:12px; color:var(--text-secondary); margin-top:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid var(--border);">
+                      "Rekomendasi internal disetujui, teruskan ke Manager UPT Pengelola."</div>
+                  </div>
+
+                  <div
+                    style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                      <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">3. MANAGER UPT
+                        PENGELOLA</span>
+                      <span class="chip chip-proses"><span class="chip-dot"></span>Dalam Persetujuan</span>
+                    </div>
+                    <div style="font-size:13px; font-weight:600;">Rian Hidayat (Manager UPT Kendari)</div>
+                    <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Status: Verifikasi ketersediaan
+                      stok lokal</div>
+                  </div>
+
+                  <div
+                    style="padding:16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#FAFBFC;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                      <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">4. ASMAN LOGISTIK
+                        PENGELOLA</span>
+                      <span class="chip chip-tunggu">Menunggu Manager</span>
+                    </div>
+                    <div style="font-size:13px; font-weight:600;">Bambang S. (Asman Logistik Kendari)</div>
+                    <div style="font-size:11px; color:var(--text-hint); margin-top:4px;">Status: Menunggu instruksi
+                      pengeluaran barang</div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- AUDIT TRAIL LOG TIMELINE CARD -->
+            <div class="section-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div class="section-label" style="margin-bottom:0;">Histori Audit Trail Log & Persetujuan Transaksi
+                </div>
+                <span style="font-size:11px; color:var(--text-hint); font-weight:600;">Urutan Kronologis
+                  Terlengkap</span>
+              </div>
+
+              <div class="timeline-list" id="timeline-log-list">
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#166534; box-shadow:0 0 0 2px #BBF7D0;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 15:10 WIB</div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#166534;"></span>Disetujui</span>
+                  </div>
+                  <div class="timeline-title">Approval Manager UPT Cilegon (UITJBB) & Pengecekan Logistik</div>
+                  <div class="timeline-desc">Manager UPT Cilegon (Syaiful Bahri) menyetujui peminjaman 8 Pcs Guy Wire
+                    Anchor. Asman Logistik melakukan pengecekan fisik & penyiapan dokumen pengiriman.</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#166534; box-shadow:0 0 0 2px #BBF7D0;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 14:50 WIB</div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#166534;"></span>Disetujui</span>
+                  </div>
+                  <div class="timeline-title">Approval Manager UPT Bandung (UITJBT) & Pengecekan Logistik</div>
+                  <div class="timeline-desc">Manager UPT Bandung (Ahmad Fauzi) menyetujui peminjaman 2 Set Tower ERS
+                    Column. Asman Logistik memverifikasi kelayakan alat & siap kirim.</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#EA580C; box-shadow:0 0 0 2px #FED7AA;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 14:30 WIB</div>
+                    <span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FED7AA; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#EA580C;"></span>Menunggu</span>
+                  </div>
+                  <div class="timeline-title">Menunggu Persetujuan Manager UPT Surabaya (UITJBM)</div>
+                  <div class="timeline-desc">Menunggu respons Manager UPT Surabaya (UITJBM) terkait ketersediaan stok
+                    dan persetujuan peminjaman unit ERS yang telah dialokasikan.</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#166534; box-shadow:0 0 0 2px #BBF7D0;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 14:20 WIB</div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#166534;"></span>Disetujui</span>
+                  </div>
+                  <div class="timeline-title">Approval Barang Keluar oleh SRM Hartrans Coordinator Pengelola</div>
+                  <div class="timeline-desc">SRM Hartrans Coordinator Pengelola (Doni Prasetyo) menyetujui penerbitan
+                    barang keluar dan pengajuan pengeluaran barang ke Manager UPT Bandung, UPT Cilegon, & UPT
+                    Surabaya.</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#166534; box-shadow:0 0 0 2px #BBF7D0;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 11:30 WIB</div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#166534;"></span>Disetujui</span>
+                  </div>
+                  <div class="timeline-title">Verifikasi & Mapping Alokasi MSB Fashar Pengelola</div>
+                  <div class="timeline-desc">MSB Fashar Pengelola (Rahmat Kurniawan) berhasil memetakan alokasi unit ERS
+                    dari 3 Unit Induk Pengelola: UITJBT, UITJBB, & UITJBM
+                    sesuai kesiapan stok gudang.</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#166534; box-shadow:0 0 0 2px #BBF7D0;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 09:15 WIB</div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#166534;"></span>Disetujui</span>
+                  </div>
+                  <div class="timeline-title">Approval SRM Hartrans Unit Peminjam & Blast Data</div>
+                  <div class="timeline-desc">SRM Hartrans UIP3B Sumatera (Budi Raharjo) menyetujui permohonan peminjaman
+                    darurat ERS dan me-blast notifikasi permohonan ke 3 Unit Induk Pengelola (UITJBT, UITJBB, UITJBM).
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#EA580C; box-shadow:0 0 0 2px #FED7AA;"></div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="timeline-time">24 Feb 2026 - 08:00 WIB</div>
+                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;">
+                      <span class="chip-dot" style="background:#166534;"></span>Disetujui</span>
+                  </div>
+                  <div class="timeline-title">Pengajuan Mutasi Antar Unit Induk Dibuat</div>
+                  <div class="timeline-desc">Staff Operasional P3BS UPT Medan membuat permohonan mutasi ERS
+                    REQ202600000218 dengan destinasi Antar Unit Induk (UIP3B Sumatera).</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TAB 3: PENGECEKAN & PENGIRIMAN (PENGELOLA) -->
+          <div id="tab-pengecekan-pengelola" class="tab-pane">
+            <div class="section-card">
+              <div class="section-label">Informasi Pengiriman & Surat Jalan Gudang</div>
+              <div class="info-grid">
+                <div class="info-field">
+                  <label>Nomor Surat Jalan</label>
+                  <div class="info-val" style="font-family:monospace; font-weight:700;">SJ/GUD-MND/2026/089</div>
+                </div>
+                <div class="info-field">
+                  <label>Penyedia Ekspedisi / Kurir</label>
+                  <div class="info-val">PLN Logistics / Transportasi Internal</div>
+                </div>
+                <div class="info-field">
+                  <label>No. Polisi Kendaraan / Resi</label>
+                  <div class="info-val" style="font-family:monospace">DB 8402 AB / RESI-99218</div>
+                </div>
+                <div class="info-field">
+                  <label>Tanggal Berangkat Kirim</label>
+                  <div class="info-val">25 Februari 2026</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-label">Pengecekan Fisik & Karantina Alat (Pengelola)</div>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>Komponen / Alat ERS</th>
+                      <th>Jumlah Kirim</th>
+                      <th>Status Karantina</th>
+                      <th>Kondisi Fisik Pengelola</th>
+                      <th>Hasil Pengecekan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td style="font-weight:600">Tower ERS Column Structure 15m</td>
+                      <td>1 Set</td>
+                      <td><span class="chip" style="background:#F0FDF4; color:#166534">Lolos Karantina</span></td>
+                      <td>Bagus & Lengkap</td>
+                      <td><span class="chip" style="background:#EFF6FF; color:#1D4ED8">Siap Kirim</span></td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td style="font-weight:600">Guy Wire Anchor Assembly Heavy Duty</td>
+                      <td>4 Pcs</td>
+                      <td><span class="chip" style="background:#F0FDF4; color:#166534">Lolos Karantina</span></td>
+                      <td>Bagus & Lengkap</td>
+                      <td><span class="chip" style="background:#EFF6FF; color:#1D4ED8">Siap Kirim</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: PENERIMAAN (PEMINJAM) -->
+          <div id="tab-penerimaan" class="tab-pane">
+            <div class="section-card">
+              <div class="section-label">Status & Berita Acara Penerimaan Barang</div>
+              <div class="info-grid">
+                <div class="info-field">
+                  <label>Status Penerimaan</label>
+                  <div class="info-val"><span class="chip chip-proses"><span class="chip-dot"></span>Menunggu Kedatangan
+                      Barang</span></div>
+                </div>
+                <div class="info-field">
+                  <label>Penerima di Site / UPT</label>
+                  <div class="info-val">Supervisor Pemeliharaan UPT Makassar</div>
+                </div>
+                <div class="info-field">
+                  <label>Tanggal Estimasi Tiba</label>
+                  <div class="info-val">26 Februari 2026</div>
+                </div>
+                <div class="info-field">
+                  <label>Lokasi Posko Site</label>
+                  <div class="info-val">GI Tello 150kV Makassar</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-label">Checklist Verifikasi Fisik Saat Diterima</div>
+              <p style="font-size:13px; color:var(--text-hint); font-style:italic; margin-bottom:16px;">*Formulir
+                verifikasi penerimaan barang akan diisi oleh Peminjam setelah fisik alat ERS tiba di lokasi site.</p>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>Nama Alat</th>
+                      <th>Jumlah Dikirim</th>
+                      <th>Jumlah Diterima</th>
+                      <th>Kondisi Saat Diterima</th>
+                      <th>Catatan Penerima</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td style="font-weight:600">Tower ERS Column Structure 15m</td>
+                      <td>1 Set</td>
+                      <td>1 Set</td>
+                      <td><span class="chip" style="background:#FEFCE8; color:#854D0E">Menunggu Verifikasi</span></td>
+                      <td>-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: PROSES PENGEMBALIAN -->
+          <div id="tab-pengembalian" class="tab-pane">
+            <div class="section-card">
+              <div class="section-label">Status & Transaksi Pengembalian ERS</div>
+              <div
+                style="background:#F8FAFC; border:1px solid var(--border); border-radius:var(--radius-sm); padding:20px; text-align:center; color:var(--text-secondary);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"
+                  style="margin-bottom:8px;">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+                <div style="font-size:14px; font-weight:600; color:var(--text-primary);">Tahap Pengembalian Belum
+                  Dimulai
+                </div>
+                <div style="font-size:12px; color:var(--text-hint); margin-top:4px;">Proses pengembalian alat dapat
+                  diajukan setelah masa peminjaman selesai dan alat dikembalikan ke gudang pengelola.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 340px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        Notes & Validasi Detail Mutasi (Antar UIT)
+      </h3>
+      <ul>
+        <li><strong>User Access:</strong> Dapat diakses oleh semua user yang berkepentingan dengan privilege
+          <code>read</code>.
+        </li>
+        <li><strong>Hierarki Persetujuan Antar UIT (4 Step):</strong>
+          <ol style="margin-left:16px; margin-top:4px; font-size:12px; color:var(--text-secondary);">
+            <li>Step 1: Approval SRM Hartrans Unit Peminjam + Blast Data (Multi-Destinasi).</li>
+            <li>Step 2: Verifikasi & Mapping Alokasi MSB Fashar Pengelola (Sesuai request / Re-alokasi / Reject).</li>
+            <li>Step 3: Approval Barang Keluar SRM Hartrans Pengelola (Pengajuan Notifikasi ke UPT).</li>
+            <li>Step 4: Persetujuan Manager UPT Pengelola & Pengecekan Asman Logistik.</li>
+          </ol>
+        </li>
+        <li><strong>Alur Penolakan Manager UPT:</strong> Apabila Manager UPT menolak persetujuan stok, data dikembalikan
+          ke <u>MSB Fashar Pengelola (Step 2)</u> untuk dialokasikan ulang. Jika setuju, disiapkan oleh Asman Logistik.
+        </li>
+      </ul>
+    </div>
+
+    <script>
+      function toggleApprovalMode(mode) {
+        const modeUit = document.getElementById('approval-mode-uit');
+        const modeUpt = document.getElementById('approval-mode-upt');
+        const btnUit = document.getElementById('mode-uit-btn');
+        const btnUpt = document.getElementById('mode-upt-btn');
+
+        if (mode === 'uit') {
+          modeUit.style.display = 'block';
+          modeUpt.style.display = 'none';
+          btnUit.style.background = '#fff';
+          btnUit.style.color = 'var(--pln-blue)';
+          btnUit.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+          btnUpt.style.background = 'transparent';
+          btnUpt.style.color = '#fff';
+          btnUpt.style.boxShadow = 'none';
+        } else {
+          modeUit.style.display = 'none';
+          modeUpt.style.display = 'block';
+          btnUpt.style.background = '#fff';
+          btnUpt.style.color = 'var(--pln-blue)';
+          btnUpt.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+          btnUit.style.background = 'transparent';
+          btnUit.style.color = '#fff';
+          btnUit.style.boxShadow = 'none';
+        }
+      }
+
+      function switchTab(tabId, element) {
+        const panes = document.querySelectorAll('.tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        if (element) element.classList.add('active');
+
+        // Sync stepper active underline
+        const stepMap = {
+          'tab-peminjaman': 0,
+          'tab-approval': 1,
+          'tab-pengecekan-pengelola': 2,
+          'tab-penerimaan': 3,
+          'tab-pengembalian': 4
+        };
+        const stepIndex = stepMap[tabId];
+        if (stepIndex !== undefined) {
+          const steps = document.querySelectorAll('.workflow-stepper .step-item');
+          steps.forEach((step, idx) => {
+            if (idx === stepIndex) {
+              step.classList.add('active');
+            } else {
+              step.classList.remove('active');
+            }
+          });
+        }
+      }
+
+      function switchStep(stepIndex, tabId) {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        switchTab(tabId, tabButtons[stepIndex]);
+      }
+    </script>
+
+    <!-- DETAIL PANEL (COPIED EXACTLY FROM PREVIEW PAGE) -->
+    <div id="det-backdrop" class="side-backdrop" onclick="closeDetailPanel()"></div>
+    <div id="det-panel" class="side-panel" style="width:65%">
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div>
+          <div style="font-size:14px;font-weight:600" id="det-panel-title">Detail Set Peminjaman</div>
+          <div style="font-size:12px;color:var(--text-hint);margin-top:2px" id="det-subtitle">-</div>
+        </div>
+        <button onclick="closeDetailPanel()"
+          style="width:32px;height:32px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="det-banner"
+        style="margin:14px 22px 0;padding:10px 14px;border-radius:var(--radius-sm);display:flex;align-items:flex-start;gap:9px;flex-shrink:0">
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:16px 22px">
+        <div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden">
+          <table style="width:100%">
+            <thead id="det-thead"></thead>
+            <tbody id="det-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div
+        style="border-top:1px solid var(--border);padding:12px 22px;display:flex;justify-content:flex-end;flex-shrink:0">
+        <button onclick="closeDetailPanel()"
+          style="padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer">Tutup</button>
+      </div>
+    </div>
+
+    <!-- SET KOMPONEN SUB-PANEL (COPIED EXACTLY FROM PREVIEW PAGE) -->
+    <div id="sk-backdrop" style="position:fixed;inset:0;background:rgba(10,20,50,.25);z-index:302;display:none"
+      onclick="closeSetKomponen()"></div>
+    <div id="sk-panel" class="side-panel" style="width:70%;z-index:303">
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div>
+          <div style="font-size:14px;font-weight:600">Detail Komponen Set</div>
+          <div style="font-size:12px;color:var(--text-hint);margin-top:2px">Merk: <strong id="sk-merk">-</strong>
+            &nbsp;·&nbsp; Template: <strong id="sk-template">-</strong></div>
+        </div>
+        <button onclick="closeSetKomponen()"
+          style="width:32px;height:32px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px 22px">
+        <div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden">
+          <table style="width:100%">
+            <thead id="sk-thead"></thead>
+            <tbody id="sk-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div
+        style="border-top:1px solid var(--border);padding:12px 22px;display:flex;justify-content:flex-end;flex-shrink:0">
+        <button onclick="closeSetKomponen()"
+          style="padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer">Tutup</button>
+      </div>
+    </div>
 </body>
+
 </html>
