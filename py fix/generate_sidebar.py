@@ -3,7 +3,7 @@ import re
 
 root_dir = r'C:\KERJAAN\Project\hifi-transmisi'
 home_html_path = os.path.join(root_dir, 'hifi-home', 'home.html')
-exclude_dirs = {'.git', '.github', 'py fix', 'hifi-home'}
+exclude_dirs = {'.git', '.github', '.agents', 'py fix', 'hifi-home', 'data', 'script', 'node_modules'}
 
 # 1. Gather all files
 tree = {}
