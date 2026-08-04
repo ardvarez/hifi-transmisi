@@ -9,6 +9,7 @@
   <script>
     var currentDestinasi = 'uit';
     var currentTipe = 'satuan';
+    var currentStatus = 'proses4';
 
     function toggleApprovalMode(mode) {
       const modeUit = document.getElementById('approval-mode-uit');
@@ -153,6 +154,234 @@
       setTipeSimulasi(mode);
     }
 
+    function setStepperState(idx, state) {
+      var item = document.getElementById('stepper-item-' + idx);
+      if (!item) return;
+      item.classList.remove('completed', 'processing', 'rejected');
+      var icon = item.querySelector('.step-icon');
+      if (state === 'completed') {
+        item.classList.add('completed');
+        if (icon) icon.innerHTML = '✓';
+      } else if (state === 'processing') {
+        item.classList.add('processing');
+        if (icon) icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: stepSpin 1.5s linear infinite;"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg>';
+      } else if (state === 'rejected') {
+        item.classList.add('rejected');
+        if (icon) icon.innerHTML = '✕';
+      } else {
+        if (icon) icon.innerHTML = String(idx + 1);
+      }
+    }
+
+    function setTabStatusBadge(id, state) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (state === 'completed') {
+        el.style.display = 'inline-flex';
+        el.style.background = '#F0FDF4'; el.style.color = '#166534'; el.style.border = '1px solid #BBF7D0';
+        el.textContent = '✓ Selesai';
+      } else if (state === 'processing') {
+        el.style.display = 'inline-flex';
+        el.style.background = '#EFF6FF'; el.style.color = '#1D4ED8'; el.style.border = '1px solid #BFDBFE';
+        el.textContent = '● Proses';
+      } else if (state === 'rejected') {
+        el.style.display = 'inline-flex';
+        el.style.background = '#FEE2E2'; el.style.color = '#DC2626'; el.style.border = '1px solid #FECACA';
+        el.textContent = '✕ Ditolak';
+      } else {
+        el.style.display = 'none';
+      }
+    }
+
+    function setStatusSimulasi(status) {
+      currentStatus = status;
+
+      // ---- PILL STYLING ----
+      var pillIds = { proses4: 'sim-status-proses4', selesai: 'sim-status-selesai', reject3: 'sim-status-reject3' };
+      var pillColors = { proses4: '#C2410C', selesai: '#166534', reject3: '#DC2626' };
+      Object.keys(pillIds).forEach(function (key) {
+        var btn = document.getElementById(pillIds[key]);
+        if (!btn) return;
+        if (key === status) {
+          btn.style.background = '#fff';
+          btn.style.color = pillColors[key];
+          btn.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--text-secondary)';
+          btn.style.boxShadow = 'none';
+        }
+      });
+
+      // ---- ELEMENT REFS ----
+      var summaryChip = document.getElementById('summary-status-chip');
+      var step3Chip = document.getElementById('step3-status-chip');
+      var step3Msg = document.getElementById('step3-message');
+      var step3UitjbmCard = document.getElementById('step3-uitjbm-card');
+      var step3UitjbmChip = document.getElementById('step3-uitjbm-chip');
+      var step3UitjbmStatus = document.getElementById('step3-uitjbm-status');
+      var step4Card = document.getElementById('step4-card');
+      var step4Chip = document.getElementById('step4-status-chip');
+      var step4LockedBanner = document.getElementById('step4-locked-banner');
+      var step4UitjbmCard = document.getElementById('step4-uitjbm-card');
+      var step4UitjbmChip = document.getElementById('step4-uitjbm-chip');
+      var step4UitjbmHint = document.getElementById('step4-uitjbm-hint');
+      var step4UitjbmNote = document.getElementById('step4-uitjbm-note');
+      var step4UitjbmAsman = document.getElementById('step4-uitjbm-asman');
+      var timelineList = document.getElementById('timeline-log-list');
+
+      // Bersihkan entri timeline hasil injeksi simulasi sebelumnya
+      document.querySelectorAll('.sim-injected-timeline').forEach(function (el) { el.remove(); });
+
+      if (status === 'selesai') {
+        // ===== SELESAI POSITIF FLOW (Step 1-4 seluruhnya Disetujui) =====
+        if (summaryChip) {
+          summaryChip.className = 'chip';
+          summaryChip.style.background = '#F0FDF4';
+          summaryChip.style.color = '#166534';
+          summaryChip.style.border = '1px solid #BBF7D0';
+          summaryChip.innerHTML = '<span class="chip-dot" style="background:#166534;"></span>Selesai';
+        }
+        if (step3Chip) {
+          step3Chip.style.background = '#F0FDF4'; step3Chip.style.color = '#166534'; step3Chip.style.border = '1px solid #BBF7D0';
+          step3Chip.innerHTML = '<span class="chip-dot"></span>Barang Keluar Disetujui';
+        }
+        if (step3Msg) step3Msg.innerHTML = '💬 <em>"Menyetujui penerbitan Pengajuan barang keluar ERS berdasarkan alokasi MSB Fashar. Notifikasi Pengajuan diteruskan ke Manager UPT masing-masing Unit Pengelola."</em>';
+        if (step3UitjbmCard) step3UitjbmCard.style.border = '1px solid #FED7AA';
+        if (step3UitjbmChip) { step3UitjbmChip.style.background = '#F0FDF4'; step3UitjbmChip.style.color = '#166534'; step3UitjbmChip.textContent = 'Pengajuan Disetujui'; }
+        if (step3UitjbmStatus) { step3UitjbmStatus.style.background = '#FFF7ED'; step3UitjbmStatus.style.border = '1px solid #FFEDD5'; step3UitjbmStatus.style.color = '#C2410C'; step3UitjbmStatus.textContent = 'Status: Notifikasi Pengajuan Didelegasikan ke UPT Surabaya'; }
+
+        if (step4Card) { step4Card.style.opacity = '1'; step4Card.style.pointerEvents = 'auto'; }
+        if (step4LockedBanner) step4LockedBanner.style.display = 'none';
+        if (step4Chip) {
+          step4Chip.className = 'chip';
+          step4Chip.style.background = '#F0FDF4'; step4Chip.style.color = '#166534'; step4Chip.style.border = '1px solid #BBF7D0';
+          step4Chip.innerHTML = '<span class="chip-dot" style="background:#166534;"></span>Selesai (3/3 Disetujui)';
+        }
+        if (step4UitjbmCard) step4UitjbmCard.style.border = '1px solid #CBD5E1';
+        if (step4UitjbmChip) { step4UitjbmChip.className = 'chip'; step4UitjbmChip.style.background = '#F0FDF4'; step4UitjbmChip.style.color = '#166534'; step4UitjbmChip.style.fontSize = '11px'; step4UitjbmChip.textContent = 'Setuju (2 Set Base Plate)'; }
+        if (step4UitjbmHint) step4UitjbmHint.textContent = 'Approved: 24 Feb 2026 15:40 WIB';
+        if (step4UitjbmNote) { step4UitjbmNote.style.background = '#F8FAFC'; step4UitjbmNote.style.border = '1px solid var(--border)'; step4UitjbmNote.style.color = 'var(--text-secondary)'; step4UitjbmNote.textContent = '"Stok gudang Surabaya terverifikasi lengkap & diizinkan untuk dipinjamkan."'; }
+        if (step4UitjbmAsman) { step4UitjbmAsman.className = 'chip'; step4UitjbmAsman.style.background = '#EFF6FF'; step4UitjbmAsman.style.color = '#1D4ED8'; step4UitjbmAsman.style.fontSize = '10px'; step4UitjbmAsman.style.padding = '2px 8px'; step4UitjbmAsman.textContent = '✓ Checked & Siap Kirim'; }
+
+        if (timelineList) {
+          var itemSelesai = document.createElement('div');
+          itemSelesai.className = 'timeline-item sim-injected-timeline';
+          itemSelesai.innerHTML = '<div class="timeline-dot" style="background:#166534; box-shadow:0 0 0 2px #BBF7D0;"></div>' +
+            '<div style="display:flex; align-items:center; gap:8px;">' +
+            '<div class="timeline-time">24 Feb 2026 - 15:40 WIB</div>' +
+            '<span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; font-size:10px; padding:2px 8px;"><span class="chip-dot" style="background:#166534;"></span>Disetujui</span>' +
+            '</div>' +
+            '<div class="timeline-title">Approval Manager UPT Surabaya (UITJBM) & Mutasi Selesai</div>' +
+            '<div class="timeline-desc">Manager UPT Surabaya (Bambang H.) menyetujui peminjaman 2 Set Base Plate. Seluruh unit pengelola telah menyetujui & barang siap dikirim. Proses mutasi dinyatakan Selesai.</div>';
+          timelineList.insertBefore(itemSelesai, timelineList.firstChild);
+        }
+
+        // ---- IMPACT: WORKFLOW STEPPER (ATAS) & TAB BAR ----
+        setStepperState(1, 'completed');
+        setStepperState(2, 'completed');
+        setStepperState(3, 'completed');
+        setStepperState(4, 'completed');
+        setTabStatusBadge('tabbtn-approval-badge', 'completed');
+        setTabStatusBadge('tabbtn-pengecekan-badge', 'completed');
+        setTabStatusBadge('tabbtn-penerimaan-badge', 'completed');
+        setTabStatusBadge('tabbtn-pengembalian-badge', 'completed');
+
+      } else if (status === 'reject3') {
+        // ===== CASE DITOLAK DI STEP 3 (Sebagian Unit Direject) =====
+        if (summaryChip) {
+          summaryChip.className = 'chip';
+          summaryChip.style.background = '#FEE2E2'; summaryChip.style.color = '#DC2626'; summaryChip.style.border = '1px solid #FECACA';
+          summaryChip.innerHTML = '<span class="chip-dot" style="background:#DC2626;"></span>Ada Item Ditolak - Realokasi Diperlukan';
+        }
+        if (step3Chip) {
+          step3Chip.style.background = '#FEE2E2'; step3Chip.style.color = '#DC2626'; step3Chip.style.border = '1px solid #FECACA';
+          step3Chip.innerHTML = '<span class="chip-dot" style="background:#DC2626;"></span>2 Disetujui, 1 Ditolak';
+        }
+        if (step3Msg) step3Msg.innerHTML = '💬 <em>"Menyetujui penerbitan barang keluar untuk UITJBT & UITJBB. Pengajuan untuk UITJBM DITOLAK karena kondisi fisik Base Plate tidak sesuai hasil mapping MSB Fashar. Data dikembalikan ke MSB Fashar Pengelola (Step 2) untuk dialokasikan ulang."</em>';
+        if (step3UitjbmCard) step3UitjbmCard.style.border = '1px solid #FECACA';
+        if (step3UitjbmChip) { step3UitjbmChip.style.background = '#FEE2E2'; step3UitjbmChip.style.color = '#DC2626'; step3UitjbmChip.textContent = 'Pengajuan Ditolak'; }
+        if (step3UitjbmStatus) { step3UitjbmStatus.style.background = '#FEE2E2'; step3UitjbmStatus.style.border = '1px solid #FECACA'; step3UitjbmStatus.style.color = '#DC2626'; step3UitjbmStatus.textContent = 'Status: Ditolak - Kondisi Fisik Base Plate Tidak Sesuai, Menunggu Realokasi Step 2'; }
+
+        if (step4Card) { step4Card.style.opacity = '0.45'; step4Card.style.pointerEvents = 'none'; }
+        if (step4LockedBanner) step4LockedBanner.style.display = 'flex';
+        if (step4Chip) {
+          step4Chip.className = 'chip';
+          step4Chip.style.background = '#FEE2E2'; step4Chip.style.color = '#DC2626'; step4Chip.style.border = '1px solid #FECACA';
+          step4Chip.innerHTML = '<span class="chip-dot" style="background:#DC2626;"></span>Tertunda (Menunggu Realokasi Step 2)';
+        }
+        if (step4UitjbmCard) step4UitjbmCard.style.border = '1px solid #E2E8F0';
+        if (step4UitjbmChip) { step4UitjbmChip.className = 'chip'; step4UitjbmChip.style.background = '#F1F5F9'; step4UitjbmChip.style.color = '#64748B'; step4UitjbmChip.style.fontSize = '11px'; step4UitjbmChip.textContent = 'Diblokir'; }
+        if (step4UitjbmHint) step4UitjbmHint.textContent = 'Status: Menunggu hasil realokasi ulang Step 2';
+        if (step4UitjbmNote) { step4UitjbmNote.style.background = '#F1F5F9'; step4UitjbmNote.style.border = '1px solid #E2E8F0'; step4UitjbmNote.style.color = '#64748B'; step4UitjbmNote.textContent = '🚫 Proses dihentikan sementara akibat penolakan sebagian di Step 3.'; }
+        if (step4UitjbmAsman) { step4UitjbmAsman.className = ''; step4UitjbmAsman.style.background = 'transparent'; step4UitjbmAsman.style.padding = '0'; step4UitjbmAsman.style.color = 'var(--text-hint)'; step4UitjbmAsman.textContent = '—'; }
+
+        if (timelineList) {
+          var itemReject = document.createElement('div');
+          itemReject.className = 'timeline-item sim-injected-timeline';
+          itemReject.innerHTML = '<div class="timeline-dot" style="background:#DC2626; box-shadow:0 0 0 2px #FECACA;"></div>' +
+            '<div style="display:flex; align-items:center; gap:8px;">' +
+            '<div class="timeline-time">24 Feb 2026 - 14:30 WIB</div>' +
+            '<span class="chip" style="background:#FEE2E2; color:#DC2626; border:1px solid #FECACA; font-size:10px; padding:2px 8px;"><span class="chip-dot" style="background:#DC2626;"></span>Ditolak</span>' +
+            '</div>' +
+            '<div class="timeline-title">Pengajuan Barang Keluar UITJBM Ditolak SRM Hartrans Pengelola</div>' +
+            '<div class="timeline-desc">SRM Hartrans Coordinator Pengelola (Doni Prasetyo) menolak pengajuan barang keluar untuk UITJBM (UPT Surabaya) karena kondisi fisik Base Plate tidak sesuai. Data dikembalikan ke MSB Fashar Pengelola (Step 2) untuk realokasi ulang.</div>';
+          timelineList.insertBefore(itemReject, timelineList.firstChild);
+        }
+
+        // ---- IMPACT: WORKFLOW STEPPER (ATAS) & TAB BAR ----
+        // Approval & Review terhenti/ditolak akibat case Step 3 ditolak -> proses lanjutan belum bisa dimulai
+        setStepperState(1, 'rejected');
+        setStepperState(2, 'pending');
+        setStepperState(3, 'pending');
+        setStepperState(4, 'pending');
+        setTabStatusBadge('tabbtn-approval-badge', 'rejected');
+        setTabStatusBadge('tabbtn-pengecekan-badge', null);
+        setTabStatusBadge('tabbtn-penerimaan-badge', null);
+        setTabStatusBadge('tabbtn-pengembalian-badge', null);
+
+      } else {
+        // ===== DEFAULT: SEDANG BERLANGSUNG SAMPAI STEP 4 (2/3 Approved) =====
+        status = 'proses4';
+        if (summaryChip) {
+          summaryChip.className = 'chip chip-proses';
+          summaryChip.style.background = ''; summaryChip.style.color = ''; summaryChip.style.border = '';
+          summaryChip.innerHTML = '<span class="chip-dot"></span>Sedang diproses';
+        }
+        if (step3Chip) {
+          step3Chip.style.background = '#F0FDF4'; step3Chip.style.color = '#166534'; step3Chip.style.border = '1px solid #BBF7D0';
+          step3Chip.innerHTML = '<span class="chip-dot"></span>Barang Keluar Disetujui';
+        }
+        if (step3Msg) step3Msg.innerHTML = '💬 <em>"Menyetujui penerbitan Pengajuan barang keluar ERS berdasarkan alokasi MSB Fashar. Notifikasi Pengajuan diteruskan ke Manager UPT masing-masing Unit Pengelola."</em>';
+        if (step3UitjbmCard) step3UitjbmCard.style.border = '1px solid #FED7AA';
+        if (step3UitjbmChip) { step3UitjbmChip.style.background = '#F0FDF4'; step3UitjbmChip.style.color = '#166534'; step3UitjbmChip.textContent = 'Pengajuan Disetujui'; }
+        if (step3UitjbmStatus) { step3UitjbmStatus.style.background = '#FFF7ED'; step3UitjbmStatus.style.border = '1px solid #FFEDD5'; step3UitjbmStatus.style.color = '#C2410C'; step3UitjbmStatus.textContent = 'Status: Notifikasi Pengajuan Didelegasikan ke UPT Surabaya'; }
+
+        if (step4Card) { step4Card.style.opacity = '1'; step4Card.style.pointerEvents = 'auto'; }
+        if (step4LockedBanner) step4LockedBanner.style.display = 'none';
+        if (step4Chip) {
+          step4Chip.className = 'chip chip-proses';
+          step4Chip.style.background = ''; step4Chip.style.color = ''; step4Chip.style.border = '';
+          step4Chip.innerHTML = '<span class="chip-dot"></span>Sedang Berlangsung (2/3 Approved)';
+        }
+        if (step4UitjbmCard) step4UitjbmCard.style.border = '1px solid #CBD5E1';
+        if (step4UitjbmChip) { step4UitjbmChip.className = 'chip chip-tunggu'; step4UitjbmChip.style.background = ''; step4UitjbmChip.style.color = ''; step4UitjbmChip.style.fontSize = '11px'; step4UitjbmChip.textContent = 'Menunggu Persetujuan'; }
+        if (step4UitjbmHint) step4UitjbmHint.textContent = 'Status: Melakukan inspeksi fisik stok gudang';
+        if (step4UitjbmNote) { step4UitjbmNote.style.background = '#FEFCE8'; step4UitjbmNote.style.border = '1px solid #FEF08A'; step4UitjbmNote.style.color = '#854D0E'; step4UitjbmNote.textContent = '⏳ Dalam verifikasi fisik base plate sebelum penandatanganan.'; }
+        if (step4UitjbmAsman) { step4UitjbmAsman.className = ''; step4UitjbmAsman.style.background = 'transparent'; step4UitjbmAsman.style.padding = '0'; step4UitjbmAsman.style.color = 'var(--text-hint)'; step4UitjbmAsman.textContent = 'Menunggu Manager UPT'; }
+
+        // ---- IMPACT: WORKFLOW STEPPER (ATAS) & TAB BAR ----
+        setStepperState(1, 'processing');
+        setStepperState(2, 'pending');
+        setStepperState(3, 'pending');
+        setStepperState(4, 'pending');
+        setTabStatusBadge('tabbtn-approval-badge', 'processing');
+        setTabStatusBadge('tabbtn-pengecekan-badge', null);
+        setTabStatusBadge('tabbtn-penerimaan-badge', null);
+        setTabStatusBadge('tabbtn-pengembalian-badge', null);
+      }
+    }
+
     
     function renderTabs345(uptList, isUit, units) {
       var tab3Container = document.getElementById('tab3-container');
@@ -187,9 +416,9 @@
             : '<th style="width:36px;text-align:center">No.</th><th>Kategori</th><th>Section</th><th>Nama Item</th><th style="width:90px;text-align:center">Jumlah</th><th style="width:180px;text-align:center">Status Pengecekan & Pengiriman</th>';
 
           var tableRows3 = isSet
-            ? '<tr><td style="text-align:center;color:var(--text-hint)">1</td><td>TOWER SOLUTION</td><td>Tower Column ERS</td><td>150kV</td><td style="text-align:center;font-weight:600">2 Set</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Sudah Dikirim</span></td></tr>'
-            + '<tr><td style="text-align:center;color:var(--text-hint)">2</td><td>TOWER SOLUTION</td><td>Guying & Anchor ERS</td><td>150kV</td><td style="text-align:center;font-weight:600">1 Set</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Sudah Dikirim</span></td></tr>'
-            + '<tr><td style="text-align:center;color:var(--text-hint)">3</td><td>TOWER SOLUTION</td><td>Base Plate ERS</td><td>150kV</td><td style="text-align:center;font-weight:600">4 Set</td><td style="text-align:center"><span class="chip" style="background:#FFF7ED;color:#C2410C"><span class="chip-dot" style="background:#EA580C"></span>Belum Dicek</span></td></tr>'
+            ? '<tr><td style="text-align:center;color:var(--text-hint)">1</td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:600">2 Set</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Sudah Dikirim</span></td></tr>'
+            + '<tr><td style="text-align:center;color:var(--text-hint)">2</td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:600">1 Set</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Sudah Dikirim</span></td></tr>'
+            + '<tr><td style="text-align:center;color:var(--text-hint)">3</td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:600">4 Set</td><td style="text-align:center"><span class="chip" style="background:#FFF7ED;color:#C2410C"><span class="chip-dot" style="background:#EA580C"></span>Belum Dicek</span></td></tr>'
             : '<tr><td style="text-align:center;color:var(--text-hint)">1</td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Struktur ERS</span></td><td>Tower Column 15m</td><td>Tower Structure 150kV</td><td style="text-align:center;font-weight:600">2</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Sudah Dikirim</span></td></tr>'
             + '<tr><td style="text-align:center;color:var(--text-hint)">2</td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Aksesoris ERS</span></td><td>Guying & Anchor</td><td>Anchor Assembly</td><td style="text-align:center;font-weight:600">1</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Sudah Dikirim</span></td></tr>'
             + '<tr><td style="text-align:center;color:var(--text-hint)">3</td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Pondasi ERS</span></td><td>Base Plate & Guy Wire</td><td>Base Plate</td><td style="text-align:center;font-weight:600">4</td><td style="text-align:center"><span class="chip" style="background:#FFF7ED;color:#C2410C"><span class="chip-dot" style="background:#EA580C"></span>Belum Dicek</span></td></tr>';
@@ -226,9 +455,9 @@
             : '<th style="width:36px;text-align:center">No.</th><th>Kategori</th><th>Section</th><th>Nama Item</th><th style="width:95px;text-align:center">Jumlah Dikirim</th><th style="width:95px;text-align:center">Jumlah Diterima</th><th style="width:160px;text-align:center">Status Penerimaan</th><th style="width:120px;text-align:center">Evidence</th>';
 
           var tableRows4 = isSet
-            ? '<tr><td style="text-align:center;color:var(--text-hint)">1</td><td>TOWER SOLUTION</td><td>Tower Column ERS</td><td>150kV</td><td style="text-align:center;font-weight:600">2 Set</td><td style="text-align:center;font-weight:700;color:#166534">2 Set</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Diterima Lengkap</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Tower Column ERS\', \'Lengkap\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
-            + '<tr><td style="text-align:center;color:var(--text-hint)">2</td><td>TOWER SOLUTION</td><td>Guying & Anchor ERS</td><td>150kV</td><td style="text-align:center;font-weight:600">1 Set</td><td style="text-align:center;font-weight:700;color:#1D4ED8">0 Set</td><td style="text-align:center"><span class="chip" style="background:#EFF6FF;color:#1D4ED8"><span class="chip-dot" style="background:#2563EB"></span>Dalam Pengiriman</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Guying & Anchor ERS\', \'Dalam Pengiriman\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
-            + '<tr><td style="text-align:center;color:var(--text-hint)">3</td><td>TOWER SOLUTION</td><td>Base Plate ERS</td><td>150kV</td><td style="text-align:center;font-weight:600">4 Set</td><td style="text-align:center;font-weight:700;color:#DC2626">3 Set</td><td style="text-align:center"><span class="chip" style="background:#FEF2F2;color:#991B1B"><span class="chip-dot" style="background:#DC2626"></span>Defisit 1 Set</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Base Plate ERS\', \'Defisit 1 Set\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
+            ? '<tr><td style="text-align:center;color:var(--text-hint)">1</td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:600">2 Set</td><td style="text-align:center;font-weight:700;color:#166534">2 Set</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Diterima Lengkap</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Tower Column ERS\', \'Lengkap\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
+            + '<tr><td style="text-align:center;color:var(--text-hint)">2</td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:600">1 Set</td><td style="text-align:center;font-weight:700;color:#1D4ED8">0 Set</td><td style="text-align:center"><span class="chip" style="background:#EFF6FF;color:#1D4ED8"><span class="chip-dot" style="background:#2563EB"></span>Dalam Pengiriman</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Guying & Anchor ERS\', \'Dalam Pengiriman\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
+            + '<tr><td style="text-align:center;color:var(--text-hint)">3</td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:600">4 Set</td><td style="text-align:center;font-weight:700;color:#DC2626">3 Set</td><td style="text-align:center"><span class="chip" style="background:#FEF2F2;color:#991B1B"><span class="chip-dot" style="background:#DC2626"></span>Defisit 1 Set</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Base Plate ERS\', \'Defisit 1 Set\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
             : '<tr><td style="text-align:center;color:var(--text-hint)">1</td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Struktur ERS</span></td><td>Tower Column 15m</td><td>Tower Structure 150kV</td><td style="text-align:center;font-weight:600">2</td><td style="text-align:center;font-weight:700;color:#166534">2</td><td style="text-align:center"><span class="chip" style="background:#F0FDF4;color:#166534"><span class="chip-dot" style="background:#166534"></span>Diterima Lengkap</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Tower Structure 150kV\', \'Lengkap\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
             + '<tr><td style="text-align:center;color:var(--text-hint)">2</td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Aksesoris ERS</span></td><td>Guying & Anchor</td><td>Anchor Assembly</td><td style="text-align:center;font-weight:600">1</td><td style="text-align:center;font-weight:700;color:#1D4ED8">0</td><td style="text-align:center"><span class="chip" style="background:#EFF6FF;color:#1D4ED8"><span class="chip-dot" style="background:#2563EB"></span>Dalam Pengiriman</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Anchor Assembly\', \'Dalam Pengiriman\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
             + '<tr><td style="text-align:center;color:var(--text-hint)">3</td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Pondasi ERS</span></td><td>Base Plate & Guy Wire</td><td>Base Plate</td><td style="text-align:center;font-weight:600">4</td><td style="text-align:center;font-weight:700;color:#DC2626">3</td><td style="text-align:center"><span class="chip" style="background:#FEF2F2;color:#991B1B"><span class="chip-dot" style="background:#DC2626"></span>Defisit 1</span></td><td style="text-align:center"><button onclick="openEvidenceModal(\'Base Plate\', \'Defisit 1\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Evidence Penerimaan"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>';
@@ -460,15 +689,15 @@
 
         if (tbody) {
           var row1 = isSet
-            ? '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">1</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBT</div></td><td>TOWER SOLUTION</td><td>Tower Column ERS</td><td>150kV</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">2 Set</td><td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBT\', \'2 Set Tower\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
+            ? '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">1</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBT</div></td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">2 Set</td><td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBT\', \'2 Set Tower\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
             : '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">1</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBT</div></td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Struktur ERS</span></td><td>Tower Column 15m</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">4</td><td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBT\', \'4\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>';
 
           var row2 = isSet
-            ? '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">2</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBB</div></td><td>TOWER SOLUTION</td><td>Guying & Anchor ERS</td><td>150kV</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">1 Set</td><td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBB\', \'1 Set Anchor Assembly\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
+            ? '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">2</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBB</div></td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">1 Set</td><td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBB\', \'1 Set Anchor Assembly\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>'
             : '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">2</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBB</div></td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Aksesoris ERS</span></td><td>Guying & Anchor</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">8</td><td><span class="chip" style="background:#F0FDF4; color:#166534;"><span class="chip-dot"></span>Alokasi Disetujui</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBB\', \'8\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td></tr>';
 
           var row3 = isSet
-            ? '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">3</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBM</div></td><td>TOWER SOLUTION</td><td>Base Plate ERS</td><td>150kV</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">4 Set</td><td><span class="chip chip-tunggu"><span class="chip-dot"></span>Menunggu Persetujuan</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBM\', \'4 Set Base Plate\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button></td></tr>'
+            ? '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">3</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBM</div></td><td>TOWER SOLUTION</td><td>Suspension</td><td>150kV</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">4 Set</td><td><span class="chip chip-tunggu"><span class="chip-dot"></span>Menunggu Persetujuan</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBM\', \'4 Set Base Plate\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button></td></tr>'
             : '<tr><td style="text-align:center;color:var(--text-hint);font-size:12px">3</td><td><div style="font-weight:700;color:var(--text-primary)">UITJBM</div></td><td><span class="chip" style="background:#F1F5F9; color:#475569; padding:2px 8px;">Pondasi ERS</span></td><td>Base Plate & Guy Wire</td><td style="text-align:center;font-weight:700;color:var(--pln-blue)">2</td><td><span class="chip chip-tunggu"><span class="chip-dot"></span>Menunggu Persetujuan</span></td><td style="text-align:center"><button onclick="openDetailPanel(\'UITJBM\', \'2\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--pln-blue)" title="Lihat Detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button></td></tr>';
 
           tbody.innerHTML = row1 + row2 + row3;
@@ -846,6 +1075,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
       updateUnitTable();
+      setStatusSimulasi('proses4');
     });
   </script>
   <style>
@@ -1894,6 +2124,29 @@
                   </button>
                 </div>
               </div>
+
+              <!-- KONDISI STATUS SELECTOR -->
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">Kondisi Status:</span>
+                <div
+                  style="display:inline-flex; background:var(--surface); padding:2px; border-radius:20px; border:1px solid var(--border);">
+                  <button id="sim-status-proses4" class="sim-pill-btn" onclick="setStatusSimulasi('proses4')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:#fff; color:#C2410C; box-shadow:0 1px 4px rgba(0,0,0,0.1);"
+                    title="Sedang berlangsung sampai Step 4">
+                    ⏳ Proses s.d Step 4
+                  </button>
+                  <button id="sim-status-selesai" class="sim-pill-btn" onclick="setStatusSimulasi('selesai')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary);"
+                    title="Selesai Positif Flow (Semua Step Disetujui)">
+                    ✅ Selesai Positif
+                  </button>
+                  <button id="sim-status-reject3" class="sim-pill-btn" onclick="setStatusSimulasi('reject3')"
+                    style="border:none; padding:4px 12px; border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-secondary);"
+                    title="Case Ditolak pada Step 3">
+                    ❌ Reject di Step 3
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1907,7 +2160,7 @@
                 <polyline points="14 2 14 8 20 8"></polyline>
               </svg>
               <h2>REQ202600000218</h2>
-              <span class="chip chip-proses"><span class="chip-dot"></span>Sedang diproses</span>
+              <span class="chip chip-proses" id="summary-status-chip"><span class="chip-dot"></span>Sedang diproses</span>
             </div>
             <div>
               <span class="jenis-mutasi-tag" style="font-size:12px; padding:6px 14px;">Peminjaman ERS</span>
@@ -1944,7 +2197,7 @@
               <div class="step-icon">✓</div>
               <div class="step-label">1. Permohonan</div>
             </div>
-            <div class="step-item processing active" onclick="switchStep(1, 'tab-approval')">
+            <div class="step-item processing active" id="stepper-item-1" onclick="switchStep(1, 'tab-approval')">
               <div class="step-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: stepSpin 1.5s linear infinite;">
                   <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
@@ -1952,19 +2205,15 @@
               </div>
               <div class="step-label">2. Approval & Review</div>
             </div>
-            <div class="step-item processing" onclick="switchStep(2, 'tab-pengecekan-pengelola')">
-              <div class="step-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: stepSpin 1.5s linear infinite;">
-                  <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
-                </svg>
-              </div>
+            <div class="step-item" id="stepper-item-2" onclick="switchStep(2, 'tab-pengecekan-pengelola')">
+              <div class="step-icon">3</div>
               <div class="step-label">3. Pengecekan & Kirim</div>
             </div>
-            <div class="step-item rejected" onclick="switchStep(3, 'tab-penerimaan')">
-              <div class="step-icon">✕</div>
+            <div class="step-item" id="stepper-item-3" onclick="switchStep(3, 'tab-penerimaan')">
+              <div class="step-icon">4</div>
               <div class="step-label">4. Penerimaan</div>
             </div>
-            <div class="step-item" onclick="switchStep(4, 'tab-pengembalian')">
+            <div class="step-item" id="stepper-item-4" onclick="switchStep(4, 'tab-pengembalian')">
               <div class="step-icon">5</div>
               <div class="step-label">5. Pengembalian</div>
             </div>
@@ -1986,6 +2235,7 @@
             </svg>
             2. Approval & Log Persetujuan
             <span class="tab-badge">Log 4</span>
+            <span id="tabbtn-approval-badge" style="display:none;margin-left:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;"></span>
           </button>
           <button class="tab-btn" onclick="switchTab('tab-pengecekan-pengelola', this)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1995,6 +2245,7 @@
               <circle cx="18.5" cy="18.5" r="2.5"></circle>
             </svg>
             3. Pengecekan & Pengiriman (Pengelola)
+            <span id="tabbtn-pengecekan-badge" style="display:none;margin-left:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;"></span>
           </button>
           <button class="tab-btn" onclick="switchTab('tab-penerimaan', this)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2002,6 +2253,7 @@
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
             4. Penerimaan (Peminjam)
+            <span id="tabbtn-penerimaan-badge" style="display:none;margin-left:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;"></span>
           </button>
           <button class="tab-btn" onclick="switchTab('tab-pengembalian', this)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2009,6 +2261,7 @@
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
             5. Proses Pengembalian
+            <span id="tabbtn-pengembalian-badge" style="display:none;margin-left:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;"></span>
           </button>
         </div>
 
@@ -2383,7 +2636,7 @@
                       <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-top:2px;">Approval
                         Barang Keluar dari SRM Hartrans Pengelola</h4>
                     </div>
-                    <span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">
+                    <span class="chip" id="step3-status-chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">
                       <span class="chip-dot"></span>Barang Keluar Disetujui
                     </span>
                   </div>
@@ -2391,7 +2644,7 @@
                     <div><strong style="color:var(--text-secondary);">Pejabat SRM Coordinator:</strong> Doni Prasetyo
                       (SRM Hartrans Pengelola)</div>
                   </div>
-                  <div
+                  <div id="step3-message"
                     style="font-size:12px; color:var(--text-secondary); background:#fff; padding:10px 14px; border-radius:8px; border:1px solid #FFEDD5; margin-bottom:14px;">
                     💬 <em>"Menyetujui penerbitan Pengajuan barang keluar ERS berdasarkan alokasi MSB Fashar. Notifikasi
                       Pengajuan diteruskan ke Manager UPT masing-masing Unit Pengelola."</em>
@@ -2447,12 +2700,12 @@
                     </div>
 
                     <!-- SUB-CARD UITJBM -->
-                    <div
+                    <div id="step3-uitjbm-card"
                       style="background:#fff; border:1px solid #FED7AA; border-radius:var(--radius-sm); padding:14px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBM • UPT
                           SURABAYA</span>
-                        <span class="chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Pengajuan
+                        <span class="chip" id="step3-uitjbm-chip" style="background:#F0FDF4; color:#166534; font-size:11px;">Pengajuan
                           Disetujui</span>
                       </div>
                       <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:4px;">
@@ -2463,7 +2716,7 @@
                       </div>
                       <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Approved: 24 Feb 2026
                         14:20 WIB</div>
-                      <div
+                      <div id="step3-uitjbm-status"
                         style="font-size:11px; background:#FFF7ED; padding:6px 10px; border-radius:6px; border:1px solid #FFEDD5; color:#C2410C;">
                         Status: Notifikasi Pengajuan Didelegasikan ke UPT Surabaya
                       </div>
@@ -2496,8 +2749,8 @@
                 </div>
 
                 <!-- STEP 4 CARD -->
-                <div
-                  style="padding:20px; border:1px solid #BBF7D0; border-radius:var(--radius-lg); background:#F0FDF4; position:relative;">
+                <div id="step4-card"
+                  style="padding:20px; border:1px solid #BBF7D0; border-radius:var(--radius-lg); background:#F0FDF4; position:relative; transition:opacity 0.2s;">
                   <div
                     style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                     <div>
@@ -2507,9 +2760,14 @@
                       <h4 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-top:2px;">
                         Persetujuan Manager UPT & Pengecekan Asman Logistik Pengelola</h4>
                     </div>
-                    <span class="chip chip-proses">
+                    <span class="chip chip-proses" id="step4-status-chip">
                       <span class="chip-dot"></span>Sedang Berlangsung (2/3 Approved)
                     </span>
+                  </div>
+
+                  <!-- LOCKED BANNER (MUNCUL SAAT REJECT DI STEP 3) -->
+                  <div id="step4-locked-banner" style="display:none; align-items:center; gap:8px; background:#FEE2E2; border:1px dashed #DC2626; color:#DC2626; font-size:12px; font-weight:600; padding:10px 14px; border-radius:8px; margin-top:6px;">
+                    ⚠️ Step 4 tertunda — menunggu hasil re-alokasi ulang dari Step 2 akibat penolakan sebagian di Step 3.
                   </div>
 
                   <!-- SUB-CARDS UNTUK EACH UNIT PENGELOLA (HORIZONAL SCROLL IF > 3) -->
@@ -2550,17 +2808,17 @@
                     </div>
 
                     <!-- SUB-CARD UITJBM UPT SURABAYA -->
-                    <div style="background:#fff; border:1px solid #CBD5E1; border-radius:var(--radius-sm); padding:16px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
+                    <div id="step4-uitjbm-card" style="background:#fff; border:1px solid #CBD5E1; border-radius:var(--radius-sm); padding:16px; flex:0 0 calc((100% - 32px) / 3); min-width:310px; box-sizing:border-box;">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:12px; font-weight:700; color:var(--text-primary);">🏢 UITJBM • UPT SURABAYA</span>
-                        <span class="chip chip-tunggu" style="font-size:11px;">Menunggu Persetujuan</span>
+                        <span class="chip chip-tunggu" id="step4-uitjbm-chip" style="font-size:11px;">Menunggu Persetujuan</span>
                       </div>
                       <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;"><strong>Manager UPT:</strong> Bambang H. (UPT Surabaya)</div>
-                      <div style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Status: Melakukan inspeksi fisik stok gudang</div>
-                      <div style="font-size:11px; background:#FEFCE8; padding:8px; border-radius:6px; border:1px solid #FEF08A; color:#854D0E; margin-bottom:10px;">⏳ Dalam verifikasi fisik base plate sebelum penandatanganan.</div>
+                      <div id="step4-uitjbm-hint" style="font-size:11px; color:var(--text-hint); margin-bottom:8px;">Status: Melakukan inspeksi fisik stok gudang</div>
+                      <div id="step4-uitjbm-note" style="font-size:11px; background:#FEFCE8; padding:8px; border-radius:6px; border:1px solid #FEF08A; color:#854D0E; margin-bottom:10px;">⏳ Dalam verifikasi fisik base plate sebelum penandatanganan.</div>
                       <div style="border-top:1px dashed var(--border); padding-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
                         <span style="color:var(--text-secondary); font-weight:600;">Asman Logistik:</span>
-                        <span style="color:var(--text-hint);">Menunggu Manager UPT</span>
+                        <span id="step4-uitjbm-asman" style="color:var(--text-hint);">Menunggu Manager UPT</span>
                       </div>
                     </div>
                   </div>
@@ -2828,33 +3086,6 @@
     </div>
 
     <script>
-      function toggleApprovalMode(mode) {
-        const modeUit = document.getElementById('approval-mode-uit');
-        const modeUpt = document.getElementById('approval-mode-upt');
-        const btnUit = document.getElementById('mode-uit-btn');
-        const btnUpt = document.getElementById('mode-upt-btn');
-
-        if (mode === 'uit') {
-          modeUit.style.display = 'block';
-          modeUpt.style.display = 'none';
-          btnUit.style.background = '#fff';
-          btnUit.style.color = 'var(--pln-blue)';
-          btnUit.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
-          btnUpt.style.background = 'transparent';
-          btnUpt.style.color = '#fff';
-          btnUpt.style.boxShadow = 'none';
-        } else {
-          modeUit.style.display = 'none';
-          modeUpt.style.display = 'block';
-          btnUpt.style.background = '#fff';
-          btnUpt.style.color = 'var(--pln-blue)';
-          btnUpt.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
-          btnUit.style.background = 'transparent';
-          btnUit.style.color = '#fff';
-          btnUit.style.boxShadow = 'none';
-        }
-      }
-
       function switchTab(tabId, element) {
         const panes = document.querySelectorAll('.tab-pane');
         panes.forEach(pane => pane.classList.remove('active'));
