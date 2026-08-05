@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,21 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
+            --bg-color: #eef2f7;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --primary-color: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.35);
+            --secondary-color: #059669;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --hover-bg: rgba(15, 23, 42, 0.05);
+            --active-bg: rgba(37, 99, 235, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        [data-theme="dark"] {
             --bg-color: #0f172a;
             --glass-bg: rgba(30, 41, 59, 0.7);
             --glass-border: rgba(255, 255, 255, 0.08);
@@ -18,6 +33,8 @@
             --text-muted: #94a3b8;
             --hover-bg: rgba(255, 255, 255, 0.05);
             --active-bg: rgba(59, 130, 246, 0.15);
+            --input-bg: rgba(0, 0, 0, 0.25);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         * {
@@ -36,6 +53,7 @@
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .sidebar {
@@ -212,7 +230,7 @@
         }
 
         .search-bar {
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--input-bg);
             border: 1px solid var(--glass-border);
             padding: 10px 16px;
             border-radius: 8px;
@@ -258,7 +276,7 @@
             font-size: 28px;
             font-weight: 600;
             margin-bottom: 8px;
-            background: linear-gradient(to right, #fff, #94a3b8);
+            background: linear-gradient(to right, var(--text-main), var(--text-muted));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -297,9 +315,9 @@
             transition: opacity 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+.card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--card-shadow);
         }
 
         .card:hover::before {
@@ -329,6 +347,47 @@
             color: var(--text-muted);
             font-size: 14px;
             line-height: 1.5;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle i {
+            font-size: 18px;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--active-bg);
+            color: var(--primary-color);
         }
 
         /* Animations */
@@ -688,14 +747,21 @@
     <!-- Main Content -->
     <main class="main-content">
         <div id="defaultDashboard">
-            <!-- Dashboard Content -->
-            <div class="dashboard-header fade-in delay-1">
-                <h1>Welcome to HiFi Portal</h1>
-                <p>Select a module from the sidebar to get started.</p>
+            <!-- Top Nav -->
+            <div class="top-nav fade-in delay-1">
+                <div class="dashboard-header" style="margin-bottom: 0;">
+                    <h1>Welcome to HiFi Portal</h1>
+                    <p>Select a module from the sidebar to get started.</p>
+                </div>
+                <button class="theme-toggle" id="theme-switcher" onclick="toggleTheme()" title="Ganti tema">
+                    <i class="ri-moon-line" id="theme-icon"></i>
+                    <span id="theme-text">Mode Gelap</span>
+                </button>
             </div>
 
             <div class="cards-grid">
                 <div class="card fade-in delay-1">
+                    <span class="card-badge" id="stat-count-0">Halaman</span>
                     <div class="card-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
                         <i class="ri-apps-2-line"></i>
                     </div>
@@ -704,6 +770,7 @@
                 </div>
 
                 <div class="card fade-in delay-2">
+                    <span class="card-badge" id="stat-count-1">Halaman</span>
                     <div class="card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                         <i class="ri-bar-chart-box-line"></i>
                     </div>
@@ -712,6 +779,7 @@
                 </div>
 
                 <div class="card fade-in delay-3">
+                    <span class="card-badge" id="stat-count-2">Halaman</span>
                     <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
                         <i class="ri-shield-check-line"></i>
                     </div>
@@ -888,6 +956,45 @@
 
         // Load on initial visit
         loadPageFromHash();
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', current);
+            localStorage.setItem('hifi-portal-theme', current);
+            updateThemeButton(current);
+        }
+
+        function updateThemeButton(theme) {
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            if (!icon || !text) return;
+            if (theme === 'dark') {
+                icon.className = 'ri-sun-line';
+                text.innerText = 'Mode Terang';
+            } else {
+                icon.className = 'ri-moon-line';
+                text.innerText = 'Mode Gelap';
+            }
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('hifi-portal-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            updateThemeButton(saved);
+        }
+
+        function updateStats() {
+            document.querySelectorAll('.menu-section').forEach((section, index) => {
+                const count = section.querySelectorAll('a.submenu-item').length;
+                const badge = document.getElementById('stat-count-' + index);
+                if (badge) badge.innerText = count + ' Halaman';
+            });
+        }
+
+        initTheme();
+        updateStats();
     </script>
 </body>
 </html>
