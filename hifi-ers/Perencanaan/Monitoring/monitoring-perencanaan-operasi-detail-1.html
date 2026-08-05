@@ -22,6 +22,7 @@
   --text-secondary: #475569;
   --text-hint: #94A3B8;
   --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: 16px;
   --sidebar-w: 64px;
   --danger: #DC2626;
@@ -524,7 +525,7 @@ body {
         }
 
         .form-footer {
-            position: fixed;
+            position: sticky;
             bottom: 0;
             left: var(--sidebar-w);
             right: 0;
@@ -681,6 +682,54 @@ body {
             color: var(--pln-blue);
             font-weight: 600;
         }
+
+        /* Chip / Status Badge */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .chip-green {
+            background: var(--chip-approval-bg);
+            color: var(--chip-approval-text);
+            border: 1px solid #BBF7D0;
+        }
+        .chip-green .chip-dot { background: var(--chip-approval-dot); }
+
+        .chip-blue {
+            background: var(--chip-kirim-bg);
+            color: var(--chip-kirim-text);
+            border: 1px solid #BFDBFE;
+        }
+        .chip-blue .chip-dot { background: var(--chip-kirim-dot); }
+
+        .chip-orange {
+            background: var(--chip-proses-bg);
+            color: var(--chip-proses-text);
+            border: 1px solid #FED7AA;
+        }
+        .chip-orange .chip-dot { background: var(--chip-proses-dot); }
+
+        .chip-red {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid #FCA5A5;
+        }
+        .chip-red .chip-dot { background: var(--danger); }
     </style>
 
 </head>
@@ -735,7 +784,7 @@ body {
                     </div>
                 </div>
             </div>
-            <div class="topbar-right" style="display:flex; align-items:center; gap:12px;">
+            <div class="topbar-right">
                 <div style="display:flex; align-items:center; gap:8px; background:#F1F5F9; border:1px solid #CBD5E1; padding:4px 12px; border-radius:20px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#003B8E" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
                     <span style="font-size:12px; font-weight:600; color:#003B8E; white-space:nowrap;">Simulasi Status:</span>
@@ -812,7 +861,6 @@ body {
                     </div>
                 </div>
 
-                <!-- Peta Section -->
                 <!-- Peta Section -->
                 <div id="map-informasi-pemasangan"
                     style="width: 100%; height: 350px; border-radius: var(--radius-md); z-index: 1; border: 1px solid var(--border); margin-bottom: 24px;">
@@ -1073,9 +1121,9 @@ body {
                             style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                             <div class="sub-tabs-wrap">
                                 <button id="btn-sub-komponen" class="sub-tab-btn active"
-                                    onclick="switchSubTab('sub-komponen')">Daftar Komponen</button>
+                                    onclick="switchSubTab('sub-komponen', this)">Daftar Komponen</button>
                                 <button id="btn-sub-konfigurasi" class="sub-tab-btn"
-                                    onclick="switchSubTab('sub-konfigurasi')">Daftar Konfigurasi</button>
+                                    onclick="switchSubTab('sub-konfigurasi', this)">Daftar Konfigurasi</button>
                             </div>
 
                             <!-- Sub Tab: Daftar Komponen -->
@@ -1736,6 +1784,7 @@ body {
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
 
@@ -2798,103 +2847,6 @@ body {
             </div>
         </footer>
 
-        <!-- Modal Reject -->
-        <div id="modal-reject-backdrop"
-            style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:9000; display:none; align-items:center; justify-content:center;">
-            <div
-                style="background:var(--card); width:100%; max-width:440px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden">
-                <div
-                    style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between">
-                    <div style="font-size:15px; font-weight:700; color:#DC2626">Alasan Reject</div>
-                    <button onclick="closeModalReject()"
-                        style="background:none; border:none; cursor:pointer; color:var(--text-secondary)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div style="padding:24px">
-                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:20px; line-height:1.5">
-                        Berikan alasan mengapa data ini ditolak.</div>
-                    <div style="margin-bottom:8px; font-size:12.5px; font-weight:600; color:var(--text-primary)">Alasan
-                        Reject <span style="color:#DC2626">*</span></div>
-                    <textarea id="input-alasan-reject" rows="4" placeholder="Masukkan alasan..."
-                        style="width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:13px; outline:none; resize:vertical;"></textarea>
-                </div>
-                <div
-                    style="padding:16px 24px; border-top:1px solid var(--border); background:#FEF2F2; display:flex; justify-content:flex-end; gap:10px">
-                    <button onclick="closeModalReject()"
-                        style="padding:8px 16px; border:1px solid #FCA5A5; border-radius:6px; background:#fff; color:#991B1B; font-size:13px; font-weight:600; cursor:pointer">Batal</button>
-                    <button onclick="closeModalReject()"
-                        style="padding:8px 16px; border:none; border-radius:6px; background:#DC2626; color:#fff; font-size:13px; font-weight:600; cursor:pointer">Submit
-                        Reject</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Submit -->
-        <div id="modal-submit-backdrop"
-            style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:9000; display:none; align-items:center; justify-content:center;">
-            <div
-                style="background:var(--card); width:100%; max-width:440px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden">
-                <div
-                    style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between">
-                    <div style="font-size:15px; font-weight:700; color:var(--text-primary)">Konfirmasi Submit</div>
-                    <button onclick="closeModalSubmit()"
-                        style="background:none; border:none; cursor:pointer; color:var(--text-secondary)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div style="padding:24px">
-                    <div style="font-size:14px; color:var(--text-primary); text-align:center; margin-bottom:10px;">
-                        Apakah anda yakin ingin mengirimkan data ini ?</div>
-                </div>
-                <div
-                    style="padding:16px 24px; border-top:1px solid var(--border); background:#F8FAFC; display:flex; justify-content:flex-end; gap:10px">
-                    <button onclick="closeModalSubmit()"
-                        style="padding:8px 16px; border:1px solid var(--border); border-radius:6px; background:#fff; color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer">Batal</button>
-                    <button onclick="closeModalSubmit()"
-                        style="padding:8px 16px; border:none; border-radius:6px; background:var(--pln-blue); color:#fff; font-size:13px; font-weight:600; cursor:pointer">Ya,
-                        Kirim</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Disposisi -->
-        <div id="modal-disposisi-backdrop"
-            style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:9000; display:none; align-items:center; justify-content:center;">
-            <div
-                style="background:var(--card); width:100%; max-width:440px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden">
-                <div
-                    style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between">
-                    <div style="font-size:15px; font-weight:700; color:var(--text-primary)">Konfirmasi Disposisi</div>
-                    <button onclick="closeModalDisposisi()"
-                        style="background:none; border:none; cursor:pointer; color:var(--text-secondary)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div style="padding:24px">
-                    <div style="font-size:14px; color:var(--text-primary); text-align:center; margin-bottom:10px;">
-                        Apakah anda yakin ingin Disposisi perencanaan ini ke Staff anda?</div>
-                </div>
-                <div
-                    style="padding:16px 24px; border-top:1px solid var(--border); background:#F8FAFC; display:flex; justify-content:flex-end; gap:10px">
-                    <button onclick="closeModalDisposisi()"
-                        style="padding:8px 16px; border:1px solid var(--border); border-radius:6px; background:#fff; color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer">Batal</button>
-                    <button onclick="closeModalDisposisi()"
-                        style="padding:8px 16px; border:none; border-radius:6px; background:var(--pln-blue); color:#fff; font-size:13px; font-weight:600; cursor:pointer">Ya,
-                        Disposisi</button>
-                </div>
-            </div>
-        </div>
-
         <!-- SIDE PANEL OVERLAY: LOG PENGEMBALIAN -->
         <div id="side-panel-log-overlay"
             style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001; display:none;"
@@ -3119,6 +3071,59 @@ body {
             updateSimulasiStatus(statusVal);
         }
 
+        function setTableTruncated(table, keepCols, isTruncated) {
+            if (!table) return;
+            const rows = table.querySelectorAll('tr');
+            if (!isTruncated) {
+                rows.forEach(row => {
+                    row.style.display = '';
+                    Array.from(row.children).forEach(cell => cell.style.display = '');
+                });
+                return;
+            }
+
+            const spans = [];
+            rows.forEach((row, rowIdx) => {
+                const isHeaderSubrow = row.closest('thead') && rowIdx === 1;
+                if (isHeaderSubrow) {
+                    row.style.display = 'none';
+                    return;
+                } else {
+                    row.style.display = '';
+                }
+
+                const cells = Array.from(row.children);
+                let colIdx = 0;
+                let cellIdx = 0;
+
+                while (cellIdx < cells.length) {
+                    while (spans[colIdx] > 0) {
+                        spans[colIdx]--;
+                        colIdx++;
+                    }
+
+                    const cell = cells[cellIdx];
+                    const colspan = parseInt(cell.getAttribute('colspan') || 1);
+                    const rowspan = parseInt(cell.getAttribute('rowspan') || 1);
+
+                    if (colIdx >= keepCols) {
+                        cell.style.display = 'none';
+                    } else {
+                        cell.style.display = '';
+                        for (let i = 0; i < colspan; i++) {
+                            spans[colIdx + i] = rowspan - 1;
+                        }
+                    }
+                    colIdx += colspan;
+                    cellIdx++;
+                }
+
+                for (let i = colIdx; i < spans.length; i++) {
+                    if (spans[i] > 0) spans[i]--;
+                }
+            });
+        }
+
         function updateSimulasiStatus(status) {
             const badge = document.getElementById('monitoring-status-badge');
             const rejectBanner = document.getElementById('alert-reject-banner');
@@ -3127,32 +3132,34 @@ body {
 
             if (!badge) return;
 
-            // --- STEP 1: Set tab visibility FIRST ---
+            // Tab 3 (Pemetaan Material) is ALWAYS visible for all statuses
+            if (tabBtn3) tabBtn3.style.display = '';
+
+            const isDraftOrWaitingMSB = (
+                status.includes('Draft') || 
+                status.includes('Verifikasi MSB Fashar')
+            );
+
             let tabToActivate = TABS[currentTabIndex] || 'tab-informasi';
 
-            if (status === 'Draft / Waiting Approval Manager UPT' || status === 'Waiting Verifikasi MSB Fashar') {
-                // Tab 1 & Tab 2 ONLY
-                if (tabBtn3) tabBtn3.style.display = 'none';
+            if (isDraftOrWaitingMSB) {
+                // Tab 1, 2, 3 visible
                 if (tabBtn4) tabBtn4.style.display = 'none';
                 if (rejectBanner) rejectBanner.style.display = 'none';
                 badge.className = 'chip chip-orange';
                 badge.innerHTML = `<span class="chip-dot"></span>${status}`;
-                // If current tab is 3 or 4, reset to tab 1
-                if (currentTabIndex >= 2) tabToActivate = 'tab-informasi';
+                if (currentTabIndex >= 3) tabToActivate = 'tab-informasi';
 
             } else if (status === 'Waiting Approval SRM Hartrans') {
-                // Tab 1, 2, 3 only
-                if (tabBtn3) tabBtn3.style.display = '';
+                // Tab 1, 2, 3 visible
                 if (tabBtn4) tabBtn4.style.display = 'none';
                 if (rejectBanner) rejectBanner.style.display = 'none';
                 badge.className = 'chip chip-orange';
                 badge.innerHTML = '<span class="chip-dot"></span>Waiting Approval SRM Hartrans';
-                // If current tab is 4, reset to tab 1
                 if (currentTabIndex >= 3) tabToActivate = 'tab-informasi';
 
             } else if (status === 'Sedang Pemenuhan Material') {
                 // Tab 1, 2, 3, 4 all visible
-                if (tabBtn3) tabBtn3.style.display = '';
                 if (tabBtn4) tabBtn4.style.display = '';
                 if (rejectBanner) rejectBanner.style.display = 'none';
                 badge.className = 'chip chip-blue';
@@ -3160,7 +3167,6 @@ body {
 
             } else if (status === 'Ditolak') {
                 // Tab 1, 2, 3 visible + red banner
-                if (tabBtn3) tabBtn3.style.display = '';
                 if (tabBtn4) tabBtn4.style.display = 'none';
                 if (rejectBanner) rejectBanner.style.display = 'flex';
                 badge.className = 'chip chip-red';
@@ -3169,7 +3175,6 @@ body {
 
             } else {
                 // Default: Tower Beroperasi — Tab 1, 2, 3 visible
-                if (tabBtn3) tabBtn3.style.display = '';
                 if (tabBtn4) tabBtn4.style.display = 'none';
                 if (rejectBanner) rejectBanner.style.display = 'none';
                 badge.className = 'chip chip-green';
@@ -3177,7 +3182,13 @@ body {
                 if (currentTabIndex >= 3) tabToActivate = 'tab-informasi';
             }
 
-            // --- STEP 2: Switch to correct tab AFTER visibility is set ---
+            // --- STEP 2: Truncate / Restore Tab 2 Tables ---
+            const subKomponenTable = document.querySelector('#sub-komponen table');
+            const subKonfigurasiTable = document.querySelector('#sub-konfigurasi table');
+            setTableTruncated(subKomponenTable, 6, isDraftOrWaitingMSB);
+            setTableTruncated(subKonfigurasiTable, 8, isDraftOrWaitingMSB);
+
+            // --- STEP 3: Switch to correct tab AFTER visibility is set ---
             switchMainTab(tabToActivate);
         }
 
@@ -3245,7 +3256,7 @@ body {
             document.getElementById('modal-disposisi-backdrop').style.display = 'none';
         }
 
-        function switchSubTab(tabId) {
+        function switchSubTab(tabId, btnElement) {
             // Hide all sub tab contents
             document.querySelectorAll('.sub-tab-content').forEach(el => el.style.display = 'none');
             // Deactivate all sub tab buttons
@@ -3254,7 +3265,7 @@ body {
             // Show selected sub tab content
             document.getElementById(tabId).style.display = 'block';
             // Activate clicked sub tab button
-            event.currentTarget.classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
         }
         function openSidePanel(btnElement) {
             if (btnElement) {
@@ -3772,7 +3783,12 @@ body {
             const breadcrumbSpan = document.querySelector('.breadcrumb span');
             if(breadcrumbSpan) breadcrumbSpan.textContent = 'Detail Perencanaan';
 
-            document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                // Skip simulasi controls so they remain interactive
+                if (el.id === 'simulasi-status-select') return;
+                if (el.closest('.sim-pill-btn')) return;
+                el.disabled = true;
+            });
 
             document.querySelectorAll('.btn-submit, .btn-tambah').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.btn-outline').forEach(el => {
@@ -3782,12 +3798,6 @@ body {
                 }
             });
 
-            const tabs = document.querySelectorAll('.main-tab-btn');
-            tabs.forEach(tab => {
-                if(tab.textContent.includes('Pemetaan Material')) tab.remove();
-            });
-            const pemetaanContent = document.getElementById('tab-pemetaan');
-            if(pemetaanContent) pemetaanContent.remove();
 
             function truncateTableColumns(table, keepCols) {
                 const rows = table.querySelectorAll('tr');
@@ -3840,6 +3850,10 @@ body {
             // Keep form footer visible
             const footer = document.querySelector('.form-footer');
             if(footer) footer.style.display = 'flex';
+
+            // Sync initial table column visibility with initial status
+            const initialStatus = document.getElementById('simulasi-status-select')?.value || 'Tower Beroperasi';
+            updateSimulasiStatus(initialStatus);
         });
     </script>
 
