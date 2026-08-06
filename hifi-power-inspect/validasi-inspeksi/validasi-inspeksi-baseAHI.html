@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Monitoring AHI - Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar Utilities */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24; /* PLN Yellow */
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb; /* PLN Blue */
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-header {
+            padding: 24px 32px 16px 32px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title i {
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .breadcrumbs {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumbs span {
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 0 32px 32px 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Detail Specific CSS */
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .middle-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            color: var(--text-main);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .score-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .score-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .score-critical { color: var(--text-main); }
+        .score-percentage { color: var(--text-main); }
+
+        .score-icon-top {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--primary);
+            font-size: 20px;
+        }
+        
+        .score-icon-left {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 32px;
+            height: 32px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        /* Image thumbnails */
+        .img-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .img-thumb {
+            width: 60px;
+            height: 60px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .empty-state i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        /* Bottom Section / Tabs / Table */
+        .bottom-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 24px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-item {
+            padding: 16px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-item:hover {
+            color: var(--text-main);
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .toolbar {
+            display: flex;
+            padding: 16px 24px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            padding-left: 8px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--primary);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #f8fafc;
+        }
+
+        /* Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background: #fff;
+            color: var(--text-main);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: #f1f5f9;
+        }
+
+        .max-ahi-row td {
+            font-weight: 700;
+            text-align: center;
+            padding: 16px 24px;
+        }
+
+        .badge-critical { color: var(--danger); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-poor { color: #ef4444; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-fair { color: var(--warning); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-good { color: var(--success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-verygood { color: var(--success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        
+        .badge-icon {
+            font-size: 14px;
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .link-text {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .page-item {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .page-item.active {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 360px;
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-surface);
+        }
+
+        /* Right Drawer Overlay Styles */
+        .drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1050;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -85%;
+            width: 85%;
+            max-width: 1300px;
+            height: 100vh;
+            background: var(--bg-surface);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drawer.active {
+            right: 0;
+        }
+
+        /* Modal Pop-up Konfirmasi Validasi */
+        .modal-confirm-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            z-index: 1300;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-confirm-backdrop.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-confirm-box {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transform: translateY(15px);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-confirm-backdrop.active .modal-confirm-box {
+            transform: translateY(0);
+        }
+
+        .modal-confirm-header {
+            padding: 16px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-confirm-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: #ffffff;
+        }
+
+        .modal-confirm-footer {
+            padding: 14px 20px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .drawer-header {
+            padding: 18px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-body {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drawer-footer {
+            padding: 16px 24px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            background: #ffffff;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top System Bar -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-server-line"></i> Server Training
+        </div>
+        <div class="right">
+            Contact us: helpdesk.pi@iconpln.co.id | Security Issue: soc@pln.co.id
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-flashlight-fill"></i>
+            <span>PLN</span>
+        </div>
+        <div class="menu-item"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item"><i class="ri-line-chart-line"></i></div>
+        <div class="menu-item"><i class="ri-settings-4-line"></i></div>
+        <div class="menu-item active"><i class="ri-table-alt-line"></i></div>
+        <div class="menu-item"><i class="ri-focus-2-line"></i></div>
+        <div class="menu-item"><i class="ri-file-list-3-line"></i></div>
+        <div class="menu-item"><i class="ri-team-line"></i></div>
+        <div class="menu-item"><i class="ri-customer-service-2-line"></i></div>
+        <div class="menu-item"><i class="ri-filter-3-line"></i></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="ri-arrow-left-line" onclick="window.history.back()"></i>
+                Detail Monitoring AHI & Kualitas Data ( GI 150KV KALISARI )
+            </h1>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; gap: 12px;">
+                <div class="breadcrumbs" style="margin-top: 0;">
+                    <span>Monitoring AHI & Kualitas Data</span>
+                    <i class="ri-arrow-right-s-line"></i>
+                    Detail Monitoring AHI & Kualitas Data
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; background: #ffffff; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                    <i class="ri-user-settings-line" style="color: var(--primary); font-size: 15px;"></i>
+                    <span style="font-weight: 600; color: var(--text-muted);">Role User Simulasikan:</span>
+                    <select id="activeRoleSelector" onchange="updateRoleActionVisibility()" style="border: none; outline: none; background: transparent; font-weight: 700; color: var(--primary); cursor: pointer; font-size: 12px;">
+                        <option value="TL ASDIG UPT" selected>TL ASDIG UPT (Validator)</option>
+                        <option value="Asman Pemeliharaan Gardu Induk pada Unit Induk">Asman Pemeliharaan GI Unit Induk (Validator)</option>
+                        <option value="Staff Pemeliharaan Gardu Induk pada Unit Induk">Staff Pemeliharaan GI Unit Induk (Validator)</option>
+                        <option value="Asman RENEV UPT">Asman RENEV UPT (Validator)</option>
+                        <option value="TL OLDAT UPT">TL OLDAT UPT (Validator)</option>
+                        <option value="Staff ASDIG UPT">Staff ASDIG UPT (Validator)</option>
+                        <option value="Staff OLDAT UPT">Staff OLDAT UPT (Validator)</option>
+                        <option value="Staff RENEV UPT">Staff RENEV UPT (Validator)</option>
+                        <option value="Teknisi Lapangan">Teknisi Lapangan (Non-Validator / View Only)</option>
+                        <option value="Guest">Guest / Viewer (Non-Validator / View Only)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            
+            <!-- Top Cards Grid -->
+            <div class="top-grid">
+                <!-- Lokasi Asset -->
+                <div class="card">
+                    <div class="card-title"><i class="ri-map-pin-line"></i> Lokasi Asset</div>
+                    <div class="info-row">
+                        <span class="info-label">UIT</span>
+                        <span class="info-value">UITJBM</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">UPT</span>
+                        <span class="info-value">UPT SURABAYA</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">ULTG</span>
+                        <span class="info-value">ULTG SURABAYA UTARA</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Gardu Induk</span>
+                        <span class="info-value">GI 150KV KALISARI</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Bay</span>
+                        <span class="info-value">PHT 150KV SURABAYA SELATAN #2</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Penempatan</span>
+                        <span class="info-value">PMS BUS A</span>
+                    </div>
+                </div>
+
+                <!-- Identitas Asset -->
+                <div class="card">
+                    <div class="card-title"><i class="ri-list-check-2"></i> Identitas Asset</div>
+                    <div class="info-row">
+                        <span class="info-label">Jenis Aset</span>
+                        <span class="info-value">Disconnecting Switch</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Merk</span>
+                        <span class="info-value">SIEMENS</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tipe</span>
+                        <span class="info-value">3DN1CB 170</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phasa</span>
+                        <span class="info-value">RST</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Serial ID</span>
+                        <span class="info-value">100059102010001</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status Aset</span>
+                        <span class="info-value">PLN Operasi</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Techidentno</span>
+                        <span class="info-value">15361155555500000018</span>
+                    </div>
+                </div>
+
+                <!-- AHI Score -->
+                <div class="card">
+                    <div class="score-icon-left"></div>
+                    <i class="ri-bar-chart-grouped-line score-icon-top"></i>
+                    <div class="score-card">
+                        <div class="score-number score-critical">5</div>
+                        <div class="score-label" style="color: var(--text-main); font-size: 18px; margin-top: 4px;">Critical</div>
+                        <div class="score-label" style="margin-top: 4px;">Aset Health Index</div>
+                    </div>
+                </div>
+
+                <!-- Data Quality Score -->
+                <div class="card">
+                    <i class="ri-information-line" style="position: absolute; top: 20px; left: 20px; color: var(--text-muted);"></i>
+                    <div class="score-card">
+                        <div class="score-number score-percentage">76.67%</div>
+                        <div class="score-label" style="margin-top: 8px;">Kualitas Data</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note Tindak Lanjut Aset Section -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 15px; font-weight: 600; color: #000; margin: 0;">Note Tindak Lanjut Aset</h3>
+                    <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+                        <i class="ri-add-line"></i> Tambah Data Note
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr>
+                                <th>Kriteria</th>
+                                <th>Tindak Lanjut</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3" style="text-align: center; padding: 32px 16px; color: var(--text-muted); background: var(--bg-surface);">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                        <i class="ri-inbox-line" style="font-size: 24px; color: #cbd5e1;"></i>
+                                        <span style="font-size: 12px;">Belum ada catatan tindak lanjut</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Middle Cards Grid -->
+            <div class="middle-grid">
+                <!-- Foto Aset -->
+                <div class="card">
+                    <div class="card-title" style="margin-bottom: 4px; color: #000;">Foto Aset & Nameplate</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Total 0 Foto</div>
+                    <div class="empty-state">
+                        <i class="ri-inbox-line"></i>
+                        <span>Tidak ada data</span>
+                        <span style="font-size: 11px;">Maaf, Data Aset belum tersedia</span>
+                    </div>
+                </div>
+
+                <!-- Foto Inspeksi -->
+                <div class="card">
+                    <div class="card-title" style="margin-bottom: 4px; color: #000;">Foto Inspeksi Terakhir</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Total 8 Foto</div>
+                    <div class="img-grid">
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                        <div class="img-thumb"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section / Tabs & Table -->
+            <div class="bottom-section">
+                <div class="tabs">
+                    <div class="tab-item active" onclick="switchTab(0)">Trending</div>
+                    <div class="tab-item" onclick="switchTab(1)">AHI</div>
+                    <div class="tab-item" onclick="switchTab(2)">Detail Parameter Inspeksi</div>
+                </div>
+
+                <div class="toolbar" id="table-toolbar" style="display: none;">
+                    <div class="search-box">
+                        <input type="text" placeholder="Cari Parameter">
+                        <i class="ri-search-line" style="color: var(--primary);"></i>
+                    </div>
+                    <button class="btn">
+                        <i class="ri-filter-3-line"></i> Filter
+                    </button>
+                </div>
+
+                <!-- Trending Tab Content -->
+                <div class="table-container" id="table-trending" style="padding: 24px; display: block;">
+                    <!-- Parameter 1: Thermovisi Body Aset -->
+                    <div style="margin-bottom: 40px; border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; background: #fff;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: 15px; font-weight: 600; color: var(--primary);">1. Trend: Thermovisi Body Aset</h3>
+                            </div>
+                            <span class="badge-good">Status Terakhir: 2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span>
+                        </div>
+                        <div class="chart-container"><canvas id="trendChartThermovisi"></canvas></div>
+                        <div style="overflow-x: auto; margin-top: 16px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nomor WO</th>
+                                        <th>Tanggal</th>
+                                        <th>Suhu Fasa R</th>
+                                        <th>Suhu Fasa S</th>
+                                        <th>Suhu Fasa T</th>
+                                        <th>Selisih Suhu (ΔT)</th>
+                                        <th>Kondisi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>INS202600883600</td>
+                                        <td>15 Juni 2026</td>
+                                        <td>35.2 °C</td>
+                                        <td>36.1 °C</td>
+                                        <td>35.8 °C</td>
+                                        <td>0.9 °C</td>
+                                        <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883601</td>
+                                        <td>16 Juni 2026</td>
+                                        <td>36.0 °C</td>
+                                        <td>37.5 °C</td>
+                                        <td>36.8 °C</td>
+                                        <td>1.5 °C</td>
+                                        <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883602</td>
+                                        <td>17 Juni 2026</td>
+                                        <td>37.1 °C</td>
+                                        <td>40.2 °C</td>
+                                        <td>38.0 °C</td>
+                                        <td>3.1 °C</td>
+                                        <td><span class="badge-fair">3 - Fair <i class="ri-information-line badge-icon"></i></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Parameter 2: Tekanan Gas SF6 -->
+                    <div style="margin-bottom: 40px; border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; background: #fff;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: 15px; font-weight: 600; color: var(--primary);">2. Trend: Tekanan Gas SF6</h3>
+                            </div>
+                            <span class="badge-verygood">Status Terakhir: 1 - Very Good (6.2 Bar) <i class="ri-checkbox-circle-line badge-icon"></i></span>
+                        </div>
+                        <div class="chart-container"><canvas id="trendChartSF6"></canvas></div>
+                        <div style="overflow-x: auto; margin-top: 16px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nomor WO</th>
+                                        <th>Tanggal</th>
+                                        <th>Tekanan Gas SF6</th>
+                                        <th>Temperatur Sekitar</th>
+                                        <th>Kondisi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>INS202600883600</td>
+                                        <td>15 Juni 2026</td>
+                                        <td>6.5 Bar</td>
+                                        <td>31.2 °C</td>
+                                        <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883601</td>
+                                        <td>16 Juni 2026</td>
+                                        <td>6.3 Bar</td>
+                                        <td>32.0 °C</td>
+                                        <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883602</td>
+                                        <td>17 Juni 2026</td>
+                                        <td>6.2 Bar</td>
+                                        <td>32.5 °C</td>
+                                        <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Parameter 3: Tahanan Kontak -->
+                    <div style="border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; background: #fff;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: 15px; font-weight: 600; color: var(--primary);">3. Trend: Tahanan Kontak</h3>
+                            </div>
+                            <span class="badge-verygood">Status Terakhir: 1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span>
+                        </div>
+                        <div class="chart-container"><canvas id="trendChartResistance"></canvas></div>
+                        <div style="overflow-x: auto; margin-top: 16px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nomor WO</th>
+                                        <th>Tanggal</th>
+                                        <th>Fasa R</th>
+                                        <th>Fasa S</th>
+                                        <th>Fasa T</th>
+                                        <th>Kondisi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>INS202600883600</td>
+                                        <td>15 Juni 2026</td>
+                                        <td>45 µΩ</td>
+                                        <td>46 µΩ</td>
+                                        <td>44 µΩ</td>
+                                        <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883601</td>
+                                        <td>16 Juni 2026</td>
+                                        <td>46 µΩ</td>
+                                        <td>48 µΩ</td>
+                                        <td>45 µΩ</td>
+                                        <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883602</td>
+                                        <td>17 Juni 2026</td>
+                                        <td>48 µΩ</td>
+                                        <td>50 µΩ</td>
+                                        <td>47 µΩ</td>
+                                        <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container" id="table-ahi" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Sub Sistem <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Parameter Anomali <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Skor Kondisi <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Nomor Inspeksi <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Last Update <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Accuracy <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Timeliness <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Completeness <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Dielectric</td>
+                                <td>Pengujian Tahanan Isolasi</td>
+                                <td><span class="badge-critical">5 - Critical <i class="ri-error-warning-line badge-icon"></i></span></td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30%</td>
+                                <td>100.0%</td>
+                                <td>100%</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Pengujian Tahanan Isolasi', 'Dielectric', '5 - Critical', 'INS202600102015', '13 Mei 2026 10:40:44', '0.0', 'MΩ', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Primary Unit</td>
+                                <td>Pengujian Tahanan Kontak - S</td>
+                                <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30%</td>
+                                <td>100.0%</td>
+                                <td>100%</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Pengujian Tahanan Kontak - S', 'Primary Unit', '2 - Good', 'INS202600102015', '13 Mei 2026 10:40:44', '29.48', 'μΩ', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Driving Mechanism</td>
+                                <td>Transmisi Penggerak</td>
+                                <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30%</td>
+                                <td>100.0%</td>
+                                <td>100%</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Transmisi Penggerak', 'Driving Mechanism', '1 - Very Good', 'INS202600102015', '13 Mei 2026 10:40:44', 'Normal', '-', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="max-ahi-row">
+                                <td colspan="3">MAX AHI</td>
+                                <td colspan="7" style="text-align: left;"><span class="badge-critical" style="font-size: 14px;">5 - Critical</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Detail Parameter Inspeksi -->
+                <div class="table-container" id="table-detail-parameter" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Sub Sistem <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Parameter Anomali <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Level Inspeksi <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Periode <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Skor Kondisi <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Hasil Inspeksi <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Satuan <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Nomor Inspeksi <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Last Update <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Accuracy <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Timeliness <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Completeness <i class="ri-arrow-up-down-line" style="color:#cbd5e1; font-size:14px; margin-left:4px;"></i></th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Grounding</td>
+                                <td>Tahanan Pentanahan</td>
+                                <td>Inspeksi Level 3</td>
+                                <td>2 Tahunan</td>
+                                <td><span class="badge-poor">4 - Poor <i class="ri-error-warning-line badge-icon"></i></span></td>
+                                <td>9000.0</td>
+                                <td>Ω</td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30</td>
+                                <td>100</td>
+                                <td>100</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Tahanan Pentanahan', 'Grounding', '4 - Poor', 'INS202600102015', '13 Mei 2026 10:40:44', '9000.0', 'Ω', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Secondary</td>
+                                <td>Pengujian Fungsi, Kontrol, Alarm, Interlock, Penggerak</td>
+                                <td>Inspeksi Level 3</td>
+                                <td>2 Tahunan</td>
+                                <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                <td>Normal</td>
+                                <td>-</td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30</td>
+                                <td>100</td>
+                                <td>100</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Pengujian Fungsi, Kontrol, Alarm, Interlock, Penggerak', 'Secondary', '1 - Very Good', 'INS202600102015', '13 Mei 2026 10:40:44', 'Normal', '-', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Driving Mechanism</td>
+                                <td>Pengujian Tegangan Motor</td>
+                                <td>Inspeksi Level 3</td>
+                                <td>2 Tahunan</td>
+                                <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                <td>99.91</td>
+                                <td>-</td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30</td>
+                                <td>100</td>
+                                <td>100</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Pengujian Tegangan Motor', 'Driving Mechanism', '1 - Very Good', 'INS202600102015', '13 Mei 2026 10:40:44', '99.91', 'V', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Driving Mechanism</td>
+                                <td>Transmisi Penggerak</td>
+                                <td>Inspeksi Level 3</td>
+                                <td>2 Tahunan</td>
+                                <td><span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                <td>Normal</td>
+                                <td>-</td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30</td>
+                                <td>100</td>
+                                <td>100</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Transmisi Penggerak', 'Driving Mechanism', '1 - Very Good', 'INS202600102015', '13 Mei 2026 10:40:44', 'Normal', '-', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Dielectric</td>
+                                <td>Pengujian Tahanan Isolasi</td>
+                                <td>Inspeksi Level 3</td>
+                                <td>2 Tahunan</td>
+                                <td><span class="badge-critical">5 - Critical <i class="ri-error-warning-line badge-icon"></i></span></td>
+                                <td>0.0</td>
+                                <td>MΩ</td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30</td>
+                                <td>100</td>
+                                <td>100</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Pengujian Tahanan Isolasi', 'Dielectric', '5 - Critical', 'INS202600102015', '13 Mei 2026 10:40:44', '0.0', 'MΩ', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Primary Unit</td>
+                                <td>Pengujian Tahanan Kontak - S</td>
+                                <td>Inspeksi Level 3</td>
+                                <td>2 Tahunan</td>
+                                <td><span class="badge-good">2 - Good <i class="ri-checkbox-circle-line badge-icon"></i></span></td>
+                                <td>29.48</td>
+                                <td>μΩ</td>
+                                <td><a href="#" class="link-text">INS202600102015</a></td>
+                                <td>13 Mei 2026 10:40:44</td>
+                                <td>30</td>
+                                <td>100</td>
+                                <td>100</td>
+                                <td>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button class="btn-icon" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;" title="Validasi Parameter Ini" onclick="openSingleParamValidationDrawer('Pengujian Tahanan Kontak - S', 'Primary Unit', '2 - Good', 'INS202600102015', '13 Mei 2026 10:40:44', '29.48', 'μΩ', this)"><i class="ri-checkbox-circle-line"></i></button>
+                                        <button class="btn-icon" title="Detail Data"><i class="ri-external-link-line"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div>Menampilkan 
+                        <select style="border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 4px; outline: none; margin: 0 4px;">
+                            <option>10</option>
+                        </select>
+                        dari <strong>3</strong> Data
+                    </div>
+                    <div class="pagination-controls">
+                        <div class="page-item"><i class="ri-arrow-left-s-line"></i></div>
+                        <div class="page-item active">1</div>
+                        <div class="page-item"><i class="ri-arrow-right-s-line"></i></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let charts = {};
+        
+        // Initialize charts when page loads
+        window.onload = function() {
+            initCharts();
+        };
+
+        function switchTab(tabIndex) {
+            const tabs = document.querySelectorAll('.tab-item');
+            tabs.forEach((tab, index) => {
+                if (index === tabIndex) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            document.getElementById('table-trending').style.display = 'none';
+            document.getElementById('table-ahi').style.display = 'none';
+            document.getElementById('table-detail-parameter').style.display = 'none';
+            document.getElementById('table-toolbar').style.display = 'flex';
+
+            if (tabIndex === 0) {
+                document.getElementById('table-trending').style.display = 'block';
+                document.getElementById('table-toolbar').style.display = 'none'; // hide search for trend
+            } else if (tabIndex === 1) {
+                document.getElementById('table-ahi').style.display = 'block';
+            } else {
+                document.getElementById('table-detail-parameter').style.display = 'block';
+            }
+        }
+
+        function initCharts() {
+            const labels = ['13 Jun', '14 Jun', '15 Jun', '16 Jun', '17 Jun'];
+
+            // 1. Thermovisi Chart
+            if (!charts.thermovisi && document.getElementById('trendChartThermovisi')) {
+                const ctx1 = document.getElementById('trendChartThermovisi').getContext('2d');
+                charts.thermovisi = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Suhu Fasa R',
+                                kondisiData: ['1 - Very Good', '1 - Very Good', '1 - Very Good', '1 - Very Good', '1 - Very Good'],
+                                data: [34.5, 34.8, 35.2, 36.0, 37.1],
+                                borderColor: '#ef4444',
+                                backgroundColor: '#ef4444',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Suhu Fasa S',
+                                data: [35.0, 35.5, 36.1, 37.5, 40.2],
+                                borderColor: '#f59e0b',
+                                backgroundColor: '#f59e0b',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Suhu Fasa T',
+                                data: [34.2, 35.0, 35.8, 36.8, 38.0],
+                                borderColor: '#2563eb',
+                                backgroundColor: '#2563eb',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Selisih Suhu (ΔT)',
+                                data: [0.8, 0.7, 0.9, 1.5, 3.1],
+                                borderColor: '#64748b',
+                                backgroundColor: '#64748b',
+                                kondisiData: ['2 - Good', '2 - Good', '2 - Good', '2 - Good', '3 - Fair'],
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                pointRadius: 5,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'top', labels: { usePointStyle: true } }
+                        },
+                        scales: {
+                            y: { title: { display: true, text: 'Suhu (°C)' }, grid: { color: '#e2e8f0' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // 2. SF6 Gas Pressure Chart
+            if (!charts.sf6 && document.getElementById('trendChartSF6')) {
+                const ctx2 = document.getElementById('trendChartSF6').getContext('2d');
+                charts.sf6 = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Tekanan Gas SF6',
+                            data: [6.6, 6.5, 6.5, 6.3, 6.2],
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            borderWidth: 2,
+                            pointRadius: 5,
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { usePointStyle: true } }
+                        },
+                        scales: {
+                            y: { title: { display: true, text: 'Tekanan (Bar)' }, grid: { color: '#e2e8f0' }, min: 5.0, max: 7.0 },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // 3. Contact Resistance Chart
+            if (!charts.resistance && document.getElementById('trendChartResistance')) {
+                const ctx3 = document.getElementById('trendChartResistance').getContext('2d');
+                charts.resistance = new Chart(ctx3, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Fasa R',
+                                data: [42, 44, 45, 46, 48],
+                                borderColor: '#ef4444',
+                                backgroundColor: '#ef4444',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Fasa S',
+                                data: [43, 45, 46, 48, 50],
+                                borderColor: '#f59e0b',
+                                backgroundColor: '#f59e0b',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Fasa T',
+                                data: [41, 43, 44, 45, 47],
+                                borderColor: '#2563eb',
+                                backgroundColor: '#2563eb',
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'top', labels: { usePointStyle: true } }
+                        },
+                        scales: {
+                            y: { title: { display: true, text: 'Hambatan (µΩ)' }, grid: { color: '#e2e8f0' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        /* ===== JS FOR SINGLE PARAMETER VALIDATION DRAWER OVERLAY ===== */
+        let activeRowElement = null;
+        let activeParamData = {};
+
+        function openSingleParamValidationDrawer(paramName, subSistem, skorKondisi, noInspeksi, lastUpdate, hasilInspeksi, satuan, btnEl) {
+            activeRowElement = btnEl ? btnEl.closest('tr') : null;
+            activeParamData = {
+                paramName: paramName,
+                subSistem: subSistem,
+                skorKondisi: skorKondisi,
+                noInspeksi: noInspeksi,
+                lastUpdate: lastUpdate,
+                hasilInspeksi: hasilInspeksi + (satuan && satuan !== '-' ? ' ' + satuan : '')
+            };
+
+            if (document.getElementById('drawerTitleText')) {
+                document.getElementById('drawerTitleText').textContent = 'Validasi Parameter: ' + paramName;
+            }
+            if (document.getElementById('dpSubSistem')) document.getElementById('dpSubSistem').textContent = subSistem || '-';
+            if (document.getElementById('dpParamName')) document.getElementById('dpParamName').textContent = paramName || '-';
+            if (document.getElementById('dpNoInspeksi')) document.getElementById('dpNoInspeksi').textContent = noInspeksi || '-';
+            if (document.getElementById('dpHasilInspeksi')) document.getElementById('dpHasilInspeksi').textContent = activeParamData.hasilInspeksi;
+            if (document.getElementById('dpLastUpdate')) document.getElementById('dpLastUpdate').textContent = lastUpdate || '-';
+
+            // Badge skor
+            let badgeHtml = '<span class="badge-good">2 - Good</span>';
+            if (skorKondisi.includes('5') || skorKondisi.includes('Critical')) {
+                badgeHtml = '<span class="badge-critical">5 - Critical <i class="ri-error-warning-line badge-icon"></i></span>';
+            } else if (skorKondisi.includes('4') || skorKondisi.includes('Poor')) {
+                badgeHtml = '<span class="badge-poor">4 - Poor <i class="ri-error-warning-line badge-icon"></i></span>';
+            } else if (skorKondisi.includes('3') || skorKondisi.includes('Fair')) {
+                badgeHtml = '<span class="badge-fair">3 - Fair <i class="ri-information-line badge-icon"></i></span>';
+            } else if (skorKondisi.includes('1') || skorKondisi.includes('Very Good')) {
+                badgeHtml = '<span class="badge-verygood">1 - Very Good <i class="ri-checkbox-circle-line badge-icon"></i></span>';
+            }
+            if (document.getElementById('dpSkorBadge')) {
+                document.getElementById('dpSkorBadge').innerHTML = badgeHtml;
+            }
+
+            // Select matching score in dropdown
+            const skalaSelect = document.getElementById('formValidasiSkalaAHI');
+            if (skalaSelect) {
+                if (skorKondisi.includes('5')) skalaSelect.value = '5 - Critical';
+                else if (skorKondisi.includes('4')) skalaSelect.value = '4 - Poor';
+                else if (skorKondisi.includes('3')) skalaSelect.value = '3 - Fair';
+                else if (skorKondisi.includes('1')) skalaSelect.value = '1 - Very Good';
+                else skalaSelect.value = '2 - Good';
+            }
+
+            // Determine parameter validation input control dynamically matching validasi-inspeksi-mainpage.html
+            let validasiCellHtml = '';
+            const unitStr = (satuan && satuan !== '-') ? satuan : '';
+            const rawVal = (hasilInspeksi || '').toString();
+            const isNumeric = !isNaN(parseFloat(rawVal)) || unitStr !== '';
+
+            if (isNumeric) {
+                validasiCellHtml = '<div style="display:flex; align-items:center; gap: 6px; width: 220px;">' +
+                    '<input type="number" step="0.1" class="form-control" value="" placeholder="Isi angka..." style="flex: 1; min-width: 0; padding: 4px 8px; font-size: 12px; height: 32px;">' +
+                    '<span style="font-size: 11px; color: var(--text-muted); font-weight: 600; min-width: 28px;">' + unitStr + '</span>' +
+                    '</div>';
+            } else {
+                validasiCellHtml = '<select class="form-control" style="padding: 4px 8px; font-size: 12px; height: 32px; width: 220px; box-sizing: border-box;">' +
+                    '<option value="" selected>- Pilih Validasi -</option>' +
+                    '<option value="Normal">Normal</option>' +
+                    '<option value="Baik / Sesuai">Baik / Sesuai</option>' +
+                    '<option value="Perlu Koreksi">Perlu Koreksi</option>' +
+                    '<option value="Abnormal">Abnormal</option>' +
+                    '</select>';
+            }
+
+            // Render the 8-column parameter table inside drawer matching validasi-inspeksi-mainpage.html
+            const drawerTbody = document.getElementById('drawerSingleParamTbody');
+            if (drawerTbody) {
+                drawerTbody.innerHTML = '<tr>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">1</td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);"><strong style="color: var(--primary);">' + (subSistem || 'Inspeksi Parameter') + '</strong></td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">' + paramName + '</td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);"><span style="color: var(--text-muted); font-weight: 500;">-</span></td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);"><span class="badge badge-active" style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;">' + activeParamData.hasilInspeksi + '</span></td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);"><span style="color: var(--text-muted); font-weight: 500;">-</span></td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">' + validasiCellHtml + '</td>' +
+                    '<td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">' + badgeHtml + '</td>' +
+                    '</tr>';
+            }
+
+            // Sync dropdown role if authorized
+            const activeRole = document.getElementById('activeRoleSelector') ? document.getElementById('activeRoleSelector').value : 'TL ASDIG UPT';
+            const drawerRoleSelect = document.getElementById('formValidasiUserRole');
+            if (drawerRoleSelect && VALIDATOR_ROLES.indexOf(activeRole) >= 0) {
+                drawerRoleSelect.value = activeRole;
+            }
+
+            // Reset inputs
+            if (document.getElementById('formValidasiCatatan')) document.getElementById('formValidasiCatatan').value = '';
+            if (document.getElementById('formValidasiHasilKoreksi')) document.getElementById('formValidasiHasilKoreksi').value = '';
+            if (document.getElementById('formValidasiAttachment')) document.getElementById('formValidasiAttachment').value = '';
+
+            // Render history for this single parameter
+            renderParamHistoryLogs(paramName, noInspeksi);
+
+            document.getElementById('drawerBackdrop').classList.add('active');
+            document.getElementById('singleParamDrawer').classList.add('active');
+        }
+
+        function closeSingleParamDrawer() {
+            document.getElementById('drawerBackdrop').classList.remove('active');
+            document.getElementById('singleParamDrawer').classList.remove('active');
+        }
+
+        const VALIDATOR_ROLES = [
+            "Asman Pemeliharaan Gardu Induk pada Unit Induk",
+            "Staff Pemeliharaan Gardu Induk pada Unit Induk",
+            "Asman RENEV UPT",
+            "TL OLDAT UPT",
+            "TL ASDIG UPT",
+            "Staff ASDIG UPT",
+            "Staff OLDAT UPT",
+            "Staff RENEV UPT"
+        ];
+
+        function updateRoleActionVisibility() {
+            const roleSelect = document.getElementById('activeRoleSelector');
+            const activeRole = roleSelect ? roleSelect.value : 'TL ASDIG UPT';
+            const isAuthorized = VALIDATOR_ROLES.indexOf(activeRole) >= 0;
+
+            document.querySelectorAll('.btn-validasi-action').forEach(function(btn) {
+                btn.style.display = isAuthorized ? 'inline-flex' : 'none';
+            });
+
+            const drawerRoleSelect = document.getElementById('formValidasiUserRole');
+            if (drawerRoleSelect && isAuthorized) {
+                drawerRoleSelect.value = activeRole;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            updateRoleActionVisibility();
+        });
+
+        function renderParamHistoryLogs(paramName, noInspeksi) {
+            const container = document.getElementById('paramHistoryList');
+            if (!container) return;
+
+            const activeRole = document.getElementById('activeRoleSelector') ? document.getElementById('activeRoleSelector').value : 'TL ASDIG UPT';
+            const nowStr = '10-04-2026 14:25 WIB';
+            container.innerHTML = '<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 6px;">' +
+                '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                '<span class="badge" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; font-size:11px; padding:2px 8px; border-radius:4px;"><i class="ri-user-3-fill"></i> User B (' + activeRole + ')</span>' +
+                '<span style="font-size: 11px; color: var(--text-muted);"><i class="ri-time-line"></i> ' + nowStr + '</span>' +
+                '</div>' +
+                '<div style="color: #334155;">Parameter <strong>' + paramName + '</strong> (WO ' + noInspeksi + ') telah diverifikasi & sesuai standar teknis operasional.</div>' +
+                '</div>';
+        }
+
+        function saveSingleParamValidation() {
+            openConfirmValidationModal();
+        }
+
+        function openConfirmValidationModal() {
+            const userRole = document.getElementById('activeRoleSelector') ? document.getElementById('activeRoleSelector').value : 'TL ASDIG UPT';
+            if (document.getElementById('modalConfirmParamName')) {
+                document.getElementById('modalConfirmParamName').textContent = activeParamData.paramName || '-';
+            }
+            if (document.getElementById('modalConfirmUserRole')) {
+                document.getElementById('modalConfirmUserRole').textContent = userRole;
+            }
+
+            // Reset inputs inside modal
+            if (document.getElementById('popupAlasanValidasi')) document.getElementById('popupAlasanValidasi').value = '';
+            if (document.getElementById('popupAttachmentFile')) document.getElementById('popupAttachmentFile').value = '';
+
+            const m = document.getElementById('modalKonfirmasiValidasi');
+            if (m) m.classList.add('active');
+        }
+
+        function closeConfirmValidationModal() {
+            const m = document.getElementById('modalKonfirmasiValidasi');
+            if (m) m.classList.remove('active');
+        }
+
+        function submitValidationFinal() {
+            const alasanInput = document.getElementById('popupAlasanValidasi');
+            const alasan = alasanInput ? alasanInput.value.trim() : '';
+
+            if (!alasan) {
+                alert('Silakan masukkan alasan & catatan validasi terlebih dahulu!');
+                if (alasanInput) alasanInput.focus();
+                return;
+            }
+
+            const userRole = document.getElementById('activeRoleSelector') ? document.getElementById('activeRoleSelector').value : 'TL ASDIG UPT';
+            const fileInput = document.getElementById('popupAttachmentFile');
+            const fileName = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : '';
+
+            // Update row highlight
+            if (activeRowElement) {
+                activeRowElement.style.background = '#f0fdf4';
+            }
+
+            // Append to timeline history in drawer
+            const container = document.getElementById('paramHistoryList');
+            if (container) {
+                const nowStr = '06-08-2026 15:59 WIB';
+                let attachmentBadge = '';
+                if (fileName) {
+                    attachmentBadge = '<div style="margin-top:4px;"><span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-size:10px;"><i class="ri-attachment-2"></i> ' + fileName + '</span></div>';
+                }
+                const newHistoryHtml = '<div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 6px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                    '<span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:11px; padding:2px 8px; border-radius:4px;"><i class="ri-checkbox-circle-fill"></i> User (' + userRole + ')</span>' +
+                    '<span style="font-size: 11px; color: var(--text-muted);"><i class="ri-time-line"></i> ' + nowStr + '</span>' +
+                    '</div>' +
+                    '<div style="color: #166534;"><strong>Alasan Validasi:</strong> ' + alasan + '</div>' +
+                    attachmentBadge +
+                    '</div>';
+                container.insertAdjacentHTML('afterbegin', newHistoryHtml);
+            }
+
+            closeConfirmValidationModal();
+            closeSingleParamDrawer();
+            showToast('Validasi parameter "' + activeParamData.paramName + '" berhasil disahkan oleh ' + userRole + '!');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.add('active');
+            setTimeout(function() {
+                t.classList.remove('active');
+            }, 3500);
+        }
+    </script>
+
+    <!-- DRAWER OVERLAY VALIDASI PARAMETER SPESIFIK (75% WIDTH OVERLAY) -->
+    <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeSingleParamDrawer()"></div>
+    <div class="drawer" id="singleParamDrawer">
+        <div class="drawer-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="ri-checkbox-circle-line" style="color: var(--primary); font-size: 22px;"></i>
+                <div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="drawerTitleText">Validasi Parameter Inspeksi</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="drawerSubTitleText">GI 150KV KALISARI - PMS BUS A</div>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeSingleParamDrawer()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <div class="drawer-body">
+            <!-- Informational Banner -->
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #1e3a8a; display: flex; align-items: flex-start; gap: 10px;">
+                <i class="ri-information-line" style="font-size: 20px; color: var(--primary); flex-shrink: 0; margin-top: 2px;"></i>
+                <div>
+                    <strong>Validasi Spesifik Parameter Inspeksi</strong>
+                    <div style="font-size: 12px; color: #3b82f6; margin-top: 2px;">Anda sedang melakukan validasi & pengesahan khusus untuk 1 parameter anomali yang dipilih dari tabel AHI / Detail Inspeksi.</div>
+                </div>
+            </div>
+
+            <!-- Summary Card Parameter Selected -->
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                    <i class="ri-list-check-2" style="color: var(--primary);"></i> Detail Parameter yang Diklik
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 12px;">
+                    <div><span style="color: var(--text-muted);">Sub Sistem:</span> <strong id="dpSubSistem" style="color: var(--text-main);">-</strong></div>
+                    <div><span style="color: var(--text-muted);">Parameter Anomali:</span> <strong id="dpParamName" style="color: var(--primary);">-</strong></div>
+                    <div><span style="color: var(--text-muted);">Nomor Inspeksi (WO):</span> <strong id="dpNoInspeksi" style="font-family: monospace; color: var(--text-main);">-</strong></div>
+                    <div><span style="color: var(--text-muted);">Hasil Inspeksi Lapangan:</span> <strong id="dpHasilInspeksi" style="color: #0f172a;">-</strong></div>
+                    <div><span style="color: var(--text-muted);">Last Update:</span> <strong id="dpLastUpdate" style="color: var(--text-main);">-</strong></div>
+                    <div><span style="color: var(--text-muted);">Skor AHI Terakhir:</span> <span id="dpSkorBadge">-</span></div>
+                </div>
+            </div>
+
+            <!-- Tabel Rincian Parameter Inspeksi (Exact 8-Column Format from validasi-inspeksi-mainpage.html) -->
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <i class="ri-list-check-3" style="color: var(--primary);"></i> Tabel Rincian Data Parameter Inspeksi
+                    </div>
+                    <span style="font-size: 11px; font-weight: 600; background: #eff6ff; color: var(--primary); padding: 3px 10px; border-radius: 12px; border: 1px solid #bfdbfe;">1 Parameter Terpilih</span>
+                </div>
+
+                <div style="border: 1px solid var(--border-color); border-radius: 6px; overflow-x: auto; background: #fff;">
+                    <table style="width: 100%; min-width: 1050px; border-collapse: separate; border-spacing: 0; font-size: 12px; white-space: nowrap;">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px; background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">No.</th>
+                                <th style="background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Parameter</th>
+                                <th style="background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Uraian</th>
+                                <th style="background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Sub Uraian</th>
+                                <th style="background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Hasil Inspeksi</th>
+                                <th style="width: 140px; background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Hasil Koreksi</th>
+                                <th style="width: 220px; background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Kolom Validasi</th>
+                                <th style="width: 160px; background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; text-align: left;">Skala Kondisi Sementara</th>
+                            </tr>
+                        </thead>
+                        <tbody id="drawerSingleParamTbody">
+                            <!-- Dynamically rendered via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+            <!-- Section Timeline Riwayat Validasi Parameter Spesifik -->
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                    <i class="ri-history-line" style="color: var(--primary);"></i> Timeline Riwayat Validasi Parameter Ini
+                </div>
+                <div id="paramHistoryList" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Dynamically rendered -->
+                </div>
+            </div>
+        </div>
+
+        <div class="drawer-footer">
+            <button class="btn" style="padding: 8px 18px;" onclick="closeSingleParamDrawer()">Batal</button>
+            <button class="btn" style="background: var(--primary); color: #fff; border: none; padding: 8px 20px;" onclick="saveSingleParamValidation()">
+                <i class="ri-checkbox-circle-line"></i> Submit Validasi
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL POP-UP KONFIRMASI VALIDASI -->
+    <div class="modal-confirm-backdrop" id="modalKonfirmasiValidasi">
+        <div class="modal-confirm-box">
+            <div class="modal-confirm-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-checkbox-circle-fill" style="color: var(--primary); font-size: 20px;"></i>
+                    <strong style="font-size: 15px; color: var(--text-main);">Konfirmasi Pengesahan Validasi</strong>
+                </div>
+                <button class="modal-close" onclick="closeConfirmValidationModal()" style="border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--text-muted);">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <div class="modal-confirm-body">
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #1e3a8a; display: flex; flex-direction: column; gap: 4px;">
+                    <div><span style="color: #3b82f6;">Parameter:</span> <strong id="modalConfirmParamName" style="color: var(--primary);">-</strong></div>
+                    <div><span style="color: #3b82f6;">Role Validator:</span> <strong id="modalConfirmUserRole" style="color: #0f172a;">-</strong></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 6px;">
+                        Alasan & Catatan Validasi <span style="color: var(--danger);">*</span>
+                    </label>
+                    <textarea id="popupAlasanValidasi" class="form-control" rows="3" placeholder="Masukkan alasan atau catatan pengesahan validasi parameter ini..."></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 6px;">
+                        Attachment File / Dokumen Pendukung <span style="color: var(--text-muted); font-size: 11px; font-weight: normal;">(Opsional - PDF, JPG, PNG)</span>
+                    </label>
+                    <input type="file" id="popupAttachmentFile" class="form-control" style="padding: 6px 10px; font-size: 12px;">
+                </div>
+            </div>
+
+            <div class="modal-confirm-footer">
+                <button class="btn" style="padding: 8px 16px; font-size: 12px;" onclick="closeConfirmValidationModal()">Batal</button>
+                <button class="btn" style="background: var(--primary); color: #fff; border: none; padding: 8px 18px; font-size: 12px; font-weight: 600;" onclick="submitValidationFinal()">
+                    <i class="ri-checkbox-circle-line"></i> Simpan & Sahkan Validasi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast">
+        <i class="ri-checkbox-circle-fill" style="color: var(--success); font-size: 18px;"></i>
+        <span id="toastMsg">Validasi parameter berhasil disahkan!</span>
+    </div>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <!-- TODO: UPDATE NOTES HERE -->
+        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
+        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
+        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>
