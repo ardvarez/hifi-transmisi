@@ -1624,8 +1624,8 @@
 
             <!-- VIEW TAB: DETAIL ITEM INSPEKSI WO -->
             <div id="drawerTabInspectionDetail" style="display: none;">
-                <!-- Action Bar (Status Badge & Sahkan Button) -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+                <!-- Action Bar (Status Badge & Sahkan Button - STICKY HEADER) -->
+                <div style="position: sticky; top: -24px; z-index: 100; background: #f8fafc; padding: 16px 24px; margin: -24px -24px 20px -24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);">
                     <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-main);">
                         <i class="ri-file-list-3-line" style="color: var(--primary);"></i> Parameter Hasil Inspeksi Work Order
                     </div>
@@ -1634,7 +1634,7 @@
                         <button class="btn btn-outline" style="padding: 6px 14px; font-size: 12px; border-radius: 6px; display: none;" id="btnLihatRiwayatWO" onclick="openModalRiwayatWO()">
                             <i class="ri-history-line" style="color: var(--primary);"></i> Lihat Riwayat Validasi
                         </button>
-                        <button class="btn btn-primary" style="padding: 7px 16px; font-size: 13px;" onclick="openModalValidasiHasil()">
+                        <button class="btn btn-primary" style="padding: 7px 16px; font-size: 13px;" onclick="simpanValidasiDetail()">
                             <i class="ri-checkbox-circle-line"></i> Validasi Hasil Inspeksi
                         </button>
                     </div>
@@ -2015,12 +2015,17 @@
                     <i class="ri-checkbox-circle-line" style="font-size: 28px;"></i>
                 </div>
                 <div style="font-size: 16px; font-weight: 600;">Koreksi Berhasil Disimpan</div>
-                <div style="font-size: 13px; color: var(--text-muted);" id="konfirmasiMessage">Data koreksi telah
-                    disimpan.</div>
+                <div style="font-size: 13px; color: var(--text-muted);" id="konfirmasiMessage">Data koreksi telah disimpan.</div>
             </div>
-    <!-- MODAL POPUP VALIDASI HASIL INSPEKSI -->
-    <div class="modal-overlay" id="modalValidasiHasil">
-        <div class="modal" style="width: 620px; max-width: 90vw;">
+            <div class="modal-footer" style="justify-content: center; padding: 14px 24px; background: #f8fafc;">
+                <button class="btn btn-primary" onclick="closeKonfirmasi()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP VALIDASI HASIL INSPEKSI (STACKED OVER DRAWER OVERLAY) -->
+    <div class="modal-overlay" id="modalValidasiHasil" style="z-index: 3000; backdrop-filter: blur(4px); background: rgba(15, 23, 42, 0.6);">
+        <div class="modal" style="width: 560px; max-width: 90vw; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.2); overflow: hidden;">
             <div class="modal-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <i class="ri-checkbox-circle-line" style="font-size: 20px; color: var(--primary);"></i>
@@ -2041,17 +2046,10 @@
                         <label>Nomor Work Order (WO)</label>
                         <input type="text" id="modalValidasiNoWoInput" class="form-control" disabled style="background: #f1f5f9; font-weight: 700; color: var(--primary);">
                     </div>
-                    <div class="form-group">
-                        <label>Role / Jabatan User Validator <span style="color: var(--danger);">*</span></label>
-                        <select id="modalValidasiUserRole" class="form-control" style="font-weight: 500; height: 38px;">
+                    <div class="form-group" style="display: none;">
+                        <label>Role / Jabatan User Validator</label>
+                        <select id="modalValidasiUserRole" class="form-control">
                             <option value="TL ASDIG UPT" selected>TL ASDIG UPT</option>
-                            <option value="Asman Pemeliharaan Gardu Induk pada Unit Induk">Asman Pemeliharaan Gardu Induk pada Unit Induk</option>
-                            <option value="Staff Pemeliharaan Gardu Induk pada Unit Induk">Staff Pemeliharaan Gardu Induk pada Unit Induk</option>
-                            <option value="Asman RENEV UPT">Asman RENEV UPT</option>
-                            <option value="TL OLDAT UPT">TL OLDAT UPT</option>
-                            <option value="Staff ASDIG UPT">Staff ASDIG UPT</option>
-                            <option value="Staff OLDAT UPT">Staff OLDAT UPT</option>
-                            <option value="Staff RENEV UPT">Staff RENEV UPT</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -3075,6 +3073,117 @@
         }
 
         function simpanValidasiDetail() {
+            // Validate per-parameter completeness rule:
+            // 1. Unvalidated parameters can be skipped completely (0 filled items is allowed).
+            // 2. BUT if at least 1 item in a parameter is filled, ALL items in that parameter must be filled!
+
+            const tbody = document.getElementById('inspectionItemsTbody');
+            if (!tbody) {
+                openModalValidasiHasil();
+                return;
+            }
+
+            const trs = Array.from(tbody.querySelectorAll('tr'));
+            if (trs.length === 0) {
+                openModalValidasiHasil();
+                return;
+            }
+
+            // Group rows by parameter name
+            const paramGroups = {};
+            let currentParamName = '';
+
+            trs.forEach(function (tr) {
+                // Find parameter cell if present or inherit from previous row
+                const paramTd = tr.querySelector('td:nth-child(2)');
+                if (paramTd && paramTd.hasAttribute('rowspan')) {
+                    currentParamName = paramTd.textContent.trim();
+                } else if (!currentParamName) {
+                    currentParamName = 'Parameter Inspeksi';
+                }
+
+                if (!paramGroups[currentParamName]) {
+                    paramGroups[currentParamName] = [];
+                }
+
+                // Check input in this row
+                const inputEl = tr.querySelector('input:not([type="checkbox"]), select');
+                const msEl = tr.querySelector('.custom-multiselect');
+                const isFormula = tr.textContent.includes('Kalkulasi Otomatis') || tr.textContent.includes('Locked');
+
+                let isFilled = false;
+                let targetInput = null;
+
+                if (isFormula) {
+                    isFilled = true; // Formula fields are automatically valid/filled
+                } else if (inputEl) {
+                    targetInput = inputEl;
+                    if (inputEl.tagName.toLowerCase() === 'select') {
+                        isFilled = inputEl.value.trim() !== '';
+                    } else {
+                        isFilled = inputEl.value.trim() !== '';
+                    }
+                } else if (msEl) {
+                    targetInput = msEl.querySelector('.ms-trigger');
+                    const label = msEl.querySelector('.ms-label');
+                    if (label && label.textContent.trim() !== '' && label.textContent.trim() !== 'Pilih kondisi...') {
+                        isFilled = true;
+                    }
+                }
+
+                paramGroups[currentParamName].push({
+                    row: tr,
+                    input: targetInput,
+                    isFormula: isFormula,
+                    isFilled: isFilled
+                });
+            });
+
+            // Validate each group
+            let hasError = false;
+            let errorMessage = '';
+            let firstInvalidInput = null;
+
+            // Reset previous invalid highlights
+            trs.forEach(function (tr) {
+                tr.querySelectorAll('.form-control, .ms-trigger').forEach(function (el) {
+                    el.style.borderColor = '';
+                    el.style.background = '';
+                });
+            });
+
+            for (const paramName in paramGroups) {
+                const items = paramGroups[paramName];
+                const nonFormulaItems = items.filter(function (x) { return !x.isFormula; });
+                const filledItems = nonFormulaItems.filter(function (x) { return x.isFilled; });
+
+                if (filledItems.length > 0 && filledItems.length < nonFormulaItems.length) {
+                    // Violation: At least 1 item is filled, but not all items under this parameter are completed!
+                    hasError = true;
+                    errorMessage = 'Parameter "' + paramName + '" memiliki ' + filledItems.length + ' dari ' + nonFormulaItems.length + ' uraian terisi.\n\nJika 1 uraian pada parameter terisi, maka SELURUH uraian dalam parameter tersebut wajib dilengkapi!';
+
+                    nonFormulaItems.forEach(function (x) {
+                        if (!x.isFilled && x.input) {
+                            x.input.style.borderColor = '#ef4444';
+                            x.input.style.background = '#fef2f2';
+                            if (!firstInvalidInput) firstInvalidInput = x.input;
+                        }
+                    });
+
+                    break; // Stop at first incomplete parameter group
+                }
+            }
+
+            if (hasError) {
+                alert(errorMessage);
+                if (firstInvalidInput) {
+                    firstInvalidInput.focus();
+                    firstInvalidInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            // All checks passed -> open validation modal
             openModalValidasiHasil();
         }
 
