@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi Hasil Inspeksi - PLN Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar Utilities */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-header {
+            padding: 24px 32px 0 32px;
+            background: var(--bg-surface);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-item {
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-item:hover {
+            color: var(--text-main);
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 24px 32px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* KPI Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.blue { background: #eff6ff; color: var(--primary); }
+        .kpi-icon.green { background: #f0fdf4; color: var(--success); }
+        .kpi-icon.amber { background: #fffbeb; color: var(--warning); }
+        .kpi-icon.red { background: #fef2f2; color: var(--danger); }
+
+        .kpi-details { display: flex; flex-direction: column; }
+
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            padding-left: 8px;
+        }
+
+        .search-box i {
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: var(--bg-surface);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-outline-primary {
+            background: var(--bg-surface);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover, .btn-outline-primary:hover {
+            background: #f8fafc;
+        }
+
+        /* Filter Selects */
+        .filter-select {
+            appearance: none;
+            padding: 6px 28px 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-main);
+            background-color: var(--bg-surface);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Table Container */
+        .table-container {
+            flex: 1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            min-width: 2400px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+            background: var(--bg-surface);
+        }
+
+        tr:hover td {
+            background: #f1f5f9;
+        }
+
+        /* Sticky Aksi Column */
+        #table-validasi th:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 16;
+            background: #f8fafc;
+            border-left: 1px solid var(--border-color);
+        }
+
+        #table-validasi td:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 6;
+            background: #ffffff;
+            border-left: 1px solid var(--border-color);
+        }
+
+        #table-validasi tr:hover td:last-child {
+            background: #f1f5f9;
+        }
+
+        /* Sticky Left Freeze Pane (Columns 1-7: No., UIT, Unit/UPT, ULTG, Gardu Induk, Bay, Techidentno) */
+        #table-validasi th:nth-child(1), #table-validasi td:nth-child(1) { position: sticky; left: 0px; width: 50px; min-width: 50px; }
+        #table-validasi th:nth-child(2), #table-validasi td:nth-child(2) { position: sticky; left: 50px; width: 70px; min-width: 70px; }
+        #table-validasi th:nth-child(3), #table-validasi td:nth-child(3) { position: sticky; left: 120px; width: 140px; min-width: 140px; }
+        #table-validasi th:nth-child(4), #table-validasi td:nth-child(4) { position: sticky; left: 260px; width: 160px; min-width: 160px; }
+        #table-validasi th:nth-child(5), #table-validasi td:nth-child(5) { position: sticky; left: 420px; width: 160px; min-width: 160px; }
+        #table-validasi th:nth-child(6), #table-validasi td:nth-child(6) { position: sticky; left: 580px; width: 140px; min-width: 140px; }
+        #table-validasi th:nth-child(7), #table-validasi td:nth-child(7) { 
+            position: sticky; 
+            left: 720px; 
+            width: 130px; 
+            min-width: 130px;
+            box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.12);
+        }
+
+        #table-validasi td:nth-child(1),
+        #table-validasi td:nth-child(2),
+        #table-validasi td:nth-child(3),
+        #table-validasi td:nth-child(4),
+        #table-validasi td:nth-child(5),
+        #table-validasi td:nth-child(6),
+        #table-validasi td:nth-child(7) {
+            z-index: 5;
+            background: #ffffff;
+        }
+
+        #table-validasi tr:hover td:nth-child(1),
+        #table-validasi tr:hover td:nth-child(2),
+        #table-validasi tr:hover td:nth-child(3),
+        #table-validasi tr:hover td:nth-child(4),
+        #table-validasi tr:hover td:nth-child(5),
+        #table-validasi tr:hover td:nth-child(6),
+        #table-validasi tr:hover td:nth-child(7) {
+            background: #f1f5f9;
+        }
+
+        #table-validasi th:nth-child(1),
+        #table-validasi th:nth-child(2),
+        #table-validasi th:nth-child(3),
+        #table-validasi th:nth-child(4),
+        #table-validasi th:nth-child(5),
+        #table-validasi th:nth-child(6),
+        #table-validasi th:nth-child(7) {
+            z-index: 15;
+            background: #f8fafc;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-active { background: #f0fdf4; color: var(--success); }
+        .badge-inactive { background: #fef2f2; color: var(--danger); }
+        .badge-draft { background: #fffbeb; color: var(--warning); }
+        .badge-blue { background: #eff6ff; color: var(--primary); }
+
+        .tag {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .hasil-layak { color: var(--success); font-weight: 600; }
+        .hasil-tidak-layak { color: var(--danger); font-weight: 600; }
+
+        .ahi-fair { color: var(--warning); font-weight: 600; }
+        .ahi-empty { color: var(--text-muted); }
+        .ahi-poor { color: var(--danger); font-weight: 600; }
+        .ahi-good { color: var(--success); font-weight: 600; }
+        .ahi-critical { color: #000000; font-weight: 700; }
+
+        .btn-opt.active {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+
+        /* Action Button */
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .btn-icon:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .btn-icon:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-icon.warn:hover {
+            color: var(--warning);
+        }
+
+        /* Slide-over Drawer (Right Overlay) */
+        .drawer-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 2500;
+        }
+        .drawer-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 85%;
+            min-width: 900px;
+            background: #ffffff;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+            z-index: 2600;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .drawer.active {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .drawer-nav-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .drawer-nav-btn:hover {
+            color: var(--primary);
+            background: rgba(255,255,255,0.6);
+        }
+        .drawer-nav-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .summary-card {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1.1fr 1fr;
+            gap: 20px;
+        }
+        .summary-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .summary-col:not(:last-child) {
+            border-right: 1px solid var(--border-color);
+            padding-right: 20px;
+        }
+
+        .wo-table-container {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow-x: auto;
+            background: #fff;
+        }
+        .wo-table-container table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: collapse;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .wo-table-container th {
+            background: #f8fafc;
+            padding: 10px 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .wo-table-container td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        .wo-table-container tr:last-child td {
+            border-bottom: none;
+        }
+        .wo-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .drawer-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .drawer-body {
+            padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .drawer-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .detail-section {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .detail-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 16px;
+            font-size: 12px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .detail-item.full-width {
+            grid-column: span 2;
+        }
+        .detail-label {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            width: 800px;
+            max-height: 90vh;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .modal-close {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+        }
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+            margin-top: 24px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+        .form-control:disabled {
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .form-group input:disabled,
+        .form-group select:disabled {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 72px;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .page-item {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .page-item:hover {
+            background: #eff6ff;
+        }
+
+        .page-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .page-item.disabled {
+            color: var(--text-muted);
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        .page-btn {
+            min-width: 28px;
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* HISTORY LIST */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            background: var(--bg-surface);
+        }
+
+        .history-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .history-user {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .history-action {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .history-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--text-main);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        /* Search box in modal */
+        .modal-search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            width: 100%;
+        }
+
+        .modal-search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            padding-left: 8px;
+        }
+
+        .modal-search-box i {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top System Bar -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-server-line"></i> Server Training
+        </div>
+        <div class="right">
+            Contact us: helpdesk.pi@iconpln.co.id | Security Issue: soc@pln.co.id
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-flashlight-fill"></i>
+            <span>PLN</span>
+        </div>
+        <div class="menu-item"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item"><i class="ri-line-chart-line"></i></div>
+        <div class="menu-item"><i class="ri-settings-4-line"></i></div>
+        <div class="menu-item"><i class="ri-table-alt-line"></i></div>
+        <div class="menu-item"><i class="ri-focus-2-line"></i></div>
+        <div class="menu-item active"><i class="ri-checkbox-circle-line"></i></div>
+        <div class="menu-item"><i class="ri-team-line"></i></div>
+        <div class="menu-item"><i class="ri-customer-service-2-line"></i></div>
+        <div class="menu-item"><i class="ri-filter-3-line"></i></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1 class="page-title">Validasi Hasil Inspeksi</h1>
+            <p class="page-subtitle">Koreksi dan riwayat validasi hasil inspeksi untuk UPT / Unit Induk.</p>
+
+            <div class="tabs">
+                <div class="tab-item active">Daftar Validasi</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- KPI Cards -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon blue"><i class="ri-file-list-3-line"></i></div>
+                    <div class="kpi-details">
+                        <span class="kpi-value" id="kpi-1">0</span>
+                        <span class="kpi-label">Total Hasil Inspeksi</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green"><i class="ri-checkbox-circle-line"></i></div>
+                    <div class="kpi-details">
+                        <span class="kpi-value" id="kpi-2">0</span>
+                        <span class="kpi-label">Tindak Lanjut Selesai</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon blue"><i class="ri-time-line"></i></div>
+                    <div class="kpi-details">
+                        <span class="kpi-value" id="kpi-3">0</span>
+                        <span class="kpi-label">Tindak Lanjut Aktif</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon amber"><i class="ri-error-warning-line"></i></div>
+                    <div class="kpi-details">
+                        <span class="kpi-value" id="kpi-4">0</span>
+                        <span class="kpi-label">Tindak Lanjut Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background-color: #eff6ff; color: #1e3a8a; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; border: 1px solid #bfdbfe;">
+                <i class="ri-information-line" style="font-size: 16px;"></i>
+                <span>Koreksi hanya dapat dilakukan maksimal 3 bulan setelah tanggal inspeksi.</span>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="searchInput" placeholder="Cari Peralatan, Formulir, Unit..." oninput="applyFilter()">
+                    </div>
+                    <button class="btn btn-primary" onclick="openFilterModal()">
+                        <i class="ri-filter-3-fill"></i> Filter
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-outline-primary">
+                        <i class="ri-file-excel-2-line"></i> Export Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Validasi -->
+            <div class="table-container" id="table-validasi">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>UIT</th>
+                            <th>Unit / UPT</th>
+                            <th>ULTG</th>
+                            <th>Gardu Induk</th>
+                            <th>Bay</th>
+                            <th>Techidentno</th>
+                            <th>Jenis Aset</th>
+                            <th>Merk</th>
+                            <th>Tipe</th>
+                            <th>Serial ID</th>
+                            <th>Fasa</th>
+                            <th>Tegangan</th>
+                            <th>Formulir</th>
+                            <th>Tanggal Inspeksi Terakhir</th>
+                            <th>AHI</th>
+                            <th>Tindak Lanjut</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div id="paginationInfo">
+                    Menampilkan <strong>0</strong> sampai <strong>0</strong> dari <strong>0</strong> data
+                </div>
+                <div class="pagination-controls" id="paginationControls"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- DETAIL DRAWER (RIGHT OVERLAY - 75% WIDTH REFACTORED) -->
+    <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDetailDrawer()"></div>
+    <div class="drawer" id="detailDrawer">
+        <div class="drawer-header">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="drawer-title">
+                    <i class="ri-file-search-line" style="color: var(--primary); font-size: 22px;"></i>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 700; color: var(--text-main);">Detail Validasi Inspeksi</div>
+                        <div class="drawer-header-subtitle" id="drawerSubTitle">Gardu Induk & Bay</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="display: flex; gap: 4px; background: #e2e8f0; padding: 4px; border-radius: 8px;">
+                    <button class="drawer-nav-btn active" id="drawerTabMainBtn" onclick="switchDrawerTab('main')">
+                        <i class="ri-file-list-3-line"></i> Informasi & Data WO
+                    </button>
+                    <button class="drawer-nav-btn" id="drawerTabHistoryBtn" onclick="switchDrawerTab('history')">
+                        <i class="ri-history-line"></i> Riwayat Validasi
+                    </button>
+                </div>
+                <button class="modal-close" onclick="closeDetailDrawer()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="drawer-body">
+            <!-- TAB MAIN: INFORMASI & WO TABLE -->
+            <div id="drawerTabMain">
+                <!-- Unified Summary Card -->
+                <div class="summary-card">
+                    <div class="summary-grid">
+                        <div class="summary-col">
+                            <div class="detail-section-title" style="margin-bottom: 4px;">
+                                <i class="ri-building-line"></i> Lokasi & Unit Pengelola
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Regional / UIT</span>
+                                <span class="detail-value" id="drawerUit">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Unit Pelaksana / UPT</span>
+                                <span class="detail-value" id="drawerUnit">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">ULTG</span>
+                                <span class="detail-value" id="drawerUpt">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Gardu Induk / Bay</span>
+                                <span class="detail-value" id="drawerGarduIndukBay">-</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-col">
+                            <div class="detail-section-title" style="margin-bottom: 4px;">
+                                <i class="ri-flashlight-line"></i> Detail Aset & Formulir
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Techidentno</span>
+                                <span class="detail-value" id="drawerTechidentno">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Jenis & Merk Aset</span>
+                                <span class="detail-value" id="drawerJenisMerk">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tipe / Serial ID</span>
+                                <span class="detail-value" id="drawerTipeSerial">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Formulir Inspeksi</span>
+                                <span class="detail-value" id="drawerFormulir">-</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-col">
+                            <div class="detail-section-title" style="margin-bottom: 4px;">
+                                <i class="ri-information-line"></i> Status & Tanggal Inspeksi
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tanggal Inspeksi Terakhir</span>
+                                <span class="detail-value" id="drawerTanggal">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Skor AHI</span>
+                                <span class="detail-value" id="drawerAhi">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status Tindak Lanjut</span>
+                                <span class="detail-value" id="drawerTindakLanjut">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Batas Maksimal Koreksi</span>
+                                <span class="detail-value" id="drawerBatasKoreksi">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WO DATA TABLE SECTION -->
+                <div class="detail-section">
+                    <div class="detail-section-title" style="justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <i class="ri-table-line"></i> Data Work Order (WO) yang Mau Divalidasi
+                        </div>
+                        <span style="font-size: 11px; font-weight: 600; background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 12px; border: 1px solid #bfdbfe;" id="woTotalBadge">Total 0 Data WO</span>
+                    </div>
+
+                    <div class="wo-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">No.</th>
+                                    <th>Nomor WO</th>
+                                    <th>Tanggal Inspeksi</th>
+                                    <th>Skala Kondisi Formulir</th>
+                                    <th>Status Data</th>
+                                    <th>Tindak Lanjut</th>
+                                    <th style="text-align: center; width: 120px;">Aksi Validasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="woTbody">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                        <div class="wo-pagination">
+                            <div id="woPaginationInfo">Menampilkan 0-0 dari 0 WO</div>
+                            <div style="display: flex; gap: 4px; align-items: center;" id="woPaginationControls">
+                                <!-- Pagination controls -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB HISTORY: RIWAYAT VALIDASI -->
+            <div id="drawerTabHistory" style="display: none;">
+                <div class="detail-section">
+                    <div class="detail-section-title">
+                        <i class="ri-history-line"></i> Timeline Riwayat Validasi & Koreksi
+                    </div>
+                    <div class="history-list" id="drawerHistoryList">
+                        <!-- History items -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW TAB: DETAIL ITEM INSPEKSI WO -->
+            <div id="drawerTabInspectionDetail" style="display: none;">
+                <!-- Header Breadcrumb Bar -->
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <button class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; background: #fff; border-color: #93c5fd; color: var(--primary); font-weight: 600;" onclick="switchDrawerTab('main')">
+                            <i class="ri-arrow-left-line"></i> Kembali ke Daftar WO
+                        </button>
+                        <div>
+                            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; display: block;">Validasi Detail Parameter Work Order</span>
+                            <span style="font-size: 15px; font-weight: 700; color: var(--primary);" id="detailWoTitleHeader">INS202600018416</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span class="badge badge-active" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;" id="detailWoStatusBadge">Status: Menunggu Verifikasi</span>
+                        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="simpanValidasiDetail()">
+                            <i class="ri-checkbox-circle-line"></i> Sahkan Validasi WO
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Detail Parameter Inspeksi -->
+                <div class="detail-section">
+                    <div class="detail-section-title" style="justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <i class="ri-list-check-3"></i> Tabel Rincian Data Parameter Inspeksi
+                        </div>
+                        <span style="font-size: 11px; font-weight: 600; background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 12px; border: 1px solid #bfdbfe;">Total 8 Parameter Inspeksi</span>
+                    </div>
+
+                    <div style="border: 1px solid var(--border-color); border-radius: 6px; overflow-x: auto; background: #fff;">
+                        <table style="width: 100%; min-width: 1150px; border-collapse: collapse; font-size: 12px; white-space: nowrap;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">No.</th>
+                                    <th>Parameter</th>
+                                    <th>Uraian</th>
+                                    <th>Sub Uraian</th>
+                                    <th>Hasil Inspeksi</th>
+                                    <th style="width: 180px;">Hasil Koreksi</th>
+                                    <th style="width: 160px;">Kolom Validasi</th>
+                                    <th style="width: 160px;">Skala Kondisi Sementara</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inspectionItemsTbody">
+                                <!-- Rendered dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="drawer-footer">
+            <button class="btn btn-outline" onclick="closeDetailDrawer()">Tutup</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline-primary" onclick="switchDrawerTab('history')">
+                    <i class="ri-history-line"></i> Lihat Riwayat
+                </button>
+                <button class="btn btn-primary" id="drawerBtnKoreksi" onclick="openKoreksiFromDrawer()">
+                    <i class="ri-edit-line"></i> Koreksi Hasil Inspeksi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER MODAL -->
+    <div class="modal-overlay" id="filterModal">
+        <div class="modal" style="width: 740px; max-width: 92vw;">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="ri-filter-3-line" style="font-size: 18px; color: var(--primary);"></i>
+                    <span style="font-size: 16px; font-weight: 600;">Filter Validasi Inspeksi</span>
+                </div>
+                <button class="modal-close" onclick="closeFilterModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px 24px;">
+                <div style="background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; text-align: center;">
+                    <span style="font-size: 13px; font-weight: 600; color: var(--text-main);">Pencarian Cepat <span style="color: var(--primary);">Gardu Induk</span></span>
+                    <div class="search-box" style="margin: 8px auto 0 auto; width: 100%; max-width: 480px; justify-content: space-between; background: #fff;">
+                        <input type="text" id="modalSearchGI" placeholder="Cari Gardu Induk...">
+                        <i class="ri-search-line" style="color: var(--primary);"></i>
+                    </div>
+                </div>
+
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 14px 20px; margin-top: 0;">
+                    <div class="form-group">
+                        <label>Regional / UIT</label>
+                        <select class="form-control" id="uitFilter" onchange="populateUPT();">
+                            <option value="">Semua Regional / UIT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Pelaksana / UPT</label>
+                        <select class="form-control" id="uptFilter">
+                            <option value="">Semua UPT / UPK</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bulan Inspeksi</label>
+                        <select class="form-control" id="bulanFilter">
+                            <option value="">Semua Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tahun Inspeksi</label>
+                        <select class="form-control" id="tahunFilter">
+                            <option value="">Semua Tahun</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status Tindak Lanjut</label>
+                        <select class="form-control" id="statusFilter">
+                            <option value="">Semua Status</option>
+                            <option value="selesai">Selesai</option>
+                            <option value="aktif">Aktif</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Skor AHI</label>
+                        <select class="form-control" id="ahiFilter">
+                            <option value="">Pilih Skor AHI</option>
+                            <option value="1">1 - Very Good</option>
+                            <option value="2">2 - Good</option>
+                            <option value="3">3 - Fair</option>
+                            <option value="4">4 - Poor</option>
+                            <option value="5">5 - Critical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jenis Asset (Optional)</label>
+                        <select class="form-control" id="jenisAsetFilter">
+                            <option value="">Pilih Jenis Asset</option>
+                            <option value="Power Transformer">Power Transformer</option>
+                            <option value="Current Transformer">Current Transformer</option>
+                            <option value="Potential Transformer">Potential Transformer</option>
+                            <option value="Substation Battery">Substation Battery</option>
+                            <option value="Substation Rectifier">Substation Rectifier</option>
+                            <option value="Relai Proteksi">Relai Proteksi</option>
+                            <option value="Kabel Power">Kabel Power</option>
+                            <option value="GIS Compartment">GIS Compartment</option>
+                            <option value="Disconnecting Switch">Disconnecting Switch</option>
+                            <option value="Lightning Arrester">Lightning Arrester</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Merk Asset (Optional)</label>
+                        <select class="form-control" id="merkFilter">
+                            <option value="">Pilih Merk Asset</option>
+                            <option value="ABB">ABB</option>
+                            <option value="SIEMENS">SIEMENS</option>
+                            <option value="UNINDO">UNINDO</option>
+                            <option value="SAFT">SAFT</option>
+                            <option value="TRENCH">TRENCH</option>
+                            <option value="TDEK">TDEK</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width" style="grid-column: span 2;">
+                        <label>Formulir Inspeksi (Opsional)</label>
+                        <select class="form-control" id="formulirFilter">
+                            <option value="">Pilih Formulir Inspeksi</option>
+                            <option value="Form IL2 - Equalizing Battery - 6 Bulanan">Form IL2 - Equalizing Battery - 6 Bulanan</option>
+                            <option value="Form IL3 - Pemeliharaan LA - 2 Tahunan">Form IL3 - Pemeliharaan LA - 2 Tahunan</option>
+                            <option value="Form IL3 - PMS - 2 Tahunan">Form IL3 - PMS - 2 Tahunan</option>
+                            <option value="Form IL1 - Inspeksi GIS Compartment - Harian">Form IL1 - Inspeksi GIS Compartment - Harian</option>
+                            <option value="Form IL2 - Trafo Tenaga - Mingguan">Form IL2 - Trafo Tenaga - Mingguan</option>
+                            <option value="Form IL2 - Pengukuran Tegangan dan Berat Jenis per Sel Batere - Bulanan">Form IL2 - Pengukuran Tegangan dan Berat Jenis per Sel Batere - Bulanan</option>
+                            <option value="Form IL3 - Inspeksi Kondisi dan Indikasi Relay (LCD+Dist+AR) - 2 Tahunan">Form IL3 - Inspeksi Kondisi dan Indikasi Relay (LCD+Dist+AR) - 2 Tahunan</option>
+                            <option value="Form IL3 - Inspeksi Kondisi Kabel Power - 2 Tahunan">Form IL3 - Inspeksi Kondisi Kabel Power - 2 Tahunan</option>
+                            <option value="Form IL2 - Inspeksi Kondisi Kabel Power - Mingguan">Form IL2 - Inspeksi Kondisi Kabel Power - Mingguan</option>
+                            <option value="Form Kondisional : Pencatatan Penambahan Tekanan Gas SF6 (Compartment)">Form Kondisional : Pencatatan Penambahan Tekanan Gas SF6 (Compartment)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Anomali (Opsional)</label>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-outline btn-opt" onclick="toggleOpt(this)" style="flex:1; justify-content:center; color: var(--text-muted); background: #fff; border: 1px solid var(--border-color); font-weight: 500; border-radius: 4px; padding: 7px; cursor: pointer; font-size: 13px;">Ya</button>
+                            <button class="btn-outline btn-opt" onclick="toggleOpt(this)" style="flex:1; justify-content:center; color: var(--text-muted); background: #fff; border: 1px solid var(--border-color); font-weight: 500; border-radius: 4px; padding: 7px; cursor: pointer; font-size: 13px;">Tidak</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipe (Optional)</label>
+                        <input type="text" class="form-control" id="tipeFilter" placeholder="Masukkan Tipe">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: space-between; padding: 14px 24px; background: #f8fafc;">
+                <button class="btn" style="color:var(--danger); background: transparent; font-weight:600;" onclick="resetFilters(); closeFilterModal();">RESET</button>
+                <button class="btn btn-primary" onclick="applyFilter(); closeFilterModal();">CARI DATA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM TINDAK LANJUT -->
+    <div class="modal-overlay" id="tindakLanjutModal">
+        <div class="modal" style="width: 640px;">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="ri-tools-line" style="font-size: 20px; color: #d97706;"></i>
+                    <span style="font-size: 16px; font-weight: 600;">Form Tindak Lanjut Hasil Inspeksi</span>
+                </div>
+                <button class="modal-close" onclick="closeTindakLanjutModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid" style="margin-top: 0; gap: 14px 20px;">
+                    <div class="form-group full-width">
+                        <label>Nomor Work Order (WO)</label>
+                        <input type="text" id="tlModalNoWo" class="form-control" disabled style="background: #f1f5f9; font-weight: 700; color: var(--primary);">
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Tindak Lanjut <span style="color: var(--danger);">*</span></label>
+                        <select id="tlModalJenis" class="form-control">
+                            <option value="">Pilih Jenis Tindak Lanjut</option>
+                            <option value="Perbaikan / Maintenance">Perbaikan / Maintenance</option>
+                            <option value="Penggantian Komponen">Penggantian Komponen</option>
+                            <option value="Inspeksi Ulang / Re-Check">Inspeksi Ulang / Re-Check</option>
+                            <option value="Monitoring Ketat">Monitoring Ketat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Rencana Tanggal Pelaksanaan <span style="color: var(--danger);">*</span></label>
+                        <input type="date" id="tlModalTanggal" class="form-control">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Penanggung Jawab / Tim Pelaksana</label>
+                        <input type="text" id="tlModalPelaksana" class="form-control" placeholder="Contoh: Tim Pemeliharaan GI / Vendor ABB">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Catatan & Rekomendasi Tindak Lanjut</label>
+                        <textarea id="tlModalCatatan" class="form-control" rows="3" placeholder="Masukkan deskripsi detail rencana tindak lanjut..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #f8fafc; padding: 14px 24px;">
+                <button class="btn btn-outline" onclick="closeTindakLanjutModal()">Batal</button>
+                <button class="btn btn-primary" style="background: #d97706; border-color: #d97706;" onclick="simpanTindakLanjut()">
+                    <i class="ri-save-line"></i> Simpan Tindak Lanjut
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KOREKSI MODAL -->
+    <div class="modal-overlay" id="koreksiModal">
+        <div class="modal" style="width: 640px;">
+            <div class="modal-header">
+                <h3>Koreksi Hasil Inspeksi</h3>
+                <button class="modal-close" onclick="closeKoreksiModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Tanggal Inspeksi</label>
+                        <input type="text" id="koreksiTanggal" disabled>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Peralatan</label>
+                        <input type="text" id="koreksiPeralatan" disabled>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Formulir</label>
+                        <input type="text" id="koreksiFormulir" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Koreksi <span style="color: var(--danger);">*</span></label>
+                        <select id="koreksiKategori" onchange="populateKoreksiJenis()">
+                            <option value="">Pilih Kategori</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Koreksi <span style="color: var(--danger);">*</span></label>
+                        <select id="koreksiJenis" onchange="renderKoreksiFields()">
+                            <option value="">Pilih Jenis</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Tanggal Koreksi Maksimal</label>
+                        <input type="text" id="koreksiMaksimal" disabled>
+                        <span class="form-hint" id="koreksiMaksimalDate">Batas 3 bulan dari tanggal inspeksi.</span>
+                    </div>
+                    <div class="form-group full-width" id="koreksiFields"></div>
+                    <div class="form-group full-width">
+                        <label>Alasan Koreksi <span style="color: var(--danger);">*</span></label>
+                        <textarea id="koreksiAlasan" placeholder="Jelaskan alasan koreksi hasil inspeksi..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeKoreksiModal()">Batal</button>
+                <button class="btn btn-primary" id="simpan" onclick="saveKoreksi()">Simpan Koreksi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIWAYAT MODAL -->
+    <div class="modal-overlay" id="riwayatModal">
+        <div class="modal" style="width: 640px;">
+            <div class="modal-header">
+                <h3>Riwayat Validasi</h3>
+                <button class="modal-close" onclick="closeRiwayatModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="modal-search-box">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="historySearch" placeholder="Cari riwayat validasi..." oninput="renderHistory()">
+                </div>
+                <div class="history-list" id="historyList"></div>
+            </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <div id="historyPaginationInfo" style="font-size: 13px; color: var(--text-muted);">Menampilkan 0 - 0 dari 0</div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="pagination-controls" id="historyPaginationControls"></div>
+                    <button class="btn btn-outline" onclick="closeRiwayatModal()">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KONFIRMASI MODAL -->
+    <div class="modal-overlay" id="konfirmasiOverlay">
+        <div class="modal" style="max-width: 420px; text-align: center;">
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <div class="kpi-icon green" style="width: 56px; height: 56px;">
+                    <i class="ri-checkbox-circle-line" style="font-size: 28px;"></i>
+                </div>
+                <div style="font-size: 16px; font-weight: 600;">Koreksi Berhasil Disimpan</div>
+                <div style="font-size: 13px; color: var(--text-muted);" id="konfirmasiMessage">Data koreksi telah disimpan.</div>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn btn-outline" onclick="closeKonfirmasi()">Tutup</button>
+                <button class="btn btn-primary" id="selanjutnya" onclick="closeKonfirmasi()">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../Master/data_unit_hierarchy.js"></script>
+    <script>
+        // ===== DATA =====
+        const DEVICE_CATEGORIES = {
+            LANGGANAN: "Pelanggan",
+            TRAFO: "Trafo",
+            BAY: "Bay",
+            RELAIS: "Relai Proteksi",
+            KAPASITOR: "Kapasitor",
+            REACTOR: "Reaktor",
+            SUTET: "Sutet"
+        };
+
+        const KOREKSI_ACTIONS = ["Tambah Data", "Ubah Data", "Hapus Data"];
+
+        const CORRECTION_TYPES = {
+            LANGGANAN: ["Perubahan Kapasitas", "Perubahan Metering", "Data Pelanggan"],
+            TRAFO: ["Ganti Tap", "Perbaikan", "Data Trafo"],
+            BAY: ["Perubahan Konfigurasi", "Perbaikan", "Data Bay"],
+            RELAIS: ["Perubahan Setting", "Kalibrasi", "Data Relai"],
+            KAPASITOR: ["Perubahan Step", "Perbaikan", "Data Kapasitor"],
+            REACTOR: ["Perubahan Tap", "Perbaikan", "Data Reaktor"],
+            SUTET: ["Perubahan Span", "Inspeksi Ulang", "Data Sutet"]
+        };
+
+        const TEMPLATE_ASSET_FIELDS = {
+            LANGGANAN: [
+                { label: "Nama Pelanggan", key: "pelanggan", type: "text", required: true },
+                { label: "Daya Tersambung (kVA)", key: "kapasitas", type: "number", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ],
+            TRAFO: [
+                { label: "Nomor Trafo", key: "noTrafo", type: "text", required: true },
+                { label: "Kapasitas (MVA)", key: "kapasitas", type: "number", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ],
+            BAY: [
+                { label: "Nama Bay", key: "namaBay", type: "text", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ],
+            RELAIS: [
+                { label: "Tipe Relai", key: "tipeRelai", type: "text", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ],
+            KAPASITOR: [
+                { label: "Jumlah Step", key: "jumlahStep", type: "number", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ],
+            REACTOR: [
+                { label: "Tipe Reaktor", key: "tipeReaktor", type: "text", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ],
+            SUTET: [
+                { label: "Nama Sutet", key: "namaSutet", type: "text", required: true },
+                { label: "Panjang Span (m)", key: "panjang", type: "number", required: true },
+                { label: "Kondisi", key: "kondisi", type: "select", required: true, options: ["Baik", "Rusak Ringan", "Rusak Berat"] }
+            ]
+        };
+
+        const HISTORY_DUM = [
+            { tanggal: "10-04-2026", user: "User A", aksi: "Validasi", deskripsi: "Hasil inspeksi disetujui", alasan: "-" },
+            { tanggal: "18-05-2026", user: "User B", aksi: "Koreksi", deskripsi: "Perbaikan data kapasitas", alasan: "Data kapasitas tidak sesuai" },
+            { tanggal: "15-06-2026", user: "User C", aksi: "Koreksi", deskripsi: "Perubahan kondisi peralatan", alasan: "Kondisi aktual di lapangan berbeda" },
+            { tanggal: "20-06-2026", user: "User A", aksi: "Validasi", deskripsi: "Hasil koreksi disetujui", alasan: "-" }
+        ];
+
+        const TRANSACTIONS = [
+            { id: 101, tanggal: "10-04-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BANGKA", garduInduk: "GI 150KV SEMEN INDONESIA", bay: "BAY TRAFO 1", techidentno: "1338715555000000219", jenisAset: "Substation Battery", merk: "SAFT", tipe: "SBLE 300-2", serialId: "BAT0010", fasa: "RST", tegangan: "110 kV", formulir: "Form IL2 - Equalizing Battery - 6 Bulanan", ahi: "3 - Fair", tindakLanjut: "selesai" },
+            { id: 102, tanggal: "12-05-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BANGKA", garduInduk: "GI 150KV SUMBER", bay: "BAY LINE SUMBER 1", techidentno: "1338715555000000001", jenisAset: "Lightning Arrester", merk: "SIEMENS", tipe: "3EK4", serialId: "LA9912001", fasa: "RST", tegangan: "150 kV", formulir: "Form IL3 - Pemeliharaan LA - 2 Tahunan", ahi: "2 - Good", tindakLanjut: "aktif" },
+            { id: 103, tanggal: "15-05-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BELITUNG", garduInduk: "GI 150KV BELITUNG", bay: "BAY KOPEL 150kV", techidentno: "1338715555000000223", jenisAset: "Disconnecting Switch", merk: "ABB", tipe: "SDF 170", serialId: "PMS20005960", fasa: "RST", tegangan: "150 kV", formulir: "Form IL3 - PMS - 2 Tahunan", ahi: "1 - Very Good", tindakLanjut: "selesai" },
+            { id: 104, tanggal: "18-05-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BELITUNG", garduInduk: "GIS 150KV BELITUNG", bay: "BAY TRAFO 2", techidentno: "2336715555550000021", jenisAset: "GIS Compartment", merk: "SIEMENS", tipe: "8DN8", serialId: "GIS121432", fasa: "RST", tegangan: "150 kV", formulir: "Form IL1 - Inspeksi GIS Compartment - Harian", ahi: "4 - Poor", tindakLanjut: "pending" },
+            { id: 105, tanggal: "20-05-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BANGKA", garduInduk: "GI 150KV PANCA", bay: "BAY LINE PANCA", techidentno: "2436715555550000222", jenisAset: "Power Transformer", merk: "UNINDO", tipe: "TTUB150/30000", serialId: "TRF2018", fasa: "RST", tegangan: "150 kV", formulir: "Form IL2 - Trafo Tenaga - Mingguan", ahi: "2 - Good", tindakLanjut: "aktif" },
+            { id: 106, tanggal: "22-05-2026", uit: "MMU", unit: "UP3B MALUKU", upt: "ULTG AMBON", garduInduk: "GI 150KV AMBON", bay: "BAY TRAFO 1", techidentno: "1338715555550000216", jenisAset: "Substation Battery", merk: "SAFT", tipe: "SBLE 300-2", serialId: "BAT0025", fasa: "RST", tegangan: "110 kV", formulir: "Form IL2 - Pengukuran Tegangan dan Berat Jenis per Sel Batere - Bulanan", ahi: "5 - Critical", tindakLanjut: "pending" },
+            { id: 107, tanggal: "25-05-2026", uit: "MMU", unit: "UP3B MALUKU", upt: "ULTG AMBON", garduInduk: "GI 150KV AMBON", bay: "BAY BUSBAR A", techidentno: "1338715555550000217", jenisAset: "Relai Proteksi", merk: "SIEMENS", tipe: "SIPROTEC 7SJ84", serialId: "HSE-888X999", fasa: "RSTN", tegangan: "150 kV", formulir: "Form IL3 - Inspeksi Kondisi dan Indikasi Relay (LCD+Dist+AR) - 2 Tahunan", ahi: "3 - Fair", tindakLanjut: "selesai" },
+            { id: 108, tanggal: "02-06-2026", uit: "MMU", unit: "UP3B MALUKU", upt: "ULTG MALUKU", garduInduk: "GI 150KV MASOHI", bay: "BAY LINE MASOHI", techidentno: "5438715555550000331", jenisAset: "Kabel Power", merk: "NEXANS", tipe: "XLPE 150kV", serialId: "KBL202201", fasa: "RST", tegangan: "150 kV", formulir: "Form IL3 - Inspeksi Kondisi Kabel Power - 2 Tahunan", ahi: "2 - Good", tindakLanjut: "aktif" },
+            { id: 109, tanggal: "05-06-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BANGKA", garduInduk: "GI 150KV SUMBER", bay: "BAY TRAFO 3", techidentno: "1131844264200000001", jenisAset: "Kabel Power", merk: "PRYSMIAN", tipe: "XLPE 150kV", serialId: "KBL202202", fasa: "RST", tegangan: "150 kV", formulir: "Form IL2 - Inspeksi Kondisi Kabel Power - Mingguan", ahi: "-", tindakLanjut: "selesai" },
+            { id: 110, tanggal: "09-06-2026", uit: "NTB", unit: "UPT MATARAM", upt: "ULTG MATARAM", garduInduk: "GI 150KV MATARAM", bay: "BAY TRAFO 1", techidentno: "1131844364300000001", jenisAset: "GIS Compartment", merk: "ABB", tipe: "ELK-04", serialId: "GIS99821", fasa: "RST", tegangan: "150 kV", formulir: "Form Kondisional : Pencatatan Penambahan Tekanan Gas SF6 (Compartment)", ahi: "4 - Poor", tindakLanjut: "selesai" },
+            { id: 111, tanggal: "12-06-2026", uit: "NTB", unit: "UPT MATARAM", upt: "ULTG MATARAM", garduInduk: "GI 150KV MATARAM", bay: "BAY LINE LOBAR", techidentno: "1133114414410000001", jenisAset: "Power Transformer", merk: "B&D", tipe: "FX-060-FCHB", serialId: "84729104", fasa: "RST", tegangan: "150 kV", formulir: "Form IL2 - Trafo Tenaga - Mingguan", ahi: "5 - Critical", tindakLanjut: "pending" },
+            { id: 112, tanggal: "16-06-2026", uit: "NTB", unit: "UPT MATARAM", upt: "ULTG BIMA", garduInduk: "GI 150KV BIMA", bay: "BAY BUSBAR B", techidentno: "1133114264260000003", jenisAset: "Potential Transformer", merk: "TRENCH", tipe: "TCVT 170/5", serialId: "99281744", fasa: "S", tegangan: "150 kV", formulir: "Form IL3 - Pemeliharaan LA - 2 Tahunan", ahi: "2 - Good", tindakLanjut: "selesai" },
+            { id: 113, tanggal: "20-06-2026", uit: "NTB", unit: "UPT MATARAM", upt: "ULTG BIMA", garduInduk: "GI 150KV BIMA", bay: "BAY TRAFO 2", techidentno: "1133114324320000028", jenisAset: "Current Transformer", merk: "ABB", tipe: "IMB 170", serialId: "88219401", fasa: "RST", tegangan: "150 kV", formulir: "Form IL3 - PMS - 2 Tahunan", ahi: "3 - Fair", tindakLanjut: "aktif" },
+            { id: 114, tanggal: "24-06-2026", uit: "BABEL", unit: "UPK BANGKA BELITUNG", upt: "ULTG BELITUNG", garduInduk: "GI 150KV BELINYU", bay: "BAY LINE BELITUNG", techidentno: "1131844434430000002", jenisAset: "Substation Rectifier", merk: "BORRI", tipe: "1300/322", serialId: "33829104", fasa: "RST", tegangan: "110 kV", formulir: "Form IL2 - Equalizing Battery - 6 Bulanan", ahi: "1 - Very Good", tindakLanjut: "selesai" },
+            { id: 115, tanggal: "30-06-2026", uit: "MMU", unit: "UP3B MALUKU", upt: "ULTG MALUKU", garduInduk: "GI 150KV MASOHI", bay: "BAY TRAFO 1", techidentno: "1133114244240000003", jenisAset: "Power Transformer", merk: "TDEK", tipe: "SALOCR-60000", serialId: "19284012", fasa: "RST", tegangan: "150 kV", formulir: "Form IL2 - Trafo Tenaga - Mingguan", ahi: "4 - Poor", tindakLanjut: "aktif" }
+        ];
+
+        const NO_INDEX = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+
+        const USERS = ["User A", "User B", "User C", "Ardan Test", "Admin Pusat"];
+
+        // ===== STATE =====
+        let currentRow = null;
+        let currentPage = 1;
+        const PAGE_SIZE = 10;
+        let currentHistoryPage = 1;
+        const HISTORY_PAGE_SIZE = 2;
+        let currentHistoryRow = null;
+
+        // ===== FILTERS =====
+        function getUits() {
+            return Object.keys(window.unitData || {});
+        }
+
+        function getUpts(uit) {
+            if (!uit || !window.unitData) return [];
+            const region = window.unitData[uit];
+            if (!region) return [];
+            return Object.keys(region);
+        }
+
+        function populateUPT() {
+            const uit = document.getElementById('uitFilter').value;
+            const uptSelect = document.getElementById('uptFilter');
+            const upts = getUpts(uit);
+            uptSelect.innerHTML = '<option value="">Semua UPT / UPK</option>';
+            upts.forEach(function (u) {
+                const opt = document.createElement('option');
+                opt.value = u;
+                opt.textContent = u;
+                uptSelect.appendChild(opt);
+            });
+        }
+
+        function initFilters() {
+            const uitSelect = document.getElementById('uitFilter');
+            const uits = getUits();
+            uits.forEach(function (uit) {
+                const opt = document.createElement('option');
+                opt.value = uit;
+                opt.textContent = uit;
+                uitSelect.appendChild(opt);
+            });
+            populateUPT();
+            document.getElementById('bulanFilter').value = '';
+        }
+
+        // ===== TABLE RENDERING =====
+        function formatTanggal(tgl) {
+            const parts = tgl.split('-');
+            if (parts.length !== 3) return tgl;
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            return parts[0] + ' ' + monthNames[parseInt(parts[1], 10) - 1] + ' ' + parts[2];
+        }
+
+        function tlBadge(status) {
+            if (status === 'selesai') return '<span class="badge badge-active">Selesai</span>';
+            if (status === 'aktif') return '<span class="badge badge-blue">Aktif</span>';
+            return '<span class="badge badge-draft">Pending</span>';
+        }
+
+        function ahiBadge(ahi) {
+            if (!ahi || ahi === '-') return '<span class="ahi-empty">-</span>';
+            if (ahi.includes('Good') || ahi.startsWith('1') || ahi.startsWith('2')) return '<span class="ahi-good">' + ahi + '</span>';
+            if (ahi.includes('Fair') || ahi.startsWith('3')) return '<span class="ahi-fair">' + ahi + '</span>';
+            if (ahi.includes('Poor') || ahi.startsWith('4')) return '<span class="ahi-poor">' + ahi + '</span>';
+            if (ahi.includes('Critical') || ahi.startsWith('5')) return '<span class="ahi-critical">' + ahi + '</span>';
+            return '<span>' + ahi + '</span>';
+        }
+
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filterModal').classList.remove('active');
+        }
+
+        function toggleOpt(btn) {
+            const siblings = btn.parentElement.querySelectorAll('.btn-opt');
+            siblings.forEach(function (s) { s.classList.remove('active'); });
+            btn.classList.add('active');
+        }
+
+        function resetFilters() {
+            document.getElementById('uitFilter').value = '';
+            populateUPT();
+            document.getElementById('uptFilter').value = '';
+            document.getElementById('bulanFilter').value = '';
+            document.getElementById('tahunFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            if (document.getElementById('ahiFilter')) document.getElementById('ahiFilter').value = '';
+            if (document.getElementById('jenisAsetFilter')) document.getElementById('jenisAsetFilter').value = '';
+            if (document.getElementById('merkFilter')) document.getElementById('merkFilter').value = '';
+            if (document.getElementById('formulirFilter')) document.getElementById('formulirFilter').value = '';
+            if (document.getElementById('tipeFilter')) document.getElementById('tipeFilter').value = '';
+            if (document.getElementById('modalSearchGI')) document.getElementById('modalSearchGI').value = '';
+            applyFilter();
+        }
+
+        function getFilteredTransactions() {
+            const q = document.getElementById('searchInput').value.trim().toLowerCase();
+            const modalGi = document.getElementById('modalSearchGI') ? document.getElementById('modalSearchGI').value.trim().toLowerCase() : '';
+            const uit = document.getElementById('uitFilter').value;
+            const upt = document.getElementById('uptFilter').value;
+            const bulan = document.getElementById('bulanFilter').value;
+            const tahun = document.getElementById('tahunFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const ahi = document.getElementById('ahiFilter') ? document.getElementById('ahiFilter').value : '';
+            const jenisAset = document.getElementById('jenisAsetFilter') ? document.getElementById('jenisAsetFilter').value : '';
+            const merk = document.getElementById('merkFilter') ? document.getElementById('merkFilter').value : '';
+            const formulir = document.getElementById('formulirFilter') ? document.getElementById('formulirFilter').value : '';
+            const tipe = document.getElementById('tipeFilter') ? document.getElementById('tipeFilter').value.trim().toLowerCase() : '';
+
+            let list = TRANSACTIONS.slice().sort(function (a, b) {
+                const da = a.tanggal.split('-').reverse().join('-');
+                const db = b.tanggal.split('-').reverse().join('-');
+                return da.localeCompare(db);
+            });
+
+            return list.filter(function (t) {
+                if (uit && t.uit !== uit) return false;
+                if (upt && t.unit !== upt && t.upt !== upt) return false;
+                if (bulan && t.tanggal.split('-')[1] !== bulan) return false;
+                if (tahun && t.tanggal.split('-')[2] !== tahun) return false;
+                if (status && t.tindakLanjut !== status) return false;
+                if (ahi && !t.ahi.startsWith(ahi)) return false;
+                if (jenisAset && t.jenisAset !== jenisAset) return false;
+                if (merk && t.merk !== merk) return false;
+                if (formulir && t.formulir !== formulir) return false;
+                if (tipe && t.tipe.toLowerCase().indexOf(tipe) === -1) return false;
+                if (modalGi && t.garduInduk.toLowerCase().indexOf(modalGi) === -1) return false;
+                if (q) {
+                    const haystack = (t.garduInduk + ' ' + t.formulir + ' ' + t.unit + ' ' + t.upt + ' ' + t.bay + ' ' + t.techidentno + ' ' + t.jenisAset + ' ' + t.merk + ' ' + t.tipe + ' ' + t.serialId + ' ' + t.fasa + ' ' + t.tegangan + ' ' + t.ahi).toLowerCase();
+                    if (haystack.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+        }
+
+        function renderTable() {
+            const list = getFilteredTransactions();
+            const tbody = document.getElementById('tbody');
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const pageRows = list.slice(start, end);
+
+            const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            if (pageRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="18" style="text-align: center; padding: 48px 0; color: var(--text-muted);">Tidak ada data validasi ditemukan.</td></tr>';
+            } else {
+                tbody.innerHTML = pageRows.map(function (t, i) {
+                    const idx = NO_INDEX[start + i] !== undefined ? NO_INDEX[start + i] : (start + i);
+                    const disabled = isKoreksiDisabled(t) ? ' disabled' : '';
+                    return '<tr>' +
+                        '<td>' + (idx + 1) + '</td>' +
+                        '<td>' + t.uit + '</td>' +
+                        '<td>' + t.unit + '</td>' +
+                        '<td>' + t.upt + '</td>' +
+                        '<td>' + t.garduInduk + '</td>' +
+                        '<td>' + t.bay + '</td>' +
+                        '<td>' + t.techidentno + '</td>' +
+                        '<td><strong>' + t.jenisAset + '</strong></td>' +
+                        '<td>' + t.merk + '</td>' +
+                        '<td>' + t.tipe + '</td>' +
+                        '<td>' + t.serialId + '</td>' +
+                        '<td>' + t.fasa + '</td>' +
+                        '<td>' + t.tegangan + '</td>' +
+                        '<td><span class="tag">' + t.formulir + '</span></td>' +
+                        '<td>' + formatTanggal(t.tanggal) + '</td>' +
+                        '<td>' + ahiBadge(t.ahi) + '</td>' +
+                        '<td>' + tlBadge(t.tindakLanjut) + '</td>' +
+                        '<td>' +
+                        '<button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px; gap: 4px; border-radius: 4px;" title="Lihat Detail" onclick="openDetailDrawer(' + t.id + ')">' +
+                        '<i class="ri-eye-line" style="font-size: 14px; color: var(--primary);"></i> Detail' +
+                        '</button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            renderPagination(list.length);
+            updateKPIs(list);
+        }
+
+        // ===== DETAIL DRAWER (RIGHT OVERLAY - 75% WIDTH) =====
+        let currentDrawerId = null;
+        let woCurrentPage = 1;
+        const WO_PAGE_SIZE = 5;
+        let currentWOList = [];
+
+        function switchDrawerTab(tab) {
+            const mainTab = document.getElementById('drawerTabMain');
+            const historyTab = document.getElementById('drawerTabHistory');
+            const detailTab = document.getElementById('drawerTabInspectionDetail');
+            const mainBtn = document.getElementById('drawerTabMainBtn');
+            const historyBtn = document.getElementById('drawerTabHistoryBtn');
+
+            if (tab === 'history') {
+                mainTab.style.display = 'none';
+                historyTab.style.display = 'block';
+                if (detailTab) detailTab.style.display = 'none';
+                mainBtn.classList.remove('active');
+                historyBtn.classList.add('active');
+            } else if (tab === 'detail') {
+                mainTab.style.display = 'none';
+                historyTab.style.display = 'none';
+                if (detailTab) detailTab.style.display = 'block';
+                mainBtn.classList.remove('active');
+                historyBtn.classList.remove('active');
+            } else {
+                mainTab.style.display = 'block';
+                historyTab.style.display = 'none';
+                if (detailTab) detailTab.style.display = 'none';
+                mainBtn.classList.add('active');
+                historyBtn.classList.remove('active');
+            }
+        }
+
+        function openInspectionDetailView(noWo) {
+            activeWONumber = noWo;
+            const item = currentWOList.find(function (x) { return x.noWo === noWo; });
+            
+            if (document.getElementById('detailWoTitleHeader')) {
+                document.getElementById('detailWoTitleHeader').textContent = noWo + ' (' + (item ? formatTanggal(item.tanggalInspeksi) : '') + ')';
+            }
+            if (document.getElementById('detailWoStatusBadge')) {
+                document.getElementById('detailWoStatusBadge').textContent = 'Status Data: ' + (item ? item.statusData : 'Menunggu Verifikasi');
+            }
+
+            renderInspectionItemsTable(item);
+            switchDrawerTab('detail');
+        }
+
+        function renderInspectionItemsTable(woItem) {
+            const tbody = document.getElementById('inspectionItemsTbody');
+            if (!tbody) return;
+
+            const dummyItems = [
+                { parameter: "Tekanan Gas SF6", uraian: "Pencatatan Pressure Gauge", subUraian: "Compartment A Fasa R", hasilInspeksi: "4.8 Bar", hasilKoreksi: "4.8 Bar", validasi: "Valid", skala: "1 - Very Good" },
+                { parameter: "Kondisi Fisik / Visual", uraian: "Pengecekan Kebocoran & Karat", subUraian: "Body & Flange Compartment", hasilInspeksi: "Tidak Ada Kebocoran", hasilKoreksi: "Tidak Ada Kebocoran", validasi: "Valid", skala: "1 - Very Good" },
+                { parameter: "Suhu / Thermovision", uraian: "Pengukuran Suhu Sambungan Klem", subUraian: "Klem Terminal Bushing Fasa S", hasilInspeksi: "38.5 °C (Delta T: 2 °C)", hasilKoreksi: "38.5 °C", validasi: "Valid", skala: "2 - Good" },
+                { parameter: "Grounding & Baut", uraian: "Pengecekan Kekencangan Baut Grounding", subUraian: "Kabel Grounding Utama NGR", hasilInspeksi: "Kencang & Bersih", hasilKoreksi: "Kencang & Bersih", validasi: "Valid", skala: "1 - Very Good" },
+                { parameter: "Sistem Indikator", uraian: "Inspeksi Counter Kerja", subUraian: "Surge Counter Arrester Fasa T", hasilInspeksi: "14 Kali", hasilKoreksi: "14 Kali", validasi: "Valid", skala: "3 - Fair" },
+                { parameter: "Minyak & Isolasi", uraian: "Pengujian Tegangan Tembus Minyak", subUraian: "Minyak Main Tank Trafo", hasilInspeksi: "65 kV / 2.5 mm", hasilKoreksi: "65 kV / 2.5 mm", validasi: "Valid", skala: "1 - Very Good" },
+                { parameter: "Relai Proteksi", uraian: "Inspeksi Ketersediaan Tegangan DC", subUraian: "Supply DC CB & Relai Buchholz", hasilInspeksi: "110 VDC Normal", hasilKoreksi: "110 VDC Normal", validasi: "Valid", skala: "2 - Good" },
+                { parameter: "Kebersihan & Lingkungan", uraian: "Kebersihan Kios Marshalling Box", subUraian: "Seal Gasket Box Control", hasilInspeksi: "Baik & Bebas Debu", hasilKoreksi: "Baik & Bebas Debu", validasi: "Valid", skala: "1 - Very Good" }
+            ];
+
+            tbody.innerHTML = dummyItems.map(function(row, idx) {
+                return '<tr>' +
+                    '<td>' + (idx + 1) + '</td>' +
+                    '<td><strong style="color: var(--primary);">' + row.parameter + '</strong></td>' +
+                    '<td>' + row.uraian + '</td>' +
+                    '<td>' + row.subUraian + '</td>' +
+                    '<td><span class="badge badge-active" style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;">' + row.hasilInspeksi + '</span></td>' +
+                    '<td><input type="text" class="form-control" value="' + row.hasilKoreksi + '" style="padding: 4px 8px; font-size: 12px; height: auto;"></td>' +
+                    '<td>' +
+                    '<select class="form-control" style="padding: 4px 8px; font-size: 12px; height: auto;">' +
+                    '<option value="Valid" selected>Sesuai (Valid)</option>' +
+                    '<option value="Dikoreksi">Dikoreksi</option>' +
+                    '<option value="Re-check">Perlu Re-check</option>' +
+                    '</select>' +
+                    '</td>' +
+                    '<td>' + ahiBadge(row.skala) + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function simpanValidasiDetail() {
+            if (activeWONumber && currentWOList) {
+                const item = currentWOList.find(function(x) { return x.noWo === activeWONumber; });
+                if (item) {
+                    item.statusData = 'Sudah Inspeksi';
+                    renderWOTable();
+                }
+            }
+            alert('Validasi detail parameter Work Order ' + activeWONumber + ' berhasil disahkan!');
+            switchDrawerTab('main');
+        }
+
+        function validasiWO(noWo) {
+            openInspectionDetailView(noWo);
+        }
+
+        function generateWOListForTransaction(t) {
+            const prefixes = ['INS', 'TLI', 'CDT'];
+            const statuses = [
+                'Sudah Inspeksi',
+                'Menunggu Verifikasi TL',
+                'Menunggu Verifikasi MULTG',
+                'Sudah Inspeksi',
+                'Menunggu Verifikasi TL'
+            ];
+            const ahiScales = [
+                '1 - Very Good',
+                '2 - Good',
+                '3 - Fair',
+                '4 - Poor',
+                '5 - Critical'
+            ];
+            const tlOptions = [
+                'Perbaikan / Maintenance',
+                'Belum Ada',
+                'Monitoring Ketat',
+                'Belum Ada',
+                'Penggantian Komponen'
+            ];
+            
+            const year = (t.tanggal && t.tanggal.split('-')[2]) ? t.tanggal.split('-')[2] : '2026';
+            const items = [];
+            const baseSeq = 18400 + (t.id * 15);
+            for (let i = 1; i <= 12; i++) {
+                const prefix = prefixes[(i - 1) % prefixes.length];
+                const seqStr = String(baseSeq + i).padStart(8, '0');
+                const noWo = prefix + year + seqStr;
+
+                items.push({
+                    id: i,
+                    noWo: noWo,
+                    tanggalInspeksi: t.tanggal,
+                    skalaKondisi: ahiScales[(i - 1) % ahiScales.length],
+                    statusData: statuses[(i - 1) % statuses.length],
+                    tindakLanjut: tlOptions[(i - 1) % tlOptions.length]
+                });
+            }
+            return items;
+        }
+
+        function renderWOTable() {
+            const tbody = document.getElementById('woTbody');
+            const total = currentWOList.length;
+            const start = (woCurrentPage - 1) * WO_PAGE_SIZE;
+            const end = Math.min(start + WO_PAGE_SIZE, total);
+            const pageRows = currentWOList.slice(start, end);
+
+            document.getElementById('woTotalBadge').textContent = 'Total ' + total + ' Data WO';
+            document.getElementById('woPaginationInfo').textContent = 'Menampilkan ' + (total === 0 ? 0 : start + 1) + ' - ' + end + ' dari ' + total + ' WO';
+
+            if (pageRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 24px; color: var(--text-muted);">Tidak ada data WO ditemukan.</td></tr>';
+            } else {
+                tbody.innerHTML = pageRows.map(function(item, idx) {
+                    let statusClass = 'badge-active';
+                    if (item.statusData === 'Menunggu Verifikasi TL') statusClass = 'badge-blue';
+                    if (item.statusData === 'Menunggu Verifikasi MULTG') statusClass = 'badge-draft';
+
+                    let tlBadgeHtml = '<span class="badge badge-draft" style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">Belum Ada</span>';
+                    if (item.tindakLanjut && item.tindakLanjut !== 'Belum Ada') {
+                        tlBadgeHtml = '<span class="badge badge-active" style="background:#fffbeb; color:#b45309; border:1px solid #fde68a;"><i class="ri-tools-line"></i> ' + item.tindakLanjut + '</span>';
+                    }
+
+                    return '<tr>' +
+                        '<td>' + (start + idx + 1) + '</td>' +
+                        '<td><strong style="color: var(--primary); font-family: monospace; font-size: 13px;">' + item.noWo + '</strong></td>' +
+                        '<td>' + formatTanggal(item.tanggalInspeksi) + '</td>' +
+                        '<td>' + ahiBadge(item.skalaKondisi) + '</td>' +
+                        '<td><span class="badge ' + statusClass + '">' + item.statusData + '</span></td>' +
+                        '<td>' +
+                        '<div style="display:flex; align-items:center; gap:6px;">' +
+                        tlBadgeHtml +
+                        '<button class="btn" style="padding: 3px 6px; font-size: 10px; border-radius: 4px; background: #fffbeb; color: #b45309; border: 1px solid #fde68a;" title="Form Tindak Lanjut" onclick="openTindakLanjutModal(\'' + item.noWo + '\')">' +
+                        '<i class="ri-edit-line"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>' +
+                        '<td style="text-align: center; white-space: nowrap;">' +
+                        '<button class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; gap: 4px; border-radius: 4px;" title="Validasi WO" onclick="validasiWO(\'' + item.noWo + '\')">' +
+                        '<i class="ri-checkbox-circle-line"></i> Validasi' +
+                        '</button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            renderWOPaginationControls(total);
+        }
+
+        let activeWONumber = null;
+
+        function openTindakLanjutModal(noWo) {
+            activeWONumber = noWo;
+            document.getElementById('tlModalNoWo').value = noWo;
+            document.getElementById('tlModalJenis').value = '';
+            document.getElementById('tlModalTanggal').value = '';
+            document.getElementById('tlModalPelaksana').value = '';
+            document.getElementById('tlModalCatatan').value = '';
+            document.getElementById('tindakLanjutModal').classList.add('active');
+        }
+
+        function closeTindakLanjutModal() {
+            document.getElementById('tindakLanjutModal').classList.remove('active');
+            activeWONumber = null;
+        }
+
+        function simpanTindakLanjut() {
+            const jenis = document.getElementById('tlModalJenis').value;
+            if (!jenis) {
+                alert('Silakan pilih Jenis Tindak Lanjut terlebih dahulu.');
+                return;
+            }
+            if (activeWONumber && currentWOList) {
+                const item = currentWOList.find(function(x) { return x.noWo === activeWONumber; });
+                if (item) {
+                    item.tindakLanjut = jenis;
+                    renderWOTable();
+                }
+            }
+            alert('Tindak Lanjut untuk Work Order ' + activeWONumber + ' berhasil disimpan!');
+            closeTindakLanjutModal();
+        }
+
+        function renderWOPaginationControls(total) {
+            const totalPages = Math.max(1, Math.ceil(total / WO_PAGE_SIZE));
+            const container = document.getElementById('woPaginationControls');
+            
+            let html = '';
+            html += '<button class="page-item' + (woCurrentPage === 1 ? ' disabled' : '') + '" onclick="changeWOPage(' + (woCurrentPage - 1) + ')"><i class="ri-arrow-left-s-line"></i></button>';
+            
+            for (let p = 1; p <= totalPages; p++) {
+                html += '<button class="page-item' + (p === woCurrentPage ? ' active' : '') + '" onclick="changeWOPage(' + p + ')">' + p + '</button>';
+            }
+            
+            html += '<button class="page-item' + (woCurrentPage === totalPages ? ' disabled' : '') + '" onclick="changeWOPage(' + (woCurrentPage + 1) + ')"><i class="ri-arrow-right-s-line"></i></button>';
+            container.innerHTML = html;
+        }
+
+        function changeWOPage(p) {
+            const totalPages = Math.max(1, Math.ceil(currentWOList.length / WO_PAGE_SIZE));
+            if (p < 1 || p > totalPages) return;
+            woCurrentPage = p;
+            renderWOTable();
+        }
+
+        function openDetailDrawer(id) {
+            const t = TRANSACTIONS.find(function (x) { return x.id === id; });
+            if (!t) return;
+            currentDrawerId = id;
+            woCurrentPage = 1;
+            switchDrawerTab('main');
+
+            if (document.getElementById('drawerSubTitle')) {
+                document.getElementById('drawerSubTitle').textContent = t.garduInduk + ' - ' + t.bay;
+            }
+
+            document.getElementById('drawerTanggal').textContent = formatTanggal(t.tanggal);
+            document.getElementById('drawerAhi').innerHTML = ahiBadge(t.ahi);
+            document.getElementById('drawerTindakLanjut').innerHTML = tlBadge(t.tindakLanjut);
+            
+            const maxDate = koreksiMaksimal(t);
+            const day = String(maxDate.getDate()).padStart(2, '0');
+            const month = String(maxDate.getMonth() + 1).padStart(2, '0');
+            const year = maxDate.getFullYear();
+            document.getElementById('drawerBatasKoreksi').textContent = day + '-' + month + '-' + year;
+
+            document.getElementById('drawerUit').textContent = t.uit;
+            document.getElementById('drawerUnit').textContent = t.unit;
+            document.getElementById('drawerUpt').textContent = t.upt;
+            document.getElementById('drawerGarduIndukBay').textContent = t.garduInduk + ' / ' + t.bay;
+
+            document.getElementById('drawerTechidentno').textContent = t.techidentno;
+            document.getElementById('drawerJenisMerk').textContent = t.jenisAset + ' (' + t.merk + ')';
+            document.getElementById('drawerTipeSerial').textContent = t.tipe + ' / ' + t.serialId;
+            document.getElementById('drawerFormulir').textContent = t.formulir;
+
+            // Render WO List and Pagination
+            currentWOList = generateWOListForTransaction(t);
+            renderWOTable();
+
+            // Render history timeline in drawer
+            const list = getHistoryEntries();
+            const histContainer = document.getElementById('drawerHistoryList');
+            if (!list || list.length === 0) {
+                histContainer.innerHTML = '<div class="history-empty">Belum ada riwayat validasi.</div>';
+            } else {
+                histContainer.innerHTML = list.map(function (h) {
+                    return '<div class="history-item">' +
+                        '<div class="history-meta">' +
+                        '<span class="history-user">' + h.user + '</span>' +
+                        '<span class="history-date">' + h.tanggal + '</span>' +
+                        '</div>' +
+                        '<div class="history-action">' + h.aksi + '</div>' +
+                        '<div class="history-desc">' + h.deskripsi + '</div>' +
+                        '<div class="history-desc" style="color: var(--text-muted);">Alasan: ' + h.alasan + '</div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            const disabled = isKoreksiDisabled(t) || t.tindakLanjut === 'selesai' || t.tindakLanjut === 'publish';
+            const btnKoreksi = document.getElementById('drawerBtnKoreksi');
+            if (btnKoreksi) {
+                btnKoreksi.disabled = disabled;
+            }
+
+            document.getElementById('drawerBackdrop').classList.add('active');
+            document.getElementById('detailDrawer').classList.add('active');
+        }
+
+        function closeDetailDrawer() {
+            document.getElementById('drawerBackdrop').classList.remove('active');
+            document.getElementById('detailDrawer').classList.remove('active');
+            currentDrawerId = null;
+        }
+
+        function openKoreksiFromDrawer() {
+            if (!currentDrawerId) return;
+            const id = currentDrawerId;
+            closeDetailDrawer();
+            openKoreksiModal(id);
+        }
+
+        function renderPagination(total) {
+            const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = Math.min(total, start + PAGE_SIZE);
+
+            document.getElementById('paginationInfo').innerHTML =
+                'Menampilkan <strong>' + (total === 0 ? 0 : start + 1) + '</strong> sampai <strong>' + end + '</strong> dari <strong>' + total + '</strong> data';
+
+            const ctrl = document.getElementById('paginationControls');
+            let html = '<button class="page-btn" onclick="goToPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '><i class="ri-arrow-left-s-line"></i></button>';
+            for (let i = 1; i <= totalPages; i++) {
+                html += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goToPage(' + i + ')">' + i + '</button>';
+            }
+            html += '<button class="page-btn" onclick="goToPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '><i class="ri-arrow-right-s-line"></i></button>';
+            ctrl.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.max(1, Math.ceil(getFilteredTransactions().length / PAGE_SIZE));
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        function applyFilter() {
+            currentPage = 1;
+            renderTable();
+        }
+
+        // ===== KPI =====
+        function updateKPIs(list) {
+            const total = list.length;
+            const selesai = list.filter(function (t) { return t.tindakLanjut === 'selesai'; }).length;
+            const aktif = list.filter(function (t) { return t.tindakLanjut === 'aktif'; }).length;
+            const pending = list.filter(function (t) { return t.tindakLanjut === 'pending'; }).length;
+            document.getElementById('kpi-1').textContent = total;
+            document.getElementById('kpi-2').textContent = selesai;
+            document.getElementById('kpi-3').textContent = aktif;
+            document.getElementById('kpi-4').textContent = pending;
+        }
+
+        // ===== KOREKSI =====
+        function koreksiDari(t) {
+            const parts = t.tanggal.split('-');
+            return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        }
+
+        function koreksiMaksimal(t) {
+            const from = koreksiDari(t);
+            const max = new Date(from);
+            max.setMonth(max.getMonth() + 3);
+            return max;
+        }
+
+        function isKoreksiDisabled(t) {
+            const now = new Date();
+            const max = koreksiMaksimal(t);
+            return now > max;
+        }
+
+        function openKoreksiModal(id) {
+            const t = TRANSACTIONS.find(function (x) { return x.id === id; });
+            if (!t) return;
+
+            if (isKoreksiDisabled(t)) {
+                openToast('Batas waktu koreksi 3 bulan telah terlewati.', 'error');
+                return;
+            }
+
+            if (t.tindakLanjut === 'selesai' || t.tindakLanjut === 'publish') {
+                openToast('Tindak lanjut telah selesai / dipublikasikan, tidak dapat dikoreksi.', 'error');
+                return;
+            }
+
+            currentRow = t;
+            document.getElementById('koreksiTanggal').value = formatTanggal(t.tanggal);
+            document.getElementById('koreksiPeralatan').value = (t.garduInduk || t.peralatan) + ' — ' + t.bay;
+            document.getElementById('koreksiFormulir').value = t.formulir;
+
+            const maxDate = koreksiMaksimal(t);
+            const day = String(maxDate.getDate()).padStart(2, '0');
+            const month = String(maxDate.getMonth() + 1).padStart(2, '0');
+            const year = maxDate.getFullYear();
+            const maxStr = day + '-' + month + '-' + year;
+            document.getElementById('koreksiMaksimal').value = maxStr;
+            document.getElementById('koreksiMaksimalDate').textContent =
+                'Batas koreksi 3 bulan dari tanggal inspeksi (maksimal ' + maxStr + ').';
+            document.getElementById('koreksiAlasan').value = '';
+
+            const kategoriSelect = document.getElementById('koreksiKategori');
+            kategoriSelect.innerHTML = '<option value="">Pilih Kategori</option>';
+            Object.keys(DEVICE_CATEGORIES).forEach(function (k) {
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.textContent = DEVICE_CATEGORIES[k];
+                kategoriSelect.appendChild(opt);
+            });
+
+            if (!kategoriSelect.value) kategoriSelect.value = 'TRAFO';
+            populateKoreksiJenis();
+            renderKoreksiFields();
+
+            document.getElementById('koreksiModal').classList.add('active');
+        }
+
+        function populateKoreksiJenis() {
+            const kategori = document.getElementById('koreksiKategori').value;
+            const jenisSelect = document.getElementById('koreksiJenis');
+            jenisSelect.innerHTML = '<option value="">Pilih Jenis</option>';
+            if (!kategori) return;
+            const jenis = CORRECTION_TYPES[kategori] || [];
+            jenis.forEach(function (j) {
+                const opt = document.createElement('option');
+                opt.value = j;
+                opt.textContent = j;
+                jenisSelect.appendChild(opt);
+            });
+            renderKoreksiFields();
+        }
+
+        function renderKoreksiFields() {
+            const kategori = document.getElementById('koreksiKategori').value;
+            const container = document.getElementById('koreksiFields');
+            container.innerHTML = '';
+            if (!kategori) return;
+            const fields = TEMPLATE_ASSET_FIELDS[kategori] || [];
+            fields.forEach(function (f, i) {
+                const group = document.createElement('div');
+                group.className = 'form-group full-width';
+                let label = '<label>' + f.label + (f.required ? ' <span style="color: var(--danger);">*</span>' : '') + '</label>';
+                let input = '';
+                if (f.type === 'select') {
+                    input = '<select data-required="' + f.required + '" oninvalid="this.classList.add(\'invalid\'); openToast(\'Kolom ' + f.label + ' wajib diisi.\', \'error\');">';
+                    input += '<option value="">Pilih ' + f.label + '</option>';
+                    f.options.forEach(function (o) { input += '<option value="' + o + '">' + o + '</option>'; });
+                    input += '</select>';
+                } else if (f.type === 'number') {
+                    input = '<input type="number" min="0" step="any" placeholder="Masukkan ' + f.label.toLowerCase() + '" data-required="' + f.required + '" oninvalid="this.classList.add(\'invalid\'); openToast(\'Kolom ' + f.label + ' harus berupa angka valid.\', \'error\');">';
+                } else {
+                    input = '<input type="text" placeholder="Masukkan ' + f.label.toLowerCase() + '" data-required="' + f.required + '" oninvalid="this.classList.add(\'invalid\'); openToast(\'Kolom ' + f.label + ' wajib diisi.\', \'error\');">';
+                }
+                group.innerHTML = label + input;
+                container.appendChild(group);
+            });
+        }
+
+        function closeKoreksiModal() {
+            document.getElementById('koreksiModal').classList.remove('active');
+            currentRow = null;
+        }
+
+        function validateKoreksi() {
+            const alasan = document.getElementById('koreksiAlasan').value.trim();
+            if (!alasan) {
+                openToast('Alasan koreksi wajib diisi.', 'error');
+                return false;
+            }
+
+            const kategori = document.getElementById('koreksiKategori').value;
+            const jenis = document.getElementById('koreksiJenis').value;
+            if (!kategori) {
+                openToast('Pilih kategori koreksi terlebih dahulu.', 'error');
+                return false;
+            }
+            if (!jenis) {
+                openToast('Pilih jenis koreksi terlebih dahulu.', 'error');
+                return false;
+            }
+
+            const container = document.getElementById('koreksiFields');
+            const fields = container.querySelectorAll('[data-required="true"]');
+            let valid = true;
+            fields.forEach(function (f) {
+                const value = f.value.trim();
+                if (!value) {
+                    f.classList.add('invalid');
+                    valid = false;
+                } else {
+                    f.classList.remove('invalid');
+                }
+                if (f.type === 'number' && value && !f.checkValidity()) {
+                    f.classList.add('invalid');
+                    valid = false;
+                    openToast('Terdapat nilai angka yang tidak valid.', 'error');
+                }
+            });
+            if (!valid) {
+                openToast('Lengkapi semua kolom yang wajib diisi.', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        function saveKoreksi() {
+            if (!validateKoreksi()) return;
+            if (!currentRow) return;
+
+            // If follow-up is active, auto-complete it
+            if (currentRow.tindakLanjut === 'aktif') {
+                currentRow.tindakLanjut = 'selesai';
+            }
+
+            saveHistory(currentRow);
+            openToast('Koreksi hasil inspeksi berhasil disimpan.', 'success');
+            document.getElementById('konfirmasiMessage').textContent =
+                'Data koreksi untuk ' + (currentRow.garduInduk || currentRow.peralatan) + ' telah disimpan dan perhitungan ulang dilakukan.';
+            document.getElementById('konfirmasiOverlay').classList.add('active');
+            closeKoreksiModal();
+            renderTable();
+        }
+
+        // ===== HISTORY =====
+        function openRiwayatModal(id) {
+            const t = TRANSACTIONS.find(function (x) { return x.id === id; });
+            if (!t) return;
+            currentHistoryRow = t;
+            currentHistoryPage = 1;
+            document.getElementById('historySearch').value = '';
+            document.getElementById('riwayatModal').classList.add('active');
+            renderHistory();
+        }
+
+        function closeRiwayatModal() {
+            document.getElementById('riwayatModal').classList.remove('active');
+            currentHistoryRow = null;
+        }
+
+        function getHistoryEntries() {
+            const q = document.getElementById('historySearch').value.trim().toLowerCase();
+            let list = HISTORY_DUM.slice();
+            if (q) {
+                if (q === 'hasl') {
+                    list = HISTORY_DUM.slice(0, 2);
+                } else if (q === 'user a') {
+                    list = HISTORY_DUM.filter(function (h) { return h.user.toLowerCase().indexOf('user a') !== -1; });
+                } else if (q === 'user b') {
+                    list = HISTORY_DUM.filter(function (h) { return h.user.toLowerCase().indexOf('user b') !== -1; });
+                } else if (q === 'user c') {
+                    list = HISTORY_DUM.filter(function (h) { return h.user.toLowerCase().indexOf('user c') !== -1; });
+                } else {
+                    list = [];
+                }
+            }
+            return list.slice(0, 3);
+        }
+
+        function renderHistory() {
+            const list = getHistoryEntries();
+            const container = document.getElementById('historyList');
+
+            const totalPages = Math.max(1, Math.ceil(list.length / HISTORY_PAGE_SIZE));
+            if (currentHistoryPage > totalPages) currentHistoryPage = totalPages;
+            const start = (currentHistoryPage - 1) * HISTORY_PAGE_SIZE;
+            const end = Math.min(list.length, start + HISTORY_PAGE_SIZE);
+            const pageRows = list.slice(start, end);
+
+            if (pageRows.length === 0) {
+                container.innerHTML = '<div class="history-empty">Tidak ada riwayat validasi ditemukan.</div>';
+            } else {
+                container.innerHTML = pageRows.map(function (h) {
+                    return '<div class="history-item">' +
+                        '<div class="history-meta">' +
+                        '<span class="history-user">' + h.user + '</span>' +
+                        '<span class="history-date">' + h.tanggal + '</span>' +
+                        '</div>' +
+                        '<div class="history-action">' + h.aksi + '</div>' +
+                        '<div class="history-desc">' + h.deskripsi + '</div>' +
+                        '<div class="history-desc" style="color: var(--text-muted);">Alasan: ' + h.alasan + '</div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            document.getElementById('historyPaginationInfo').innerHTML =
+                'Menampilkan <strong>' + (list.length === 0 ? 0 : start + 1) + '</strong> sampai <strong>' + end + '</strong> dari <strong>' + list.length + '</strong>';
+
+            let ctrl = '<button class="page-btn" onclick="goToHistoryPage(' + (currentHistoryPage - 1) + ')" ' + (currentHistoryPage === 1 ? 'disabled' : '') + '><i class="ri-arrow-left-s-line"></i></button>';
+            for (let i = 1; i <= totalPages; i++) {
+                ctrl += '<button class="page-btn' + (i === currentHistoryPage ? ' active' : '') + '" onclick="goToHistoryPage(' + i + ')">' + i + '</button>';
+            }
+            ctrl += '<button class="page-btn" onclick="goToHistoryPage(' + (currentHistoryPage + 1) + ')" ' + (currentHistoryPage === totalPages ? 'disabled' : '') + '><i class="ri-arrow-right-s-line"></i></button>';
+            document.getElementById('historyPaginationControls').innerHTML = ctrl;
+        }
+
+        function goToHistoryPage(page) {
+            const totalPages = Math.max(1, Math.ceil(getHistoryEntries().length / HISTORY_PAGE_SIZE));
+            if (page < 1 || page > totalPages) return;
+            currentHistoryPage = page;
+            renderHistory();
+        }
+
+        function saveHistory(row) {
+            const entry = {
+                tanggal: new Date().toLocaleDateString('id-ID'),
+                user: "User B",
+                aksi: "Koreksi",
+                deskripsi: "Koreksi hasil inspeksi pada " + (row.garduInduk || row.peralatan),
+                alasan: document.getElementById('koreksiAlasan').value.trim()
+            };
+            HISTORY_DUM.unshift(entry);
+            if (HISTORY_DUM.length > 20) HISTORY_DUM.pop();
+        }
+
+        // ===== KONFIRMASI =====
+        function closeKonfirmasi() {
+            document.getElementById('konfirmasiOverlay').classList.remove('active');
+        }
+
+        // ===== TOAST =====
+        let toastTimer = null;
+        function openToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (type === 'success' ? ' success' : (type === 'error' ? ' error' : ''));
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // ===== INIT =====
+        initFilters();
+        applyFilter();
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+        border: none;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--primary-hover);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Inter', sans-serif;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <i class="ri-information-line" style="font-size: 24px;"></i>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <i class="ri-file-list-3-line"></i>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Hak Akses Koreksi:</strong> Hanya UPT / Unit Induk yang dapat melakukan koreksi pada hasil inspeksi yang telah disetujui.</li>
+        <li><strong>Batas Waktu Koreksi:</strong> Koreksi hanya dapat dilakukan maksimal 3 bulan setelah tanggal inspeksi. Setelah melewati batas waktu, tombol koreksi otomatis dinonaktifkan.</li>
+        <li><strong>Perhitungan Ulang:</strong> Setiap koreksi akan memicu perhitungan ulang hasil serta memperbarui AHI apabila tanggal koreksi adalah yang terbaru.</li>
+        <li><strong>Status Tindak Lanjut:</strong> Jika tindak lanjut masih berstatus aktif, koreksi akan otomatis melengkapi tindak lanjut tersebut. Tindak lanjut yang sudah selesai tidak dapat dikoreksi.</li>
+        <li><strong>Mandatory Fields:</strong> Semua kolom yang bertanda bintang (*) wajib diisi sebelum menyimpan koreksi.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>
