@@ -5,26 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Power Inspect - Diagram Probis</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+        <style>
         * { box-sizing: border-box; }
         body {
             margin: 0;
             padding: 0;
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
         }
         .viewer-container {
             background-color: #ffffff;
-            border-radius: 0;
-            padding: 0;
+            border-radius: 12px;
+            padding: 24px;
             overflow: auto;
-            margin-top: 52px;
+            margin: 68px 20px 24px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
         }
         .mxgraph {
             max-width: 100%;
             border: none !important;
+            background-color: #ffffff;
         }
         svg {
             font-family: 'Inter', sans-serif !important;
@@ -38,35 +41,33 @@
 </head>
 <body>
 
-    <!-- Single Custom Toolbar -->
+        <!-- Single Custom Toolbar (High Contrast Theme) -->
     <div id="customHtmlToolbar" style="
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 99999;
-        background: rgba(15, 23, 42, 0.97);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 10px 20px;
+        background: #ffffff;
+        border-bottom: 1px solid #cbd5e1;
+        padding: 8px 20px;
         display: flex;
         align-items: center;
         gap: 14px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     ">
         <!-- Brand -->
-        <div style="font-size: 13px; font-weight: 700; color: #38bdf8; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.12); padding-right: 14px;">
-            ⚡ Power Inspect
+        <div style="font-size: 13px; font-weight: 700; color: #0284c7; white-space: nowrap; border-right: 1px solid #e2e8f0; padding-right: 14px; display: flex; align-items: center; gap: 6px;">
+            ⚡ <span style="color: #0f172a;">Power Inspect</span>
         </div>
 
         <!-- Page Selector -->
         <div style="display: flex; align-items: center; gap: 6px;">
-            <button onclick="changePageNav(-1)" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 10px; font-weight: 700; cursor: pointer;" title="Halaman Sebelumnya">&lt;</button>
+            <button onclick="changePageNav(-1)" style="background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-weight: 700; cursor: pointer; transition: all 0.2s;" title="Halaman Sebelumnya" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">&lt;</button>
             <select id="customPageSelect" onchange="onCustomPageSelect(this.value)" style="
-                background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 6px;
+                background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px;
                 padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
-                outline: none; cursor: pointer; max-width: 320px;
+                outline: none; cursor: pointer; max-width: 340px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             ">
                 <option value="0" selected>1. Use Case PI</option>
                 <option value="1">2. Use Case New PST</option>
@@ -108,20 +109,20 @@
             <button onclick="changePageNav(1)" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 10px; font-weight: 700; cursor: pointer;" title="Halaman Berikutnya">&gt;</button>
         </div>
 
-        <!-- Zoom -->
-        <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 14px; border-right: 1px solid rgba(255,255,255,0.12); padding-right: 14px;">
-            <button onclick="zoomCustom(-0.15)" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer;" title="Zoom Out">-</button>
-            <button onclick="resetZoomCustom()" style="background: rgba(255,255,255,0.08); color: #94a3b8; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; font-size: 11px; cursor: pointer;" title="Reset Zoom">100%</button>
-            <button onclick="zoomCustom(0.15)" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer;" title="Zoom In">+</button>
+                <!-- Zoom -->
+        <div style="display: flex; align-items: center; gap: 4px; border-left: 1px solid #e2e8f0; padding-left: 14px; border-right: 1px solid #e2e8f0; padding-right: 14px;">
+            <button onclick="zoomCustom(-0.15)" style="background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Zoom Out" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">-</button>
+            <button onclick="resetZoomCustom()" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; cursor: pointer;" title="Reset Zoom" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">100%</button>
+            <button onclick="zoomCustom(0.15)" style="background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Zoom In" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">+</button>
         </div>
 
         <!-- Actions -->
         <div style="display: flex; align-items: center; gap: 8px;">
-            <button onclick="refreshLiveFromGDrive()" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 6px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <button onclick="refreshLiveFromGDrive()" style="background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; padding: 6px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s;" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 Live Sync
             </button>
-            <button onclick="downloadActivePagePNG()" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 3px 10px rgba(2, 132, 199, 0.4);">
+            <button onclick="downloadActivePagePNG()" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; padding: 6px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3); transition: all 0.2s;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Download PNG
             </button>
