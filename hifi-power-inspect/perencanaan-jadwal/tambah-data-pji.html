@@ -954,6 +954,7 @@
                                 <option value="">Pilih Periode</option>
                                 <option value="harian">Harian</option>
                                 <option value="mingguan">Mingguan</option>
+                                <option value="2_mingguan">2 Mingguan</option>
                                 <option value="bulanan">Bulanan</option>
                                 <option value="tahunan">Tahunan</option>
                                 <option value="kondisional">Kondisional</option>
@@ -974,19 +975,12 @@
 
                         <!-- ROW 3 -->
                         <div class="form-group">
-                            <label class="form-label">Tanggal Terbit <span class="req">*</span></label>
-                            <input type="date" class="form-control" id="tanggalTerbit" value="2026-06-19"
-                                onchange="calculateNextDate()">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Tanggal Terbit Selanjutnya</label>
-                            <input type="date" class="form-control" id="tanggalTerbitSelanjutnya" value="2026-07-19"
-                                disabled>
-                        </div>
-                        <div class="form-group">
                             <label class="form-label">Status</label>
                             <input type="text" class="form-control status-draft" value="DRAFT" disabled>
                         </div>
+                        <div class="form-group"></div>
+                        <div class="form-group"></div>
+                        <div class="form-group"></div>
 
                         <!-- Status Aset: Multi Select -->
                         <div class="form-group">
@@ -1085,6 +1079,76 @@
                                     kosong</span>
                                 <span class="char-counter" id="charCounter">0 / 150</span>
                             </div>
+                        </div>
+
+                        <!-- SECTION: Mekanisme Penerbitan -->
+                        <div class="form-group full" style="padding-top: 20px; border-top: 1px solid var(--border);">
+                            <div class="section-header" style="margin-bottom: 0;">
+                                <h2 style="font-size: 18px; font-weight: 700;">Mekanisme Penerbitan</h2>
+                            </div>
+                        </div>
+
+                        <!-- Hari Kerja: Multi Select -->
+                        <div class="form-group">
+                            <label class="form-label">Hari Kerja <span class="req">*</span></label>
+                            <div class="multi-select-container" id="hariKerjaContainer">
+                                <div class="form-control multi-select-btn" onclick="toggleDropdown(this)"
+                                    id="hariKerjaBtnText">Pilih Hari Kerja...</div>
+                                <div class="multi-select-dropdown" id="hariKerjaDropdown">
+                                    <div class="ms-search" style="border-bottom: 1px solid var(--border);">
+                                        <label class="ms-select-all" title="Pilih Semua">
+                                            <input type="checkbox" id="selectAll_hariKerjaContainer"
+                                                onchange="handleSelectAll('hariKerjaContainer', 'Pilih Hari Kerja...')">
+                                        </label>
+                                        <span style="font-size: 13px; color: var(--text-hint);">Pilih Semua</span>
+                                    </div>
+                                    <div class="ms-options">
+                                        <label><input type="checkbox" value="senin"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Senin</label>
+                                        <label><input type="checkbox" value="selasa"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Selasa</label>
+                                        <label><input type="checkbox" value="rabu"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Rabu</label>
+                                        <label><input type="checkbox" value="kamis"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Kamis</label>
+                                        <label><input type="checkbox" value="jumat"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Jumat</label>
+                                        <label><input type="checkbox" value="sabtu"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Sabtu</label>
+                                        <label><input type="checkbox" value="minggu"
+                                                onchange="updateMsText('hariKerjaContainer', 'Pilih Hari Kerja...'); syncSelectAll('hariKerjaContainer')">
+                                            Minggu</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jumlah Terbit -->
+                        <div class="form-group">
+                            <label class="form-label">Jumlah Terbit <span class="req">*</span></label>
+                            <select class="form-control" id="jumlahTerbitSelect" disabled>
+                                <option value="">Pilih Periode Terlebih Dahulu</option>
+                            </select>
+                        </div>
+
+                        <!-- Tanggal Terbit -->
+                        <div class="form-group">
+                            <label class="form-label">Tanggal Terbit <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="tanggalTerbit" value="2026-06-19"
+                                onchange="calculateNextDate()">
+                        </div>
+
+                        <!-- Tanggal Terbit Selanjutnya -->
+                        <div class="form-group">
+                            <label class="form-label">Tanggal Terbit Selanjutnya</label>
+                            <input type="date" class="form-control" id="tanggalTerbitSelanjutnya" value="2026-07-19"
+                                disabled>
                         </div>
 
                     </div>
@@ -1365,6 +1429,47 @@
                 tanggalSelanjutnya.disabled = true; // tetap disabled tapi auto-fill
                 calculateNextDate();
             }
+
+            // Update Jumlah Terbit berdasarkan Periode
+            updateJumlahTerbit();
+        }
+
+        // Update Jumlah Terbit berdasarkan Periode yang dipilih
+        function updateJumlahTerbit() {
+            const periodeSelect = document.getElementById('periodeSelect');
+            const jumlahTerbitSelect = document.getElementById('jumlahTerbitSelect');
+
+            let options = [];
+            if (periodeSelect.value === 'mingguan') {
+                options = [
+                    { value: '5', label: '5x Terbit (dengan minggu ke-5)', selected: true },
+                    { value: '4', label: '4x Terbit (tanpa minggu ke-5)', selected: false },
+                ];
+            } else if (periodeSelect.value === '2_mingguan') {
+                options = [
+                    { value: '3', label: '3x Terbit (dengan minggu ke-5)', selected: true },
+                    { value: '2', label: '2x Terbit (tanpa minggu ke-5)', selected: false },
+                ];
+            }
+
+            jumlahTerbitSelect.innerHTML = '';
+            if (options.length === 0) {
+                jumlahTerbitSelect.disabled = true;
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Pilih Periode Terlebih Dahulu';
+                jumlahTerbitSelect.appendChild(option);
+                return;
+            }
+
+            jumlahTerbitSelect.disabled = false;
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                option.selected = opt.selected;
+                jumlahTerbitSelect.appendChild(option);
+            });
         }
 
         // Calculate next date based on periode
@@ -1385,6 +1490,9 @@
                     break;
                 case 'mingguan':
                     date.setDate(date.getDate() + 7);
+                    break;
+                case '2_mingguan':
+                    date.setDate(date.getDate() + 14);
                     break;
                 case 'bulanan':
                     date.setMonth(date.getMonth() + 1);
