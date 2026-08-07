@@ -435,7 +435,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header" style="justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="goHome()" title="Kembali ke Dashboard Utama">
                 <div class="logo-icon">H</div>
                 <div class="logo-text">HiFi Portal</div>
             </div>
@@ -447,6 +447,12 @@
         </div>
 
         <div class="sidebar-menu">
+            <!-- Search Menu Input -->
+            <div class="search-bar" style="margin-bottom: 16px;">
+                <i class="ri-search-line" style="color: var(--text-muted);"></i>
+                <input type="text" id="searchInput" placeholder="Cari halaman..." oninput="filterMenu(this.value)">
+            </div>
+
             <!-- Module: flow_req -->
             <div class="menu-section">
                 <div class="menu-section-title">Flow Req</div>
@@ -884,8 +890,8 @@
             <!-- Top Nav -->
             <div class="top-nav fade-in delay-1">
                 <div class="dashboard-header" style="margin-bottom: 0;">
-                    <h1>Welcome to HiFi Portal</h1>
-                    <p>Select a module from the sidebar to get started.</p>
+                    <h1 onclick="goHome()" style="cursor: pointer;">Welcome to HiFi Portal</h1>
+                    <p>Select a module from the sidebar or click a card below to get started.</p>
                 </div>
                 <button class="theme-toggle" id="theme-switcher" onclick="toggleTheme()" title="Ganti tema">
                     <i class="ri-moon-line" id="theme-icon"></i>
@@ -894,40 +900,37 @@
             </div>
 
             <div class="cards-grid">
-                <div class="card fade-in delay-1">
-                    <span class="card-badge" id="stat-count-0">Halaman</span>
+                <div class="card fade-in delay-1" onclick="navigateToPage('../hifi-ers/Dashboard/dashboard-ERS (Non-Detail).html')" style="cursor: pointer;">
+                    <span class="card-badge" id="stat-count-ers">0 Halaman</span>
                     <div class="card-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
                         <i class="ri-apps-2-line"></i>
                     </div>
                     <h3 class="card-title">HiFi ERS</h3>
-                    <p class="card-desc">Manage your Enterprise Resource Systems including Dashboard, Mutasi, and
-                        Perencanaan features.</p>
+                    <p class="card-desc">Manage Enterprise Resource Systems including Dashboard, Mutasi, Perencanaan, and Perizinan features.</p>
                 </div>
 
-                <div class="card fade-in delay-2">
-                    <span class="card-badge" id="stat-count-1">Halaman</span>
+                <div class="card fade-in delay-2" onclick="navigateToPage('../hifi-new-pst/Asset-Register/Mainpage.html')" style="cursor: pointer;">
+                    <span class="card-badge" id="stat-count-pst">0 Halaman</span>
                     <div class="card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                         <i class="ri-bar-chart-box-line"></i>
                     </div>
                     <h3 class="card-title">HiFi New PST</h3>
-                    <p class="card-desc">Access Power System Tools including high-level Dashboards and Master Unit
-                        configurations.</p>
+                    <p class="card-desc">Access Power System Tools including Asset Register, Master Level 5, and Sub Sistem configurations.</p>
                 </div>
 
-                <div class="card fade-in delay-3">
-                    <span class="card-badge" id="stat-count-2">Halaman</span>
+                <div class="card fade-in delay-3" onclick="navigateToPage('../hifi-power-inspect/dashboard-trend/trend-enhancement.html')" style="cursor: pointer;">
+                    <span class="card-badge" id="stat-count-pi">0 Halaman</span>
                     <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
                         <i class="ri-shield-check-line"></i>
                     </div>
                     <h3 class="card-title">Power Inspect</h3>
-                    <p class="card-desc">Comprehensive inspection tools including Trend Analysis, Form Management, and
-                        Mobile integrations.</p>
+                    <p class="card-desc">Comprehensive inspection tools including Trend Analysis, Form Management, Master Data, and Mobile integrations.</p>
                 </div>
 
                 <div class="card fade-in delay-4"
-                    onclick="window.location.hash='#page=..%2Fflow_req%2Fpower-inspect%2Fprobis-new-pi.html'"
+                    onclick="navigateToPage('../flow_req/power-inspect/probis-new-pi.html')"
                     style="cursor: pointer;">
-                    <span class="card-badge">35 Halaman</span>
+                    <span class="card-badge" id="stat-count-flow">0 Halaman</span>
                     <div class="card-icon" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
                         <i class="ri-git-merge-line"></i>
                     </div>
@@ -949,6 +952,14 @@
     </button>
 
     <script>
+        function goHome() {
+            window.location.hash = '';
+        }
+
+        function navigateToPage(url) {
+            window.location.hash = 'page=' + encodeURIComponent(url);
+        }
+
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             const floatingBtn = document.getElementById('floatingToggle');
@@ -966,7 +977,7 @@
 
             const allHasSubmenu = document.querySelectorAll('.has-submenu');
             allHasSubmenu.forEach(item => {
-                if (item !== element && !item.contains(element) && !item.nextElementSibling.contains(element)) {
+                if (item !== element && !item.contains(element) && item.nextElementSibling && !item.nextElementSibling.contains(element)) {
                     item.classList.remove('open');
                     const submenu = item.nextElementSibling;
                     if (submenu && submenu.classList.contains('submenu')) {
@@ -995,19 +1006,28 @@
                     iframe.setAttribute('src', pageUrl);
                 }
 
-                document.querySelectorAll('a.submenu-item').forEach(m => m.style.color = 'var(--text-muted)');
+                document.querySelectorAll('a.submenu-item').forEach(m => {
+                    m.style.color = 'var(--text-muted)';
+                    m.classList.remove('active');
+                });
+
                 document.querySelectorAll('a.submenu-item, a.menu-item[target="contentFrame"]').forEach(item => {
                     if (item.getAttribute('href') === pageUrl) {
                         if (item.classList.contains('submenu-item')) {
                             item.style.color = 'var(--primary-color)';
                         }
-                        const parentSubmenu = item.closest('.submenu');
-                        if (parentSubmenu && !parentSubmenu.classList.contains('open')) {
-                            parentSubmenu.classList.add('open');
-                            const menuToggle = parentSubmenu.previousElementSibling;
-                            if (menuToggle && menuToggle.classList.contains('menu-item')) {
-                                menuToggle.classList.add('open');
+                        item.classList.add('active');
+
+                        let current = item;
+                        while (current && current !== document.body) {
+                            if (current.classList.contains('submenu')) {
+                                current.classList.add('open');
+                                const prev = current.previousElementSibling;
+                                if (prev && prev.classList.contains('has-submenu')) {
+                                    prev.classList.add('open');
+                                }
                             }
+                            current = current.parentElement;
                         }
                     }
                 });
@@ -1015,7 +1035,10 @@
                 document.getElementById('defaultDashboard').style.display = 'block';
                 document.getElementById('contentFrame').style.display = 'none';
                 document.getElementById('contentFrame').removeAttribute('src');
-                document.querySelectorAll('a.submenu-item').forEach(m => m.style.color = 'var(--text-muted)');
+                document.querySelectorAll('a.submenu-item').forEach(m => {
+                    m.style.color = 'var(--text-muted)';
+                    m.classList.remove('active');
+                });
             }
         }
 
@@ -1023,12 +1046,11 @@
             item.addEventListener('click', function (e) {
                 e.preventDefault();
                 const href = this.getAttribute('href');
-                window.location.hash = 'page=' + encodeURIComponent(href);
+                navigateToPage(href);
             });
         });
 
         window.addEventListener('hashchange', loadPageFromHash);
-        loadPageFromHash();
 
         function toggleTheme() {
             const html = document.documentElement;
@@ -1058,15 +1080,65 @@
         }
 
         function updateStats() {
-            document.querySelectorAll('.menu-section').forEach((section, index) => {
-                const count = section.querySelectorAll('a.submenu-item').length;
-                const badge = document.getElementById('stat-count-' + index);
-                if (badge) badge.innerText = count + ' Halaman';
+            const moduleMap = {
+                'Flow Req': 'stat-count-flow',
+                'HiFi ERS': 'stat-count-ers',
+                'HiFi NEW PST': 'stat-count-pst',
+                'HiFi POWER INSPECT': 'stat-count-pi'
+            };
+
+            document.querySelectorAll('.menu-section').forEach(section => {
+                const titleEl = section.querySelector('.menu-section-title');
+                if (titleEl) {
+                    const titleText = titleEl.innerText.trim();
+                    const badgeId = moduleMap[titleText];
+                    if (badgeId) {
+                        const badge = document.getElementById(badgeId);
+                        const count = section.querySelectorAll('a.submenu-item').length;
+                        if (badge) badge.innerText = count + ' Halaman';
+                    }
+                }
+            });
+        }
+
+        function filterMenu(query) {
+            const q = query.toLowerCase().trim();
+            const allLinks = document.querySelectorAll('a.submenu-item');
+
+            if (!q) {
+                allLinks.forEach(link => {
+                    link.style.display = 'flex';
+                });
+                document.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('open'));
+                document.querySelectorAll('.has-submenu').forEach(hs => hs.classList.remove('open'));
+                loadPageFromHash();
+                return;
+            }
+
+            allLinks.forEach(link => {
+                const text = link.innerText.toLowerCase();
+                if (text.includes(q)) {
+                    link.style.display = 'flex';
+                    let current = link.parentElement;
+                    while (current && current !== document.body) {
+                        if (current.classList.contains('submenu')) {
+                            current.classList.add('open');
+                            const prev = current.previousElementSibling;
+                            if (prev && prev.classList.contains('has-submenu')) {
+                                prev.classList.add('open');
+                            }
+                        }
+                        current = current.parentElement;
+                    }
+                } else {
+                    link.style.display = 'none';
+                }
             });
         }
 
         initTheme();
         updateStats();
+        loadPageFromHash();
     </script>
 </body>
 
