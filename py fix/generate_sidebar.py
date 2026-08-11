@@ -41,7 +41,7 @@ def format_name(name):
     return n
 
 # max_depth limits how deep the menu can nest.
-def build_tree(data, path_parts, depth=1, max_depth=2):
+def build_tree(data, path_parts, depth=1, max_depth=3):
     html = []
     pad = 12 * depth
     
@@ -99,7 +99,7 @@ for top_level, data in tree.items():
     html_parts.append(f'            <div class="menu-section">')
     html_parts.append(f'                <div class="menu-section-title">{format_name(top_level)}</div>')
     
-    html_parts.extend(build_tree(data, [top_level], depth=1, max_depth=2))
+    html_parts.extend(build_tree(data, [top_level], depth=1, max_depth=3))
     
     html_parts.append(f'            </div>')
 
