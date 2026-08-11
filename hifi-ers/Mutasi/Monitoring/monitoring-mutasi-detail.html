@@ -910,7 +910,6 @@
     var setData = {
       'UITJBT': [
         { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 3, jumlah: 2, alokasi: 2 },
-        { merk: 'TOWER SOLUTION', kategori: 'Aksesoris ERS', section: 'Guying & Anchor System', kondisi: 'Tidak Lengkap', tersedia: 1, jumlah: 0, alokasi: 0 },
       ],
       'UITJBB': [
         { merk: 'TOWER SOLUTION', kategori: 'Struktur ERS', section: 'Tower Column 15m', kondisi: 'Lengkap', tersedia: 2, jumlah: 1, alokasi: 1 },
@@ -1015,8 +1014,6 @@
           thead.innerHTML = '<tr>'
             + '<th style="width:36px;text-align:center">No.</th>'
             + '<th>Merk</th>'
-            + '<th>Kategori</th>'
-            + '<th>Section</th>'
             + '<th style="width:120px;text-align:center">Kondisi</th>'
             + '<th style="width:80px;text-align:center">Tersedia</th>'
             + '<th style="width:90px;text-align:center">Jml. Kebutuhan</th>'
@@ -1024,7 +1021,8 @@
             + '</tr>';
         }
 
-        var rows = setData[unit] || setData['UITJBT'] || [];
+        var rawRows = setData[unit] || setData['UITJBT'] || [];
+        var rows = rawRows.filter(function (r) { return r.kondisi === 'Lengkap'; });
         var tbody = document.getElementById('det-tbody');
         if (tbody) {
           tbody.innerHTML = rows.map(function (r, i) {
@@ -1035,8 +1033,6 @@
             return '<tr>'
               + '<td style="text-align:center;color:var(--text-hint);font-size:12px">' + (i + 1) + '</td>'
               + '<td style="font-size:12.5px;font-weight:500">' + r.merk + '</td>'
-              + '<td style="font-size:12px"><span class="chip chip-kategori">' + (r.kategori || 'Struktur ERS') + '</span></td>'
-              + '<td style="font-size:12.5px">' + (r.section || 'Tower Column 15m') + '</td>'
               + '<td style="text-align:center">' + cond + '</td>'
               + '<td style="text-align:center;font-weight:600;color:var(--pln-blue)">' + r.tersedia + '</td>'
               + '<td style="text-align:center;font-weight:600">' + r.jumlah + '</td>'
@@ -1087,14 +1083,6 @@
         setTimeout(function () { backdrop.classList.add('open'); }, 10);
         panel.style.transform = 'translateX(0)';
         document.body.style.overflow = 'hidden';
-
-        if (isSet) {
-          var rows = setData[unit] || setData['UITJBT'] || [];
-          var firstRow = (rows && rows.length > 0) ? rows[0] : { merk: 'TOWER SOLUTION', kondisi: 'Lengkap' };
-          setTimeout(function () {
-            openSetKomponen(firstRow.merk, firstRow.kondisi, unit);
-          }, 50);
-        }
       }
     }
 
