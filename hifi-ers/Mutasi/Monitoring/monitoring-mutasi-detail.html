@@ -203,6 +203,23 @@
           }
         }
       }
+
+      // Update visibility of Detail Set ERS buttons and badges across all tabs
+      var setBtns = document.querySelectorAll('.btn-detail-set-ers');
+      var setBadges = document.querySelectorAll('.badge-total-set-ers');
+      setBtns.forEach(function (btn) {
+        btn.style.display = isSet ? 'inline-flex' : 'none';
+      });
+      setBadges.forEach(function (badge) {
+        badge.style.display = isSet ? 'inline-flex' : 'none';
+      });
+
+      // Update visibility of Level 1 B (other Unit Induk) card when destinasi = Antar UPT vs Antar UIT
+      var isUpt = (currentDestinasi === 'upt');
+      var otherUnitCards = document.querySelectorAll('.level1-card-other-unit');
+      otherUnitCards.forEach(function (card) {
+        card.style.display = isUpt ? 'none' : 'block';
+      });
     }
 
     function setTipeSimulasi(tipe) {
@@ -378,19 +395,27 @@
         if (s1Time) s1Time.textContent = '—';
 
         var s2Card = document.getElementById('step2-card');
+        var s2Empty = document.getElementById('step2-empty-state');
         var s2Banner = document.getElementById('step2-locked-banner');
-        if (s2Card) { s2Card.style.opacity = '0.45'; s2Card.style.pointerEvents = 'none'; }
-        if (s2Banner) { s2Banner.style.display = 'flex'; s2Banner.textContent = '⏳ Step 2 tertunda — menunggu Approval SRM Unit Peminjam (Step 1).'; }
+        if (s2Card) s2Card.style.display = 'none';
+        if (s2Empty) s2Empty.style.display = 'flex';
+        if (s2Banner) s2Banner.style.display = 'none';
 
         var s3Card = document.getElementById('step3-card');
-        if (s3Card) { s3Card.style.opacity = '0.45'; s3Card.style.pointerEvents = 'none'; }
+        var s3Empty = document.getElementById('step3-empty-state');
+        if (s3Card) s3Card.style.display = 'none';
+        if (s3Empty) s3Empty.style.display = 'flex';
 
-        if (step4Card) { step4Card.style.opacity = '0.45'; step4Card.style.pointerEvents = 'none'; }
+        var s4Card = document.getElementById('step4-card');
+        var s4Empty = document.getElementById('step4-empty-state');
+        if (s4Card) s4Card.style.display = 'none';
+        if (s4Empty) s4Empty.style.display = 'flex';
 
         var s1UptChip = document.getElementById('step1-upt-chip');
         var s1UptMsg = document.getElementById('step1-upt-msg');
         var s1UptTime = document.getElementById('step1-upt-time');
         var s2UptCard = document.getElementById('step2-upt-card');
+        var s2UptEmpty = document.getElementById('step2-upt-empty-state');
 
         if (s1UptChip) {
           s1UptChip.className = 'chip';
@@ -399,7 +424,8 @@
         }
         if (s1UptMsg) s1UptMsg.innerHTML = '💬 <em>"Permohonan peminjaman ERS antar UPT (Internal Unit Induk) telah dibuat dan sedang menunggu approval SRM Unit Peminjam."</em>';
         if (s1UptTime) s1UptTime.textContent = '—';
-        if (s2UptCard) { s2UptCard.style.opacity = '0.45'; s2UptCard.style.pointerEvents = 'none'; }
+        if (s2UptCard) s2UptCard.style.display = 'none';
+        if (s2UptEmpty) s2UptEmpty.style.display = 'flex';
 
         if (timelineList) {
           var itemPending = document.createElement('div');
@@ -422,8 +448,32 @@
         setTabStatusBadge('tabbtn-pengecekan-badge', null);
         setTabStatusBadge('tabbtn-penerimaan-badge', null);
         setTabStatusBadge('tabbtn-pengembalian-badge', null);
+        renderTabEmptyStates(true);
 
       } else {
+        renderTabEmptyStates(false);
+
+        // Restore Tab 2 Cards display for non-pending_srm
+        var s2Card = document.getElementById('step2-card');
+        var s2Empty = document.getElementById('step2-empty-state');
+        if (s2Card) s2Card.style.display = 'block';
+        if (s2Empty) s2Empty.style.display = 'none';
+
+        var s3Card = document.getElementById('step3-card');
+        var s3Empty = document.getElementById('step3-empty-state');
+        if (s3Card) s3Card.style.display = 'block';
+        if (s3Empty) s3Empty.style.display = 'none';
+
+        var s4Card = document.getElementById('step4-card');
+        var s4Empty = document.getElementById('step4-empty-state');
+        if (s4Card) s4Card.style.display = 'block';
+        if (s4Empty) s4Empty.style.display = 'none';
+
+        var s2UptCard = document.getElementById('step2-upt-card');
+        var s2UptEmpty = document.getElementById('step2-upt-empty-state');
+        if (s2UptCard) s2UptCard.style.display = 'block';
+        if (s2UptEmpty) s2UptEmpty.style.display = 'none';
+
         // Tampilkan kembali histori audit normal
         document.querySelectorAll('.timeline-future-step').forEach(function (el) { el.style.display = 'block'; });
 
@@ -439,19 +489,13 @@
         if (s1Msg) s1Msg.innerHTML = '💬 <em>"Permohonan peminjaman ERS darurat disetujui. Notifikasi permohonan diblast ke 3 Unit Induk Pengelola (UITJBT, UITJBB, UITJBM)."</em>';
         if (s1Time) s1Time.textContent = '24 Feb 2026 09:15 WIB';
 
-        var s2Card = document.getElementById('step2-card');
         var s2Banner = document.getElementById('step2-locked-banner');
-        if (s2Card) { s2Card.style.opacity = '1'; s2Card.style.pointerEvents = 'auto'; }
         if (s2Banner) { s2Banner.style.display = 'none'; }
 
-        var s3Card = document.getElementById('step3-card');
-        if (s3Card) { s3Card.style.opacity = '1'; s3Card.style.pointerEvents = 'auto'; }
-
-        // Reset UPT Mode Step 1, 2 Card states
+        // Reset UPT Mode Step 1 Card states
         var s1UptChip = document.getElementById('step1-upt-chip');
         var s1UptMsg = document.getElementById('step1-upt-msg');
         var s1UptTime = document.getElementById('step1-upt-time');
-        var s2UptCard = document.getElementById('step2-upt-card');
         if (s1UptChip) {
           s1UptChip.className = 'chip chip-approval chip-bordered';
           s1UptChip.style.background = ''; s1UptChip.style.color = ''; s1UptChip.style.border = '';
@@ -459,7 +503,6 @@
         }
         if (s1UptMsg) s1UptMsg.innerHTML = '💬 <em>"Permohonan peminjaman ERS antar UPT (Internal Unit Induk) disetujui. Notifikasi permohonan diblast langsung ke Manager UPT Pengelola internal."</em>';
         if (s1UptTime) s1UptTime.textContent = '24 Feb 2026 09:15 WIB';
-        if (s2UptCard) { s2UptCard.style.opacity = '1'; s2UptCard.style.pointerEvents = 'auto'; }
 
         if (status === 'selesai') {
           // ===== SELESAI POSITIF FLOW (Step 1-4 seluruhnya Disetujui) =====
@@ -1697,6 +1740,28 @@
       background: #FAFBFC;
     }
 
+    /* FREEZE / STICKY AKSI COLUMN */
+    th.sticky-col-right,
+    td.sticky-col-right {
+      position: sticky;
+      right: 0;
+      z-index: 5;
+      box-shadow: -3px 0 6px rgba(0, 0, 0, 0.06);
+    }
+
+    th.sticky-col-right {
+      background: #F8FAFC !important;
+      z-index: 6;
+    }
+
+    td.sticky-col-right {
+      background: #fff;
+    }
+
+    tbody tr:hover td.sticky-col-right {
+      background: #FAFBFC;
+    }
+
     /* CHIPS & BADGES */
     .unit-tag {
       display: inline-block;
@@ -2575,6 +2640,18 @@
                   </div>
                 </div>
 
+                <!-- STEP 2 EMPTY STATE (SAAT PENDING_SRM) -->
+                <div id="step2-empty-state" style="display:none; background:#fff; border:1px dashed #CBD5E1; border-radius:var(--radius-lg); padding:32px 24px; text-align:center; flex-direction:column; align-items:center; justify-content:center; margin:12px 0; box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                  <div style="width:52px; height:52px; border-radius:50%; background:#FEF3C7; color:#D97706; display:flex; align-items:center; justify-content:center; margin-bottom:12px; box-shadow:0 3px 10px rgba(217,119,6,0.15);">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <h5 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">Step 2 • Verifikasi &amp; Mapping Alokasi Belum Ada Data</h5>
+                  <p style="font-size:12.5px; color:var(--text-secondary); max-width:480px; margin-bottom:12px; line-height:1.4;">Tahap 2 belum dapat diproses karena permohonan transaksi mutasi masih dalam tahap <strong>Menunggu Approval SRM Peminjam (Step 1)</strong>.</p>
+                  <span class="chip" style="background:#FEF3C7; color:#B45309; border:1px solid #FCD34D; font-weight:600; font-size:11px; padding:3px 10px;">
+                    <span class="chip-dot" style="background:#D97706;"></span>Status: Menunggu Approval SRM Peminjam
+                  </span>
+                </div>
+
                 <!-- STEP 3 CARD -->
                 <div id="step3-card"
                   style="padding:20px; border:1px solid #FED7AA; border-radius:var(--radius-lg); background:#FFF7ED; position:relative; transition:opacity 0.2s;">
@@ -2701,6 +2778,18 @@
                   </div>
                 </div>
 
+                <!-- STEP 3 EMPTY STATE (SAAT PENDING_SRM) -->
+                <div id="step3-empty-state" style="display:none; background:#fff; border:1px dashed #CBD5E1; border-radius:var(--radius-lg); padding:32px 24px; text-align:center; flex-direction:column; align-items:center; justify-content:center; margin:12px 0; box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                  <div style="width:52px; height:52px; border-radius:50%; background:#FEF3C7; color:#D97706; display:flex; align-items:center; justify-content:center; margin-bottom:12px; box-shadow:0 3px 10px rgba(217,119,6,0.15);">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <h5 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">Step 3 • Approval Barang Keluar SRM Pengelola Belum Ada Data</h5>
+                  <p style="font-size:12.5px; color:var(--text-secondary); max-width:480px; margin-bottom:12px; line-height:1.4;">Tahap 3 belum dapat diproses karena permohonan transaksi mutasi masih dalam tahap <strong>Menunggu Approval SRM Peminjam (Step 1)</strong>.</p>
+                  <span class="chip" style="background:#FEF3C7; color:#B45309; border:1px solid #FCD34D; font-weight:600; font-size:11px; padding:3px 10px;">
+                    <span class="chip-dot" style="background:#D97706;"></span>Status: Menunggu Approval SRM Peminjam
+                  </span>
+                </div>
+
                 <!-- STEP 4 CARD -->
                 <div id="step4-card"
                   style="padding:20px; border:1px solid #BBF7D0; border-radius:var(--radius-lg); background:#F0FDF4; position:relative; transition:opacity 0.2s;">
@@ -2809,6 +2898,18 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- STEP 4 EMPTY STATE (SAAT PENDING_SRM) -->
+                <div id="step4-empty-state" style="display:none; background:#fff; border:1px dashed #CBD5E1; border-radius:var(--radius-lg); padding:32px 24px; text-align:center; flex-direction:column; align-items:center; justify-content:center; margin:12px 0; box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                  <div style="width:52px; height:52px; border-radius:50%; background:#FEF3C7; color:#D97706; display:flex; align-items:center; justify-content:center; margin-bottom:12px; box-shadow:0 3px 10px rgba(217,119,6,0.15);">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <h5 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">Step 4 • Persetujuan Manager UPT &amp; Logistik Pengelola Belum Ada Data</h5>
+                  <p style="font-size:12.5px; color:var(--text-secondary); max-width:480px; margin-bottom:12px; line-height:1.4;">Tahap 4 belum dapat diproses karena permohonan transaksi mutasi masih dalam tahap <strong>Menunggu Approval SRM Peminjam (Step 1)</strong>.</p>
+                  <span class="chip" style="background:#FEF3C7; color:#B45309; border:1px solid #FCD34D; font-weight:600; font-size:11px; padding:3px 10px;">
+                    <span class="chip-dot" style="background:#D97706;"></span>Status: Menunggu Approval SRM Peminjam
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -2914,6 +3015,18 @@
                     </div>
 
                   </div>
+                </div>
+
+                <!-- STEP 2 UPT EMPTY STATE (SAAT PENDING_SRM) -->
+                <div id="step2-upt-empty-state" style="display:none; background:#fff; border:1px dashed #CBD5E1; border-radius:var(--radius-lg); padding:32px 24px; text-align:center; flex-direction:column; align-items:center; justify-content:center; margin:12px 0; box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                  <div style="width:52px; height:52px; border-radius:50%; background:#FEF3C7; color:#D97706; display:flex; align-items:center; justify-content:center; margin-bottom:12px; box-shadow:0 3px 10px rgba(217,119,6,0.15);">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <h5 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">Step 2 • Persetujuan Manager UPT Pengelola Belum Ada Data</h5>
+                  <p style="font-size:12.5px; color:var(--text-secondary); max-width:480px; margin-bottom:12px; line-height:1.4;">Tahap 2 belum dapat diproses karena permohonan transaksi mutasi masih dalam tahap <strong>Menunggu Approval SRM Peminjam (Step 1)</strong>.</p>
+                  <span class="chip" style="background:#FEF3C7; color:#B45309; border:1px solid #FCD34D; font-weight:600; font-size:11px; padding:3px 10px;">
+                    <span class="chip-dot" style="background:#D97706;"></span>Status: Menunggu Approval SRM Peminjam
+                  </span>
                 </div>
 
               </div>
@@ -3045,6 +3158,7 @@
                   <div>
                     <div style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
                       P3BS — UIP3B Sumatera
+                      <span class="chip badge-total-set-ers" style="background:rgba(255,255,255,0.25); color:#fff; border:1px solid rgba(255,255,255,0.4); font-size:11px; font-weight:600; padding:2px 8px;">Total: 3 Set ERS</span>
                     </div>
                     <div style="font-size:11px; color:rgba(255,255,255,0.85);">Unit Induk Transmisi &bull; Level 1</div>
                   </div>
@@ -3291,7 +3405,7 @@
             <!-- ============================================================ -->
             <!-- LEVEL 1 - B: P3BKAL (KALIMANTAN) -->
             <!-- ============================================================ -->
-            <div style="border:2px solid #BFDBFE; border-radius:var(--radius-lg); overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div class="level1-card-other-unit" style="border:2px solid #BFDBFE; border-radius:var(--radius-lg); overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
 
               <!-- HEADER LEVEL 1 -->
               <div style="background:linear-gradient(90deg,#1D4ED8 0%,#2563EB 100%); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
@@ -3465,14 +3579,21 @@
                   <div>
                     <div style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
                       P3BS — UIP3B Sumatera
+                      <span class="chip badge-total-set-ers" style="background:rgba(255,255,255,0.25); color:#fff; border:1px solid rgba(255,255,255,0.4); font-size:11px; font-weight:600; padding:2px 8px;">Total: 3 Set ERS</span>
                     </div>
                     <div style="font-size:11px; color:rgba(255,255,255,0.85);">Unit Induk Transmisi &bull; Level 1</div>
                   </div>
                 </div>
-                <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
-                  2 Unit Pelaksana (Level 2)
-                </span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button class="btn-detail-set-ers" onclick="openSetKomponen('TOWER SOLUTION', 'Lengkap', 'P3BS')" style="padding:6px 12px; background:rgba(255,255,255,0.22); color:#fff; border:1px solid rgba(255,255,255,0.45); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.22)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Detail 3 Set ERS</span>
+                  </button>
+                  <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
+                    2 Unit Pelaksana (Level 2)
+                  </span>
+                </div>
               </div>
 
               <!-- BODY LEVEL 1: BERISI LEVEL 2 -->
@@ -3502,14 +3623,14 @@
                   <!-- KONTEN LEVEL 2-A -->
                   <div style="padding:16px; display:flex; flex-direction:column; gap:16px;">
 
-                    <!-- Informasi Penerimaan & BA Penerimaan Barang -->
+                    <!-- Informasi Penerimaan & Dokumen Acuan / BAST -->
                     <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:var(--radius-sm); padding:14px;">
                       <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                           <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
-                        Informasi Penerimaan &amp; BA Penerimaan Barang
+                        Informasi Penerimaan &amp; Dokumen Acuan / BAST Penerimaan
                       </div>
                       <div class="info-grid" style="margin-bottom:12px;">
                         <div class="info-field">
@@ -3517,19 +3638,26 @@
                           <div class="info-val">28 Februari 2026</div>
                         </div>
                       </div>
-                      <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px dashed var(--border);">
-                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen Pengecekan Penerimaan</label>
-                          <a href="#" class="doc-link" onclick="return false;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; padding-top:12px; border-top:1px dashed var(--border);">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Acuan Dokumen Pengecekan (Pengiriman)</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('UPT MEDAN'); return false;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            View Dokumen Pengecekan
                           </a>
                         </div>
-                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BA Penerimaan Barang</label>
-                          <a href="#" class="doc-link" onclick="return false;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Acuan Surat Jalan (Pengiriman)</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('UPT MEDAN'); return false;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                            View Surat Jalan
+                          </a>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BAST Penerimaan Barang</label>
+                          <a href="#" class="doc-link" onclick="openEvidenceModal('BAST Penerimaan UPT MEDAN', 'Sudah Diterima'); return false;" style="border-color:#166534; background:#F0FDF4; color:#166534;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 12"/></svg>
+                            View BAST Penerimaan
                           </a>
                         </div>
                       </div>
@@ -3557,6 +3685,8 @@
                               <th>Komponen / Alat ERS</th>
                               <th>QTY Dikirim</th>
                               <th>QTY Diterima</th>
+                              <th style="text-align:center;">Evidence (Foto/File)</th>
+                              <th>Tindak Lanjut</th>
                               <th>Status Penerimaan</th>
                             </tr>
                           </thead>
@@ -3570,7 +3700,14 @@
                               <td style="font-weight:600">Tower ERS Column Structure 15m</td>
                               <td>1 Set</td>
                               <td style="font-weight:600; color:#1E293B;">1 Set</td>
-                              <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">Sudah Dikarantina</span></td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Tower ERS Column Structure 15m', 'Sudah Dikarantina')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
+                              <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; cursor:pointer;" onclick="openEvidenceModal('Tower ERS Column Structure 15m', 'Sudah Dikarantina')" title="Klik untuk lihat Bukti Evidence">&#10003; Sudah Dikarantina</span></td>
                             </tr>
                             <tr>
                               <td>2</td>
@@ -3580,8 +3717,15 @@
                               <td>Guy Wire Anchor</td>
                               <td style="font-weight:600">Guy Wire Anchor Assembly Heavy Duty</td>
                               <td>4 Pcs</td>
-                              <td style="font-weight:600; color:#1E293B;">4 Pcs</td>
-                              <td><span class="chip" style="background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE;">Sudah Diterima</span></td>
+                              <td style="font-weight:600; color:#DC2626;">3 Pcs</td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Guy Wire Anchor Assembly Heavy Duty', 'Diterima Dgn Catatan (Defisit 1 Pcs)', true)" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #FCA5A5; background:#FEF2F2; color:#991B1B; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5; font-size:11px; font-weight:600;">Perlu Tindak Lanjut</span></td>
+                              <td><span class="chip" style="background:#FEF2F2; color:#991B1B; border:1px solid #FCA5A5; cursor:pointer;" onclick="openEvidenceModal('Guy Wire Anchor Assembly Heavy Duty', 'Diterima Dgn Catatan (Defisit 1 Pcs)', true)" title="Klik untuk lihat Bukti Evidence">Diterima Dgn Catatan</span></td>
                             </tr>
                           </tbody>
                         </table>
@@ -3623,7 +3767,7 @@
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                           <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
-                        Informasi Penerimaan &amp; BA Penerimaan Barang
+                        Informasi Penerimaan &amp; Dokumen Acuan / BAST Penerimaan
                       </div>
                       <div class="info-grid" style="margin-bottom:12px;">
                         <div class="info-field">
@@ -3631,16 +3775,23 @@
                           <div class="info-val" style="color:var(--text-hint);">Estimasi Tiba: 28 Februari 2026</div>
                         </div>
                       </div>
-                      <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px dashed var(--border);">
-                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen Pengecekan Penerimaan</label>
+                      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; padding-top:12px; border-top:1px dashed var(--border);">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Acuan Dokumen Pengecekan (Pengiriman)</label>
                           <span class="doc-link disabled" title="Dokumen belum tersedia karena masih menunggu kedatangan barang">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                             Belum Ada Dokumen
                           </span>
                         </div>
-                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BA Penerimaan Barang</label>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Acuan Surat Jalan (Pengiriman)</label>
+                          <span class="doc-link disabled" title="Dokumen belum tersedia karena masih menunggu kedatangan barang">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                            Belum Ada Dokumen
+                          </span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BAST Penerimaan Barang</label>
                           <span class="doc-link disabled" title="Dokumen belum tersedia karena masih menunggu kedatangan barang">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                             Belum Ada Dokumen
@@ -3671,6 +3822,8 @@
                               <th>Komponen / Alat ERS</th>
                               <th>QTY Dikirim</th>
                               <th>QTY Diterima</th>
+                              <th style="text-align:center;">Evidence (Foto/File)</th>
+                              <th>Tindak Lanjut</th>
                               <th>Status Penerimaan</th>
                             </tr>
                           </thead>
@@ -3684,6 +3837,8 @@
                               <td style="font-weight:600">Earthing System Kit Portable</td>
                               <td>2 Set</td>
                               <td style="color:var(--text-hint);">-</td>
+                              <td style="text-align:center;"><span style="font-size:11px; color:var(--text-hint);">-</span></td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
                               <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5;">Menunggu Kedatangan Barang</span></td>
                             </tr>
                             <tr>
@@ -3695,6 +3850,8 @@
                               <td style="font-weight:600">Safety Harness Full Body</td>
                               <td>5 Pcs</td>
                               <td style="color:var(--text-hint);">-</td>
+                              <td style="text-align:center;"><span style="font-size:11px; color:var(--text-hint);">-</span></td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
                               <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5;">Menunggu Kedatangan Barang</span></td>
                             </tr>
                           </tbody>
@@ -3713,7 +3870,7 @@
             <!-- ============================================================ -->
             <!-- LEVEL 1 - B: P3BKAL (KALIMANTAN) -->
             <!-- ============================================================ -->
-            <div style="border:2px solid #BFDBFE; border-radius:var(--radius-lg); overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div class="level1-card-other-unit" style="border:2px solid #BFDBFE; border-radius:var(--radius-lg); overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
 
               <!-- HEADER LEVEL 1 -->
               <div style="background:linear-gradient(90deg,#1D4ED8 0%,#2563EB 100%); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
@@ -3729,14 +3886,21 @@
                   <div>
                     <div style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
                       P3BKAL — UIP3B Kalimantan
+                      <span class="chip badge-total-set-ers" style="background:rgba(255,255,255,0.25); color:#fff; border:1px solid rgba(255,255,255,0.4); font-size:11px; font-weight:600; padding:2px 8px;">Total: 1 Set ERS</span>
                     </div>
                     <div style="font-size:11px; color:rgba(255,255,255,0.85);">Unit Induk Transmisi &bull; Level 1</div>
                   </div>
                 </div>
-                <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
-                  1 Unit Pelaksana (Level 2)
-                </span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button class="btn-detail-set-ers" onclick="openSetKomponen('TOWER SOLUTION', 'Lengkap', 'P3BKAL')" style="padding:6px 12px; background:rgba(255,255,255,0.22); color:#fff; border:1px solid rgba(255,255,255,0.45); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.22)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Detail 1 Set ERS</span>
+                  </button>
+                  <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
+                    1 Unit Pelaksana (Level 2)
+                  </span>
+                </div>
               </div>
 
               <!-- BODY LEVEL 1: BERISI LEVEL 2 -->
@@ -3773,7 +3937,7 @@
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                           <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
-                        Informasi Penerimaan &amp; BA Penerimaan Barang
+                        Informasi Penerimaan &amp; Dokumen Acuan / BAST Penerimaan
                       </div>
                       <div class="info-grid" style="margin-bottom:12px;">
                         <div class="info-field">
@@ -3781,19 +3945,26 @@
                           <div class="info-val">01 Maret 2026</div>
                         </div>
                       </div>
-                      <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px dashed var(--border);">
-                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen Pengecekan Penerimaan</label>
-                          <a href="#" class="doc-link" onclick="return false;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; padding-top:12px; border-top:1px dashed var(--border);">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Acuan Dokumen Pengecekan (Pengiriman)</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('UPT BALIKPAPAN'); return false;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            View Dokumen Pengecekan
                           </a>
                         </div>
-                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BA Penerimaan Barang</label>
-                          <a href="#" class="doc-link" onclick="return false;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Acuan Surat Jalan (Pengiriman)</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('UPT BALIKPAPAN'); return false;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                            View Surat Jalan
+                          </a>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BAST Penerimaan Barang</label>
+                          <a href="#" class="doc-link" onclick="openEvidenceModal('BAST Penerimaan UPT BALIKPAPAN', 'Sudah Diterima'); return false;" style="border-color:#166534; background:#F0FDF4; color:#166534;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 12"/></svg>
+                            View BAST Penerimaan
                           </a>
                         </div>
                       </div>
@@ -3821,6 +3992,8 @@
                               <th>Komponen / Alat ERS</th>
                               <th>QTY Dikirim</th>
                               <th>QTY Diterima</th>
+                              <th style="text-align:center;">Evidence (Foto/File)</th>
+                              <th>Tindak Lanjut</th>
                               <th>Status Penerimaan</th>
                             </tr>
                           </thead>
@@ -3834,7 +4007,14 @@
                               <td style="font-weight:600">Ginseng Crane Mobile 5T</td>
                               <td>1 Unit</td>
                               <td style="font-weight:600; color:#1E293B;">1 Unit</td>
-                              <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">Sudah Dikarantina</span></td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Ginseng Crane Mobile 5T', 'Sudah Dikarantina')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
+                              <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0; cursor:pointer;" onclick="openEvidenceModal('Ginseng Crane Mobile 5T', 'Sudah Dikarantina')" title="Klik untuk lihat Bukti Evidence">&#10003; Sudah Dikarantina</span></td>
                             </tr>
                           </tbody>
                         </table>
@@ -3886,14 +4066,21 @@
                   <div>
                     <div style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
                       P3BS — UIP3B Sumatera
+                      <span class="chip badge-total-set-ers" style="background:rgba(255,255,255,0.25); color:#fff; border:1px solid rgba(255,255,255,0.4); font-size:11px; font-weight:600; padding:2px 8px;">Total: 3 Set ERS</span>
                     </div>
                     <div style="font-size:11px; color:rgba(255,255,255,0.85);">Unit Induk Transmisi &bull; Level 1</div>
                   </div>
                 </div>
-                <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
-                  2 Unit Pelaksana (Level 2)
-                </span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button class="btn-detail-set-ers" onclick="openSetKomponen('TOWER SOLUTION', 'Lengkap', 'P3BS')" style="padding:6px 12px; background:rgba(255,255,255,0.22); color:#fff; border:1px solid rgba(255,255,255,0.45); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.22)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Detail 3 Set ERS</span>
+                  </button>
+                  <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
+                    2 Unit Pelaksana (Level 2)
+                  </span>
+                </div>
               </div>
 
               <!-- BODY LEVEL 1: BERISI LEVEL 2 -->
@@ -3940,16 +4127,16 @@
                       <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px dashed var(--border);">
                         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
                           <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BA Pengembalian ERS</label>
-                          <a href="#" class="doc-link" onclick="return false;">
+                          <a href="#" class="doc-link" onclick="openEvidenceModal('BA Pengembalian ERS - UPT Medan', 'Selesai Pengembalian'); return false;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                            Lihat BA Pengembalian
                           </a>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen Pengecekan Karantina Pengembalian</label>
-                          <a href="#" class="doc-link" onclick="return false;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Surat Jalan Pengembalian</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('Surat Jalan Pengembalian - UPT Medan'); return false;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                            Lihat Surat Jalan
                           </a>
                         </div>
                       </div>
@@ -3977,10 +4164,14 @@
                               <th>Komponen / Alat ERS</th>
                               <th>QTY Kirim</th>
                               <th>QTY Diterima</th>
+                              <th>QTY Dikembalikan</th>
                               <th>QTY Normal</th>
                               <th>QTY Rusak</th>
                               <th>QTY Hilang</th>
+                              <th style="text-align:center;">Evidence Karantina (Foto/File)</th>
+                              <th>Tindak Lanjut</th>
                               <th>Status Pengembalian</th>
+                              <th style="text-align:center;" class="sticky-col-right">Aksi</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -3993,10 +4184,24 @@
                               <td style="font-weight:600">Tower ERS Column Structure 15m</td>
                               <td>1 Set</td>
                               <td style="font-weight:600; color:#1E293B;">1 Set</td>
+                              <td style="font-weight:600; color:#2563EB;">1 Set</td>
                               <td style="color:#166534; font-weight:600;">1 Set</td>
                               <td style="color:var(--text-hint);">0</td>
                               <td style="color:var(--text-hint);">0</td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Tower ERS Column Structure 15m', 'Karantina Normal')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
                               <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">Selesai Karantina</span></td>
+                              <td style="text-align:center;" class="sticky-col-right">
+                                <button onclick="openReturnHistoryModal('Tower ERS Column Structure 15m')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='#F8FAFC'">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                  Histori
+                                </button>
+                              </td>
                             </tr>
                             <tr>
                               <td>2</td>
@@ -4007,10 +4212,24 @@
                               <td style="font-weight:600">Guy Wire Anchor Assembly Heavy Duty</td>
                               <td>4 Pcs</td>
                               <td style="font-weight:600; color:#1E293B;">4 Pcs</td>
-                              <td style="color:#166534; font-weight:600;">4 Pcs</td>
+                              <td style="font-weight:600; color:#2563EB;">4 Pcs</td>
+                              <td style="color:#166534; font-weight:600;">3 Pcs</td>
+                              <td style="color:#DC2626; font-weight:700;">1 Pcs</td>
                               <td style="color:var(--text-hint);">0</td>
-                              <td style="color:var(--text-hint);">0</td>
-                              <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">Selesai Karantina</span></td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Guy Wire Anchor Assembly Heavy Duty', 'Rusak 1 Pcs saat Pengembalian')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #FCA5A5; background:#FEF2F2; color:#991B1B; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5; font-size:11px; font-weight:600;">Perlu Tindak Lanjut</span></td>
+                              <td><span class="chip" style="background:#FEF2F2; color:#991B1B; border:1px solid #FCA5A5;">Rusak 1 Pcs (Ada Defisit)</span></td>
+                              <td style="text-align:center;" class="sticky-col-right">
+                                <button onclick="openReturnHistoryModal('Guy Wire Anchor Assembly Heavy Duty')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='#F8FAFC'">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                  Histori
+                                </button>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -4062,17 +4281,17 @@
                       <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px dashed var(--border);">
                         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
                           <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BA Pengembalian ERS</label>
-                          <span class="doc-link disabled" title="Dokumen belum tersedia">
+                          <a href="#" class="doc-link" onclick="openEvidenceModal('BA Pengembalian ERS - UPT Banda Aceh', 'Proses Pengembalian'); return false;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Belum Ada Dokumen
-                          </span>
+                            Lihat BA Pengembalian
+                          </a>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen Pengecekan Karantina Pengembalian</label>
-                          <span class="doc-link disabled" title="Dokumen belum tersedia">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Surat Jalan Pengembalian</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('Surat Jalan Pengembalian - UPT Banda Aceh'); return false;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Belum Ada Dokumen
-                          </span>
+                            Lihat Surat Jalan
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -4099,10 +4318,14 @@
                               <th>Komponen / Alat ERS</th>
                               <th>QTY Kirim</th>
                               <th>QTY Diterima</th>
+                              <th>QTY Dikembalikan</th>
                               <th>QTY Normal</th>
                               <th>QTY Rusak</th>
                               <th>QTY Hilang</th>
+                              <th style="text-align:center;">Evidence Karantina (Foto/File)</th>
+                              <th>Tindak Lanjut</th>
                               <th>Status Pengembalian</th>
+                              <th style="text-align:center;" class="sticky-col-right">Aksi</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -4114,11 +4337,25 @@
                               <td>Earthing Kit</td>
                               <td style="font-weight:600">Earthing System Kit Portable</td>
                               <td>2 Set</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5;">Proses Pengembalian</span></td>
+                              <td>2 Set</td>
+                              <td style="font-weight:600; color:#2563EB;">1 Set</td>
+                              <td style="color:#166534; font-weight:600;">1 Set</td>
+                              <td style="color:var(--text-hint);">0</td>
+                              <td style="color:var(--text-hint);">0</td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Earthing System Kit Portable', 'Pengembalian Bertahap Tahap 1')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
+                              <td><span class="chip" style="background:#FEF3C7; color:#B45309; border:1px solid #FCD34D;" title="Dikembalikan bertahap: 1 dari 2 Set">Bertahap (1/2 Set)</span></td>
+                              <td style="text-align:center;" class="sticky-col-right">
+                                <button onclick="openReturnHistoryModal('Earthing System Kit Portable')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='#F8FAFC'">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                  Histori
+                                </button>
+                              </td>
                             </tr>
                             <tr>
                               <td>2</td>
@@ -4128,11 +4365,25 @@
                               <td>Safety Harness</td>
                               <td style="font-weight:600">Safety Harness Full Body</td>
                               <td>5 Pcs</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td style="color:var(--text-hint);">-</td>
-                              <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5;">Proses Pengembalian</span></td>
+                              <td>5 Pcs</td>
+                              <td style="font-weight:600; color:#2563EB;">5 Pcs</td>
+                              <td style="color:#166534; font-weight:600;">4 Pcs</td>
+                              <td style="color:var(--text-hint);">0</td>
+                              <td style="color:#DC2626; font-weight:700;">1 Pcs</td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Safety Harness Full Body', 'Hilang 1 Pcs saat Pengembalian')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #FCA5A5; background:#FEF2F2; color:#991B1B; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span class="chip" style="background:#FFF7ED; color:#C2410C; border:1px solid #FFEDD5; font-size:11px; font-weight:600;">Perlu Tindak Lanjut</span></td>
+                              <td><span class="chip" style="background:#FEF2F2; color:#991B1B; border:1px solid #FCA5A5;">Hilang 1 Pcs (Ada Defisit)</span></td>
+                              <td style="text-align:center;" class="sticky-col-right">
+                                <button onclick="openReturnHistoryModal('Safety Harness Full Body')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='#F8FAFC'">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                  Histori
+                                </button>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -4150,7 +4401,7 @@
             <!-- ============================================================ -->
             <!-- LEVEL 1 - B: P3BKAL (KALIMANTAN) -->
             <!-- ============================================================ -->
-            <div style="border:2px solid #BFDBFE; border-radius:var(--radius-lg); overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div class="level1-card-other-unit" style="border:2px solid #BFDBFE; border-radius:var(--radius-lg); overflow:hidden; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
 
               <!-- HEADER LEVEL 1 -->
               <div style="background:linear-gradient(90deg,#1D4ED8 0%,#2563EB 100%); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
@@ -4166,14 +4417,21 @@
                   <div>
                     <div style="font-size:15px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
                       P3BKAL — UIP3B Kalimantan
+                      <span class="chip badge-total-set-ers" style="background:rgba(255,255,255,0.25); color:#fff; border:1px solid rgba(255,255,255,0.4); font-size:11px; font-weight:600; padding:2px 8px;">Total: 1 Set ERS</span>
                     </div>
                     <div style="font-size:11px; color:rgba(255,255,255,0.85);">Unit Induk Transmisi &bull; Level 1</div>
                   </div>
                 </div>
-                <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
-                  1 Unit Pelaksana (Level 2)
-                </span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button class="btn-detail-set-ers" onclick="openSetKomponen('TOWER SOLUTION', 'Lengkap', 'P3BKAL')" style="padding:6px 12px; background:rgba(255,255,255,0.22); color:#fff; border:1px solid rgba(255,255,255,0.45); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.22)'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Detail 1 Set ERS</span>
+                  </button>
+                  <span class="chip" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.3); font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg>
+                    1 Unit Pelaksana (Level 2)
+                  </span>
+                </div>
               </div>
 
               <!-- BODY LEVEL 1: BERISI LEVEL 2 -->
@@ -4220,16 +4478,16 @@
                       <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:12px; border-top:1px dashed var(--border);">
                         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
                           <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen BA Pengembalian ERS</label>
-                          <a href="#" class="doc-link" onclick="return false;">
+                          <a href="#" class="doc-link" onclick="openEvidenceModal('BA Pengembalian ERS - UPT Balikpapan', 'Selesai Pengembalian'); return false;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                            Lihat BA Pengembalian
                           </a>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
-                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Dokumen Pengecekan Karantina Pengembalian</label>
-                          <a href="#" class="doc-link" onclick="return false;">
+                          <label style="font-size:12px; font-weight:500; color:var(--text-secondary);">Surat Jalan Pengembalian</label>
+                          <a href="#" class="doc-link" onclick="openShipmentDocsModal('Surat Jalan Pengembalian - UPT Balikpapan'); return false;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Lihat Dokumen
+                            Lihat Surat Jalan
                           </a>
                         </div>
                       </div>
@@ -4257,10 +4515,14 @@
                               <th>Komponen / Alat ERS</th>
                               <th>QTY Kirim</th>
                               <th>QTY Diterima</th>
+                              <th>QTY Dikembalikan</th>
                               <th>QTY Normal</th>
                               <th>QTY Rusak</th>
                               <th>QTY Hilang</th>
+                              <th style="text-align:center;">Evidence Karantina (Foto/File)</th>
+                              <th>Tindak Lanjut</th>
                               <th>Status Pengembalian</th>
+                              <th style="text-align:center;" class="sticky-col-right">Aksi</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -4273,10 +4535,24 @@
                               <td style="font-weight:600">Ginseng Crane Mobile 5T</td>
                               <td>1 Unit</td>
                               <td style="font-weight:600; color:#1E293B;">1 Unit</td>
+                              <td style="font-weight:600; color:#2563EB;">1 Unit</td>
                               <td style="color:#166534; font-weight:600;">1 Unit</td>
                               <td style="color:var(--text-hint);">0</td>
                               <td style="color:var(--text-hint);">0</td>
+                              <td style="text-align:center;">
+                                <button onclick="openEvidenceModal('Ginseng Crane Mobile 5T', 'Karantina Normal')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                  Evidence (Foto/File)
+                                </button>
+                              </td>
+                              <td><span style="color:var(--text-hint); font-size:12px;">-</span></td>
                               <td><span class="chip" style="background:#F0FDF4; color:#166534; border:1px solid #BBF7D0;">Selesai Karantina</span></td>
+                              <td style="text-align:center;" class="sticky-col-right">
+                                <button onclick="openReturnHistoryModal('Ginseng Crane Mobile 5T')" style="padding:4px 8px; font-size:11px; font-weight:600; border-radius:5px; border:1px solid #CBD5E1; background:#F8FAFC; color:#334155; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='#F8FAFC'">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                  Histori
+                                </button>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -4525,6 +4801,33 @@
         document.body.style.overflow = '';
       }
     }
+
+    var currentRhItem = 'Komponen ERS';
+    function openReturnHistoryModal(itemName) {
+      currentRhItem = itemName || 'Komponen ERS';
+      var backdrop = document.getElementById('rh-backdrop');
+      var panel = document.getElementById('rh-panel');
+      var title = document.getElementById('rh-item-title');
+      if (!backdrop || !panel) return;
+
+      if (title) title.textContent = currentRhItem;
+
+      backdrop.style.display = 'block';
+      setTimeout(function () { backdrop.classList.add('open'); }, 10);
+      panel.style.transform = 'translateX(0)';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeReturnHistoryModal() {
+      var backdrop = document.getElementById('rh-backdrop');
+      var panel = document.getElementById('rh-panel');
+      if (backdrop && panel) {
+        backdrop.classList.remove('open');
+        panel.style.transform = 'translateX(100%)';
+        setTimeout(function () { backdrop.style.display = 'none'; }, 300);
+        document.body.style.overflow = '';
+      }
+    }
   </script>
 
   <!-- DETAIL PANEL (COPIED EXACTLY FROM PREVIEW PAGE) -->
@@ -4701,26 +5004,26 @@
             <div
               style="width:40px;height:40px;margin:0 auto 8px;background:#E2E8F0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#475569;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path
-                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Foto Kondisi Fisik</div>
-            <div style="font-size:11px;color:var(--text-hint);margin-top:2px;">Fisik komponen saat dibuka</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Foto Bukti 1</div>
+            <div style="font-size:11px;color:var(--text-hint);margin-top:2px;">Bukti Fisik Barang</div>
           </div>
           <div
             style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#F8FAFC;text-align:center;padding:18px 10px;">
             <div
               style="width:40px;height:40px;margin:0 auto 8px;background:#E2E8F0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#475569;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-                <line x1="7" y1="7" x2="7.01" y2="7" />
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Foto Tagging Barcode</div>
-            <div style="font-size:11px;color:var(--text-hint);margin-top:2px;">Verifikasi serial number & label</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-primary)">Foto Bukti 2</div>
+            <div style="font-size:11px;color:var(--text-hint);margin-top:2px;">Bukti Fisik Barang</div>
           </div>
         </div>
 
@@ -4973,6 +5276,92 @@
       style="border-top:1px solid var(--border);padding:12px 22px;display:flex;justify-content:flex-end;flex-shrink:0">
       <button onclick="closeShipmentDocsModal()"
         style="padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer">Tutup</button>
+    </div>
+  </div>
+
+  <!-- HISTORI PENGEMBALIAN SIDE PANEL -->
+  <div id="rh-backdrop" class="side-backdrop" onclick="closeReturnHistoryModal()"></div>
+  <div id="rh-panel" class="side-panel" style="width:55%">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div>
+        <div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Histori Riwayat Pengembalian ERS</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-hint);margin-top:2px">Item: <strong id="rh-item-title" style="color:var(--pln-blue)">-</strong></div>
+      </div>
+      <button onclick="closeReturnHistoryModal()" style="width:32px;height:32px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;padding:20px 22px">
+      <!-- TIMELINE KRONOLOGI PENGEMBALIAN -->
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px;">
+        Urutan Kronologis Riwayat Pengembalian (Bertahap &amp; Karantina)
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;position:relative;padding-left:20px;border-left:2px dashed #CBD5E1;">
+        <!-- STAGE 2 / TERBARU -->
+        <div style="position:relative;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+          <div style="position:absolute;left:-27px;top:16px;width:12px;height:12px;border-radius:50%;background:#1D4ED8;border:2px solid #fff;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <span class="chip" style="background:#EFF6FF;color:#1D4ED8;font-weight:700;font-size:11px;border:1px solid #BFDBFE;">Pengembalian Tahap 2 (Selesai)</span>
+            <div style="font-size:11.5px;font-weight:600;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Tgl Penerimaan: 15 Maret 2026 &bull; 14:20 WIB</span>
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Penerimaan Pengembalian Sisa Barang oleh Gudang UPT</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;background:#F8FAFC;padding:8px 12px;border-radius:6px;border:1px solid #E2E8F0;">
+            <div>Dikembalikan: <strong style="color:#2563EB;">1 Pcs</strong></div>
+            <div>Normal: <strong style="color:#166534;">1 Pcs</strong></div>
+            <div>Rusak: <strong style="color:var(--text-hint);">0</strong></div>
+            <div>Hilang: <strong style="color:var(--text-hint);">0</strong></div>
+          </div>
+          <div style="margin-top:8px;font-size:11.5px;color:#475569;background:#fff;padding:8px 10px;border-radius:6px;border:1px solid #E2E8F0;">
+            Petugas Gudang: <strong>Ahmad Fauzi</strong> (Gudang ULTG Medan). BA Pengecekan Karantina #BA-RET-002 telah diunggah &amp; terverifikasi.
+          </div>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button onclick="openEvidenceModal(currentRhItem, 'Pengembalian Tahap 2 (Selesai)')" style="padding:6px 12px;font-size:11.5px;font-weight:600;border-radius:6px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;" onmouseover="this.style.background='#DBEAFE'" onmouseout="this.style.background='#EFF6FF'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Lihat Foto Evidence &amp; Dokumen Karantina</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STAGE 1 / AWAL -->
+        <div style="position:relative;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.02);">
+          <div style="position:absolute;left:-27px;top:16px;width:12px;height:12px;border-radius:50%;background:#94A3B8;border:2px solid #fff;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <span class="chip" style="background:#F1F5F9;color:#475569;font-weight:700;font-size:11px;border:1px solid #CBD5E1;">Pengembalian Tahap 1</span>
+            <div style="font-size:11.5px;font-weight:600;color:#475569;background:#F1F5F9;border:1px solid #CBD5E1;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Tgl Penerimaan: 10 Maret 2026 &bull; 09:45 WIB</span>
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Penerimaan Pengembalian Awal (Bertahap)</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;background:#F8FAFC;padding:8px 12px;border-radius:6px;border:1px solid #E2E8F0;">
+            <div>Dikembalikan: <strong style="color:#2563EB;">3 Pcs</strong></div>
+            <div>Normal: <strong style="color:#166534;">3 Pcs</strong></div>
+            <div>Rusak: <strong style="color:var(--text-hint);">0</strong></div>
+            <div>Hilang: <strong style="color:var(--text-hint);">0</strong></div>
+          </div>
+          <div style="margin-top:8px;font-size:11.5px;color:#475569;background:#fff;padding:8px 10px;border-radius:6px;border:1px solid #E2E8F0;">
+            Dikirim dari lokasi site pemeliharaan GI Titi Kuning. BA Pengembalian Tahap 1 #BA-RET-001 terlampir.
+          </div>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button onclick="openEvidenceModal(currentRhItem, 'Pengembalian Tahap 1')" style="padding:6px 12px;font-size:11.5px;font-weight:600;border-radius:6px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;" onmouseover="this.style.background='#DBEAFE'" onmouseout="this.style.background='#EFF6FF'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Lihat Foto Evidence &amp; Dokumen Karantina</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding:12px 22px;display:flex;justify-content:flex-end;flex-shrink:0">
+      <button onclick="closeReturnHistoryModal()" style="padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font-size:13px;font-weight:500;cursor:pointer">Tutup</button>
     </div>
   </div>
 </body>
