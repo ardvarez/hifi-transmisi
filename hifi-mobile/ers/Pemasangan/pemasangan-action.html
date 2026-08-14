@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pemasangan Action - ASM20250000001</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet Map Integration -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --bg-canvas: #f4f6fc;
+            --card-bg: #ffffff;
+            --primary-blue: #2563eb;
+            --primary-blue-dark: #1d4ed8;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.2s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.9;
+                transform: scale(0.996);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Top Header Section */
+        .header-section {
+            background: #ffffff;
+            padding: 12px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-main-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .header-sub-code {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .btn-file-rencana {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            background: #eff6ff;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #dbeafe;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-file-rencana:hover {
+            background: #dbeafe;
+        }
+
+        /* App Body Content */
+        .app-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 16px 12px;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-canvas);
+            scrollbar-width: none;
+        }
+
+        .app-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Alert Sisa Hari Banner */
+        .alert-banner {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.05);
+        }
+
+        .alert-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #d97706;
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .alert-text {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #b45309;
+        }
+
+        /* Top Location Card */
+        .tower-info-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .tower-card-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.35;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .tower-coords {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .btn-view-lokasi {
+            width: 100%;
+            padding: 9px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1.5px solid #2563eb;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .btn-view-lokasi:active {
+            background: #eff6ff;
+        }
+
+        .divider-line {
+            height: 1px;
+            background: #f1f5f9;
+            margin-bottom: 14px;
+        }
+
+        .meta-rows-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-val {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        /* Segmented Tabs (Aksesoris / Peta) - Sticky Header */
+        .tab-segmented-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            position: sticky;
+            top: -16px;
+            z-index: 80;
+            background: var(--bg-canvas);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Detail Specification Card */
+        .spec-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            margin-bottom: 16px;
+        }
+
+        .spec-section-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .spec-section-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 14px 0;
+        }
+
+        /* Map Container (hidden by default) */
+        .map-view-card {
+            display: none;
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            margin-bottom: 16px;
+        }
+
+        /* Sticky Bottom Action Bar */
+        .bottom-sticky-bar {
+            position: relative;
+            flex-shrink: 0;
+            background: #ffffff;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+            z-index: 90;
+        }
+
+        .btn-submit-action {
+            width: 100%;
+            height: 46px;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-submit-action:active {
+            background: #1d4ed8;
+            transform: scale(0.99);
+        }
+
+        /* iOS Bottom Bar Indicator */
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #000000;
+            border-radius: 2px;
+            z-index: 101;
+        }
+
+        /* Bottom Sheet Modal Overlay */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+                        visibility 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            will-change: transform;
+            max-height: 88vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+            cursor: pointer;
+        }
+
+        /* Success Overlay */
+        .success-overlay-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .success-overlay-container.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-icon-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 24px;
+        }
+
+        .success-circle {
+            width: 100px;
+            height: 100px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 46px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);
+            animation: checkmarkPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes checkmarkPop {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .success-subtitle {
+            font-size: 13.5px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Top Header with Back to List Pemasangan -->
+        <div class="header-section">
+            <div class="header-left">
+                <a href="./list-pemasangan.html" class="back-btn" onclick="navigateSmooth('./list-pemasangan.html', event)" title="Kembali ke List Pemasangan">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1 class="header-main-title">Pemasangan</h1>
+                    <span class="header-sub-code" id="headerCode">ASM20250000001-01</span>
+                </div>
+            </div>
+            <button type="button" class="btn-file-rencana" onclick="openFileRencana()">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>File Rencana</span>
+            </button>
+        </div>
+
+        <!-- App Body / Content Area -->
+        <div class="app-body">
+
+            <!-- Alert Banner: Sisa Hari Pemasangan -->
+            <div class="alert-banner" id="alertBannerBox" style="transition: all 0.3s ease;">
+                <div class="alert-icon" id="alertBannerIcon">!</div>
+                <span class="alert-text" id="alertBannerText">Sisa Hari Pemasangan 30 Hari</span>
+            </div>
+
+            <!-- Top Tower Location Card -->
+            <div class="tower-info-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px;">Lokasi Pemasangan ERS</span>
+                    <span id="towerStatusBadge" style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 8px; background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">
+                        Siap Pasang
+                    </span>
+                </div>
+                <h2 class="tower-card-title" id="towerTitle">TOWER SUTT 150kV UNGARAN-WELERI#0085</h2>
+                <div class="tower-coords" id="towerCoords">-7.2575, 109.1866</div>
+
+                <button type="button" class="btn-view-lokasi" onclick="viewLokasiModal()">View Lokasi</button>
+
+                <div class="divider-line"></div>
+
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Status Pemasangan</span>
+                        <span class="meta-val" id="metaStatusText" style="font-weight: 800; color: #b45309;">Siap Pasang</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Target Pemasangan</span>
+                        <span class="meta-val">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">SLA Pemasangan</span>
+                        <span class="meta-val">30 Hari</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Target Operasi</span>
+                        <span class="meta-val">10 Maret 2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segmented Control Tabs (Aksesoris / Peta / Informasi) -->
+            <div class="tab-segmented-container">
+                <button type="button" class="tab-btn active" id="tabAksesoris" onclick="switchTab('aksesoris')">Aksesoris</button>
+                <button type="button" class="tab-btn" id="tabPeta" onclick="switchTab('peta')">Peta</button>
+                <button type="button" class="tab-btn" id="tabInformasi" onclick="switchTab('informasi')" style="display: none;">Informasi</button>
+            </div>
+
+            <!-- Tab 1 Content: Spesifikasi Aksesoris & Components -->
+            <div class="spec-card" id="specCardView">
+                
+                <!-- 1. Spesifikasi Umum -->
+                <div class="spec-section-title">Spesifikasi Umum</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Tegangan</span>
+                        <span class="meta-val" id="specTegangan">150kV</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Merk</span>
+                        <span class="meta-val" id="specMerk">Lindsay</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tipe Tower</span>
+                        <span class="meta-val" id="specTipe">Suspension</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 2. FOUNDATION SECTION -->
+                <div class="spec-section-title">FOUNDATION SECTION</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Adapter Joint</span>
+                        <span class="meta-val">1 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Base Plate Anchor</span>
+                        <span class="meta-val">4 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Base Leveling Nut M24</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 3. WORK ACCESSORIES -->
+                <div class="spec-section-title">WORK ACCESSORIES</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Safety Harness & Lanyard</span>
+                        <span class="meta-val">2 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Climbing Rope 50m</span>
+                        <span class="meta-val">1 Roll</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Portable Grounding Kit</span>
+                        <span class="meta-val">1 Set</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 4. WORKING TOOLS -->
+                <div class="spec-section-title">WORKING TOOLS</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Torque Wrench 100-500 Nm</span>
+                        <span class="meta-val">2 Unit</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Ratchet Spanner M16/M20/M24</span>
+                        <span class="meta-val">4 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Hydraulic Crimping Tool</span>
+                        <span class="meta-val">1 Set</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 5. ANCHOR CONSTRUCTION -->
+                <div class="spec-section-title">ANCHOR CONSTRUCTION</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Guy Wire Stay Rod 2.5m</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Turnbuckle Eye-Eye 1" x 12"</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Wire Rope Clip 5/8"</span>
+                        <span class="meta-val">32 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 6. WORK AIDS -->
+                <div class="spec-section-title">WORK AIDS</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Gin Pole Aluminum 6m</span>
+                        <span class="meta-val">1 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Snatch Block 2-Ton</span>
+                        <span class="meta-val">4 Unit</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tag Line Rope 100m</span>
+                        <span class="meta-val">2 Roll</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 7. GROUND ANCHOR FULL ASSEMBLY -->
+                <div class="spec-section-title">GROUND ANCHOR FULL ASSEMBLY</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Ground Anchor Rod 3m</span>
+                        <span class="meta-val">6 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Earth Plate 600x600mm</span>
+                        <span class="meta-val">6 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Extension Rod & Coupling</span>
+                        <span class="meta-val">12 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 8. UNIVERSAL ATTACHMENT -->
+                <div class="spec-section-title">UNIVERSAL ATTACHMENT</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Universal Swivel Joint</span>
+                        <span class="meta-val">4 Unit</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Mast Attachment Plate</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Shackle Bow Type 3.25T</span>
+                        <span class="meta-val">12 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 9. ACCESSORIES EARTH WIRE / OPTICAL GROUND WIRE -->
+                <div class="spec-section-title">ACCESSORIES EARTH WIRE / OPTICAL GROUND WIRE</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">OPGW Suspension Clamp</span>
+                        <span class="meta-val">2 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Vibration Damper OPGW</span>
+                        <span class="meta-val">4 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Armor Rod Preformed</span>
+                        <span class="meta-val">2 Set</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 10. ERECTION TOOLS -->
+                <div class="spec-section-title">ERECTION TOOLS</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Motorized Winch 3-Ton</span>
+                        <span class="meta-val">1 Unit</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Steel Wire Rope Cable 12mm x 200m</span>
+                        <span class="meta-val">1 Roll</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Pulling Grip / Come Along</span>
+                        <span class="meta-val">3 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 11. METRIC BOLTS -->
+                <div class="spec-section-title">METRIC BOLTS</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Hex Bolt M16 x 50 (8.8 Grade)</span>
+                        <span class="meta-val">64 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Hex Bolt M20 x 70 (8.8 Grade)</span>
+                        <span class="meta-val">48 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Hex Bolt M24 x 100 (8.8 Grade)</span>
+                        <span class="meta-val">32 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Flat & Spring Washer Set</span>
+                        <span class="meta-val">144 Set</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 12. INSULATOR ASSEMBLY -->
+                <div class="spec-section-title">INSULATOR ASSEMBLY</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Polymer Suspension Insulator 150kV 120kN</span>
+                        <span class="meta-val">3 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Socket Clevis & Ball Eye</span>
+                        <span class="meta-val">6 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Arcing Horn Set</span>
+                        <span class="meta-val">6 Set</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 13. HELIX ANCHOR SET -->
+                <div class="spec-section-title">HELIX ANCHOR SET</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Triple Helix Anchor Screw 2m</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Hydraulic Drive Adapter</span>
+                        <span class="meta-val">1 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Anchor Cap & Eye Extension</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 14. ACCESSORIES ANCHOR -->
+                <div class="spec-section-title">ACCESSORIES ANCHOR</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Anchor Guy Plate Triple Eye</span>
+                        <span class="meta-val">4 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Guy Wire Galvanized 7/16" (1x19)</span>
+                        <span class="meta-val">300 Meter</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Thimble Heavy Duty 1/2"</span>
+                        <span class="meta-val">16 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 15. UNIVERSAL ATTACHMENT CONNECTION -->
+                <div class="spec-section-title">UNIVERSAL ATTACHMENT CONNECTION</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Cross Connection Plate</span>
+                        <span class="meta-val">8 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Guy Grip Dead End 7/16"</span>
+                        <span class="meta-val">16 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Connecting Pin & Cotter Pin Set</span>
+                        <span class="meta-val">16 Set</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 16. EARTH WIRE / OPTICAL GROUND WIRE MOUNTING -->
+                <div class="spec-section-title">EARTH WIRE / OPTICAL GROUND WIRE MOUNTING</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Earth Wire Peak Extension Brackets</span>
+                        <span class="meta-val">2 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">J-Hook Cable Hanger</span>
+                        <span class="meta-val">6 Pcs</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Flexible Copper Ground Strap 50mm2</span>
+                        <span class="meta-val">4 Pcs</span>
+                    </div>
+                </div>
+
+                <div class="spec-section-divider"></div>
+
+                <!-- 17. INSULATOR SET -->
+                <div class="spec-section-title">INSULATOR SET</div>
+                <div class="meta-rows-list">
+                    <div class="meta-row">
+                        <span class="meta-label">Tension Insulator Assembly 150kV 160kN</span>
+                        <span class="meta-val">3 Set</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Y-Clevis Ball Eye & Strain Clamp</span>
+                        <span class="meta-val">3 Set</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Tab 2 Content: Peta View (Hidden initially) -->
+            <div class="map-view-card" id="mapCardView" style="display: none; padding: 0; background: transparent; border: none; box-shadow: none; flex-direction: column; flex: 1; position: relative;">
+                <div id="map" style="width: 100%; min-height: 420px; flex: 1; border-radius: 16px; overflow: hidden; position: relative; z-index: 1; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(15,23,42,0.06);"></div>
+                
+                <!-- Map Legend Overlay -->
+                <div style="position: absolute; top: 12px; right: 12px; z-index: 400; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); padding: 8px 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 11px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #1e293b;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #2563eb; display: inline-block; box-shadow: 0 0 0 2px rgba(37,99,235,0.2);"></span>
+                        <span>Rencana Tower</span>
+                    </div>
+                    <div id="legendActualItem" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #059669;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 0 2px rgba(16,185,129,0.3);"></span>
+                        <span>Pemasangan Actual</span>
+                    </div>
+                </div>
+
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-top: 12px; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(15,23,42,0.04); flex-shrink: 0;">
+                    <div>
+                        <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px;">Koordinat Presisi ERS</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;" id="mapCoordText">-7.2575, 109.1866</div>
+                    </div>
+                    <button type="button" class="btn-outline-action" style="padding: 8px 14px; font-size: 12px; border-radius: 10px;" onclick="openGoogleMapsNav()">
+                        <i class="fa-solid fa-location-arrow" style="margin-right: 4px;"></i> Buka Maps
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab 3 Content: Informasi View (Gambar 2) -->
+            <div class="info-view-container" id="infoCardView" style="display: none; flex-direction: column; gap: 14px;">
+                
+                <!-- Info Metadata Card -->
+                <div class="spec-card" style="margin-bottom: 0;">
+                    <div class="meta-rows-list" style="gap: 12px;">
+                        <div class="meta-row">
+                            <span class="meta-label">Waktu Mulai</span>
+                            <span class="meta-val" id="infoWaktuMulai">10 Mei 2025, 08:06</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">PIC Pelaksana</span>
+                            <span class="meta-val" id="infoPicPelaksana">Luis Andreas BGS</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Waktu Selesai</span>
+                            <span class="meta-val" id="infoWaktuSelesai">-</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Longtitude/Latitude</span>
+                            <span class="meta-val" id="infoLongLat">-7.2575, 109.1866</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evidence Mulai Card -->
+                <div class="spec-card" style="margin-bottom: 0;">
+                    <h3 style="font-size: 14.5px; font-weight: 800; color: #0f172a; margin-bottom: 14px;">Evidence Mulai</h3>
+                    <div class="evidence-gallery-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=300&q=80" alt="Evidence 1" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 2" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=300&q=80" alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=300&q=80" alt="Evidence 4" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
+                            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">+2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evidence Selesai Card (Hidden initially, shown when finished) -->
+                <div class="spec-card" style="margin-bottom: 0; display: none;" id="cardEvidenceSelesai">
+                    <h3 style="font-size: 14.5px; font-weight: 800; color: #0f172a; margin-bottom: 14px;">Evidence Selesai</h3>
+                    <div class="evidence-gallery-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=300&q=80" alt="Evidence Selesai 1" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=300&q=80" alt="Evidence Selesai 2" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=300&q=80" alt="Evidence Selesai 3" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
+                            <img src="https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=300&q=80" alt="Evidence Selesai 4" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
+                            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">+1</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sticky Bottom Action Bar -->
+        <div class="bottom-sticky-bar">
+            <button type="button" class="btn-submit-action" id="btnMainAction" onclick="submitSelesaiPemasangan()">Selesai Pemasangan</button>
+        </div>
+
+        <!-- iOS Bottom Bar Indicator -->
+        <div class="ios-bar"></div>
+
+        <!-- Bottom Sheet Overlay Container -->
+        <div class="modal-overlay" id="filterModal" onclick="closeFilterModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeFilterModalDirect()" title="Klik/Tarik untuk tutup"></div>
+                <div id="drawerModalContent">
+                    <!-- Dynamic Bottom Sheet Content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Animated Overlay -->
+        <div class="success-overlay-container" id="successOverlay">
+            <div class="success-icon-wrapper">
+                <div class="success-circle">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+            </div>
+            <h2 class="success-title" id="successTitleText">Data Berhasil Disimpan</h2>
+            <p class="success-subtitle" id="successDescText">Selamat, proses pemasangan ERS berhasil dimulai.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab Switch & Leaflet Interactive Map Logic
+        let leafletMap = null;
+        let planMarker = null;
+        let actualMarker = null;
+        let offsetLine = null;
+        let isPemasanganStarted = false;
+
+        function initMapIfNeeded() {
+            const planLat = -7.2575;
+            const planLng = 109.1866;
+            const actualLat = -7.2579;
+            const actualLng = 109.1873;
+
+            if (!leafletMap) {
+                leafletMap = L.map('map', {
+                    center: [planLat, planLng],
+                    zoom: 16,
+                    zoomControl: true
+                });
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(leafletMap);
+
+                // 1. Titik Rencana Tower (Blue Pin)
+                const planIcon = L.divIcon({
+                    className: 'custom-plan-marker',
+                    html: `
+                        <div style="width: 34px; height: 34px; background: #2563eb; border: 3px solid #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(37,99,235,0.45);">
+                            <i class="fa-solid fa-tower-cell" style="color: #ffffff; font-size: 15px;"></i>
+                        </div>
+                    `,
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17]
+                });
+
+                planMarker = L.marker([planLat, planLng], { icon: planIcon }).addTo(leafletMap);
+                planMarker.bindPopup(`
+                    <div style="font-family: inherit; font-size: 12px; padding: 2px;">
+                        <span style="font-size: 10px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Lokasi Rencana Tower</span>
+                        <strong style="color: #0f172a; display: block; margin-top: 2px; font-size: 12px;">TOWER SUTT 150kV UNGARAN-WELERI#0085</strong>
+                        <span style="color: #64748b; font-weight: 700; font-size: 11px;">-7.2575, 109.1866</span>
+                    </div>
+                `, { closeButton: false });
+
+                // 2. Titik Actual Pemasangan (Green Pin)
+                const actualIcon = L.divIcon({
+                    className: 'custom-actual-marker',
+                    html: `
+                        <div style="width: 36px; height: 36px; background: #10b981; border: 3px solid #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(16,185,129,0.5);">
+                            <i class="fa-solid fa-location-dot" style="color: #ffffff; font-size: 17px;"></i>
+                        </div>
+                    `,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                });
+
+                actualMarker = L.marker([actualLat, actualLng], { icon: actualIcon });
+                actualMarker.bindPopup(`
+                    <div style="font-family: inherit; font-size: 12px; padding: 2px;">
+                        <span style="font-size: 10px; font-weight: 800; color: #10b981; text-transform: uppercase;">Lokasi Pemasangan ERS Actual</span>
+                        <strong style="color: #0f172a; display: block; margin-top: 2px; font-size: 12px;">Titik Pemasangan Lapangan</strong>
+                        <span style="color: #10b981; font-weight: 800; font-size: 11px;">-7.2579, 109.1873 (Selisih ~45m)</span>
+                    </div>
+                `, { closeButton: false });
+
+                offsetLine = L.polyline([[planLat, planLng], [actualLat, actualLng]], {
+                    color: '#10b981',
+                    weight: 3,
+                    dashArray: '6, 6',
+                    opacity: 0.8
+                });
+            }
+
+            // Update Map Layers & Popup based on state
+            const elLegendActual = document.getElementById('legendActualItem');
+            if (isPemasanganStarted) {
+                if (!leafletMap.hasLayer(actualMarker)) actualMarker.addTo(leafletMap);
+                if (!leafletMap.hasLayer(offsetLine)) offsetLine.addTo(leafletMap);
+                if (elLegendActual) elLegendActual.style.display = 'flex';
+                actualMarker.openPopup();
+                leafletMap.fitBounds([[planLat, planLng], [actualLat, actualLng]], { padding: [40, 40] });
+                document.getElementById('mapCoordText').innerText = '-7.2579, 109.1873 (Actual ~45m offset)';
+            } else {
+                if (leafletMap.hasLayer(actualMarker)) leafletMap.removeLayer(actualMarker);
+                if (leafletMap.hasLayer(offsetLine)) leafletMap.removeLayer(offsetLine);
+                if (elLegendActual) elLegendActual.style.display = 'none';
+                planMarker.openPopup();
+                leafletMap.setView([planLat, planLng], 16);
+                document.getElementById('mapCoordText').innerText = '-7.2575, 109.1866 (Rencana)';
+            }
+
+            setTimeout(() => {
+                if (leafletMap) {
+                    leafletMap.invalidateSize();
+                }
+            }, 120);
+        }
+
+        function switchTab(tabName) {
+            const btnAks = document.getElementById('tabAksesoris');
+            const btnPeta = document.getElementById('tabPeta');
+            const btnInfo = document.getElementById('tabInformasi');
+
+            const specView = document.getElementById('specCardView');
+            const mapView = document.getElementById('mapCardView');
+            const infoView = document.getElementById('infoCardView');
+
+            btnAks.classList.remove('active');
+            btnPeta.classList.remove('active');
+            btnInfo.classList.remove('active');
+
+            specView.style.display = 'none';
+            mapView.style.display = 'none';
+            infoView.style.display = 'none';
+
+            if (tabName === 'aksesoris') {
+                btnAks.classList.add('active');
+                specView.style.display = 'block';
+            } else if (tabName === 'peta') {
+                btnPeta.classList.add('active');
+                mapView.style.display = 'flex';
+                initMapIfNeeded();
+            } else if (tabName === 'informasi') {
+                btnInfo.classList.add('active');
+                infoView.style.display = 'flex';
+            }
+        }
+
+        function openGoogleMapsNav() {
+            window.open('https://maps.google.com/?q=-7.2575,109.1866', '_blank');
+        }
+
+        function submitSelesaiPemasangan() {
+            const timeStr = '10 Mei 2025, 16:30 WIB';
+
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div style="padding: 4px 0 10px; text-align: left;">
+                    <h2 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Selesai Pemasangan ERS</h2>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Silakan verifikasi waktu selesai dan unggah foto evidence penyelesaian di lapangan.</p>
+
+                    <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Waktu Selesai Pemasangan *</label>
+                            <div style="position: relative;">
+                                <input type="text" id="inputWaktuSelesai" class="filter-input-field" value="${timeStr}" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 12.5px; font-weight: 600; color: #0f172a;">
+                                <i class="fa-regular fa-clock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px;"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Evidence Foto Penyelesaian *</label>
+                            <div id="evidenceSelesaiDropzone" onclick="triggerUpload('evidenceSelesaiFileInput')" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px 14px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s;">
+                                <i class="fa-solid fa-camera" style="font-size: 24px; color: #2563eb; margin-bottom: 6px;"></i>
+                                <div style="font-size: 12.5px; font-weight: 700; color: #0f172a;" id="evidenceSelesaiFileName">+ Take Foto / Upload Evidence Selesai</div>
+                                <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Format JPG, PNG (Max 5MB)</div>
+                                <input type="file" id="evidenceSelesaiFileInput" accept="image/*" style="display: none;" onchange="handleUploadSelect(this, 'evidenceSelesaiFileName', 'evidenceSelesaiDropzone')">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Catatan Penyelesaian (Opsional)</label>
+                            <textarea id="catatanSelesai" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 12.5px; font-weight: 500; color: #0f172a; resize: none; height: 60px;" placeholder="Tulis catatan akhir penyelesaian pemasangan..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-submit-action" style="height: 44px; font-size: 13.5px;" onclick="confirmSubmitSelesai()">Submit Selesai Pemasangan</button>
+                </div>
+            `;
+            openFilterModal();
+        }
+
+        function confirmSubmitSelesai() {
+            const inputSelesai = document.getElementById('inputWaktuSelesai');
+            const timeVal = (inputSelesai && inputSelesai.value.trim()) ? inputSelesai.value.trim() : '10 Mei 2025, 16:30 WIB';
+            
+            // Update Waktu Selesai value in Tab Informasi
+            const elWaktuSelesai = document.getElementById('infoWaktuSelesai');
+            if (elWaktuSelesai) elWaktuSelesai.innerText = timeVal;
+            
+            // Show Evidence Selesai Card in Tab Informasi
+            const cardSelesai = document.getElementById('cardEvidenceSelesai');
+            if (cardSelesai) cardSelesai.style.display = 'block';
+
+            closeFilterModalDirect();
+
+            showSuccessOverlay('Pemasangan Selesai', 'Selamat, status perakitan ERS berhasil diperbarui menjadi Selesai Pemasangan.', () => {
+                updateStatusUI('selesai');
+                switchTab('informasi');
+                const stickyBar = document.querySelector('.bottom-sticky-bar');
+                if (stickyBar) {
+                    stickyBar.style.display = 'none';
+                }
+            });
+        }
+
+        // File Rencana Bottom Sheet
+        function openFileRencana() {
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div style="padding: 6px 4px 10px; text-align: left;">
+                    <h2 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">File Rencana Pemasangan</h2>
+                    <p style="font-size: 12.5px; color: #64748b; margin-bottom: 16px;">Dokumen teknis dan skema perakitan Tower ERS (ASM20250000001).</p>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-regular fa-file-pdf" style="font-size: 24px; color: #ef4444;"></i>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 700; color: #0f172a;">Rencana_Pemasangan_SUTT150kV.pdf</div>
+                                <div style="font-size: 11px; color: #64748b;">2.4 MB • Disetujui 28 Jan 2025</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-download" style="color: #2563eb; font-size: 16px; cursor: pointer;"></i>
+                    </div>
+
+                    <button type="button" class="btn-submit-action" style="margin-top: 10px; height: 44px;" onclick="closeFilterModalDirect()">Tutup</button>
+                </div>
+            `;
+            openFilterModal();
+        }
+
+        // View Lokasi Bottom Sheet
+        function viewLokasiModal() {
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div style="padding: 6px 4px 10px; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h2 style="font-size: 17px; font-weight: 800; color: #0f172a;">Detail Lokasi Tower</h2>
+                        <span style="background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px;">Span #85</span>
+                    </div>
+                    <p style="font-size: 12.5px; color: #64748b; margin-bottom: 14px;"><strong>TOWER SUTT 150kV UNGARAN-WELERI#0085</strong></p>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 14px; font-size: 12px;">
+                        <div style="margin-bottom: 6px;"><strong>Koordinat:</strong> -7.2575, 109.1866</div>
+                        <div style="margin-bottom: 6px;"><strong>SUTT System:</strong> SUTT 150kV Ungaran-Weleri</div>
+                        <div><strong>Kondisi Lapangan:</strong> Lahan Terbuka / Datar</div>
+                    </div>
+
+                    <button type="button" class="btn-submit-action" style="height: 44px;" onclick="closeFilterModalDirect()">Tutup</button>
+                </div>
+            `;
+            openFilterModal();
+        }
+
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function closeFilterModalDirect() {
+            const modal = document.getElementById('filterModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function closeFilterModal(e) {
+            if (!e || e.target.id === 'filterModal' || e.target.classList.contains('modal-overlay')) {
+                closeFilterModalDirect();
+            }
+        }
+
+        // Action Submit: Mulai Pemasangan (opens bottom sheet modal)
+        function submitMulaiPemasangan() {
+            const timeStr = '2 Maret 2025, 10:15 WIB';
+
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div style="padding: 4px 0 10px; text-align: left;">
+                    <h2 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Mulai Pemasangan ERS</h2>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Silakan verifikasi waktu mulai dan unggah foto evidence pelaksanaan di lapangan.</p>
+
+                    <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Waktu Mulai Pemasangan *</label>
+                            <div style="position: relative;">
+                                <input type="text" id="inputWaktuMulai" class="filter-input-field" value="${timeStr}" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 12.5px; font-weight: 600; color: #0f172a;">
+                                <i class="fa-regular fa-clock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px;"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Evidence Foto Lapangan *</label>
+                            <div id="evidenceDropzone" onclick="triggerUpload('evidenceFileInput')" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px 14px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s;">
+                                <i class="fa-solid fa-camera" style="font-size: 24px; color: #2563eb; margin-bottom: 6px;"></i>
+                                <div style="font-size: 12.5px; font-weight: 700; color: #0f172a;" id="evidenceFileName">+ Take Foto / Upload Evidence</div>
+                                <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Format JPG, PNG (Max 5MB)</div>
+                                <input type="file" id="evidenceFileInput" accept="image/*" style="display: none;" onchange="handleUploadSelect(this, 'evidenceFileName', 'evidenceDropzone')">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Catatan (Opsional)</label>
+                            <textarea id="catatanMulai" style="width: 100%; padding: 10px 12px; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 12.5px; font-weight: 500; color: #0f172a; resize: none; height: 60px;" placeholder="Tulis catatan atau kondisi awal pemasangan..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-submit-action" style="height: 44px; font-size: 13.5px;" onclick="confirmSubmitMulai()">Submit Mulai Pemasangan</button>
+                </div>
+            `;
+            openFilterModal();
+        }
+
+        function triggerUpload(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) input.click();
+        }
+
+        function handleUploadSelect(input, labelId, dropzoneId) {
+            if (input.files && input.files[0]) {
+                const name = input.files[0].name;
+                const label = document.getElementById(labelId);
+                const dropzone = document.getElementById(dropzoneId);
+                if (label) label.innerHTML = `<span style="color:#10b981;"><i class="fa-solid fa-circle-check"></i> ${name}</span>`;
+                if (dropzone) {
+                    dropzone.style.borderColor = '#10b981';
+                    dropzone.style.background = '#ecfdf5';
+                }
+            }
+        }
+
+        function updateStatusUI(status) {
+            const badge = document.getElementById('towerStatusBadge');
+            const metaText = document.getElementById('metaStatusText');
+
+            if (status === 'selesai') {
+                if (badge) {
+                    badge.style.background = '#ecfdf5';
+                    badge.style.color = '#047857';
+                    badge.style.borderColor = '#a7f3d0';
+                    badge.innerHTML = `<i class="fa-solid fa-circle-check" style="font-size: 10px;"></i> Selesai Pemasangan`;
+                }
+                if (metaText) {
+                    metaText.style.color = '#047857';
+                    metaText.innerText = 'Selesai Pemasangan';
+                }
+            } else if (status === 'pasang' || status === true) {
+                if (badge) {
+                    badge.style.background = '#eff6ff';
+                    badge.style.color = '#1d4ed8';
+                    badge.style.borderColor = '#bfdbfe';
+                    badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="font-size: 10px;"></i> Sedang Dipasang`;
+                }
+                if (metaText) {
+                    metaText.style.color = '#1d4ed8';
+                    metaText.innerText = 'Sedang Dipasang';
+                }
+            } else {
+                if (badge) {
+                    badge.style.background = '#fef3c7';
+                    badge.style.color = '#b45309';
+                    badge.style.borderColor = '#fde68a';
+                    badge.innerHTML = `Siap Pasang`;
+                }
+                if (metaText) {
+                    metaText.style.color = '#b45309';
+                    metaText.innerText = 'Siap Pasang';
+                }
+            }
+        }
+
+        function applyPemasanganState(started) {
+            isPemasanganStarted = started;
+            const tabInfo = document.getElementById('tabInformasi');
+            const btnAction = document.getElementById('btnMainAction');
+            const elWaktuMulai = document.getElementById('infoWaktuMulai');
+            const elPic = document.getElementById('infoPicPelaksana');
+
+            updateStatusUI(started);
+
+            if (started) {
+                if (tabInfo) tabInfo.style.display = 'inline-block';
+                if (btnAction) {
+                    btnAction.innerText = 'Selesai Pemasangan';
+                    btnAction.onclick = submitSelesaiPemasangan;
+                }
+                if (elWaktuMulai && elWaktuMulai.innerText === '-') elWaktuMulai.innerText = '10 Mei 2025, 08:06';
+                if (elPic) elPic.innerText = 'Luis Andreas BGS';
+            } else {
+                if (tabInfo) tabInfo.style.display = 'none';
+                if (btnAction) {
+                    btnAction.innerText = 'Mulai Pemasangan';
+                    btnAction.onclick = submitMulaiPemasangan;
+                }
+                if (elWaktuMulai) elWaktuMulai.innerText = '-';
+                if (elPic) elPic.innerText = '-';
+                switchTab('aksesoris');
+            }
+
+            if (leafletMap) {
+                initMapIfNeeded();
+            }
+        }
+
+        function confirmSubmitMulai() {
+            const inputWaktu = document.getElementById('inputWaktuMulai');
+            if (inputWaktu && inputWaktu.value.trim()) {
+                const val = inputWaktu.value.trim();
+                const elInfo = document.getElementById('infoWaktuMulai');
+                if (elInfo) elInfo.innerText = val;
+            }
+            
+            closeFilterModalDirect();
+
+            showSuccessOverlay('Pemasangan Dimulai', 'Selamat, status perakitan ERS berhasil diperbarui menjadi Mulai Pemasangan.', () => {
+                applyPemasanganState(true);
+                switchTab('aksesoris');
+            });
+        }
+
+        function showSuccessOverlay(title, subtitle, callback) {
+            document.getElementById('successTitleText').innerText = title;
+            document.getElementById('successDescText').innerText = subtitle;
+            const overlay = document.getElementById('successOverlay');
+            overlay.classList.add('active');
+
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                if (callback) {
+                    callback();
+                } else {
+                    window.location.href = './list-pemasangan.html';
+                }
+            }, 1200);
+        }
+
+        function navigateSmooth(url, e) {
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.style.opacity = '0.6';
+                container.style.transition = 'opacity 0.08s ease';
+            }
+            window.location.href = url;
+        }
+
+        // Dynamic URL Params parser & initial state setup
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeId = urlParams.get('id') || 'ASM20250000001-01';
+        document.getElementById('headerCode').innerText = codeId;
+
+        if (codeId.includes('-02') || codeId.includes('-04') || urlParams.get('status') === 'pasang') {
+            applyPemasanganState(true);
+        } else {
+            applyPemasanganState(false);
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <!-- TODO: UPDATE NOTES HERE -->
+        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
+        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
+        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>
