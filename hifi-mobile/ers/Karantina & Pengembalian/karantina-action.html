@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Karantina Action - ERS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #f4f6fc;
+            --card-bg: #ffffff;
+            --primary-blue: #2563eb;
+            --primary-blue-dark: #1d4ed8;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.2s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.9;
+                transform: scale(0.996);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Top Header Section */
+        .header-section {
+            background: #ffffff;
+            padding: 12px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-main-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .header-sub-code {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        /* App Body Content */
+        .app-body {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 16px 12px;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-canvas);
+            scrollbar-width: none;
+        }
+
+        .app-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Spesifikasi Umum Tower ERS Card */
+        .spec-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .spec-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+            margin-bottom: 2px;
+        }
+
+        .meta-rows-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13.5px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-val {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        /* Segmented Filter Pills (Aksesoris, Informasi) */
+        .tab-segmented-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .tab-pill {
+            flex: 1;
+            height: 38px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-pill.active {
+            border: 1.5px solid var(--primary-blue);
+            color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Section Checklist Card */
+        .section-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .btn-check-box {
+            width: 100%;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-check-disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-check-active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-check-active:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        .btn-check-completed {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1.5px solid #86efac;
+        }
+
+        /* Sticky Bottom Action Button Container */
+        .bottom-action-container {
+            background: #ffffff;
+            padding: 14px 20px 18px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            z-index: 90;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary-action {
+            width: 100%;
+            height: 48px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary-action:active {
+            background: var(--primary-blue-dark);
+            transform: scale(0.99);
+        }
+
+        .btn-primary-action.btn-selesai {
+            background: #10b981;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary-action.btn-selesai:active {
+            background: #059669;
+        }
+
+        /* iOS Bottom Bar Indicator */
+        .ios-bar {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #000000;
+            border-radius: 2px;
+            z-index: 101;
+            pointer-events: none;
+        }
+
+        /* Modal Overlay & Drawer */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+                        visibility 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            will-change: transform;
+            max-height: 88vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .modal-drawer::-webkit-scrollbar {
+            display: none;
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Top Header -->
+        <div class="header-section">
+            <div class="header-left">
+                <a href="./list-karantina.html" class="back-btn" onclick="navigateSmooth('./list-karantina.html', event)" title="Kembali ke List Karantina">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1 class="header-main-title">Karantina</h1>
+                    <span class="header-sub-code" id="pageOrderCode">E-2025000001</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Body / Content Area -->
+        <div class="app-body">
+
+            <!-- Card 1: Spesifikasi Umum Tower ERS -->
+            <div class="spec-card">
+                <h2 class="spec-card-title">Spesifikasi Umum Tower ERS</h2>
+                <div class="meta-rows-list">
+                    <div class="meta-row" id="rowTanggalDiterima" style="display: none;">
+                        <span class="meta-label">Tanggal Diterima</span>
+                        <span class="meta-val" id="specTanggalDiterima">10 Januari 2025, 10:45</span>
+                    </div>
+                    <div class="meta-row" id="rowTanggalSelesai" style="display: none;">
+                        <span class="meta-label">Tanggal Selesai</span>
+                        <span class="meta-val" id="specTanggalSelesai">-</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tegangan</span>
+                        <span class="meta-val" id="specTegangan">150kV</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Merk</span>
+                        <span class="meta-val" id="specMerk">Lindsay</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tipe Tower</span>
+                        <span class="meta-val" id="specTipe">Suspension</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segmented Switcher (Aksesoris, Informasi) -->
+            <div class="tab-segmented-wrapper">
+                <button type="button" class="tab-pill active" id="tabBtnAksesoris" onclick="switchMainTab('aksesoris')">Aksesoris</button>
+                <button type="button" class="tab-pill" id="tabBtnInformasi" onclick="switchMainTab('informasi')">Informasi</button>
+            </div>
+
+            <!-- Tab 1: Aksesoris Content -->
+            <div id="tabContentAksesoris" style="display: flex; flex-direction: column;">
+                
+                <!-- Section 1: Column Section -->
+                <div class="section-card">
+                    <h3 class="section-title">Column Section</h3>
+                    <div class="meta-rows-list">
+                        <div class="meta-row">
+                            <span class="meta-label">Status Data</span>
+                            <span class="meta-val" id="statusColumn" style="color: #ef4444;">Belum Pengecekan</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Total Aksesoris</span>
+                            <span class="meta-val">20</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-check-box btn-check-disabled" id="btnCheckColumn" onclick="handleSectionCheck('Column Section', 20)">
+                        <i class="fa-solid fa-clipboard-check" style="margin-right: 6px;"></i> Check
+                    </button>
+                </div>
+
+                <!-- Section 2: Foundation Section -->
+                <div class="section-card">
+                    <h3 class="section-title">Foundation Section</h3>
+                    <div class="meta-rows-list">
+                        <div class="meta-row">
+                            <span class="meta-label">Status Data</span>
+                            <span class="meta-val" id="statusFoundation" style="color: #ef4444;">Belum Pengecekan</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Total Aksesoris</span>
+                            <span class="meta-val">20</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-check-box btn-check-disabled" id="btnCheckFoundation" onclick="handleSectionCheck('Foundation Section', 20)">
+                        <i class="fa-solid fa-clipboard-check" style="margin-right: 6px;"></i> Check
+                    </button>
+                </div>
+
+                <!-- Section 3: Guy Wire Section (Tambahan Komprehensif) -->
+                <div class="section-card">
+                    <h3 class="section-title">Guy Wire Section</h3>
+                    <div class="meta-rows-list">
+                        <div class="meta-row">
+                            <span class="meta-label">Status Data</span>
+                            <span class="meta-val" id="statusGuyWire" style="color: #ef4444;">Belum Pengecekan</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Total Aksesoris</span>
+                            <span class="meta-val">12</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-check-box btn-check-disabled" id="btnCheckGuyWire" onclick="handleSectionCheck('Guy Wire Section', 12)">
+                        <i class="fa-solid fa-clipboard-check" style="margin-right: 6px;"></i> Check
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Tab 2: Informasi Content (Hidden initially) -->
+            <div id="tabContentInformasi" style="display: none; flex-direction: column; gap: 14px;">
+                
+                <!-- SECTION 1: PEMBONGKARAN -->
+                <div id="sectionPembongkaranInfo" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: -4px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #64748b;">Pembongkaran</span>
+                        <div style="flex: 1; height: 1px; background: #cbd5e1;"></div>
+                    </div>
+
+                    <!-- Info Metadata Card Pembongkaran -->
+                    <div class="spec-card" style="margin-bottom: 0;">
+                        <div class="meta-rows-list" style="gap: 12px;">
+                            <div class="meta-row">
+                                <span class="meta-label">Waktu Mulai</span>
+                                <span class="meta-val">10 Mei 2025, 08:06</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">PIC Pelaksana</span>
+                                <span class="meta-val">Luis Andreas BGS</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Waktu Selesai</span>
+                                <span class="meta-val">11 Mei 2025, 08:06</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Longtitude/Latitude</span>
+                                <span class="meta-val">-7.2575, 109.1866</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evidence Pembongkaran Card -->
+                    <div class="spec-card" style="margin-bottom: 0;">
+                        <h3 style="font-size: 14.5px; font-weight: 800; color: #0f172a; margin-bottom: 14px;">Evidence Pembongkaran</h3>
+                        <div class="evidence-gallery-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 1" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 2" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 4" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
+                                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">+2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: PEMASANGAN -->
+                <div id="sectionPemasanganInfo" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: -4px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #64748b;">Pemasangan</span>
+                        <div style="flex: 1; height: 1px; background: #cbd5e1;"></div>
+                    </div>
+
+                    <!-- Info Metadata Card Pemasangan -->
+                    <div class="spec-card" style="margin-bottom: 0;">
+                        <div class="meta-rows-list" style="gap: 12px;">
+                            <div class="meta-row">
+                                <span class="meta-label">Waktu Mulai</span>
+                                <span class="meta-val">10 April 2025, 08:06</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">PIC Pelaksana</span>
+                                <span class="meta-val">Luis Andreas BGS</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Waktu Selesai</span>
+                                <span class="meta-val">12 April 2025, 08:06</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Longtitude/Latitude</span>
+                                <span class="meta-val">-7.2575, 109.1866</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evidence Pemasangan Card -->
+                    <div class="spec-card" style="margin-bottom: 0;">
+                        <h3 style="font-size: 14.5px; font-weight: 800; color: #0f172a; margin-bottom: 14px;">Evidence Pemasangan</h3>
+                        <div class="evidence-gallery-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 1" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 2" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
+                                <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 4" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
+                                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">+2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sticky Bottom Action Button -->
+        <div class="bottom-action-container">
+            <button type="button" class="btn-primary-action" id="btnMainAction" onclick="handleMainActionClick()">
+                <span>Kedatangan</span>
+            </button>
+        </div>
+
+        <!-- iOS Bottom Indicator Line -->
+        <div class="ios-bar"></div>
+
+        <!-- Drawer Modal (Checklist & Confirmation) -->
+        <div class="modal-overlay" id="actionModal" onclick="closeModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeModalDirect()" title="Tutup Modal"></div>
+                <div id="modalDrawerContent">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Read URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id') || 'E-2025000001';
+        document.getElementById('pageOrderCode').textContent = orderId;
+
+        let karantinaState = {
+            hasArrived: false,
+            checkedSections: {
+                'Column Section': false,
+                'Foundation Section': false,
+                'Guy Wire Section': false
+            },
+            waktuKedatangan: '',
+            isCompleted: false
+        };
+
+        function switchMainTab(tabName) {
+            const btnAks = document.getElementById('tabBtnAksesoris');
+            const btnInf = document.getElementById('tabBtnInformasi');
+            const contentAks = document.getElementById('tabContentAksesoris');
+            const contentInf = document.getElementById('tabContentInformasi');
+
+            if (tabName === 'aksesoris') {
+                btnAks.classList.add('active');
+                btnInf.classList.remove('active');
+                contentAks.style.display = 'flex';
+                contentInf.style.display = 'none';
+            } else {
+                btnInf.classList.add('active');
+                btnAks.classList.remove('active');
+                contentAks.style.display = 'none';
+                contentInf.style.display = 'flex';
+            }
+        }
+
+        function handleMainActionClick() {
+            if (!karantinaState.hasArrived) {
+                // Konfirmasi kedatangan
+                openKedatanganModal();
+            } else if (!karantinaState.isCompleted) {
+                // Check if all sections are completed
+                const allChecked = Object.values(karantinaState.checkedSections).every(Boolean);
+                if (!allChecked) {
+                    alert('Harap selesaikan pengecekan (Check) untuk seluruh section terlebih dahulu.');
+                    return;
+                }
+                openSelesaiKarantinaModal();
+            } else {
+                navigateSmooth('./list-karantina.html');
+            }
+        }
+
+        function openKedatanganModal() {
+            const dateStr = '10 Januari 2025, 10:45';
+
+            document.getElementById('modalDrawerContent').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 16px; text-align: center;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Konfirmasi Kedatangan ERS</h2>
+                        <p style="font-size: 13px; color: #64748b;">Apakah material <strong>${orderId}</strong> telah tiba di area karantina?</p>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; text-align: left;">
+                        <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Waktu Kedatangan Tercatat</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${dateStr} WIB</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="btn-primary-action" onclick="confirmKedatangan('${dateStr}')">Konfirmasi Kedatangan</button>
+                        <button type="button" style="height: 44px; background: transparent; border: none; font-size: 13.5px; font-weight: 700; color: #64748b; cursor: pointer;" onclick="closeModalDirect()">Batal</button>
+                    </div>
+                </div>
+            `;
+            openModal();
+        }
+
+        function confirmKedatangan(timestamp) {
+            karantinaState.hasArrived = true;
+            karantinaState.waktuKedatangan = timestamp || '10 Januari 2025, 10:45';
+            
+            const infoWaktu = document.getElementById('infoWaktuKedatangan');
+            if (infoWaktu) infoWaktu.textContent = karantinaState.waktuKedatangan;
+
+            // Show Tanggal Diterima & Tanggal Selesai in Spesifikasi Umum Tower ERS
+            const rowTerima = document.getElementById('rowTanggalDiterima');
+            const rowSelesai = document.getElementById('rowTanggalSelesai');
+            if (rowTerima) rowTerima.style.display = 'flex';
+            if (rowSelesai) rowSelesai.style.display = 'flex';
+            
+            const specTerima = document.getElementById('specTanggalDiterima');
+            const specSelesai = document.getElementById('specTanggalSelesai');
+            if (specTerima) specTerima.textContent = '10 Januari 2025, 10:45';
+            if (specSelesai) specSelesai.textContent = '-';
+
+            // Enable check buttons to solid blue
+            ['btnCheckColumn', 'btnCheckFoundation', 'btnCheckGuyWire'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.classList.remove('btn-check-disabled');
+                    btn.classList.add('btn-check-active');
+                    btn.innerHTML = '<i class="fa-solid fa-clipboard-check" style="margin-right: 6px;"></i> Check';
+                }
+            });
+
+            // Hide bottom sticky action button initially during inspection
+            const bottomContainer = document.querySelector('.bottom-action-container');
+            if (bottomContainer) {
+                bottomContainer.style.display = 'none';
+            }
+
+            closeModalDirect();
+        }
+
+        function handleSectionCheck(sectionName, totalItems) {
+            if (!karantinaState.hasArrived) {
+                alert('Silakan klik tombol "Kedatangan" terlebih dahulu sebelum melakukan pengecekan aksesoris.');
+                return;
+            }
+
+            // Direct smooth navigation to Check Sheet page
+            navigateSmooth(`./check-sheet.html?section=${encodeURIComponent(sectionName)}&id=${encodeURIComponent(orderId)}`);
+        }
+
+        function submitSectionCheck(sectionName) {
+            karantinaState.checkedSections[sectionName] = true;
+
+            // Update UI status for that section
+            if (sectionName === 'Column Section') {
+                const statusEl = document.getElementById('statusColumn');
+                if (statusEl) {
+                    statusEl.textContent = 'Sudah Dicek';
+                    statusEl.style.color = '#10b981';
+                }
+                const btn = document.getElementById('btnCheckColumn');
+                if (btn) {
+                    btn.className = 'btn-check-box btn-check-completed';
+                    btn.innerHTML = `<i class="fa-solid fa-check" style="margin-right: 6px;"></i> Selesai Dicek`;
+                }
+            } else if (sectionName === 'Foundation Section') {
+                const statusEl = document.getElementById('statusFoundation');
+                if (statusEl) {
+                    statusEl.textContent = 'Sudah Dicek';
+                    statusEl.style.color = '#10b981';
+                }
+                const btn = document.getElementById('btnCheckFoundation');
+                if (btn) {
+                    btn.className = 'btn-check-box btn-check-completed';
+                    btn.innerHTML = `<i class="fa-solid fa-check" style="margin-right: 6px;"></i> Selesai Dicek`;
+                }
+            } else if (sectionName === 'Guy Wire Section') {
+                const statusEl = document.getElementById('statusGuyWire');
+                if (statusEl) {
+                    statusEl.textContent = 'Sudah Dicek';
+                    statusEl.style.color = '#10b981';
+                }
+                const btn = document.getElementById('btnCheckGuyWire');
+                if (btn) {
+                    btn.className = 'btn-check-box btn-check-completed';
+                    btn.innerHTML = `<i class="fa-solid fa-check" style="margin-right: 6px;"></i> Selesai Dicek`;
+                }
+            }
+
+            // Cek apakah seluruh section (atau section terakhir) telah selesai dicek
+            const checkedCount = Object.values(karantinaState.checkedSections).filter(Boolean).length;
+            const totalSections = Object.keys(karantinaState.checkedSections).length;
+
+            if (checkedCount >= totalSections - 1 || checkedCount === totalSections) {
+                // Tanggal selesai terisi pada section terakhir yang dikarantina
+                const tanggalSelesaiVal = '12 Januari 2025, 10:45';
+                const specSelesai = document.getElementById('specTanggalSelesai');
+                if (specSelesai) specSelesai.textContent = tanggalSelesaiVal;
+                const infoSelesai = document.getElementById('infoWaktuSelesai');
+                if (infoSelesai) infoSelesai.textContent = tanggalSelesaiVal;
+
+                // Tampilkan kembali tombol selesai karantina di footer
+                const bottomContainer = document.querySelector('.bottom-action-container');
+                const mainBtn = document.getElementById('btnMainAction');
+                if (bottomContainer && mainBtn) {
+                    bottomContainer.style.display = 'flex';
+                    mainBtn.innerHTML = `<span>Selesaikan Karantina</span>`;
+                    mainBtn.className = 'btn-primary-action btn-selesai';
+                }
+            }
+
+            closeModalDirect();
+        }
+
+        function openSelesaiKarantinaModal() {
+            const finishTime = '12 Januari 2025, 10:45';
+            document.getElementById('modalDrawerContent').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 16px; text-align: center;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #dcfce7; color: #15803d; font-size: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Selesaikan Proses Karantina</h2>
+                        <p style="font-size: 13px; color: #64748b;">Seluruh aksesoris telah berhasil diverifikasi dalam kondisi baik.</p>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="btn-primary-action" onclick="confirmSelesaiKarantina('${finishTime}')">Kirim Laporan Karantina</button>
+                        <button type="button" style="height: 44px; background: transparent; border: none; font-size: 13.5px; font-weight: 700; color: #64748b; cursor: pointer;" onclick="closeModalDirect()">Kembali</button>
+                    </div>
+                </div>
+            `;
+            openModal();
+        }
+
+        function confirmSelesaiKarantina(finishTime) {
+            karantinaState.isCompleted = true;
+            const infoSelesai = document.getElementById('infoWaktuSelesai');
+            if (infoSelesai) infoSelesai.textContent = finishTime;
+            closeModalDirect();
+
+            setTimeout(() => {
+                alert('Proses karantina berhasil diselesaikan dan dicatat ke dalam sistem.');
+                navigateSmooth('./list-karantina.html');
+            }, 200);
+        }
+
+        function openModal() {
+            document.getElementById('actionModal').classList.add('active');
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'actionModal') closeModalDirect();
+        }
+
+        function closeModalDirect() {
+            document.getElementById('actionModal').classList.remove('active');
+        }
+
+        function navigateSmooth(url, event) {
+            if (event) event.preventDefault();
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
+                container.style.opacity = '0.9';
+                container.style.transform = 'scale(0.996)';
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 100);
+            } else {
+                window.location.href = url;
+            }
+        }
+
+        // Restore checked state if returning from check-sheet.html
+        const isCheckedParam = urlParams.get('checked') === 'true';
+        const checkedSectionParam = urlParams.get('section');
+        if (isCheckedParam && checkedSectionParam) {
+            confirmKedatangan('1 Februari 2025, 08:30');
+            submitSectionCheck(checkedSectionParam);
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <!-- TODO: UPDATE NOTES HERE -->
+        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
+        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
+        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+
+</html>

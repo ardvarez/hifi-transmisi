@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Check Sheet - Karantina ERS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #f4f6fc;
+            --card-bg: #ffffff;
+            --primary-blue: #2563eb;
+            --primary-blue-dark: #1d4ed8;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.2s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.9;
+                transform: scale(0.996);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Top Header Section */
+        .header-section {
+            background: #ffffff;
+            padding: 12px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-main-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .header-sub-code {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        /* App Body / Scrollable Content Area */
+        .app-body {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 16px 20px;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-canvas);
+            gap: 18px;
+            scrollbar-width: none;
+        }
+
+        .app-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Equipment Item Section Container */
+        .item-group-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Group Header Card */
+        .group-header-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .group-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .group-subtitle {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Form Fields & Rows */
+        .field-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .sheet-input-field {
+            width: 100%;
+            height: 44px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0 14px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .sheet-input-field:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .sheet-input-field::placeholder {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* Evidence & Photo Count Action Row */
+        .photo-action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .photo-counter-btn {
+            flex: 1;
+            height: 40px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .photo-counter-btn.has-photo {
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+            background: #eff6ff;
+            font-weight: 700;
+        }
+
+        .btn-evidence-upload {
+            flex: 1;
+            height: 40px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-evidence-upload:active {
+            background: var(--primary-blue-dark);
+            transform: scale(0.99);
+        }
+
+        /* Date Input with Icon */
+        .input-with-icon {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-icon .sheet-input-field {
+            padding-right: 40px;
+        }
+
+        .input-icon-right {
+            position: absolute;
+            right: 14px;
+            color: var(--primary-blue);
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        /* Textarea Description */
+        .sheet-textarea {
+            width: 100%;
+            height: 90px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .sheet-textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .sheet-textarea::placeholder {
+            color: #94a3b8;
+            font-size: 12.5px;
+        }
+
+        .char-counter {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* Sticky Bottom Bar (Total Stock + Simpan Pengecekan) */
+        .sticky-footer-bar {
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            padding: 12px 20px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+            z-index: 90;
+        }
+
+        .stock-summary-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stock-summary-label {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .stock-summary-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .btn-simpan-pengecekan {
+            height: 44px;
+            padding: 0 24px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-simpan-pengecekan:active {
+            background: var(--primary-blue-dark);
+            transform: scale(0.98);
+        }
+
+        /* iOS Bottom Bar Line */
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #000000;
+            border-radius: 2px;
+            z-index: 101;
+        }
+
+        /* Camera Modal Overlay */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+                        visibility 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            will-change: transform;
+            max-height: 88vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .modal-drawer::-webkit-scrollbar {
+            display: none;
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Top Header -->
+        <div class="header-section">
+            <div class="header-left">
+                <a href="./karantina-action.html" class="back-btn" onclick="navigateSmooth('./karantina-action.html', event)" title="Kembali ke Karantina Action">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1 class="header-main-title">Check Sheet</h1>
+                    <span class="header-sub-code" id="pageSectionSubtitle">Column Section</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Body Content Area -->
+        <div class="app-body">
+
+            <!-- Item Group 1: Plate Column -->
+            <div class="item-group-container">
+                
+                <!-- Group Card Title -->
+                <div class="group-header-card">
+                    <h2 class="group-title">Plate Column</h2>
+                    <span class="group-subtitle">15 Aksesoris</span>
+                </div>
+
+                <!-- 1. Jumlah Peralatan Normal -->
+                <div class="field-block">
+                    <label class="field-label">Jumlah Peralatan Normal</label>
+                    <input type="number" class="sheet-input-field stock-calc-field" placeholder="Masukkan Nilai" oninput="calculateTotalStock()">
+                    <div class="photo-action-row">
+                        <button type="button" class="photo-counter-btn" id="photoCount_plate_normal">0 Foto</button>
+                        <button type="button" class="btn-evidence-upload" onclick="openEvidenceModal('Plate Column - Normal', 'photoCount_plate_normal')">
+                            <i class="fa-solid fa-camera"></i> Evidence
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Jumlah Peralatan Tidak Tersedia -->
+                <div class="field-block">
+                    <label class="field-label">Jumlah Peralatan Tidak Tersedia</label>
+                    <input type="number" class="sheet-input-field stock-calc-field" placeholder="Masukkan Nilai" oninput="calculateTotalStock()">
+                    <div class="photo-action-row">
+                        <button type="button" class="photo-counter-btn" id="photoCount_plate_tidak_ada">0 Foto</button>
+                        <button type="button" class="btn-evidence-upload" onclick="openEvidenceModal('Plate Column - Tidak Tersedia', 'photoCount_plate_tidak_ada')">
+                            <i class="fa-solid fa-camera"></i> Evidence
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Jumlah Peralatan Rusak -->
+                <div class="field-block">
+                    <label class="field-label">Jumlah Peralatan Rusak</label>
+                    <input type="number" class="sheet-input-field stock-calc-field" placeholder="Masukkan Nilai" oninput="calculateTotalStock()">
+                    <div class="photo-action-row">
+                        <button type="button" class="photo-counter-btn" id="photoCount_plate_rusak">0 Foto</button>
+                        <button type="button" class="btn-evidence-upload" onclick="openEvidenceModal('Plate Column - Rusak', 'photoCount_plate_rusak')">
+                            <i class="fa-solid fa-camera"></i> Evidence
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Waktu Karantina -->
+                <div class="field-block">
+                    <label class="field-label">Waktu Karantina</label>
+                    <div class="input-with-icon">
+                        <input type="text" class="sheet-input-field" value="2 Maret 2025, 10:00" placeholder="Pilih Waktu">
+                        <i class="fa-regular fa-calendar input-icon-right"></i>
+                    </div>
+                </div>
+
+                <!-- 5. Keterangan Kendala -->
+                <div class="field-block">
+                    <label class="field-label">Keterangan Kendala</label>
+                    <textarea class="sheet-textarea" placeholder="Masukkan keterangan kendala" maxlength="200" oninput="updateCharCounter(this, 'counterPlate')"></textarea>
+                    <div class="char-counter" id="counterPlate">0/200</div>
+                </div>
+
+            </div>
+
+            <!-- Item Group 2: Erection Tools -->
+            <div class="item-group-container">
+                
+                <!-- Group Card Title -->
+                <div class="group-header-card">
+                    <h2 class="group-title">Erection Tools</h2>
+                    <span class="group-subtitle">15 Aksesoris</span>
+                </div>
+
+                <!-- 1. Jumlah Peralatan Normal -->
+                <div class="field-block">
+                    <label class="field-label">Jumlah Peralatan Normal</label>
+                    <input type="number" class="sheet-input-field stock-calc-field" placeholder="Masukkan Nilai" oninput="calculateTotalStock()">
+                    <div class="photo-action-row">
+                        <button type="button" class="photo-counter-btn" id="photoCount_erection_normal">0 Foto</button>
+                        <button type="button" class="btn-evidence-upload" onclick="openEvidenceModal('Erection Tools - Normal', 'photoCount_erection_normal')">
+                            <i class="fa-solid fa-camera"></i> Evidence
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Jumlah Peralatan Tidak Tersedia -->
+                <div class="field-block">
+                    <label class="field-label">Jumlah Peralatan Tidak Tersedia</label>
+                    <input type="number" class="sheet-input-field stock-calc-field" placeholder="Masukkan Nilai" oninput="calculateTotalStock()">
+                    <div class="photo-action-row">
+                        <button type="button" class="photo-counter-btn" id="photoCount_erection_tidak_ada">0 Foto</button>
+                        <button type="button" class="btn-evidence-upload" onclick="openEvidenceModal('Erection Tools - Tidak Tersedia', 'photoCount_erection_tidak_ada')">
+                            <i class="fa-solid fa-camera"></i> Evidence
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Jumlah Peralatan Rusak -->
+                <div class="field-block">
+                    <label class="field-label">Jumlah Peralatan Rusak</label>
+                    <input type="number" class="sheet-input-field stock-calc-field" placeholder="Masukkan Nilai" oninput="calculateTotalStock()">
+                    <div class="photo-action-row">
+                        <button type="button" class="photo-counter-btn" id="photoCount_erection_rusak">0 Foto</button>
+                        <button type="button" class="btn-evidence-upload" onclick="openEvidenceModal('Erection Tools - Rusak', 'photoCount_erection_rusak')">
+                            <i class="fa-solid fa-camera"></i> Evidence
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Waktu Karantina -->
+                <div class="field-block">
+                    <label class="field-label">Waktu Karantina</label>
+                    <div class="input-with-icon">
+                        <input type="text" class="sheet-input-field" value="2 Maret 2025, 10:00" placeholder="Pilih Waktu">
+                        <i class="fa-regular fa-calendar input-icon-right"></i>
+                    </div>
+                </div>
+
+                <!-- 5. Keterangan Kendala -->
+                <div class="field-block">
+                    <label class="field-label">Keterangan Kendala</label>
+                    <textarea class="sheet-textarea" placeholder="Masukkan keterangan kendala" maxlength="200" oninput="updateCharCounter(this, 'counterErection')"></textarea>
+                    <div class="char-counter" id="counterErection">0/200</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sticky Footer Summary Bar -->
+        <div class="sticky-footer-bar">
+            <div class="stock-summary-box">
+                <span class="stock-summary-label">Total Stock</span>
+                <span class="stock-summary-value" id="displayTotalStock">0</span>
+            </div>
+            <button type="button" class="btn-simpan-pengecekan" onclick="handleSimpanPengecekan()">
+                Simpan Pengecekan
+            </button>
+        </div>
+
+        <!-- iOS Bottom Indicator Line -->
+        <div class="ios-bar"></div>
+
+        <!-- Evidence Upload / Camera Modal Drawer -->
+        <div class="modal-overlay" id="evidenceModal" onclick="closeEvidenceModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeEvidenceModalDirect()" title="Tutup Modal"></div>
+                <div id="evidenceModalContent">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Read URL section param
+        const urlParams = new URLSearchParams(window.location.search);
+        const sectionParam = urlParams.get('section') || 'Column Section';
+        document.getElementById('pageSectionSubtitle').textContent = sectionParam;
+
+        const photoStore = {};
+
+        function calculateTotalStock() {
+            const inputs = document.querySelectorAll('.stock-calc-field');
+            let total = 0;
+            inputs.forEach(input => {
+                const val = parseInt(input.value, 10);
+                if (!isNaN(val) && val > 0) {
+                    total += val;
+                }
+            });
+            document.getElementById('displayTotalStock').textContent = total;
+        }
+
+        function updateCharCounter(textarea, counterId) {
+            const count = textarea.value.length;
+            document.getElementById(counterId).textContent = `${count}/200`;
+        }
+
+        function openEvidenceModal(itemTitle, targetCounterId) {
+            currentPhotoCounterId = targetCounterId;
+            document.getElementById('evidenceModalContent').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 16px; text-align: center;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Upload Evidence Foto</h2>
+                        <p style="font-size: 13px; color: #64748b;">${itemTitle}</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <div style="aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; position: relative;">
+                            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=300&q=80" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <div style="aspect-ratio: 1; border-radius: 12px; border: 2px dashed #93c5fd; background: #eff6ff; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #2563eb; gap: 4px;" onclick="addSamplePhoto()">
+                            <i class="fa-solid fa-plus" style="font-size: 22px;"></i>
+                            <span style="font-size: 11px; font-weight: 700;">Tambah Foto</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="btn-evidence-upload" style="height: 46px;" onclick="saveEvidencePhoto()">
+                            Simpan Foto Evidence
+                        </button>
+                        <button type="button" style="height: 40px; background: transparent; border: none; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer;" onclick="closeEvidenceModalDirect()">Batal</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('evidenceModal').classList.add('active');
+        }
+
+        let currentPhotoCounterId = null;
+
+        function addSamplePhoto() {
+            alert('Foto berhasil diambil dari kamera perangkat.');
+        }
+
+        function saveEvidencePhoto() {
+            if (currentPhotoCounterId) {
+                const btn = document.getElementById(currentPhotoCounterId);
+                if (btn) {
+                    btn.textContent = '1 Foto';
+                    btn.classList.add('has-photo');
+                }
+            }
+            closeEvidenceModalDirect();
+        }
+
+        function closeEvidenceModal(e) {
+            if (e.target.id === 'evidenceModal') closeEvidenceModalDirect();
+        }
+
+        function closeEvidenceModalDirect() {
+            document.getElementById('evidenceModal').classList.remove('active');
+        }
+
+        function handleSimpanPengecekan() {
+            alert('Hasil pengecekan check sheet berhasil disimpan!');
+            navigateSmooth('./karantina-action.html?checked=true&section=' + encodeURIComponent(sectionParam));
+        }
+
+        function navigateSmooth(url, event) {
+            if (event) event.preventDefault();
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
+                container.style.opacity = '0.9';
+                container.style.transform = 'scale(0.996)';
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 100);
+            } else {
+                window.location.href = url;
+            }
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <!-- TODO: UPDATE NOTES HERE -->
+        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
+        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
+        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+
+</html>
