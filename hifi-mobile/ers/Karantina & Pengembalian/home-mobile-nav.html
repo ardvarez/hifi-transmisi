@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ERS (Tower Emergency) - Pembongkaran Mobile</title>
+    <title>ERS (Tower Emergency) - Karantina Mobile</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -25,6 +25,14 @@
             padding: 0;
             font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
             -webkit-tap-highlight-color: transparent;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         body {
@@ -245,26 +253,32 @@
             display: flex;
             flex-direction: column;
             padding: 16px;
+            gap: 14px;
             overflow-y: auto;
             position: relative;
             background-color: var(--bg-canvas);
-            padding-bottom: 24px;
+            padding-bottom: 80px;
             scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
         .app-body::-webkit-scrollbar {
             display: none;
+            width: 0;
+            height: 0;
         }
 
-        /* Data Card Styling */
+        /* ERS Card Component */
         .ers-card {
-            background: #ffffff;
-            border-radius: 20px;
+            background: var(--card-bg);
+            border-radius: 18px;
             padding: 18px 20px;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: transform 0.2s;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .ers-card:active {
@@ -275,9 +289,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px dashed #e2e8f0;
         }
 
         .card-id {
@@ -289,11 +300,12 @@
 
         /* Status Badge Variants */
         .badge-status {
-            padding: 5px 14px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 11px;
             font-weight: 700;
             display: inline-block;
+            white-space: nowrap;
         }
 
         .badge-mulai {
@@ -301,36 +313,32 @@
             color: #ffffff;
         }
 
-        .badge-dikirim {
+        .badge-dikirim,
+        .badge-dikarantina,
+        .badge-berlangsung,
+        .badge-selesai-lokal {
             background: #fff7ed;
             color: #ea580c;
             border: 1px solid #ffedd5;
         }
 
-        .badge-siap {
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #dbeafe;
-        }
-
-        .badge-pasang {
-            background: #e0f2fe;
-            color: #0284c7;
-            border: 1px solid #bae6fd;
-        }
-
-        .badge-server {
+        .badge-selesai {
             background: #dcfce7;
             color: #15803d;
             border: 1px solid #bbf7d0;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
 
         /* Card Details Rows */
         .card-details {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 18px;
+            gap: 8px;
         }
 
         .detail-row {
@@ -348,43 +356,52 @@
         .detail-val {
             color: var(--text-dark);
             font-weight: 700;
+            text-align: right;
         }
 
-        /* Card Actions */
+        /* Action Buttons */
         .card-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            margin-top: 4px;
         }
 
         .btn-action {
             flex: 1;
-            padding: 10px;
+            height: 40px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
         }
 
         .btn-outline {
             background: #ffffff;
-            border: 1.5px solid #2563eb;
-            color: #2563eb;
+            border: 1.5px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-outline:active {
+            background: #eff6ff;
         }
 
         .btn-primary {
-            background: #2563eb;
-            border: 1.5px solid #2563eb;
+            background: var(--primary-blue);
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
-        /* Bottom Navigation Bar */
+        .btn-primary:active {
+            background: var(--primary-blue-dark);
+        }
+
+        /* Bottom Navigation Bar (4 Nav Items) */
         
 
         .nav-item {
@@ -409,7 +426,7 @@
             font-size: 20px;
         }
 
-        /* iOS Bottom Bar Line */
+        /* iOS Bottom Bar Indicator */
         .ios-bar {
             position: absolute;
             bottom: 6px;
@@ -420,9 +437,10 @@
             background: #000000;
             border-radius: 2px;
             z-index: 101;
+            pointer-events: none;
         }
 
-        /* Smooth Drawer Filter Modal Overlay */
+        /* Bottom Sheet Modal Drawer */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -435,6 +453,7 @@
             justify-content: center;
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
             transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1),
                         visibility 0.35s cubic-bezier(0.32, 0.72, 0, 1);
         }
@@ -442,6 +461,7 @@
         .modal-overlay.active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
         .modal-overlay.active .modal-drawer {
@@ -474,112 +494,10 @@
             background: #cbd5e1;
             border-radius: 2px;
             margin: 0 auto 16px;
+            cursor: pointer;
         }
 
-        /* Location Bottom Sheet Styling */
-        .location-bottom-sheet {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            text-align: left;
-        }
-
-        .location-sheet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2px;
-        }
-
-        .location-sheet-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-
-        .location-count-badge {
-            font-size: 12px;
-            font-weight: 700;
-            color: #2563eb;
-            background: #eff6ff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            border: 1px solid #dbeafe;
-        }
-
-        .location-subtitle {
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 500;
-            margin-top: -8px;
-        }
-
-        .location-items-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 340px;
-            overflow-y: auto;
-            padding-right: 2px;
-            scrollbar-width: none;
-        }
-
-        .location-items-list::-webkit-scrollbar {
-            display: none;
-        }
-
-        .location-item-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .location-item-card:hover {
-            border-color: #cbd5e1;
-            background: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
-
-        .location-icon-wrapper {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: #eff6ff;
-            color: #2563eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .location-item-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .location-item-title {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.3;
-        }
-
-        .location-item-sub {
-            font-size: 12px;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        /* Bottom Sheet Filter Styling */
+        /* Filter Bottom Sheet Styling */
         .filter-bottom-sheet {
             display: flex;
             flex-direction: column;
@@ -700,6 +618,113 @@
             background: #1d4ed8;
             transform: scale(0.99);
         }
+
+        /* Keberangkatan Bottom Sheet Styling */
+        .keberangkatan-bottom-sheet {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .sheet-title-center {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            text-align: center;
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
+        }
+
+        .sheet-desc-text {
+            font-size: 13.5px;
+            color: #64748b;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-top: -6px;
+            text-align: center;
+        }
+
+        .sheet-actions-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .btn-sheet-secondary {
+            width: 100%;
+            height: 48px;
+            background: #ffffff;
+            color: #1e293b;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sheet-secondary:active {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+    
+        /* 5-TAB BOTTOM NAVBAR */
+        .bottom-nav-5tabs {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 66px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 4px 8px;
+            z-index: 100;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .tab-5-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            gap: 4px;
+            text-decoration: none;
+            width: 20%;
+            transition: color 0.2s;
+            position: relative;
+            padding: 4px 0;
+        }
+
+        .tab-5-item.active {
+            color: #0A58CA;
+        }
+
+        .tab-5-item i {
+            font-size: 17px;
+        }
+
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 4px;
+            background: #0f172a;
+            border-radius: 2px;
+            z-index: 101;
+        }
+
     </style>
 </head>
 
@@ -720,12 +745,12 @@
         <div class="header-section">
             <div class="header-titles">
                 <div class="title-with-back">
-                    <a href="../home-mobile.html" class="back-home-btn" title="Kembali ke Dashboard ERS">
+                    <a href="../home-mobile-nav.html" class="back-home-btn" title="Kembali ke Dashboard ERS">
                         <i class="fa-solid fa-chevron-left"></i>
                     </a>
                     <h1 class="main-title">ERS (Tower Emergency)</h1>
                 </div>
-                <span class="sub-title">Pembongkaran</span>
+                <span class="sub-title">Karantina</span>
             </div>
             <a href="../../power-inspect/notifikasi-mobile.html" class="notif-bell-btn" title="Notifikasi">
                 <i class="fa-regular fa-bell"></i>
@@ -736,7 +761,7 @@
         <!-- Search & Filter Bar -->
         <div class="search-filter-section">
             <div class="search-input-box">
-                <input type="text" id="ersSearchInput" placeholder="Cari data pembongkaran..." oninput="filterData(this.value)">
+                <input type="text" id="karantinaSearchInput" placeholder="Cari" oninput="filterKarantina(this.value)">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <button class="filter-btn" onclick="openFilterModalDrawer()" title="Filter Data">
@@ -745,101 +770,146 @@
         </div>
 
         <!-- App Body / Content Area -->
-        <div class="app-body" id="ersContentArea">
-            <!-- Dynamic Cards -->
+        <div class="app-body" id="karantinaContentArea">
+            <!-- Injected via JavaScript -->
         </div>
 
-        <!-- Bottom Navigation Bar -->
+        <!-- Bottom Navigation Bar (Pemasangan, Pembongkaran, Karantina, Stock Opname) -->
         
 
         <!-- iOS Bottom Indicator Line -->
         <div class="ios-bar"></div>
 
-        <!-- Filter / Location Modal Drawer Component -->
+        <!-- Drawer Filter / Keberangkatan Modal -->
         <div class="modal-overlay" id="filterModal" onclick="closeFilterModal(event)">
             <div class="modal-drawer" onclick="event.stopPropagation()">
-                <div class="drawer-handle"></div>
+                <div class="drawer-handle" onclick="closeFilterModalDirect()" title="Tutup Modal"></div>
                 <div id="drawerModalContent">
-                    <!-- Injected dynamically via JavaScript -->
+                    <!-- Dynamic Drawer Content -->
                 </div>
             </div>
         </div>
-    </div>
+    
+        <!-- 5-TAB BOTTOM NAVBAR -->
+        <nav class="bottom-nav-5tabs">
+            <a href="../home-mobile-nav.html" class="tab-5-item " title="Dashboard Root">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="../Pemasangan/home-mobile-nav.html" class="tab-5-item " title="Pemasangan ERS">
+                <i class="fa-solid fa-wrench"></i>
+                <span>Pemasangan</span>
+            </a>
+            <a href="../Pembongkaran/home-mobile-nav.html" class="tab-5-item " title="Pembongkaran ERS">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+                <span>Pembongkaran</span>
+            </a>
+            <a href="../Karantina & Pengembalian/home-mobile-nav.html" class="tab-5-item active" title="Karantina & Pengembalian">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Karantina</span>
+            </a>
+            <a href="../Stock Opname/home-mobile-nav.html" class="tab-5-item " title="Stok Opname ERS">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Stok Opnam</span>
+            </a>
+        </nav>
+        <div class="ios-bar"></div>
 
-    <script>
-        const pembongkaranData = [
+    </div>
+<script>
+        const karantinaData = [
             {
-                id: 'DIS20250000001',
+                id: 'RTR20250000001',
                 statusText: 'Mulai',
                 badgeClass: 'badge-mulai',
-                targetPembongkaran: '1 Februari 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Maret 2025',
-                jumlahTE: 2,
-                lokasi: '4'
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: true
             },
             {
-                id: 'DIS20250000002',
-                statusText: 'Sedang Berlangsung',
-                badgeClass: 'badge-pasang',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '5'
-            },
-            {
-                id: 'DIS20250000003',
-                statusText: 'Selesai Lokal',
+                id: 'RTR20250000002',
+                statusText: 'Sedang Dikirim',
                 badgeClass: 'badge-dikirim',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '3'
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: false
             },
             {
-                id: 'DIS20250000004',
+                id: 'RTR20250000003',
+                statusText: 'Sedang Dikarantina',
+                badgeClass: 'badge-dikarantina',
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: false
+            },
+            {
+                id: 'RTR20250000004',
+                statusText: 'Sedang Berlangsung',
+                badgeClass: 'badge-berlangsung',
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: false
+            },
+            {
+                id: 'RTR20250000005',
+                statusText: 'Selesai Lokal',
+                badgeClass: 'badge-selesai-lokal',
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: false
+            },
+            {
+                id: 'RTR20250000006',
                 statusText: 'Selesai',
-                badgeClass: 'badge-server',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '4'
+                badgeClass: 'badge-selesai',
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: false
+            },
+            {
+                id: 'RTR20250000007',
+                statusText: 'Rejected',
+                badgeClass: 'badge-rejected',
+                estBerangkat: '1 Februari 2025',
+                estTiba: '1 Februari 2025',
+                jumlahTE: '2',
+                merk: 'Lindsay, Tower Solution',
+                hasKeberangkatan: false
             }
         ];
 
         let selectedStatusChips = [];
         let filterState = {
-            targetPembongkaran: '',
-            targetOperasi: '',
-            lokasi: ''
+            permit: '',
+            estBerangkat: '',
+            estTiba: '',
+            merk: ''
         };
 
-        function renderCards(filterQuery = '') {
-            const container = document.getElementById('ersContentArea');
+        function renderKarantinaCards(filterQuery = '') {
+            const container = document.getElementById('karantinaContentArea');
             const q = filterQuery.toLowerCase().trim();
-            
-            const filtered = pembongkaranData.filter(item => {
-                // Search Query
-                if (q && !(item.id.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q))) {
+
+            const filtered = karantinaData.filter(item => {
+                if (q && !(item.id.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q) || item.merk.toLowerCase().includes(q))) {
                     return false;
                 }
-                // Status Chips
                 if (selectedStatusChips.length > 0 && !selectedStatusChips.includes(item.statusText)) {
                     return false;
                 }
-                // Target Pembongkaran
-                if (filterState.targetPembongkaran && item.targetPembongkaran !== filterState.targetPembongkaran) {
-                    return false;
-                }
-                // Target Operasi
-                if (filterState.targetOperasi && item.targetOperasi !== filterState.targetOperasi) {
-                    return false;
-                }
-                // Lokasi
-                if (filterState.lokasi && item.lokasi !== filterState.lokasi) {
+                if (filterState.permit && !item.id.toLowerCase().includes(filterState.permit.toLowerCase())) {
                     return false;
                 }
                 return true;
@@ -849,112 +919,94 @@
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;">
                         <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
-                        <p>Tidak ada data pembongkaran yang cocok dengan kriteria filter.</p>
+                        <p>Tidak ada data karantina yang cocok dengan kriteria pencarian.</p>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = filtered.map(item => `
-                <div class="ers-card">
-                    <div class="card-header">
-                        <span class="card-id">${item.id}</span>
-                        <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
+            container.innerHTML = filtered.map(item => {
+                let actionHtml = '';
+                if (item.hasKeberangkatan) {
+                    actionHtml = `
+                        <div class="card-actions">
+                            <button type="button" class="btn-action btn-outline" onclick="handleDetailClick('${item.id}', event)">Lihat Detail</button>
+                            <button type="button" class="btn-action btn-primary" onclick="openKeberangkatanModal('${item.id}', event)">Keberangkatan</button>
+                        </div>
+                    `;
+                } else if (item.statusText === 'Sedang Dikirim') {
+                    actionHtml = `
+                        <div class="card-actions">
+                            <button type="button" class="btn-action btn-outline" onclick="handleDetailClick('${item.id}', event)">Lihat Detail</button>
+                            <button type="button" class="btn-action btn-primary" onclick="openKedatanganModalHome('${item.id}', event)">Kedatangan</button>
+                        </div>
+                    `;
+                } else {
+                    actionHtml = `
+                        <div class="card-actions">
+                            <button type="button" class="btn-action btn-primary" style="width: 100%;" onclick="handleDetailClick('${item.id}', event)">Lihat Detail</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="ers-card" onclick="handleDetailClick('${item.id}', event)" style="cursor: pointer;">
+                        <div class="card-header">
+                            <span class="card-id">${item.id}</span>
+                            <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
+                        </div>
+                        <div class="card-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Est. Berangkat</span>
+                                <span class="detail-val">${item.estBerangkat}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Est. Tiba</span>
+                                <span class="detail-val">${item.estTiba}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Jumlah TE</span>
+                                <span class="detail-val">${item.jumlahTE}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Merk</span>
+                                <span class="detail-val">${item.merk}</span>
+                            </div>
+                        </div>
+                        <div onclick="event.stopPropagation()">
+                            ${actionHtml}
+                        </div>
                     </div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Target Pembongkaran</span>
-                            <span class="detail-val">${item.targetPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">SLA Pembongkaran</span>
-                            <span class="detail-val">${item.slaPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Target Operasi</span>
-                            <span class="detail-val">${item.targetOperasi}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Jumlah TE</span>
-                            <span class="detail-val">${item.jumlahTE}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Lokasi</span>
-                            <span class="detail-val">${item.lokasi}</span>
-                        </div>
-                    </div>
-                    <div class="card-actions" onclick="event.stopPropagation()">
-                        <button class="btn-action btn-outline" onclick="viewLocation('${item.id}', '${item.lokasi}')">View Lokasi</button>
-                        <button class="btn-action btn-primary" onclick="navigateSmooth('list-pembongkaran.html?id=${item.id}', event)">Lihat Detail</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        function filterData(val) { 
-            renderCards(val); 
+        function filterKarantina(val) {
+            renderKarantinaCards(val);
+        }
+
+        function handleDetailClick(id, event) {
+            if (event) event.stopPropagation();
+            // Navigasi ke halaman detail karantina jika ada
+            navigateSmooth('./list-karantina.html?id=' + encodeURIComponent(id));
         }
 
         function openModal() {
             document.getElementById('filterModal').classList.add('active');
         }
 
-        function closeFilterModal(e) { 
-            if (e.target.id === 'filterModal') closeFilterModalDirect(); 
+        function closeFilterModal(e) {
+            if (e.target.id === 'filterModal') closeFilterModalDirect();
         }
 
-        function closeFilterModalDirect() { 
-            document.getElementById('filterModal').classList.remove('active'); 
+        function closeFilterModalDirect() {
+            document.getElementById('filterModal').classList.remove('active');
         }
 
-        /* View Lokasi Drawer */
-        function viewLocation(id, countStr) {
-            const count = parseInt(countStr, 10) || 4;
-            const startNum = 85;
-            let itemsHtml = '';
-            
-            for (let i = 0; i < count; i++) {
-                const towerNum = String(startNum + i).padStart(4, '0');
-                itemsHtml += `
-                    <div class="location-item-card">
-                        <div class="location-icon-wrapper">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
-                        <div class="location-item-info">
-                            <div class="location-item-title">TOWER SUTT 150kV Ungaran-Weleri #${towerNum}</div>
-                            <div class="location-item-sub">Span #${startNum + i} • SUTT 150kV System</div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="location-bottom-sheet">
-                    <div class="location-sheet-header">
-                        <h2 class="location-sheet-title">Lokasi</h2>
-                        <span class="location-count-badge">${count} Lokasi Tower</span>
-                    </div>
-                    <div class="location-subtitle">Daftar lokasi pembongkaran ERS <strong>${id}</strong></div>
-                    
-                    <div class="location-items-list">
-                        ${itemsHtml}
-                    </div>
-
-                    <button type="button" class="btn-filter-submit" onclick="closeFilterModalDirect()">Tutup</button>
-                </div>
-            `;
-            openModal();
-        }
-
-        /* Filter Drawer */
+        /* Filter Bottom Sheet */
         function openFilterModalDrawer() {
-            renderFilterSheetContent();
-            openModal();
-        }
+            const allStatuses = ['Mulai', 'Sedang Dikirim', 'Sedang Dikarantina', 'Sedang Berlangsung', 'Selesai Lokal', 'Selesai', 'Rejected'];
 
-        function renderFilterSheetContent() {
-            const allStatuses = ['Mulai', 'Sedang Berlangsung', 'Selesai Lokal', 'Selesai'];
-            
             const chipsHtml = allStatuses.map(status => {
                 const isActive = selectedStatusChips.includes(status);
                 return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleStatusChip(this, '${status}')">${status}</button>`;
@@ -972,34 +1024,34 @@
                     </div>
 
                     <div class="filter-section">
-                        <label class="filter-section-label">No. Permit</label>
+                        <label class="filter-section-label">No. Permit / Dokumen</label>
                         <input type="text" id="filterNoPermit" class="filter-input-field" placeholder="Masukkan No. Permit" value="${filterState.permit || ''}">
                     </div>
 
                     <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Pembongkaran</label>
+                        <label class="filter-section-label">Tanggal Est. Berangkat</label>
                         <div class="input-with-icon">
-                            <input type="text" id="filterTargetBongkar" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetPembongkaran || '23 Januari 2026'}">
+                            <input type="text" id="filterEstBerangkat" class="filter-input-field" placeholder="1 Februari 2025" value="${filterState.estBerangkat || '1 Februari 2025'}">
                             <i class="fa-regular fa-calendar input-right-icon"></i>
                         </div>
                     </div>
 
                     <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Operasi</label>
+                        <label class="filter-section-label">Tanggal Est. Tiba</label>
                         <div class="input-with-icon">
-                            <input type="text" id="filterTargetOperasi" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetOperasi || '23 Januari 2026'}">
+                            <input type="text" id="filterEstTiba" class="filter-input-field" placeholder="1 Februari 2025" value="${filterState.estTiba || '1 Februari 2025'}">
                             <i class="fa-regular fa-calendar input-right-icon"></i>
                         </div>
                     </div>
 
                     <div class="filter-section">
-                        <label class="filter-section-label">Lokasi</label>
+                        <label class="filter-section-label">Merk ERS</label>
                         <div class="input-with-icon">
-                            <select id="filterLokasi" class="filter-input-field filter-select-field">
-                                <option value="" ${!filterState.lokasi ? 'selected' : ''}>Pilih Lokasi</option>
-                                <option value="3" ${filterState.lokasi === '3' ? 'selected' : ''}>3</option>
-                                <option value="4" ${filterState.lokasi === '4' ? 'selected' : ''}>4</option>
-                                <option value="5" ${filterState.lokasi === '5' ? 'selected' : ''}>5</option>
+                            <select id="filterMerk" class="filter-input-field filter-select-field">
+                                <option value="">Semua Merk</option>
+                                <option value="Lindsay">Lindsay</option>
+                                <option value="Tower Solution">Tower Solution</option>
+                                <option value="SBB">SBB</option>
                             </select>
                             <i class="fa-solid fa-chevron-down input-right-icon"></i>
                         </div>
@@ -1008,6 +1060,7 @@
                     <button type="button" class="btn-filter-submit" onclick="applyFilterDrawer()">Filter</button>
                 </div>
             `;
+            openModal();
         }
 
         function toggleStatusChip(btn, status) {
@@ -1020,23 +1073,78 @@
         }
 
         function applyFilterDrawer() {
-            filterState.targetPembongkaran = document.getElementById('filterTargetBongkar').value.trim();
-            filterState.targetOperasi = document.getElementById('filterTargetOperasi').value.trim();
-            filterState.lokasi = document.getElementById('filterLokasi').value;
-
-            renderCards(document.getElementById('ersSearchInput').value);
+            filterState.permit = document.getElementById('filterNoPermit') ? document.getElementById('filterNoPermit').value.trim() : '';
+            filterState.estBerangkat = document.getElementById('filterEstBerangkat') ? document.getElementById('filterEstBerangkat').value.trim() : '';
+            filterState.estTiba = document.getElementById('filterEstTiba') ? document.getElementById('filterEstTiba').value.trim() : '';
             closeFilterModalDirect();
+            renderKarantinaCards(document.getElementById('karantinaSearchInput').value);
         }
 
-        function resetFilterDrawer() {
-            selectedStatusChips = [];
-            filterState = {
-                targetPembongkaran: '',
-                targetOperasi: '',
-                lokasi: ''
-            };
-            renderFilterSheetContent();
-            renderCards(document.getElementById('ersSearchInput').value);
+        /* Keberangkatan Modal */
+        function openKeberangkatanModal(id, event) {
+            if (event) event.stopPropagation();
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div class="keberangkatan-bottom-sheet">
+                    <h2 class="sheet-title-center">Keberangkatan Karantina ERS</h2>
+                    <p class="sheet-desc-text">Apakah material <strong>${id}</strong> sudah diberangkatkan ke lokasi karantina?</p>
+
+                    <div class="filter-section" style="text-align: left; margin-top: 4px;">
+                        <label class="filter-section-label">Waktu Berangkat</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="waktuBerangkatKarantina" class="filter-input-field" value="1 Februari 2025, 09:30" placeholder="Pilih Tanggal & Waktu">
+                            <i class="fa-regular fa-calendar input-right-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="sheet-actions-stack">
+                        <button type="button" class="btn-filter-submit" onclick="submitKeberangkatan('${id}')">Submit</button>
+                        <button type="button" class="btn-sheet-secondary" onclick="closeFilterModalDirect()">Kembali</button>
+                    </div>
+                </div>
+            `;
+            openModal();
+        }
+
+        function submitKeberangkatan(id) {
+            const item = karantinaData.find(d => d.id === id);
+            if (item) {
+                item.statusText = 'Sedang Dikirim';
+                item.badgeClass = 'badge-dikirim';
+                item.hasKeberangkatan = false;
+            }
+            closeFilterModalDirect();
+            renderKarantinaCards(document.getElementById('karantinaSearchInput').value);
+        }
+
+        function openKedatanganModalHome(id, event) {
+            if (event) event.stopPropagation();
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div class="keberangkatan-bottom-sheet">
+                    <h2 class="sheet-title-center">Kedatangan</h2>
+                    <p class="sheet-desc-text">Apakah anda yakin ingin konfirmasi kedatangan material <strong>${id}</strong>?</p>
+                    
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; text-align: left; margin: 4px 0;">
+                        <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Waktu Kedatangan</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">10 Januari 2025, 10:45 WIB</div>
+                    </div>
+
+                    <div class="sheet-actions-stack">
+                        <button type="button" class="btn-filter-submit" onclick="submitKedatanganHome('${id}')">Konfirmasi Kedatangan</button>
+                        <button type="button" class="btn-sheet-secondary" onclick="closeFilterModalDirect()">Kembali</button>
+                    </div>
+                </div>
+            `;
+            openModal();
+        }
+
+        function submitKedatanganHome(id) {
+            const item = karantinaData.find(d => d.id === id);
+            if (item) {
+                item.statusText = 'Siap Karantina';
+                item.badgeClass = 'badge-siap';
+            }
+            closeFilterModalDirect();
+            renderKarantinaCards(document.getElementById('karantinaSearchInput').value);
         }
 
         function navigateSmooth(url, event) {
@@ -1054,7 +1162,7 @@
             }
         }
 
-        renderCards();
+        renderKarantinaCards();
     </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
@@ -1121,6 +1229,61 @@
       .notes-panel li {
         margin-bottom: 8px;
       }
+    
+        /* 5-TAB BOTTOM NAVBAR */
+        .bottom-nav-5tabs {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 66px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 4px 8px;
+            z-index: 100;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .tab-5-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            gap: 4px;
+            text-decoration: none;
+            width: 20%;
+            transition: color 0.2s;
+            position: relative;
+            padding: 4px 0;
+        }
+
+        .tab-5-item.active {
+            color: #0A58CA;
+        }
+
+        .tab-5-item i {
+            font-size: 17px;
+        }
+
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 4px;
+            background: #0f172a;
+            border-radius: 2px;
+            z-index: 101;
+        }
+
     </style>
     
     <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
@@ -1145,4 +1308,5 @@
     </div>
     <!-- END NOTES FEATURE -->
 </body>
+
 </html>
