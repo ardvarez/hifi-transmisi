@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Daftar Hasil Inspeksi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --orange-color: #ea580c;
+            --orange-light: #fff7ed;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* App Header (Uniform with list-aset.html and list-wo.html) */
+        .app-header {
+            padding: 18px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 15.5px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            letter-spacing: 0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+        .action-btn.btn-danger-hover:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+        }
+
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 100px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* Secondary Hero Summary Card */
+        .sync-hero-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .sync-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .sync-hero-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 9px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 20px;
+            border: 1px solid #bfdbfe;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sync-hero-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .sync-hero-desc {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* Filter Chips Row */
+        .filter-chips-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-chips-row::-webkit-scrollbar { display: none; }
+
+        .chip-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .chip-btn.active {
+            background: #1a65d6;
+            color: #ffffff;
+            border-color: #1a65d6;
+        }
+
+        /* Inspection Result Card */
+        .result-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .result-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .result-card-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .result-pills-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .result-pill-solid {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        .result-pill-green {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .dotted-divider {
+            border-top: 1.5px dotted #cbd5e1;
+            margin: 12px 0;
+        }
+
+        .meta-grid-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .meta-two-col {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .meta-item-left, .meta-item-right {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .meta-item-right {
+            text-align: right;
+            align-items: flex-end;
+        }
+
+        .meta-lbl {
+            font-size: 10.5px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .meta-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .meta-full-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .thin-line-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 2px 0;
+        }
+
+        /* Action Buttons inside Card */
+        .btn-card-sync {
+            width: 100%;
+            padding: 10px;
+            border-radius: 24px;
+            background: #ffffff;
+            border: 1.5px solid #ea580c;
+            color: #ea580c;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-card-sync:hover {
+            background: #fff7ed;
+        }
+        .btn-card-sync:active {
+            transform: scale(0.99);
+            background: #ffedd5;
+        }
+
+        .btn-card-synced {
+            width: 100%;
+            padding: 10px;
+            border-radius: 24px;
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #059669;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Fixed Bottom Action Bar */
+        .bottom-action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            padding: 14px 20px 20px;
+            border-top: 1px solid var(--border-color);
+            z-index: 20;
+        }
+
+        .btn-sync-all {
+            width: 100%;
+            padding: 13px;
+            background: #1a65d6;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(26, 101, 214, 0.25);
+        }
+        .btn-sync-all:active {
+            background: #134db0;
+        }
+
+        /* Modals (Frame-Scoped) */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            border-radius: inherit;
+            padding: 20px;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            animation: slideUpModal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUpModal {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon-sync {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #1a65d6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 14px;
+            border: 2px solid #bfdbfe;
+        }
+
+        .modal-icon-success {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 14px;
+            border: 2px solid #a7f3d0;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .modal-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 18px;
+        /* Notification Modal Result (Faithful to Screenshot) */
+        .sync-result-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 26px 20px 22px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            animation: slideUpModal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sync-success-aura {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            border: 2px dashed #6ee7b7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .sync-success-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #10b981;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        .sync-result-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #1d4ed8;
+            margin-bottom: 12px;
+            line-height: 1.35;
+            text-align: center;
+        }
+
+        .sync-summary-box {
+            font-size: 11.5px;
+            color: #64748b;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .sync-summary-header {
+            margin-bottom: 6px;
+            color: #64748b;
+        }
+
+        .sync-stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 12px;
+            color: #475569;
+        }
+
+        .sync-detail-section {
+            text-align: center;
+            margin-top: 8px;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 10px;
+        }
+
+        .sync-detail-lbl {
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        .sync-detail-item {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        
+        <!-- Modal Sync Progress / Result Notification (Inside Frame) -->
+        <div id="modalSyncProgress" class="modal-overlay" onclick="finishSyncModal()">
+            
+            <!-- Progress State (Uploading) -->
+            <div id="boxSyncProgress" class="modal-box" onclick="event.stopPropagation()">
+                <div class="modal-icon-sync">
+                    <i class="fa-solid fa-cloud-arrow-up fa-bounce"></i>
+                </div>
+                <div class="modal-title">Mengunggah ke Server PLN...</div>
+                <div class="modal-desc">
+                    Menyinkronkan data checklist inspeksi dan foto lapangan ke server pusat PLN.
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="syncProgressBar"></div>
+                </div>
+                <div style="font-size: 11.5px; font-weight: 700; color: var(--primary-blue);" id="syncProgressPercent">0% Selesai</div>
+            </div>
+
+            <!-- Result State (Exact to User Reference Screenshot) -->
+            <div id="boxSyncResult" class="sync-result-card" style="display:none;" onclick="event.stopPropagation()">
+                <div class="sync-success-aura">
+                    <div class="sync-success-circle">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+                <div class="sync-result-title">Proses Sinkron Selesai, tidak ada proses gagal</div>
+                <div class="sync-summary-box">
+                    <div class="sync-summary-header">Hasil dari proses sinkron :</div>
+                    <div class="sync-stats-list">
+                        <div>Total Target: 1 data.</div>
+                        <div>Sudah Diproses: 1 data.</div>
+                        <div>Selesai Disinkron: 1 data.</div>
+                        <div>Gagal Disinkron: 0 data.</div>
+                        <div>Belum Diproses: 0 data.</div>
+                    </div>
+                    <div class="sync-detail-section">
+                        <div class="sync-detail-lbl">Detail Berhasil:</div>
+                        <div class="sync-detail-item">- Over Current Relay | WO INS202600131960 | Form IL3 - Pemeliharaan Sistem Proteksi OCR - 2 Tahunan: Data berhasil disimpan!</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- App Header (Unified Style) -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <button class="action-btn" onclick="goBack()" title="Kembali">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="header-name">Daftar Hasil Inspeksi</div>
+                    <div class="header-sub">SINKRONISASI SERVER PLN</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn btn-danger-hover" onclick="clearAllCache()" title="Hapus Cache Lokal">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Scroll -->
+        <div class="content-scroll">
+            
+            <!-- Secondary Hero Summary Card -->
+            <div class="sync-hero-card">
+                <div class="sync-hero-top">
+                    <span class="sync-hero-badge"><i class="fa-solid fa-cloud-arrow-up"></i> Status Sinkronisasi</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #10b981;"><i class="fa-solid fa-circle"></i> Online</span>
+                </div>
+                <div class="sync-hero-title">Hasil Inspeksi Lapangan</div>
+                <div class="sync-hero-desc" id="counterStats">1 Total Inspeksi (0 Server, 1 Lokal & 0 Sedang Berlangsung)</div>
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="filter-chips-row">
+                <button class="chip-btn active" onclick="filterSync('semua', this)">Semua (3)</button>
+                <button class="chip-btn" onclick="filterSync('lokal', this)">Lokal / Belum Upload (2)</button>
+                <button class="chip-btn" onclick="filterSync('gagal', this)">Gagal Sinkron (1)</button>
+                <button class="chip-btn" onclick="filterSync('server', this)">Tersinkron Server (0)</button>
+            </div>
+
+            <!-- Card 1: Over Current Relay (Exact Reference) -->
+            <div class="result-card" id="cardResult1" data-status="lokal">
+                <div class="result-card-title">Over Current Relay</div>
+                <div class="result-card-sub">INS202600131960 - Form IL3 - Pemeliharaan Sistem Proteksi OCR - 2 Tahunan</div>
+                
+                <div class="result-pills-row">
+                    <span class="result-pill-solid" id="badgeSelesai1">Selesai Lokal</span>
+                    <span class="result-pill-solid" id="badgeSinkron1">Sinkron</span>
+                </div>
+
+                <div class="dotted-divider"></div>
+
+                <div class="meta-grid-box">
+                    <div class="meta-two-col">
+                        <div class="meta-item-left">
+                            <span class="meta-lbl">Mulai Inspeksi</span>
+                            <span class="meta-val">20 Aug 2026, 03:39 PM</span>
+                        </div>
+                        <div class="meta-item-right">
+                            <span class="meta-lbl">Selesai Inspeksi</span>
+                            <span class="meta-val">20 Aug 2026, 04:17 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="thin-line-divider"></div>
+
+                    <div class="meta-two-col">
+                        <div class="meta-item-left">
+                            <span class="meta-lbl">Gardu Induk</span>
+                            <span class="meta-val">GIS 150KV WONOKROMO</span>
+                        </div>
+                        <div class="meta-item-right">
+                            <span class="meta-lbl">No. WO</span>
+                            <span class="meta-val">INS202600131960</span>
+                        </div>
+                    </div>
+
+                    <div class="thin-line-divider"></div>
+
+                    <div class="meta-full-col">
+                        <span class="meta-lbl">Bay</span>
+                        <span class="meta-val">PHT 150KV SUKOLILO #1</span>
+                    </div>
+                </div>
+
+                <button class="btn-card-sync" id="btnSingleSync1" onclick="syncSingleCard(1)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sinkron Lokal
+                </button>
+            </div>
+
+            <!-- Card 2: Power Transformer 150/20kV -->
+            <div class="result-card" id="cardResult2" data-status="lokal">
+                <div class="result-card-title">Power Transformer</div>
+                <div class="result-card-sub">INS202600987503 - IL1 - Harian Bulanan Trafo Daya 1 150/20kV</div>
+                
+                <div class="result-pills-row">
+                    <span class="result-pill-solid" id="badgeSelesai2">Selesai Lokal</span>
+                    <span class="result-pill-solid" id="badgeSinkron2">Sinkron</span>
+                </div>
+
+                <div class="dotted-divider"></div>
+
+                <div class="meta-grid-box">
+                    <div class="meta-two-col">
+                        <div class="meta-item-left">
+                            <span class="meta-lbl">Mulai Inspeksi</span>
+                            <span class="meta-val">20 Aug 2026, 01:15 PM</span>
+                        </div>
+                        <div class="meta-item-right">
+                            <span class="meta-lbl">Selesai Inspeksi</span>
+                            <span class="meta-val">20 Aug 2026, 02:05 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="thin-line-divider"></div>
+
+                    <div class="meta-two-col">
+                        <div class="meta-item-left">
+                            <span class="meta-lbl">Gardu Induk</span>
+                            <span class="meta-val">GI 150KV KALISARI</span>
+                        </div>
+                        <div class="meta-item-right">
+                            <span class="meta-lbl">No. WO</span>
+                            <span class="meta-val">INS202600987503</span>
+                        </div>
+                    </div>
+
+                    <div class="thin-line-divider"></div>
+
+                    <div class="meta-full-col">
+                        <span class="meta-lbl">Bay</span>
+                        <span class="meta-val">TRF#4 150/20kV</span>
+                    </div>
+                </div>
+
+                <button class="btn-card-sync" id="btnSingleSync2" onclick="syncSingleCard(2)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Sinkron Lokal
+                </button>
+            </div>
+
+            <!-- Card 3: Lightning Arrester (Gagal Sinkron) -->
+            <div class="result-card" id="cardResult3" data-status="gagal">
+                <div class="result-card-title">Lightning Arrester (LA)</div>
+                <div class="result-card-sub">INS202600129841 - IL1 - Pengecekan Counter & Arus Bocor LA 150kV</div>
+                
+                <div class="result-pills-row">
+                    <span class="result-pill-solid" id="badgeSelesai3" style="background:#ef4444;">Gagal Sinkron</span>
+                    <span class="result-pill-solid" id="badgeSinkron3" style="background:#64748b;">Lokal</span>
+                </div>
+
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: #b91c1c; display: flex; gap: 6px; align-items: center;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Upload timeout saat mengirim foto lampiran (Koneksi terputus).
+                </div>
+
+                <div class="dotted-divider"></div>
+
+                <div class="meta-grid-box">
+                    <div class="meta-two-col">
+                        <div class="meta-item-left">
+                            <span class="meta-lbl">Mulai Inspeksi</span>
+                            <span class="meta-val">20 Aug 2026, 10:20 AM</span>
+                        </div>
+                        <div class="meta-item-right">
+                            <span class="meta-lbl">Selesai Inspeksi</span>
+                            <span class="meta-val">20 Aug 2026, 11:05 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="thin-line-divider"></div>
+
+                    <div class="meta-two-col">
+                        <div class="meta-item-left">
+                            <span class="meta-lbl">Gardu Induk</span>
+                            <span class="meta-val">GI 150KV KALISARI</span>
+                        </div>
+                        <div class="meta-item-right">
+                            <span class="meta-lbl">No. WO</span>
+                            <span class="meta-val">INS202600129841</span>
+                        </div>
+                    </div>
+
+                    <div class="thin-line-divider"></div>
+
+                    <div class="meta-full-col">
+                        <span class="meta-lbl">Bay</span>
+                        <span class="meta-val">TRF#4 150/20kV</span>
+                    </div>
+                </div>
+
+                <button class="btn-card-sync" id="btnSingleSync3" style="border-color: #ef4444; color: #ef4444;" onclick="syncSingleCard(3)">
+                    <i class="fa-solid fa-rotate-right"></i> Coba Sinkron Ulang
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Sticky Bottom Action Button -->
+        <div class="bottom-action-bar">
+            <button class="btn-sync-all" onclick="startSyncAll()">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Sinkron Semua
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.history.length > 1 ? window.history.back() : (window.location.href = 'list-wo.html');
+            }, 300);
+        }
+
+        function filterSync(type, btn) {
+            document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.result-card');
+            cards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                if (type === 'semua') {
+                    card.style.display = 'block';
+                } else if (type === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function clearAllCache() {
+            if (confirm('Bersihkan riwayat inspeksi lokal yang sudah selesai?')) {
+                alert('Cache riwayat lokal berhasil dibersihkan.');
+            }
+        }
+
+        function syncSingleCard(id) {
+            const btn = document.getElementById(`btnSingleSync${id}`);
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                document.getElementById(`badgeSelesai${id}`).className = 'result-pill-solid result-pill-green';
+                document.getElementById(`badgeSelesai${id}`).textContent = 'Tersinkron Server';
+                document.getElementById(`badgeSinkron${id}`).style.display = 'none';
+
+                btn.className = 'btn-card-synced';
+                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sudah Sinkron Server';
+                document.getElementById(`cardResult${id}`).setAttribute('data-status', 'server');
+                alert(`Hasil inspeksi data #${id} berhasil diunggah ke server PLN!`);
+            }, 1000);
+        }
+
+        function startSyncAll() {
+            const modal = document.getElementById('modalSyncProgress');
+            const boxProgress = document.getElementById('boxSyncProgress');
+            const boxResult = document.getElementById('boxSyncResult');
+            const pBar = document.getElementById('syncProgressBar');
+            const pText = document.getElementById('syncProgressPercent');
+
+            modal.classList.add('show');
+            boxProgress.style.display = 'block';
+            boxResult.style.display = 'none';
+
+            let progress = 10;
+            pBar.style.width = progress + '%';
+            pText.textContent = progress + '% Selesai';
+
+            const interval = setInterval(() => {
+                progress += 30;
+                pBar.style.width = Math.min(progress, 100) + '%';
+                pText.textContent = Math.min(progress, 100) + '% Selesai';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        boxProgress.style.display = 'none';
+                        boxResult.style.display = 'block';
+
+                        // Update all cards to Synced status
+                        [1, 2].forEach(id => {
+                            const badge1 = document.getElementById(`badgeSelesai${id}`);
+                            const badge2 = document.getElementById(`badgeSinkron${id}`);
+                            const btn = document.getElementById(`btnSingleSync${id}`);
+                            const card = document.getElementById(`cardResult${id}`);
+                            if (badge1) {
+                                badge1.className = 'result-pill-solid result-pill-green';
+                                badge1.textContent = 'Tersinkron Server';
+                            }
+                            if (badge2) badge2.style.display = 'none';
+                            if (btn) {
+                                btn.className = 'btn-card-synced';
+                                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sudah Sinkron Server';
+                            }
+                            if (card) card.setAttribute('data-status', 'server');
+                        });
+
+                        document.getElementById('counterStats').textContent = '2 Total Inspeksi (2 Server, 0 Lokal & 0 Sedang Berlangsung)';
+                    }, 400);
+                }
+            }, 250);
+        }
+
+        function finishSyncModal() {
+            document.getElementById('modalSyncProgress').classList.remove('show');
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Daftar Hasil Inspeksi:</strong> Mengakomodasi sinkronisasi hasil inspeksi offline lokal ke server pusat PLN.</li>
+        <li><strong>Fitur Sinkron:</strong> Mendukung Sinkron Lokal per aset dan Sinkron Semua dengan indikator progres unggah.</li>
+      </ul>
+    </div>
+
+</body>
+</html>
