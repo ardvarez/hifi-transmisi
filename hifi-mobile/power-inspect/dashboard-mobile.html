@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Dashboard Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px; 
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* App Header */
+        .app-header {
+            padding: 18px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 15px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            letter-spacing: 0.3px;
+        }
+        
+        .header-actions { 
+            display: flex; 
+            gap: 8px; 
+        }
+        
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .notif-dot {
+            display: none;
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Content Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            scrollbar-width: none;
+        }
+        .app-content::-webkit-scrollbar { display: none; }
+
+        /* Welcome Banner Card */
+        .welcome-card {
+            background: linear-gradient(135deg, #0b4884 0%, #1a65d6 100%);
+            border-radius: 20px;
+            padding: 18px 20px;
+            color: white;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(11, 72, 132, 0.18);
+        }
+
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            backdrop-filter: blur(4px);
+        }
+
+        .welcome-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .welcome-desc {
+            font-size: 12px;
+            color: #dbeafe;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .welcome-action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .welcome-btn {
+            background: #ffffff;
+            color: #0b4884;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .welcome-btn:active { transform: scale(0.96); }
+
+        .welcome-btn-outline {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        /* 4 KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .kpi-icon-box {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .kpi-blue { background: #eff6ff; color: #1a65d6; }
+        .kpi-green { background: #ecfdf5; color: #10b981; }
+        .kpi-amber { background: #fffbeb; color: #f59e0b; }
+        .kpi-purple { background: #f5f3ff; color: #8b5cf6; }
+
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Section Title */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            margin-top: 4px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-link {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        /* Notification Counter Banner */
+        .schedule-counter-banner {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .counter-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .counter-icon-bubble {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: #1a65d6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(26, 101, 214, 0.25);
+        }
+
+        .counter-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .counter-desc {
+            font-size: 11px;
+            color: #0284c7;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .counter-badge-total {
+            background: #ef4444;
+            color: white;
+            font-size: 11.5px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        /* 3 Catalog Features (3 Columns Layout) */
+        .catalog-3features-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .feature-card-item {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 8px 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .feature-card-item:active {
+            transform: scale(0.96);
+            border-color: var(--primary-blue);
+            background: #fafcff;
+        }
+
+        .feature-icon-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .feature-icon-bubble {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+        }
+
+        .feature-icon-bubble.rutin { background: #eff6ff; color: #1a65d6; }
+        .feature-icon-bubble.cbm { background: #fdf2f8; color: #db2777; }
+        .feature-icon-bubble.survey { background: #ecfdf5; color: #059669; }
+
+        .feature-count-badge-dot {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 10px;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
+        }
+
+        .feature-title {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.25;
+            margin-bottom: 6px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-badge-count {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 6px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .badge-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-purple { background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+        .badge-green { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+
+        /* Chart Card */
+        .chart-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .chart-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .chart-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .chart-badge {
+            font-size: 10px;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 170px;
+            width: 100%;
+        }
+
+        /* Recent Tasks / GI List */
+        .gi-task-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+        .gi-task-card:active { transform: scale(0.98); }
+
+        .gi-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .gi-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .gi-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        .badge-active { background: #dbeafe; color: #1a65d6; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-done { background: #dcfce7; color: #166534; }
+
+        .gi-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid #f1f5f9;
+            padding-top: 10px;
+        }
+
+        .gi-stats span strong {
+            color: var(--text-main);
+        }
+
+        /* Notification Flag */
+        .notif-flag {
+            position: absolute;
+            top: -100px;
+            left: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            z-index: 20;
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 4px solid #ef4444;
+        }
+        .notif-flag.show { top: 20px; }
+        .notif-icon { color: #ef4444; font-size: 20px; margin-top: 2px; }
+        .notif-content { flex: 1; }
+        .notif-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .notif-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .notif-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 14px; }
+
+        /* Universal Sync Modal Styles */
+        .sync-badge-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f59e0b;
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid #ffffff;
+            line-height: 1;
+        }
+
+        .sync-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .sync-modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .sync-modal-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 22px;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+            animation: slideUpModal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUpModal {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .sync-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .sync-modal-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #eff6ff;
+            color: #1a65d6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 1px solid #bfdbfe;
+            flex-shrink: 0;
+        }
+
+        .sync-modal-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .sync-modal-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .sync-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #ecfdf5;
+            color: #059669;
+            margin-bottom: 12px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+        }
+
+        .sync-item-row {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .sync-item-info { display: flex; flex-direction: column; }
+        .item-title { font-size: 12px; font-weight: 700; color: var(--text-main); }
+        .item-time { font-size: 10px; color: var(--text-muted); }
+        .sync-item-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .sync-progress-bar-bg {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .sync-progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #1a65d6;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .sync-progress-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-align: center;
+        }
+
+        .sync-modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-cancel-sync {
+            flex: 1;
+            padding: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-confirm-sync {
+            flex: 2;
+            padding: 10px;
+            background: #1a65d6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Universal Sync Modal -->
+    <div id="universalSyncModal" class="sync-modal-overlay">
+        <div class="sync-modal-card">
+            <div class="sync-modal-header">
+                <div class="sync-modal-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="sync-modal-title-box">
+                    <div class="sync-modal-title">Upload Data Offline</div>
+                    <div class="sync-modal-sub">Sinkronisasi hasil inspeksi lokal ke server PLN</div>
+                </div>
+            </div>
+            <div class="sync-status-indicator">
+                <span class="pulse-dot"></span> Mode Online (Siap Kirim)
+            </div>
+            <div class="sync-item-row">
+                <div class="sync-item-info">
+                    <span class="item-title">Inspeksi GI Kalisari (Bay Trafo 1)</span>
+                    <span class="item-time">Tersimpan offline • 20 Agu 12:45</span>
+                </div>
+                <span class="sync-item-badge">Siap Upload</span>
+            </div>
+            <div class="sync-item-row">
+                <div class="sync-item-info">
+                    <span class="item-title">Checklist LA Trafo 1 (3 Foto)</span>
+                    <span class="item-time">Tersimpan offline • 20 Agu 13:02</span>
+                </div>
+                <span class="sync-item-badge">Siap Upload</span>
+            </div>
+            <div id="syncProgressBox" style="display:none; margin-top:12px;">
+                <div class="sync-progress-bar-bg">
+                    <div id="syncProgressBar" class="sync-progress-bar-fill"></div>
+                </div>
+                <div class="sync-progress-label">Mengunggah 2 data inspeksi... (80%)</div>
+            </div>
+            <div class="sync-modal-footer">
+                <button class="btn-cancel-sync" onclick="closeUniversalSync()">Tutup</button>
+                <button id="btnStartSync" class="btn-confirm-sync" onclick="startUniversalSyncProcess()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-container">
+        
+        <!-- Notification Flag -->
+        <div id="notifFlag" class="notif-flag" onclick="goToNotif()">
+            <div class="notif-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="notif-content">
+                <div class="notif-title">Jadwal Belum Tersinkron</div>
+                <div class="notif-desc">Terdapat 3 jadwal inspeksi GI yang belum tersinkronisasi.</div>
+            </div>
+            <button class="notif-close" onclick="closeNotif(event)"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <a href="../catalog-mobile.html" class="action-btn" title="Kembali ke Katalog Master">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-group">
+                    <div class="header-name">ardan.test</div>
+                    <div class="header-sub">ULTG SURABAYA UTARA</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <!-- Upload Offline Inspection Button with Counter -->
+                <div class="action-btn" onclick="triggerUniversalSync()" title="Upload Hasil Inspeksi Offline">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="sync-badge-count">2</span>
+                </div>
+                <!-- Notification Bell Button -->
+                <div class="action-btn" id="btnNotification" onclick="goToNotif()" title="Notifikasi">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notifDot" class="notif-dot"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Body -->
+        <div class="app-content">
+            
+            <!-- Welcome Banner -->
+            <div class="welcome-card">
+                <div class="welcome-badge">
+                    <i class="fa-solid fa-shield-halved"></i> Power Inspect Mobile
+                </div>
+                <div class="welcome-title">Dashboard Inspeksi</div>
+                <div class="welcome-desc">Pantau jadwal rutin, progres penyelesaian, dan anomali transmisi ULTG Surabaya Utara.</div>
+                <div class="welcome-action-row">
+                    <a href="home-mobile.html" class="welcome-btn">
+                        <i class="fa-solid fa-play"></i> Mulai Inspeksi
+                    </a>
+                    <a href="sync-jadwal.html" class="welcome-btn-outline">
+                        <i class="fa-solid fa-rotate"></i> Sync Data
+                    </a>
+                </div>
+            </div>
+
+            <!-- Notification Schedule Counter Banner -->
+            <div class="schedule-counter-banner">
+                <div class="counter-banner-left">
+                    <div class="counter-icon-bubble">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <div class="counter-title">14 Jadwal Perlu Dieksekusi</div>
+                        <div class="counter-desc">8 Rutin • 4 CBM • 2 Survey Transmisi</div>
+                    </div>
+                </div>
+                <div class="counter-badge-total">
+                    <i class="fa-solid fa-clock"></i> 14 Total
+                </div>
+            </div>
+
+            <!-- Section: 3 Fitur Utama Katalog Power Inspect (3 KOLOM) -->
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-boxes-packing" style="color: var(--primary-blue);"></i> Fitur Power Inspect
+                </div>
+                <span style="font-size: 11px; font-weight: 700; color: var(--primary-blue);">3 Modul</span>
+            </div>
+
+            <!-- 3 Columns Features Grid -->
+            <div class="catalog-3features-container">
+                <!-- Kolom 1: Inspeksi Rutin -->
+                <a href="home-mobile.html" class="feature-card-item">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon-bubble rutin">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <span class="feature-count-badge-dot">8</span>
+                    </div>
+                    <div class="feature-title">Inspeksi Rutin</div>
+                    <span class="feature-badge-count badge-blue">
+                        <i class="fa-solid fa-clock"></i> 8 Jadwal
+                    </span>
+                </a>
+
+                <!-- Kolom 2: Inspeksi CBM -->
+                <div class="feature-card-item" onclick="openCBM()">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon-bubble cbm">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                        <span class="feature-count-badge-dot">4</span>
+                    </div>
+                    <div class="feature-title">Inspeksi CBM</div>
+                    <span class="feature-badge-count badge-purple">
+                        <i class="fa-solid fa-clock"></i> 4 Jadwal
+                    </span>
+                </div>
+
+                <!-- Kolom 3: Survey Transmisi -->
+                <div class="feature-card-item" onclick="openSurvey()">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon-bubble survey">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <span class="feature-count-badge-dot">2</span>
+                    </div>
+                    <div class="feature-title">Survey Transmisi</div>
+                    <span class="feature-badge-count badge-green">
+                        <i class="fa-solid fa-clock"></i> 2 Jadwal
+                    </span>
+                </div>
+            </div>
+
+            <!-- Section: Ringkasan Status Inspeksi (KPI Metrics) -->
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-chart-simple" style="color: var(--primary-blue);"></i> Ringkasan Status Inspeksi
+                </div>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Monitoring Real-Time</span>
+            </div>
+
+            <!-- KPI Metric Grid (4 Cards) -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon-box kpi-blue">
+                            <i class="fa-solid fa-building-shield"></i>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 700; color: #10b981;">+2 GI</span>
+                    </div>
+                    <div class="kpi-value">8</div>
+                    <div class="kpi-label">Gardu Induk Aktif</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon-box kpi-green">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 700; color: #10b981;">75%</span>
+                    </div>
+                    <div class="kpi-value">18/24</div>
+                    <div class="kpi-label">WO Selesai</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon-box kpi-amber">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 700; color: #f59e0b;">Perlu Cek</span>
+                    </div>
+                    <div class="kpi-value">3</div>
+                    <div class="kpi-label">Anomali Terdeteksi</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-icon-box kpi-purple">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 700; color: #64748b;">Offline</span>
+                    </div>
+                    <div class="kpi-value">2</div>
+                    <div class="kpi-label">Pending Sync</div>
+                </div>
+            </div>
+
+            <!-- Chart 1: Progres Inspeksi GI -->
+            <div class="chart-card">
+                <div class="chart-card-head">
+                    <div class="chart-card-title">Progres Inspeksi per Gardu Induk</div>
+                    <span class="chart-badge">Minggu Ini</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartProgresGI"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Kondisi Health Index Aset -->
+            <div class="chart-card">
+                <div class="chart-card-head">
+                    <div class="chart-card-title">Status Kondisi Aset (AHI)</div>
+                    <span class="chart-badge">Total 48 Bay</span>
+                </div>
+                <div class="chart-container" style="height: 160px;">
+                    <canvas id="chartAHI"></canvas>
+                </div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-calendar-day" style="color: var(--primary-blue);"></i> Jadwal Inspeksi Hari Ini
+                </div>
+                <a href="home-mobile.html" class="section-link">Lihat Semua</a>
+            </div>
+
+            <!-- GI Card 1 -->
+            <div class="gi-task-card" onclick="openDetailGI('GI 150KV KALISARI')">
+                <div class="gi-task-header">
+                    <div class="gi-name">GI 150KV KALISARI</div>
+                    <span class="gi-badge badge-active">Mulai</span>
+                </div>
+                <div class="gi-stats">
+                    <span>WO: <strong>2</strong></span>
+                    <span>Asset Inspeksi: <strong>4</strong></span>
+                    <span>Progres: <strong>0/4</strong></span>
+                </div>
+            </div>
+
+            <!-- GI Card 2 -->
+            <div class="gi-task-card" onclick="openDetailGI('GIS 150KV WONOKROMO')">
+                <div class="gi-task-header">
+                    <div class="gi-name">GIS 150KV WONOKROMO</div>
+                    <span class="gi-badge badge-active">Mulai</span>
+                </div>
+                <div class="gi-stats">
+                    <span>WO: <strong>1</strong></span>
+                    <span>Asset Inspeksi: <strong>5</strong></span>
+                    <span>Progres: <strong>0/5</strong></span>
+                </div>
+            </div>
+
+            <!-- GI Card 3 -->
+            <div class="gi-task-card" onclick="openDetailGI('GI 150KV SURABAYA SELATAN')">
+                <div class="gi-task-header">
+                    <div class="gi-name">GI 150KV SURABAYA SELATAN</div>
+                    <span class="gi-badge badge-active">Mulai</span>
+                </div>
+                <div class="gi-stats">
+                    <span>WO: <strong>3</strong></span>
+                    <span>Asset Inspeksi: <strong>3</strong></span>
+                    <span>Progres: <strong>0/3</strong></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Init Charts
+        function initCharts() {
+            // 1. Progres GI Bar Chart
+            const ctx1 = document.getElementById('chartProgresGI').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Kalisari', 'Wonokromo', 'Sby Selatan', 'Rungkut', 'Waru'],
+                    datasets: [
+                        {
+                            label: 'Selesai',
+                            data: [3, 4, 3, 2, 4],
+                            backgroundColor: '#1a65d6',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Belum',
+                            data: [1, 1, 0, 1, 0],
+                            backgroundColor: '#e2e8f0',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+                        y: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, stepSize: 1 } }
+                    }
+                }
+            });
+
+            // 2. AHI Donut Chart
+            const ctx2 = document.getElementById('chartAHI').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Baik (Normal)', 'Waspada (Warning)', 'Kritis (Danger)'],
+                    datasets: [{
+                        data: [38, 7, 3],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+                    },
+                    cutout: '68%'
+                }
+            });
+        }
+
+        function openDetailGI(giName) {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = `list-wo.html?gi=${encodeURIComponent(giName)}`;
+            }, 300);
+        }
+
+        function openCBM() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'list-cbm.html';
+            }, 300);
+        }
+
+        function openSurvey() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'list-survey.html';
+            }, 300);
+        }
+
+        function goToNotif() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'notifikasi-mobile.html';
+            }, 300);
+        }
+
+        function triggerUniversalSync() {
+            document.getElementById('universalSyncModal').classList.add('show');
+        }
+
+        function closeUniversalSync() {
+            document.getElementById('universalSyncModal').classList.remove('show');
+        }
+
+        function startUniversalSyncProcess() {
+            const btn = document.getElementById('btnStartSync');
+            const pBox = document.getElementById('syncProgressBox');
+            const pBar = document.getElementById('syncProgressBar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...';
+            pBox.style.display = 'block';
+            
+            let progress = 10;
+            pBar.style.width = progress + '%';
+            const interval = setInterval(() => {
+                progress += 30;
+                pBar.style.width = Math.min(progress, 100) + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.querySelectorAll('.sync-badge-count').forEach(b => b.style.display = 'none');
+                        alert('2 Hasil inspeksi offline berhasil diunggah dan tersinkronisasi ke server pusat PLN!');
+                        closeUniversalSync();
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Upload Sekarang';
+                        pBox.style.display = 'none';
+                        pBar.style.width = '0%';
+                    }, 400);
+                }
+            }, 350);
+        }
+
+        function goToSync() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'sync-jadwal.html';
+            }, 300);
+        }
+
+        function closeNotif(event) {
+            if(event) event.stopPropagation();
+            document.getElementById('notifFlag').classList.remove('show');
+        }
+
+        // Check for sync status parameter
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'failed') {
+                setTimeout(() => {
+                    document.getElementById('notifFlag').classList.add('show');
+                    document.getElementById('notifDot').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('notifFlag').classList.remove('show');
+                    }, 4000);
+                }, 1500);
+            }
+        });
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Struktur Dashboard PI:</strong> Mempertahankan desain asli Power Inspect (Welcome card, 4 KPI 2x2 grid, visual chart, dan task list).</li>
+        <li><strong>3 Fitur Utama & Counter Notifikasi:</strong> Inspeksi Rutin (8 Jadwal), Inspeksi CBM (4 Jadwal), dan Survey Transmisi (2 Jadwal), dengan banner total 14 jadwal.</li>
+        <li><strong>Navigasi:</strong> Bottom navbar dihide, action back dari fitur inspeksi/CBM/survey kembali ke dashboard PI ini, lalu tombol back atas kembali ke master catalog.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>

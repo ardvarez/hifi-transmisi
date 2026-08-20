@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Power Inspect - Inspeksi Rutin</title>
+    <title>Power Inspect - Inspeksi CBM</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -19,6 +19,7 @@
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
+            --purple-color: #8b5cf6;
         }
 
         * {
@@ -40,7 +41,7 @@
 
         .mobile-container {
             width: 100%;
-            max-width: 420px; 
+            max-width: 420px;
             height: 100vh;
             background-color: var(--bg-color);
             position: relative;
@@ -104,14 +105,15 @@
         
         .header-sub { 
             font-size: 11px; 
-            color: var(--primary-blue); 
+            color: var(--purple-color); 
             font-weight: 700; 
             letter-spacing: 0.3px;
         }
-        
-        .header-actions { 
-            display: flex; 
-            gap: 8px; 
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .action-btn {
@@ -131,71 +133,66 @@
             transition: all 0.2s;
         }
 
-        .action-btn:hover {
-            background: var(--primary-light);
-            color: var(--primary-blue);
-            border-color: #bfdbfe;
-        }
-
-        .notif-dot {
-            display: none;
-            position: absolute;
-            top: 7px;
-            right: 7px;
-            width: 8px;
-            height: 8px;
-            background-color: var(--danger-color);
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        /* Search Section */
-        .search-container {
-            padding: 14px 18px 8px;
-            background-color: var(--bg-color);
-        }
-        
-        .search-box {
-            display: flex;
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 11px 16px;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            gap: 10px;
-        }
-        
-        .search-box input {
-            border: none;
-            outline: none;
+        /* Content Scroll */
+        .content-scroll {
             flex: 1;
-            font-size: 13.5px;
-            color: var(--text-main);
-            background: transparent;
-            font-weight: 500;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            scrollbar-width: none;
         }
-        
-        .search-box input::placeholder {
-            color: #94a3b8;
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* CBM Action Banner */
+        .cbm-banner {
+            background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            border-radius: 20px;
+            padding: 18px;
+            color: white;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
         }
-        
-        .search-box i {
-            color: var(--text-muted);
-            font-size: 14px;
+
+        .cbm-banner-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 4px;
         }
+
+        .cbm-banner-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .btn-create-cbm {
+            padding: 10px 16px;
+            background: white;
+            color: #7c3aed;
+            border: none;
+            border-radius: 12px;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-create-cbm:active { transform: scale(0.98); }
 
         /* Filter Chips */
         .filter-chips-row {
             display: flex;
             gap: 8px;
-            padding: 8px 18px 12px;
             overflow-x: auto;
+            margin-bottom: 16px;
             scrollbar-width: none;
         }
         .filter-chips-row::-webkit-scrollbar { display: none; }
 
-        .filter-chip {
+        .chip {
             padding: 6px 14px;
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -208,128 +205,96 @@
             transition: all 0.2s;
         }
 
-        .filter-chip.active {
-            background: #1a65d6;
+        .chip.active {
+            background: var(--purple-color);
             color: white;
-            border-color: #1a65d6;
-            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+            border-color: var(--purple-color);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
         }
 
-        /* List Content Area */
-        .app-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 18px 24px;
-            scrollbar-width: none;
+        /* CBM Task Cards */
+        .cbm-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .app-content::-webkit-scrollbar { display: none; }
 
-        /* Task Cards */
-        .task-card {
+        .cbm-card {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
+            border: 1.5px solid var(--border-color);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-            transition: transform 0.2s, border-color 0.2s;
+            transition: all 0.2s;
             cursor: pointer;
-            text-decoration: none;
-            display: block;
         }
 
-        .task-card:active {
-            transform: scale(0.98);
-            border-color: var(--primary-blue);
+        .cbm-card:hover {
+            border-color: var(--purple-color);
+            transform: translateY(-2px);
         }
 
-        .task-header {
+        .cbm-card:active { transform: scale(0.98); }
+
+        .cbm-card-head {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .cbm-type-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #faf5ff;
+            color: var(--purple-color);
+            border: 1px solid #ddd6fe;
+        }
+
+        .cbm-status-tag {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .cbm-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .cbm-sub {
+            font-size: 12px;
+            color: var(--text-muted);
             margin-bottom: 12px;
         }
 
-        .task-title {
-            font-weight: 800;
-            font-size: 14px;
-            color: var(--text-main);
-            margin-bottom: 4px;
-            letter-spacing: -0.2px;
-        }
-
-        .task-badge-status {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .badge-mulai { background: #dbeafe; color: #1a65d6; }
-        .badge-proses { background: #fef3c7; color: #d97706; }
-        .badge-selesai { background: #dcfce7; color: #166534; }
-
-        .progress-circle-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--primary-blue);
-            border: 2px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .task-stats {
+        .cbm-meta {
             border-top: 1px solid #f1f5f9;
             padding-top: 10px;
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .stat-row {
-            display: flex;
             justify-content: space-between;
-            font-size: 12.5px;
+            align-items: center;
+            font-size: 11.5px;
             color: var(--text-muted);
         }
 
-        .stat-row span:last-child {
+        .btn-start-cbm {
+            padding: 6px 12px;
+            background: var(--purple-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
             font-weight: 700;
-            color: var(--text-main);
+            cursor: pointer;
         }
-
-        /* Notification Flag */
-        .notif-flag {
-            position: absolute;
-            top: -100px;
-            left: 20px;
-            right: 20px;
-            background-color: white;
-            border-radius: 14px;
-            padding: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            z-index: 20;
-            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-left: 4px solid #ef4444;
-        }
-        .notif-flag.show { top: 20px; }
-        .notif-icon { color: #ef4444; font-size: 20px; margin-top: 2px; }
-        .notif-content { flex: 1; }
-        .notif-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .notif-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-        .notif-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 14px; }
 
         /* Universal Sync Modal Styles */
         .sync-badge-count {
@@ -561,25 +526,15 @@
 
     <div class="mobile-container">
         
-        <!-- Notification Flag -->
-        <div id="notifFlag" class="notif-flag" onclick="goToNotif()">
-            <div class="notif-icon"><i class="fas fa-exclamation-circle"></i></div>
-            <div class="notif-content">
-                <div class="notif-title">Jadwal Belum Tersinkron</div>
-                <div class="notif-desc">Terdapat beberapa jadwal inspeksi yang belum tersinkronisasi dari server.</div>
-            </div>
-            <button class="notif-close" onclick="closeNotif(event)"><i class="fas fa-times"></i></button>
-        </div>
-
         <!-- App Header -->
         <div class="app-header">
             <div class="header-left-group">
-                <a href="dashboard-mobile.html" class="action-btn" title="Kembali ke Katalog Power Inspect">
+                <button class="action-btn" onclick="goBack()" title="Kembali ke Dashboard">
                     <i class="fa-solid fa-arrow-left"></i>
-                </a>
+                </button>
                 <div class="header-title-group">
-                    <div class="header-name">ardan.test</div>
-                    <div class="header-sub">ULTG SURABAYA UTARA</div>
+                    <div class="header-name">Inspeksi CBM</div>
+                    <div class="header-sub">4 JADWAL PENGUJIAN AKTIF</div>
                 </div>
             </div>
             <div class="header-actions">
@@ -589,189 +544,106 @@
                     <span class="sync-badge-count">2</span>
                 </div>
                 <!-- Notification Bell Button -->
-                <div class="action-btn" id="btnNotification" onclick="goToNotif()" title="Notifikasi">
+                <div class="action-btn" onclick="window.location.href='notifikasi-mobile.html'" title="Notifikasi">
                     <i class="fa-regular fa-bell"></i>
-                    <span id="notifDot" class="notif-dot"></span>
                 </div>
             </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama Gardu Induk...">
-                <i class="fa-solid fa-sliders" style="cursor: pointer;" title="Filter"></i>
-            </div>
-        </div>
-
-        <!-- Filter Chips -->
-        <div class="filter-chips-row">
-            <div class="filter-chip active" onclick="filterChip(this, 'all')">Semua GI (8)</div>
-            <div class="filter-chip" onclick="filterChip(this, '150kv')">150 kV</div>
-            <div class="filter-chip" onclick="filterChip(this, 'gis')">GIS</div>
-            <div class="filter-chip" onclick="filterChip(this, 'trafo')">Trafo</div>
-        </div>
-
-        <!-- List Content -->
-        <div class="app-content" id="taskListContainer">
+        <!-- Content Scroll -->
+        <div class="content-scroll">
             
-            <!-- Card 1 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV KALISARI')">
-                <div class="task-header">
-                    <div>
-                        <div class="task-title">GI 150KV KALISARI</div>
-                        <span class="task-badge-status badge-mulai">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> Mulai Inspeksi
-                        </span>
-                    </div>
-                    <div class="progress-circle-box">0/4</div>
-                </div>
-                <div class="task-stats">
-                    <div class="stat-row"><span>Work Order (WO)</span><span>2 WO</span></div>
-                    <div class="stat-row"><span>Asset Inspeksi</span><span>4 Peralatan</span></div>
-                </div>
-            </div>
-            
-            <!-- Card 2 -->
-            <div class="task-card" onclick="openDetailGI('GIS 150KV WONOKROMO')">
-                <div class="task-header">
-                    <div>
-                        <div class="task-title">GIS 150KV WONOKROMO</div>
-                        <span class="task-badge-status badge-mulai">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> Mulai Inspeksi
-                        </span>
-                    </div>
-                    <div class="progress-circle-box">0/5</div>
-                </div>
-                <div class="task-stats">
-                    <div class="stat-row"><span>Work Order (WO)</span><span>1 WO</span></div>
-                    <div class="stat-row"><span>Asset Inspeksi</span><span>5 Peralatan</span></div>
-                </div>
+            <!-- CBM Hero Banner -->
+            <div class="cbm-banner">
+                <div class="cbm-banner-title">Pengujian Berbasis Kondisi (CBM)</div>
+                <div class="cbm-banner-desc">Analisis kesehatan peralatan gardu induk menggunakan metode DGA, Thermovisi, dan Partial Discharge.</div>
+                <button class="btn-create-cbm" onclick="alert('Membuka formulir pembuatan pengujian CBM baru')">
+                    <i class="fa-solid fa-plus"></i> Buat Pengujian CBM Baru
+                </button>
             </div>
 
-            <!-- Card 3 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV SURABAYA SELATAN')">
-                <div class="task-header">
-                    <div>
-                        <div class="task-title">GI 150KV SURABAYA SELATAN</div>
-                        <span class="task-badge-status badge-mulai">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> Mulai Inspeksi
-                        </span>
-                    </div>
-                    <div class="progress-circle-box">0/3</div>
-                </div>
-                <div class="task-stats">
-                    <div class="stat-row"><span>Work Order (WO)</span><span>3 WO</span></div>
-                    <div class="stat-row"><span>Asset Inspeksi</span><span>3 Peralatan</span></div>
-                </div>
+            <!-- Filter Chips -->
+            <div class="filter-chips-row">
+                <div class="chip active">Semua (4)</div>
+                <div class="chip">DGA Trafo</div>
+                <div class="chip">Thermovisi</div>
+                <div class="chip">Partial Discharge</div>
             </div>
 
-            <!-- Card 4 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV RUNGKUT')">
-                <div class="task-header">
-                    <div>
-                        <div class="task-title">GI 150KV RUNGKUT</div>
-                        <span class="task-badge-status badge-proses">
-                            <i class="fa-solid fa-spinner" style="font-size: 9px;"></i> On Progress
-                        </span>
+            <!-- CBM Tasks List -->
+            <div class="cbm-list">
+                
+                <!-- Task 1: Thermovisi Kalisari -->
+                <div class="cbm-card" onclick="alert('Membuka form CBM Thermovisi')">
+                    <div class="cbm-card-head">
+                        <span class="cbm-type-badge">Thermovisi Infrared</span>
+                        <span class="cbm-status-tag">Perlu Cek</span>
                     </div>
-                    <div class="progress-circle-box" style="color: #d97706; border-color: #fde68a;">2/4</div>
+                    <div class="cbm-title">Thermovisi Klem & Sambungan Bay Trafo 1</div>
+                    <div class="cbm-sub">GI 150kV Kalisari • Anomali Delta T > 15°C</div>
+                    <div class="cbm-meta">
+                        <span><i class="fa-regular fa-calendar"></i> Target: 21 Agu 2026</span>
+                        <button class="btn-start-cbm">Uji CBM</button>
+                    </div>
                 </div>
-                <div class="task-stats">
-                    <div class="stat-row"><span>Work Order (WO)</span><span>2 WO</span></div>
-                    <div class="stat-row"><span>Asset Inspeksi</span><span>4 Peralatan</span></div>
-                </div>
-            </div>
 
-            <!-- Card 5 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV WARU')">
-                <div class="task-header">
-                    <div>
-                        <div class="task-title">GI 150KV WARU</div>
-                        <span class="task-badge-status badge-selesai">
-                            <i class="fa-solid fa-check" style="font-size: 9px;"></i> Selesai
-                        </span>
+                <!-- Task 2: DGA Oil Trafo -->
+                <div class="cbm-card" onclick="alert('Membuka form CBM DGA')">
+                    <div class="cbm-card-head">
+                        <span class="cbm-type-badge">DGA (Dissolved Gas)</span>
+                        <span class="cbm-status-tag" style="background:#dbeafe; color:#1a65d6;">Siap Uji</span>
                     </div>
-                    <div class="progress-circle-box" style="color: #166534; border-color: #bbf7d0;">4/4</div>
+                    <div class="cbm-title">Uji Gas Terlarut Trafo Daya 60 MVA</div>
+                    <div class="cbm-sub">GIS 150kV Wonokromo • Periode 6 Bulanan</div>
+                    <div class="cbm-meta">
+                        <span><i class="fa-regular fa-calendar"></i> Target: 22 Agu 2026</span>
+                        <button class="btn-start-cbm">Uji CBM</button>
+                    </div>
                 </div>
-                <div class="task-stats">
-                    <div class="stat-row"><span>Work Order (WO)</span><span>4 WO</span></div>
-                    <div class="stat-row"><span>Asset Inspeksi</span><span>4 Peralatan</span></div>
+
+                <!-- Task 3: Partial Discharge -->
+                <div class="cbm-card" onclick="alert('Membuka form CBM PD')">
+                    <div class="cbm-card-head">
+                        <span class="cbm-type-badge">Partial Discharge (PD)</span>
+                        <span class="cbm-status-tag" style="background:#dbeafe; color:#1a65d6;">Siap Uji</span>
+                    </div>
+                    <div class="cbm-title">Pengujian PD Kabel Tegangan Tinggi 150kV</div>
+                    <div class="cbm-sub">GI Surabaya Selatan • Bay Line 1</div>
+                    <div class="cbm-meta">
+                        <span><i class="fa-regular fa-calendar"></i> Target: 24 Agu 2026</span>
+                        <button class="btn-start-cbm">Uji CBM</button>
+                    </div>
                 </div>
+
+                <!-- Task 4: SF6 Purity -->
+                <div class="cbm-card" onclick="alert('Membuka form CBM SF6')">
+                    <div class="cbm-card-head">
+                        <span class="cbm-type-badge">Kemurnian Gas SF6</span>
+                        <span class="cbm-status-tag" style="background:#dbeafe; color:#1a65d6;">Siap Uji</span>
+                    </div>
+                    <div class="cbm-title">Uji Kualitas & Kemurnian Gas PMT 150kV</div>
+                    <div class="cbm-sub">GI 150kV Rungkut • Kompartemen PMT</div>
+                    <div class="cbm-meta">
+                        <span><i class="fa-regular fa-calendar"></i> Target: 25 Agu 2026</span>
+                        <button class="btn-start-cbm">Uji CBM</button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
     </div>
 
     <script>
-        function openDetailGI(giName) {
+        function goBack() {
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
             setTimeout(() => {
-                window.location.href = `list-wo.html?gi=${encodeURIComponent(giName)}`;
+                window.location.href = 'dashboard-mobile.html';
             }, 300);
         }
 
-        function filterChip(el, filterType) {
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-
-            const cards = document.querySelectorAll('.task-card');
-            cards.forEach(card => {
-                const title = card.querySelector('.task-title').textContent.toLowerCase();
-                if (filterType === 'all') {
-                    card.style.display = 'block';
-                } else if (filterType === '150kv') {
-                    card.style.display = title.includes('150kv') ? 'block' : 'none';
-                } else if (filterType === 'gis') {
-                    card.style.display = title.includes('gis') ? 'block' : 'none';
-                } else if (filterType === 'trafo') {
-                    card.style.display = title.includes('trafo') || title.includes('kalisari') ? 'block' : 'none';
-                }
-            });
-        }
-
-        // Live Search
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.task-card');
-            cards.forEach(card => {
-                const title = card.querySelector('.task-title').textContent.toLowerCase();
-                card.style.display = title.includes(query) ? 'block' : 'none';
-            });
-        });
-
-        // Check for URL query parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const status = urlParams.get('status');
-
-        if (status === 'failed') {
-            setTimeout(() => {
-                const notifFlag = document.getElementById('notifFlag');
-                const notifDot = document.getElementById('notifDot');
-                if(notifFlag) notifFlag.classList.add('show');
-                if(notifDot) notifDot.style.display = 'block';
-
-                setTimeout(() => {
-                    if(notifFlag) notifFlag.classList.remove('show');
-                }, 4000);
-            }, 2000);
-        }
-
-        function closeNotif(event) {
-            if(event) event.stopPropagation();
-            document.getElementById('notifFlag').classList.remove('show');
-        }
-
-        function goToNotif() {
-            const container = document.querySelector('.mobile-container');
-            container.classList.add('page-slide-out');
-            setTimeout(() => {
-                window.location.href = 'notifikasi-mobile.html';
-            }, 300);
-        }
-
+        // Universal Sync Functions
         function triggerUniversalSync() {
             document.getElementById('universalSyncModal').classList.add('show');
         }
@@ -806,14 +678,6 @@
                     }, 400);
                 }
             }, 350);
-        }
-
-        function goToSync() {
-            const container = document.querySelector('.mobile-container');
-            container.classList.add('page-slide-out');
-            setTimeout(() => {
-                window.location.href = 'sync-jadwal.html';
-            }, 300);
         }
     </script>
 
@@ -897,9 +761,7 @@
         Notes & Validasi
       </h3>
       <ul>
-        <li><strong>Desain Seragam:</strong> Tone dan styling diselaraskan dengan Dashboard Power Inspect (Plus Jakarta Sans, border halus, badge modern).</li>
-        <li><strong>Filter Chips:</strong> Fitur filter cepat (Semua GI, 150kV, GIS, Trafo) untuk mempermudah pencarian aset di lapangan.</li>
-        <li><strong>Akses & Navigasi:</strong> Tombol Back langsung kembali ke Dashboard Power Inspect Catalog (`dashboard-mobile.html`).</li>
+        <li><strong>Modul CBM:</strong> Menampilkan daftar pengujian berkala prediktif (Thermovisi, DGA, PD, SF6) dan pembuatan task CBM baru.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->

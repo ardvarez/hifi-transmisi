@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Form Inspeksi Rutin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --purple-color: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* App Header */
+        .app-header {
+            padding: 18px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 14.5px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            letter-spacing: 0.3px;
+        }
+        
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 100px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* Asset Hero Badge */
+        .asset-hero {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .asset-hero-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .asset-hero-code {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border-radius: 6px;
+            font-family: monospace;
+            border: 1px solid #bfdbfe;
+        }
+
+        .asset-hero-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .asset-hero-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Form Card Section */
+        .form-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .form-card-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .form-card-title i {
+            color: var(--primary-blue);
+        }
+
+        .form-field {
+            margin-bottom: 14px;
+        }
+
+        .form-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .field-label span {
+            color: var(--danger-color);
+        }
+
+        /* Option Pills (Normal / Abnormal) */
+        .radio-options-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .radio-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-color);
+            background: #f8fafc;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-pill.selected-normal {
+            background: #dcfce7;
+            border-color: #10b981;
+            color: #15803d;
+        }
+
+        .radio-pill.selected-abnormal {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #b91c1c;
+        }
+
+        /* Input Controls */
+        .text-input, .select-input {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-color);
+            background: #f8fafc;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .text-input:focus, .select-input:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
+        }
+
+        .unit-input-group {
+            position: relative;
+        }
+        .unit-label {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* Photo Upload Mockup */
+        .photo-upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .photo-upload-box:hover {
+            border-color: var(--primary-blue);
+            background: #eff6ff;
+        }
+
+        .photo-upload-icon {
+            font-size: 24px;
+            color: var(--primary-blue);
+            margin-bottom: 6px;
+        }
+
+        .photo-upload-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .photo-upload-sub {
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        /* Bottom Fixed Action Footer */
+        .bottom-action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            padding: 14px 18px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 13px;
+            background: #1a65d6;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-submit:active { transform: scale(0.98); background: #134db0; }
+
+        /* Success Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .modal-box {
+            background: white;
+            padding: 24px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon-success {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 14px;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .modal-desc {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Success Modal -->
+    <div id="modalSuccess" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon-success">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="modal-title">Inspeksi Aset Tersimpan!</div>
+            <div class="modal-desc">
+                Data checklist teknis dan pengukuran telah berhasil disimpan secara lokal dan siap dikirim ke server.
+            </div>
+            <button class="btn-submit" style="width: 100%; margin-bottom: 0;" onclick="finishForm()">
+                Lanjutkan Aset Berikutnya <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="mobile-container">
+        
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <button class="action-btn" onclick="goBack()" title="Kembali ke Daftar Aset">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="header-name">Form Checklist Inspeksi</div>
+                    <div class="header-sub" id="headerSubText">BAY TRAFO 1 • KALISARI</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Scroll -->
+        <div class="content-scroll">
+            
+            <!-- Asset Hero Card -->
+            <div class="asset-hero">
+                <div class="asset-hero-head">
+                    <span class="asset-hero-code" id="heroAssetCode">TRF-150-KLS-01</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #10b981;"><i class="fa-solid fa-circle-check"></i> GPS Verified</span>
+                </div>
+                <div class="asset-hero-title" id="heroAssetName">Trafo Daya 1 150/20kV (60 MVA)</div>
+                <div class="asset-hero-meta" id="heroAssetMeta">Bay Trafo 1 • WO-TR-2026-0812 • ULTG Surabaya Utara</div>
+            </div>
+
+            <!-- Section 1: Kondisi Visual & Fisik -->
+            <div class="form-card">
+                <div class="form-card-title">
+                    <i class="fa-solid fa-eye"></i> 1. Pemeriksaan Visual & Fisik
+                </div>
+                
+                <div class="form-field">
+                    <label class="field-label">Level & Kondisi Minyak Trafo <span>*</span></label>
+                    <div class="radio-options-row">
+                        <div class="radio-pill selected-normal" onclick="selectPill(this, 'normal')">
+                            <i class="fa-solid fa-check"></i> Normal
+                        </div>
+                        <div class="radio-pill" onclick="selectPill(this, 'abnormal')">
+                            <i class="fa-solid fa-xmark"></i> Abnormal
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Kondisi Silicagel (Warna Biru / Pink) <span>*</span></label>
+                    <div class="radio-options-row">
+                        <div class="radio-pill selected-normal" onclick="selectPill(this, 'normal')">
+                            <i class="fa-solid fa-check"></i> Normal (Biru)
+                        </div>
+                        <div class="radio-pill" onclick="selectPill(this, 'abnormal')">
+                            <i class="fa-solid fa-xmark"></i> Jenuh (Pink)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Kebocoran Minyak (Gasket / Valve) <span>*</span></label>
+                    <div class="radio-options-row">
+                        <div class="radio-pill selected-normal" onclick="selectPill(this, 'normal')">
+                            <i class="fa-solid fa-check"></i> Tidak Ada
+                        </div>
+                        <div class="radio-pill" onclick="selectPill(this, 'abnormal')">
+                            <i class="fa-solid fa-xmark"></i> Ada Rembesan
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Pengukuran Suhu & Tekanan -->
+            <div class="form-card">
+                <div class="form-card-title">
+                    <i class="fa-solid fa-temperature-half"></i> 2. Pengukuran Suhu & Indikator
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Suhu Oil Temperature Indicator (OTI) <span>*</span></label>
+                    <div class="unit-input-group">
+                        <input type="number" class="text-input" placeholder="Masukkan nilai..." value="54.5">
+                        <span class="unit-label">°C</span>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Suhu Winding Temperature Indicator (WTI) <span>*</span></label>
+                    <div class="unit-input-group">
+                        <input type="number" class="text-input" placeholder="Masukkan nilai..." value="61.2">
+                        <span class="unit-label">°C</span>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Posisi Tap Changer (OLTC) <span>*</span></label>
+                    <div class="unit-input-group">
+                        <input type="number" class="text-input" placeholder="Posisi tap..." value="7">
+                        <span class="unit-label">Tap</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Foto & Temuan Lapangan -->
+            <div class="form-card">
+                <div class="form-card-title">
+                    <i class="fa-solid fa-camera"></i> 3. Dokumentasi & Catatan
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Foto Kondisi Peralatan <span>*</span></label>
+                    <div class="photo-upload-box" onclick="alert('Mengaktifkan kamera perangkat...')">
+                        <div class="photo-upload-icon"><i class="fa-solid fa-camera-retro"></i></div>
+                        <div class="photo-upload-text">Ambil Foto Lapangan</div>
+                        <div class="photo-upload-sub">Wajib menyertakan foto manometer / visual aset</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label">Catatan Teknis / Anomali (Opsional)</label>
+                    <textarea class="text-input" rows="3" placeholder="Tuliskan catatan kondisi khusus bila ada..."></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="bottom-action-bar">
+            <button class="btn-submit" onclick="submitForm()">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Hasil Inspeksi
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const assetParam = urlParams.get('asset') || 'TRF-150-KLS-01';
+        const nameParam = urlParams.get('name') || 'Trafo Daya 1 150/20kV (60 MVA)';
+        const bayParam = urlParams.get('bay') || 'Bay Trafo 1 150kV';
+        const woParam = urlParams.get('wo') || 'WO-TR-2026-0812';
+        const giParam = urlParams.get('gi') || 'GI 150KV KALISARI';
+
+        document.getElementById('heroAssetCode').textContent = assetParam;
+        document.getElementById('heroAssetName').textContent = nameParam;
+        document.getElementById('heroAssetMeta').textContent = `${bayParam} • ${woParam} • ${giParam}`;
+        document.getElementById('headerSubText').textContent = `${bayParam.toUpperCase()}`;
+
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = `list-aset.html?bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}`;
+            }, 300);
+        }
+
+        function selectPill(el, type) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.radio-pill').forEach(p => {
+                p.classList.remove('selected-normal', 'selected-abnormal');
+            });
+            if (type === 'normal') {
+                el.classList.add('selected-normal');
+            } else {
+                el.classList.add('selected-abnormal');
+            }
+        }
+
+        function submitForm() {
+            document.getElementById('modalSuccess').classList.add('show');
+        }
+
+        function finishForm() {
+            document.getElementById('modalSuccess').classList.remove('show');
+            goBack();
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Form Checklist:</strong> Pengisian kondisi visual, suhu OTI/WTI, posisi OLTC, dan dokumentasi foto wajib.</li>
+        <li><strong>Simpan Hasil:</strong> Data tersimpan secara offline-first dan siap disinkronisasi ke server pusat.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>
