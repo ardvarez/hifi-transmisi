@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Formulir Survey Ketersediaan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --header-blue: #0b4884;
+            --header-blue-dark: #083868;
+            --primary-blue: #0b4884;
+            --primary-blue-hover: #083868;
+            --primary-light: #e8f3ff;
+            --header-blue-bg: #e8f3ff;
+            --header-blue-text: #0b4884;
+            --text-main: #0f172a;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #475569;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            --warning-color: #f59e0b;
+            --orange-color: #d97706;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Floating Back to Catalog Button */
+        .btn-back-catalog {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #1e293b;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+            z-index: 99999;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+        }
+        .btn-back-catalog:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+        }
+
+        /* App Header (Uniform) */
+        .app-header {
+            padding: 16px 20px 14px;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .header-sub {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            letter-spacing: 0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .sync-badge-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f59e0b;
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid #ffffff;
+            line-height: 1;
+        }
+
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 18px 90px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* Sub-Header: Unit Hierarchy Card (Faithful to wireframe) */
+        .survey-header-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            margin-bottom: 14px;
+        }
+
+        .survey-card-title {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .hierarchy-grid-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .hierarchy-grid-table .bold-val {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        /* Section Title Block */
+        .form-section-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .section-header-banner {
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-body {
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Button Toggle / Segmented Option (<= 3 options) */
+        .btn-toggle-group {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-toggle-option {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1.5px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .btn-toggle-option:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .btn-toggle-option.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 3px 10px rgba(11, 72, 132, 0.22);
+        }
+
+        /* Combo Box / Select Dropdown (> 3 options) */
+        .form-select-custom {
+            width: 100%;
+            background: #f8fafc url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") no-repeat right 14px center/12px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 38px 10px 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-select-custom:focus {
+            border-color: var(--primary-blue);
+            background-color: #ffffff;
+        }
+
+        /* Checkbox as Dropdown Combobox with Multi-Check */
+        .multiselect-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .multiselect-header-trigger {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .multiselect-header-trigger:hover {
+            border-color: #cbd5e1;
+        }
+
+        .multiselect-container.open .multiselect-header-trigger {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(11, 72, 132, 0.1);
+        }
+
+        .multiselect-summary-text {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .multiselect-arrow-icon {
+            font-size: 11px;
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+
+        .multiselect-container.open .multiselect-arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .multiselect-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .multiselect-container.open .multiselect-dropdown-menu {
+            display: flex;
+        }
+
+        .multiselect-option-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .multiselect-option-row:hover {
+            background: #f1f5f9;
+        }
+
+        .multiselect-option-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        /* Input with Suffix / Affix */
+        .input-suffix-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-input-text {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 42px 10px 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input-text:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 12px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Camera / Photo Upload Box */
+        .photo-upload-box {
+            border: 1.5px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 14px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .photo-upload-box:hover {
+            border-color: var(--primary-blue);
+            background: #eff6ff;
+        }
+
+        .camera-icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--primary-blue);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .upload-hint-text {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* Photo Recap Section (Above Notes) */
+        .photo-recap-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .photo-recap-header {
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .photo-recap-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .photo-recap-badge {
+            background: #e8f3ff;
+            color: var(--primary-blue);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .photo-recap-grid {
+            padding: 14px 18px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .photo-recap-item {
+            position: relative;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+        }
+        .photo-recap-item:hover {
+            border-color: #bfdbfe;
+            box-shadow: 0 4px 12px rgba(11, 72, 132, 0.08);
+        }
+
+        .photo-recap-thumb-box {
+            width: 100%;
+            height: 90px;
+            background: #e2e8f0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .photo-recap-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-recap-info {
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: #ffffff;
+        }
+
+        .photo-recap-name {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-recap-sub {
+            font-size: 10px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .photo-recap-zoom-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(11, 72, 132, 0.85);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Photo Detail Activity View (Frame-Scoped Fullscreen Activity) */
+        .photo-detail-activity {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0f172a;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            color: #ffffff;
+            animation: fadeInActivity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: inherit;
+        }
+
+        .photo-detail-activity.show {
+            display: flex;
+        }
+
+        @keyframes fadeInActivity {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        .activity-back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .activity-back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .activity-title-group {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .activity-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .activity-sub {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .activity-content {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            scrollbar-width: none;
+        }
+        .activity-content::-webkit-scrollbar { display: none; }
+
+        .activity-image-wrapper {
+            width: 100%;
+            height: 280px;
+            background: #1e293b;
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .activity-image-wrapper svg,
+        .activity-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .activity-meta-card {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .activity-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .meta-label {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .meta-value {
+            color: #f1f5f9;
+            font-weight: 700;
+        }
+
+        .activity-bottom-bar {
+            padding: 14px 18px 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-delete-photo {
+            flex: 1;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-delete-photo:hover, .btn-delete-photo:active {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-retake-photo {
+            flex: 1;
+            padding: 12px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-retake-photo:active {
+            background: var(--primary-blue-hover);
+        }
+
+        /* Fixed Bottom Action Bar */
+        .bottom-action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            padding: 12px 20px 18px;
+            border-top: 1px solid var(--border-color);
+            z-index: 20;
+        }
+
+        .btn-submit-survey {
+            width: 100%;
+            padding: 13.5px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.25);
+        }
+        .btn-submit-survey:active {
+            background: var(--primary-blue-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Back to Catalog Portal Button -->
+    <a href="../../hifi-home/home.html" class="btn-back-catalog" title="Kembali ke Catalog Portal">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Catalog</span>
+    </a>
+
+    <div class="mobile-container">
+        
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <button class="action-btn" onclick="goBack()" title="Kembali">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="header-name" id="surveyHeaderTitle">SVY202400000001</div>
+                    <div class="header-sub">FORMULIR SURVEY LAPANGAN</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="action-btn" onclick="window.location.href='sync-hasil-inspeksi.html'" title="Upload Offline">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="sync-badge-count">2</span>
+                </div>
+                <div class="action-btn" onclick="window.location.href='notifikasi-mobile.html'" title="Notifikasi">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Scroll -->
+        <div class="content-scroll">
+            
+            <!-- Sub-Header Card: Unit Hierarchy Info (Faithful to wireframe) -->
+            <div class="survey-header-card">
+                <div class="survey-card-title">Ketersediaan Pengamanan</div>
+                <div class="hierarchy-grid-table">
+                    <div>UIT: <span class="bold-val">UITJBB</span></div>
+                    <div>ULTG: <span class="bold-val">ULTG CAWANG</span></div>
+                    <div>UPT: <span class="bold-val">UPT CAWANG</span></div>
+                    <div>GI: <span class="bold-val">GI CAWANG 150kV</span></div>
+                </div>
+            </div>
+
+            <!-- Section 1: APAR (Faithful to wireframe) -->
+            <div class="form-section-card">
+                <div class="section-header-banner">
+                    <span><i class="fa-solid fa-fire-extinguisher" style="color: var(--danger-color); margin-right: 6px;"></i> APAR (Alat Pemadam Api Ringan)</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #10b981;">Wajib</span>
+                </div>
+                <div class="section-body">
+                    <!-- 1. Radio (<= 3 items): Button Toggle -->
+                    <div class="form-group">
+                        <label class="form-label">Ketersediaan APAR (Radio: Button Group)</label>
+                        <div class="btn-toggle-group" data-field="apar_avail">
+                            <button type="button" class="btn-toggle-option active" onclick="selectToggle(this)">
+                                Tersedia
+                            </button>
+                            <button type="button" class="btn-toggle-option" onclick="selectToggle(this)">
+                                Tidak Tersedia
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. Radio (<= 3 items): Button Toggle 3 opsi -->
+                    <div class="form-group">
+                        <label class="form-label">Kondisi Fisik Tabung (Radio: 3 Opsi Button)</label>
+                        <div class="btn-toggle-group" data-field="apar_kondisi">
+                            <button type="button" class="btn-toggle-option active" onclick="selectToggle(this)">Baik</button>
+                            <button type="button" class="btn-toggle-option" onclick="selectToggle(this)">Perlu Perbaikan</button>
+                            <button type="button" class="btn-toggle-option" onclick="selectToggle(this)">Rusak</button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Combo Box Default (> 3 items) -->
+                    <div class="form-group">
+                        <label class="form-label">Jenis Media APAR (Combo Box: >3 Opsi)</label>
+                        <select class="form-select-custom" id="selectMediaApar">
+                            <option value="dcp" selected>Dry Chemical Powder (DCP)</option>
+                            <option value="co2">Carbon Dioxide (CO2)</option>
+                            <option value="clean_agent">Clean Agent / Halon Free</option>
+                            <option value="foam">Foam (Busa AFFF)</option>
+                            <option value="water_mist">Water Mist</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. Checkbox (Multi-Select): Dropdown Combobox Multi-Check -->
+                    <div class="form-group">
+                        <label class="form-label">Perlengkapan Terpasang (Checkbox: Dropdown Multi-Check)</label>
+                        <div class="multiselect-container" id="multiselectApar">
+                            <div class="multiselect-header-trigger" onclick="toggleMultiSelect('multiselectApar')">
+                                <span class="multiselect-summary-text" id="summaryApar">2 Item Terpilih</span>
+                                <i class="fa-solid fa-chevron-down multiselect-arrow-icon"></i>
+                            </div>
+                            <div class="multiselect-dropdown-menu">
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" checked onchange="updateMultiSelect('multiselectApar', 'summaryApar')">
+                                    <span>Hose & Nozzle Utuh</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" checked onchange="updateMultiSelect('multiselectApar', 'summaryApar')">
+                                    <span>Pin Pengaman & Segel Utuh</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" onchange="updateMultiSelect('multiselectApar', 'summaryApar')">
+                                    <span>Braket Dinding / Gantungan Kokoh</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" onchange="updateMultiSelect('multiselectApar', 'summaryApar')">
+                                    <span>Petunjuk Penggunaan Jelas</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" onchange="updateMultiSelect('multiselectApar', 'summaryApar')">
+                                    <span>Kartu Riwayat Uji Terpasang</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Number (Integer) -->
+                    <div class="form-group">
+                        <label class="form-label">Jumlah Tabung Terpasang (Number: Integer)</label>
+                        <div class="input-suffix-wrapper">
+                            <input type="number" step="1" min="1" class="form-input-text" placeholder="Contoh: 4" value="2">
+                            <span class="input-suffix">Tabung</span>
+                        </div>
+                    </div>
+
+                    <!-- 6. Number (Double / Decimal) -->
+                    <div class="form-group">
+                        <label class="form-label">Tekanan Barometer (Number: Double)</label>
+                        <div class="input-suffix-wrapper">
+                            <input type="number" step="0.1" class="form-input-text" placeholder="Masukkan nilai tekanan" value="14.5">
+                            <span class="input-suffix">Bar</span>
+                        </div>
+                    </div>
+
+                    <!-- 7. Text Input -->
+                    <div class="form-group">
+                        <label class="form-label">Nomor Seri / Tag Tabung (Text Input)</label>
+                        <input type="text" class="form-input-text" placeholder="Contoh: APAR-MPG-01" value="APAR-CWG-150-01">
+                    </div>
+
+                    <!-- Tanggal Pengecekan Terakhir -->
+                    <div class="form-group">
+                        <label class="form-label">Tanggal Pengecekan Terakhir</label>
+                        <input type="date" class="form-input-text" value="2024-10-31">
+                    </div>
+
+                    <!-- Foto Dokumentasi APAR -->
+                    <div class="form-group">
+                        <label class="form-label">Dokumentasi Foto APAR</label>
+                        <div class="photo-upload-box" onclick="triggerCamera('APAR')">
+                            <div class="camera-icon-circle">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <span class="upload-hint-text" id="hintApar">Ambil Foto APAR & Barometer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Fire Sprinkle System (Faithful to wireframe) -->
+            <div class="form-section-card">
+                <div class="section-header-banner">
+                    <span><i class="fa-solid fa-shower" style="color: var(--primary-blue); margin-right: 6px;"></i> Fire Sprinkle System</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #10b981;">Wajib</span>
+                </div>
+                <div class="section-body">
+                    <!-- Radio (<= 3 items: Button Toggle) -->
+                    <div class="form-group">
+                        <label class="form-label">Ketersediaan Fire Sprinkle System (Radio: Button Group)</label>
+                        <div class="btn-toggle-group" data-field="sprinkle_avail">
+                            <button type="button" class="btn-toggle-option active" onclick="selectToggle(this)">
+                                Tersedia
+                            </button>
+                            <button type="button" class="btn-toggle-option" onclick="selectToggle(this)">
+                                Tidak Tersedia
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Operasional (<= 3 items: Button Toggle) -->
+                    <div class="form-group">
+                        <label class="form-label">Status Operasional (Radio: Button Group)</label>
+                        <div class="btn-toggle-group" data-field="sprinkle_status">
+                            <button type="button" class="btn-toggle-option active" onclick="selectToggle(this)">
+                                Aktif & Siaga
+                            </button>
+                            <button type="button" class="btn-toggle-option" onclick="selectToggle(this)">
+                                Non-Aktif / Rusak
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lokasi Penempatan Sprinkle (> 3 items: Combo Box) -->
+                    <div class="form-group">
+                        <label class="form-label">Lokasi Penempatan (Combo Box: >3 Opsi)</label>
+                        <select class="form-select-custom" id="selectLokasiSprinkle">
+                            <option value="control_bldg" selected>Gedung Kontrol (Control Building)</option>
+                            <option value="switchgear">Ruang Switchgear / Kubikel 20kV</option>
+                            <option value="trafo">Area Trafo Tenaga (Outdoor)</option>
+                            <option value="battery">Ruang Baterai / DC System</option>
+                            <option value="gis">Gedung GIS / Gas Insulated</option>
+                        </select>
+                    </div>
+
+                    <!-- Checkbox (Multi-Select): Dropdown Combobox Multi-Check -->
+                    <div class="form-group">
+                        <label class="form-label">Poin Verifikasi Komponen (Checkbox: Dropdown Multi-Check)</label>
+                        <div class="multiselect-container" id="multiselectSprinkle">
+                            <div class="multiselect-header-trigger" onclick="toggleMultiSelect('multiselectSprinkle')">
+                                <span class="multiselect-summary-text" id="summarySprinkle">3 Item Terpilih</span>
+                                <i class="fa-solid fa-chevron-down multiselect-arrow-icon"></i>
+                            </div>
+                            <div class="multiselect-dropdown-menu">
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" checked onchange="updateMultiSelect('multiselectSprinkle', 'summarySprinkle')">
+                                    <span>Main Control Valve Terbuka</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" checked onchange="updateMultiSelect('multiselectSprinkle', 'summarySprinkle')">
+                                    <span>Nozzle Bebas Korosi / Hambatan</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" checked onchange="updateMultiSelect('multiselectSprinkle', 'summarySprinkle')">
+                                    <span>Tekanan Pipa Distribusi Normal</span>
+                                </label>
+                                <label class="multiselect-option-row">
+                                    <input type="checkbox" onchange="updateMultiSelect('multiselectSprinkle', 'summarySprinkle')">
+                                    <span>Water Flow Switch Berfungsi</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tanggal Pengecekan Terakhir -->
+                    <div class="form-group">
+                        <label class="form-label">Tanggal Pengecekan Terakhir</label>
+                        <input type="date" class="form-input-text" value="2024-10-31">
+                    </div>
+
+                    <!-- Foto Dokumentasi Fire Sprinkle -->
+                    <div class="form-group">
+                        <label class="form-label">Dokumentasi Foto Fire Sprinkle</label>
+                        <div class="photo-upload-box" onclick="triggerCamera('Fire Sprinkle')">
+                            <div class="camera-icon-circle">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <span class="upload-hint-text" id="hintSprinkle">Ambil Foto Valve / Nozzle Sprinkle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rekap Foto Dokumentasi (Above Notes) -->
+            <div class="photo-recap-card" id="photoRecapSection">
+                <div class="photo-recap-header">
+                    <div class="photo-recap-title">
+                        <i class="fa-solid fa-images" style="color: var(--primary-blue);"></i> Rekap Foto Dokumentasi
+                    </div>
+                    <span class="photo-recap-badge" id="recapCountBadge">2 Foto Terlampir</span>
+                </div>
+                <div class="photo-recap-grid" id="recapPhotoGrid">
+                    <!-- Recap Item 1: APAR -->
+                    <div class="photo-recap-item" id="recapItemApar" onclick="openPhotoDetail('apar')">
+                        <div class="photo-recap-thumb-box">
+                            <!-- SVG Representation of APAR -->
+                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
+                                <rect width="160" height="100" fill="#e2e8f0"/>
+                                <rect x="68" y="28" width="24" height="58" rx="6" fill="#ef4444"/>
+                                <rect x="74" y="16" width="12" height="12" rx="2" fill="#334155"/>
+                                <line x1="80" y1="16" x2="80" y2="10" stroke="#0f172a" stroke-width="3"/>
+                                <circle cx="86" cy="22" r="4" fill="#fbbf24"/>
+                                <path d="M74 24 Q60 30 64 65" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+                                <rect x="72" y="45" width="16" height="22" rx="2" fill="#ffffff" opacity="0.9"/>
+                            </svg>
+                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('apar'); event.stopPropagation();" title="Lihat Detail Foto">
+                                <i class="fa-solid fa-expand"></i>
+                            </div>
+                        </div>
+                        <div class="photo-recap-info">
+                            <span class="photo-recap-name">APAR & Barometer</span>
+                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 10:32 • 1.8 MB</span>
+                        </div>
+                    </div>
+
+                    <!-- Recap Item 2: Fire Sprinkle -->
+                    <div class="photo-recap-item" id="recapItemSprinkle" onclick="openPhotoDetail('sprinkle')">
+                        <div class="photo-recap-thumb-box">
+                            <!-- SVG Representation of Sprinkle Valve -->
+                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
+                                <rect width="160" height="100" fill="#e2e8f0"/>
+                                <rect x="72" y="10" width="16" height="78" fill="#94a3b8"/>
+                                <circle cx="80" cy="50" r="14" fill="#0284c7"/>
+                                <circle cx="80" cy="50" r="8" fill="#ffffff"/>
+                                <circle cx="80" cy="50" r="4" fill="#0284c7"/>
+                                <line x1="45" y1="50" x2="115" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+                            </svg>
+                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('sprinkle'); event.stopPropagation();" title="Lihat Detail Foto">
+                                <i class="fa-solid fa-expand"></i>
+                            </div>
+                        </div>
+                        <div class="photo-recap-info">
+                            <span class="photo-recap-name">Valve Sprinkle</span>
+                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 10:35 • 2.4 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State Placeholder (Hidden by default) -->
+                <div id="recapEmptyState" style="display:none; padding: 20px; text-align: center; color: #94a3b8; font-size: 12px; font-weight: 600;">
+                    <i class="fa-regular fa-images" style="font-size: 24px; margin-bottom: 6px; display: block;"></i>
+                    Belum ada foto dokumentasi terlampir
+                </div>
+            </div>
+
+            <!-- Section 3: Catatan Tambahan / Lampiran (Text Area) -->
+            <div class="form-section-card">
+                <div class="section-header-banner">
+                    <span><i class="fa-solid fa-paperclip" style="color: var(--primary-blue); margin-right: 6px;"></i> Catatan Tambahan</span>
+                </div>
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">Catatan Hasil Survey (Text Area)</label>
+                        <textarea class="form-input-text" rows="3" placeholder="Tambahkan catatan temuan atau status pengamanan..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Fixed Bottom Button -->
+        <div class="bottom-action-bar">
+            <button class="btn-submit-survey" onclick="saveSurveyEntry()">
+                <i class="fa-solid fa-floppy-disk"></i> SIMPAN FORMULIR SURVEY
+            </button>
+        </div>
+
+        <!-- Dedicated Photo Detail Activity View (Fullscreen inside frame) -->
+        <div class="photo-detail-activity" id="photoDetailActivity">
+            <div class="activity-header">
+                <button class="activity-back-btn" onclick="closePhotoDetail()" title="Kembali ke Form">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="activity-title-group">
+                    <div class="activity-title" id="actPhotoTitle">Detail Foto Dokumentasi</div>
+                    <div class="activity-sub" id="actPhotoSub">Form Survey Lapangan</div>
+                </div>
+                <div style="width: 36px;"></div>
+            </div>
+
+            <div class="activity-content">
+                <div class="activity-image-wrapper" id="actImageWrapper">
+                    <!-- Dynamic Image / SVG rendered here -->
+                </div>
+
+                <div class="activity-meta-card">
+                    <div class="activity-meta-row">
+                        <span class="meta-label">Komponen</span>
+                        <span class="meta-value" id="actMetaKomponen">APAR & Barometer</span>
+                    </div>
+                    <div class="activity-meta-row">
+                        <span class="meta-label">Waktu Pengambilan</span>
+                        <span class="meta-value" id="actMetaWaktu">21 Agu 2026, 10:32 WIB</span>
+                    </div>
+                    <div class="activity-meta-row">
+                        <span class="meta-label">Ukuran Berkas</span>
+                        <span class="meta-value" id="actMetaUkuran">1.8 MB (High Resolution)</span>
+                    </div>
+                    <div class="activity-meta-row">
+                        <span class="meta-label">Status Lokasi</span>
+                        <span class="meta-value" style="color: #4ade80;"><i class="fa-solid fa-location-dot"></i> GI CAWANG 150kV</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-bottom-bar">
+                <button class="btn-delete-photo" onclick="deleteCurrentPhoto()">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Foto
+                </button>
+                <button class="btn-retake-photo" onclick="retakeCurrentPhoto()">
+                    <i class="fa-solid fa-camera-rotate"></i> Ganti Foto
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const surveyParam = urlParams.get('survey') || 'SVY202400000001';
+        document.getElementById('surveyHeaderTitle').textContent = surveyParam;
+
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = `list-form-survey.html?survey=${encodeURIComponent(surveyParam)}`;
+            }, 300);
+        }
+
+        function selectToggle(buttonEl) {
+            const parent = buttonEl.closest('.btn-toggle-group');
+            if (!parent) return;
+            const allButtons = parent.querySelectorAll('.btn-toggle-option');
+            allButtons.forEach(btn => btn.classList.remove('active'));
+            buttonEl.classList.add('active');
+        }
+
+        function toggleMultiSelect(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const isOpen = container.classList.contains('open');
+            // Close all others first
+            document.querySelectorAll('.multiselect-container').forEach(c => c.classList.remove('open'));
+            if (!isOpen) {
+                container.classList.add('open');
+            }
+        }
+
+        function updateMultiSelect(containerId, summaryId) {
+            const container = document.getElementById(containerId);
+            const summary = document.getElementById(summaryId);
+            if (!container || !summary) return;
+            const checkedBoxes = container.querySelectorAll('input[type="checkbox"]:checked');
+            const total = checkedBoxes.length;
+            if (total === 0) {
+                summary.textContent = 'Pilih opsi...';
+            } else if (total === 1) {
+                summary.textContent = checkedBoxes[0].nextElementSibling.textContent;
+            } else {
+                summary.textContent = `${total} Item Terpilih`;
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multiselect-container')) {
+                document.querySelectorAll('.multiselect-container').forEach(c => c.classList.remove('open'));
+            }
+        });
+
+        // Photo Detail Activity Logic
+        let currentPhotoType = null;
+        let activePhotos = {
+            apar: {
+                id: 'apar',
+                name: 'APAR & Barometer',
+                waktu: '21 Agu 2026, 10:32 WIB',
+                ukuran: '1.8 MB (High Resolution)',
+                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                        <rect width="300" height="240" fill="#0f172a"/>
+                        <!-- APAR Tube Body -->
+                        <rect x="120" y="60" width="60" height="140" rx="14" fill="#dc2626"/>
+                        <!-- Valve & Handle -->
+                        <rect x="135" y="32" width="30" height="28" rx="4" fill="#475569"/>
+                        <line x1="150" y1="32" x2="150" y2="16" stroke="#e2e8f0" stroke-width="6"/>
+                        <line x1="130" y1="20" x2="170" y2="20" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+                        <!-- Gauge Pressure Meter -->
+                        <circle cx="170" cy="46" r="10" fill="#ffffff"/>
+                        <circle cx="170" cy="46" r="8" fill="#10b981"/>
+                        <line x1="170" y1="46" x2="173" y2="41" stroke="#ffffff" stroke-width="2"/>
+                        <!-- Hose -->
+                        <path d="M135 48 Q95 65 105 160" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+                        <!-- Label Sticker -->
+                        <rect x="130" y="95" width="40" height="55" rx="4" fill="#ffffff" opacity="0.95"/>
+                        <text x="135" y="115" font-size="10" font-weight="bold" fill="#dc2626">DCP 6KG</text>
+                        <text x="135" y="130" font-size="8" font-weight="bold" fill="#334155">PLN UIT JBM</text>
+                      </svg>`
+            },
+            sprinkle: {
+                id: 'sprinkle',
+                name: 'Valve & Nozzle Sprinkle',
+                waktu: '21 Agu 2026, 10:35 WIB',
+                ukuran: '2.4 MB (High Resolution)',
+                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                        <rect width="300" height="240" fill="#0f172a"/>
+                        <!-- Main Pipe -->
+                        <rect x="135" y="20" width="30" height="200" fill="#64748b"/>
+                        <line x1="50" y1="120" x2="250" y2="120" stroke="#64748b" stroke-width="20" stroke-linecap="round"/>
+                        <!-- Valve Wheel -->
+                        <circle cx="150" cy="120" r="32" fill="#0284c7"/>
+                        <circle cx="150" cy="120" r="18" fill="#0f172a"/>
+                        <circle cx="150" cy="120" r="8" fill="#38bdf8"/>
+                        <!-- Spray Nozzles -->
+                        <polygon points="150,220 135,235 165,235" fill="#f59e0b"/>
+                        <text x="100" y="90" font-size="11" font-weight="bold" fill="#38bdf8">MAIN SPRINKLE VALVE</text>
+                      </svg>`
+            }
+        };
+
+        function openPhotoDetail(photoType) {
+            const photo = activePhotos[photoType];
+            if (!photo) return;
+            currentPhotoType = photoType;
+            document.getElementById('actPhotoTitle').textContent = photo.name;
+            document.getElementById('actMetaKomponen').textContent = photo.name;
+            document.getElementById('actMetaWaktu').textContent = photo.waktu;
+            document.getElementById('actMetaUkuran').textContent = photo.ukuran;
+            document.getElementById('actImageWrapper').innerHTML = photo.svg;
+            document.getElementById('photoDetailActivity').classList.add('show');
+        }
+
+        function closePhotoDetail() {
+            document.getElementById('photoDetailActivity').classList.remove('show');
+            currentPhotoType = null;
+        }
+
+        function deleteCurrentPhoto() {
+            if (!currentPhotoType) return;
+            if (confirm(`Apakah Anda yakin ingin menghapus foto "${activePhotos[currentPhotoType].name}"?`)) {
+                // Delete from DOM
+                const elementId = currentPhotoType === 'apar' ? 'recapItemApar' : 'recapItemSprinkle';
+                const el = document.getElementById(elementId);
+                if (el) el.remove();
+                delete activePhotos[currentPhotoType];
+
+                // Update counter
+                const remaining = Object.keys(activePhotos).length;
+                const badge = document.getElementById('recapCountBadge');
+                if (remaining === 0) {
+                    badge.textContent = '0 Foto';
+                    document.getElementById('recapPhotoGrid').style.display = 'none';
+                    document.getElementById('recapEmptyState').style.display = 'block';
+                } else {
+                    badge.textContent = `${remaining} Foto Terlampir`;
+                }
+
+                alert('Foto dokumentasi berhasil dihapus.');
+                closePhotoDetail();
+            }
+        }
+
+        function retakeCurrentPhoto() {
+            alert(`Membuka kamera untuk mengambil ulang foto ${activePhotos[currentPhotoType].name}.`);
+            closePhotoDetail();
+        }
+
+        function triggerCamera(itemName) {
+            alert(`Membuka kamera untuk foto dokumentasi ${itemName}. Foto terlampir.`);
+        }
+
+        function saveSurveyEntry() {
+            alert('Hasil pengisian survey baru berhasil disimpan (konsep: insert data baru). Total mengisi survey bertambah.');
+            goBack();
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Mekanisme Form Survey:</strong> Mekanisme list formulir serupa dengan form inspeksi.</li>
+        <li><strong>Konsep Multi-Input (Insert):</strong> User dapat mengisi formulir survey lebih dari 1x dengan konsep insert data baru (bukan replace/overwrite).</li>
+      </ul>
+    </div>
+
+</body>
+</html>

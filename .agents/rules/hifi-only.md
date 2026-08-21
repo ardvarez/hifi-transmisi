@@ -11,5 +11,10 @@ trigger: always_on
 - Tanyakan user creatornya
 - Buat 1 Tampilan yang seragam untuk semua Hifi
 - Kalo mau cek tampilan jangan buka localhost langsung ke path file aja bukanya dari home.html
-- Jika ada notes atau validasi tolong buatkan sekalian dengan trigger C:\KERJAAN\Project\hifi-transmisi\py fix\inject_notes.py supaya tidak tertinggal atau kelupaan.
 - Dom digunakan hanya ketika ada perintah saja, jangan terlalu inisiatif scanning page
+- **Standard Input UI**:
+  - **Radio Button (Single Select <= 3 opsi)**: Pakai konsep Button biasa tanpa icon (Segmented Pill / Toggle Button group text only).
+  - **Combo Box Default (Single Select > 3 opsi)**: Pakai dropdown select / combobox standar.
+  - **Checkbox (Multi Select)**: Pakai konsep dropdown combobox dengan opsi multi-check (Multi-Select Checklist Dropdown).
+  - **Number**: Sesuaikan tipe data (Integer tanpa desimal atau Double/Float dengan desimal dan step).
+  - **Text Input & Text Area**: Mengikuti styling input PLN yang seragam.

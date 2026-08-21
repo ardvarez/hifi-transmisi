@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Sinkronisasi Data Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --header-blue: #0b4884;
+            --header-blue-dark: #083868;
+            --primary-blue: #0b4884;
+            --primary-blue-hover: #083868;
+            --primary-light: #e8f3ff;
+            --text-main: #0f172a;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #475569;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            --warning-color: #f59e0b;
+            --orange-color: #d97706;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Floating Back to Catalog Button */
+        .btn-back-catalog {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #1e293b;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+            z-index: 99999;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+        }
+        .btn-back-catalog:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+        }
+
+        /* App Header (Uniform with list-aset & sync-hasil-inspeksi) */
+        .app-header {
+            padding: 18px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 15.5px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            letter-spacing: 0.3px;
+        }
+
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 18px 90px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* State Simulation Switcher */
+        .sim-switcher-row {
+            display: flex;
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 3px;
+            margin-bottom: 14px;
+            gap: 4px;
+        }
+        .sim-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 9px;
+            border: none;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #64748b;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .sim-btn.active-success {
+            background: #ffffff;
+            color: #059669;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        .sim-btn.active-error {
+            background: #ffffff;
+            color: #ef4444;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Progress Animation Hero Card */
+        .sync-progress-hero {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .progress-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-hero-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .progress-hero-percent {
+            font-size: 12px;
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: #10b981;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .progress-bar-fill.bar-error {
+            background: #ef4444;
+            width: 45%;
+        }
+
+        .progress-hero-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Survey Result Card (Faithful to wireframe) */
+        .survey-sync-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px;
+            border: 1.5px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .card-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .survey-code-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.2px;
+        }
+
+        .badge-berhasil {
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            font-size: 11.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-gagal {
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+            font-size: 11.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .badge-gagal:active {
+            transform: scale(0.96);
+        }
+
+        .dotted-divider {
+            border-top: 1.5px dotted #cbd5e1;
+            margin: 12px 0;
+        }
+
+        .survey-type-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .survey-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .meta-lbl {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .meta-val {
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* Fixed Bottom Action Bar */
+        .bottom-action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            padding: 14px 20px 20px;
+            border-top: 1px solid var(--border-color);
+            z-index: 20;
+        }
+
+        .btn-finish-sync {
+            width: 100%;
+            padding: 13.5px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.25);
+        }
+        .btn-finish-sync:active {
+            background: var(--primary-blue-hover);
+        }
+
+        .btn-retry-sync {
+            width: 100%;
+            padding: 13.5px;
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+        }
+
+        /* Bottom Sheet Error Modal (Inside Frame) */
+        .bottom-sheet-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: flex-end;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            border-radius: inherit;
+        }
+        .bottom-sheet-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bottom-sheet-card {
+            width: 100%;
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 16px 20px 24px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bottom-sheet-overlay.show .bottom-sheet-card {
+            transform: translateY(0);
+        }
+
+        .drag-handle {
+            width: 44px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 4px;
+            margin: 0 auto 16px;
+        }
+
+        .sheet-icon-error {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #fef2f2;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin: 0 auto 12px;
+            border: 2px solid #fecaca;
+        }
+
+        .sheet-title-error {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .error-message-box {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 12px;
+            padding: 12px 14px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .error-lead {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #c53030;
+            margin-bottom: 4px;
+        }
+
+        .error-detail-text {
+            font-size: 13px;
+            font-weight: 800;
+            color: #9b2c2c;
+            line-height: 1.4;
+        }
+
+        .error-helpdesk-note {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 6px;
+        }
+
+        .sheet-action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sheet-cancel {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-sheet-retry {
+            flex: 1.4;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(11, 72, 132, 0.25);
+            transition: background 0.2s;
+        }
+        .btn-sheet-retry:hover {
+            background: var(--primary-blue-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Back to Catalog Portal Button -->
+    <a href="../../hifi-home/home.html" class="btn-back-catalog" title="Kembali ke Catalog Portal">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Catalog</span>
+    </a>
+
+    <div class="mobile-container">
+        
+        <!-- Bottom Sheet Error Download (Faithful to wireframe) -->
+        <div id="modalErrorDownload" class="bottom-sheet-overlay" onclick="closeErrorDownload()">
+            <div class="bottom-sheet-card" onclick="event.stopPropagation()">
+                <div class="drag-handle"></div>
+                <div class="sheet-icon-error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="sheet-title-error">Error Download</div>
+                
+                <div class="error-message-box">
+                    <div class="error-lead">Terdapat Error:</div>
+                    <div class="error-detail-text" id="errorMessageDetail">Survey Tersebut sudah Berhasil</div>
+                    <div class="error-helpdesk-note">Pesan ini dapat ditunjukkan ke tim Helpdesk PLN apabila kendala berlanjut.</div>
+                </div>
+
+                <div class="sheet-action-row">
+                    <button class="btn-sheet-cancel" onclick="closeErrorDownload()">Kembali</button>
+                    <button class="btn-sheet-retry" onclick="retrySyncSurvey()">Sinkronisasi Ulang</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <button class="action-btn" onclick="goBack()" title="Kembali">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="header-name">Sinkronisasi Data Survey</div>
+                    <div class="header-sub">UNDUH FORMULIR OFFLINE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Scroll -->
+        <div class="content-scroll">
+            
+            <!-- State Switcher for Easy Verification -->
+            <div class="sim-switcher-row">
+                <button class="sim-btn active-success" id="btnSimSuccess" onclick="setSyncState('success')">
+                    <i class="fa-solid fa-circle-check"></i> Kondisi Berhasil
+                </button>
+                <button class="sim-btn" id="btnSimError" onclick="setSyncState('error')">
+                    <i class="fa-solid fa-circle-xmark"></i> Kondisi Gagal
+                </button>
+            </div>
+
+            <!-- Progress Status Hero -->
+            <div class="sync-progress-hero">
+                <div class="progress-hero-top">
+                    <div class="progress-hero-title" id="progressTitle">Paket Data Terunduh</div>
+                    <div class="progress-hero-percent" id="progressPercent">100%</div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
+                <div class="progress-hero-sub" id="progressSub">Data survey berhasil diunduh dan siap digunakan secara offline.</div>
+            </div>
+
+            <!-- Survey Card (Clickable when in Error State to show Bottom Sheet) -->
+            <div class="survey-sync-card" id="surveySyncCard" onclick="handleCardClick()">
+                <div class="card-top-row">
+                    <div class="survey-code-title" id="surveyCodeText">SVY202400000001</div>
+                    <span id="surveyBadgeState" class="badge-berhasil">
+                        <i class="fa-solid fa-circle-check"></i> Berhasil
+                    </span>
+                </div>
+
+                <div class="dotted-divider"></div>
+
+                <div class="survey-type-name" id="surveyTypeText">Survey Ketersediaan & ROW</div>
+
+                <div class="survey-meta-row">
+                    <span class="meta-lbl">Formulir</span>
+                    <span class="meta-val" id="surveyFormCount">3 Formulir</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Fixed Bottom Button -->
+        <div class="bottom-action-bar" id="bottomActionBar">
+            <button class="btn-finish-sync" id="btnBottomAction" onclick="finishSyncSurvey()">
+                Selesai Sinkronisasi Data <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const surveyParam = urlParams.get('survey') || 'SVY202400000001';
+        const typeParam = urlParams.get('type') || 'Survey Ketersediaan';
+        const formCountParam = urlParams.get('forms') || '3';
+        let currentStatus = urlParams.get('status') || 'success';
+
+        document.getElementById('surveyCodeText').textContent = surveyParam;
+        document.getElementById('surveyTypeText').textContent = typeParam;
+        document.getElementById('surveyFormCount').textContent = `${formCountParam} Formulir`;
+
+        if (currentStatus === 'error') {
+            setSyncState('error');
+        } else {
+            setSyncState('success');
+        }
+
+        function setSyncState(state) {
+            currentStatus = state;
+            const btnSuccess = document.getElementById('btnSimSuccess');
+            const btnError = document.getElementById('btnSimError');
+            const badge = document.getElementById('surveyBadgeState');
+            const pTitle = document.getElementById('progressTitle');
+            const pPercent = document.getElementById('progressPercent');
+            const pFill = document.getElementById('progressBarFill');
+            const pSub = document.getElementById('progressSub');
+            const bBtn = document.getElementById('btnBottomAction');
+
+            if (state === 'success') {
+                btnSuccess.className = 'sim-btn active-success';
+                btnError.className = 'sim-btn';
+                
+                badge.className = 'badge-berhasil';
+                badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Berhasil';
+
+                pTitle.textContent = 'Paket Data Terunduh';
+                pPercent.textContent = '100%';
+                pPercent.style.color = '#10b981';
+                pFill.className = 'progress-bar-fill';
+                pFill.style.width = '100%';
+                pSub.textContent = 'Data survey berhasil diunduh dan siap digunakan secara offline.';
+
+                bBtn.className = 'btn-finish-sync';
+                bBtn.innerHTML = 'Selesai Sinkronisasi Data <i class="fa-solid fa-arrow-right"></i>';
+                bBtn.onclick = finishSyncSurvey;
+            } else {
+                btnSuccess.className = 'sim-btn';
+                btnError.className = 'sim-btn active-error';
+
+                badge.className = 'badge-gagal';
+                badge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Gagal';
+
+                pTitle.textContent = 'Unduhan Terkendala';
+                pPercent.textContent = 'Gagal';
+                pPercent.style.color = '#ef4444';
+                pFill.className = 'progress-bar-fill bar-error';
+                pSub.textContent = 'Gagal mengunduh paket data. Ketuk kartu atau tombol di bawah untuk rincian error.';
+
+                bBtn.className = 'btn-retry-sync';
+                bBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Sinkronisasi Ulang';
+                bBtn.onclick = openErrorDownloadSheet;
+            }
+        }
+
+        function handleCardClick() {
+            if (currentStatus === 'error') {
+                openErrorDownloadSheet();
+            }
+        }
+
+        function openErrorDownloadSheet() {
+            document.getElementById('modalErrorDownload').classList.add('show');
+        }
+
+        function closeErrorDownload() {
+            document.getElementById('modalErrorDownload').classList.remove('show');
+        }
+
+        function retrySyncSurvey() {
+            closeErrorDownload();
+            const pFill = document.getElementById('progressBarFill');
+            const pPercent = document.getElementById('progressPercent');
+            const pTitle = document.getElementById('progressTitle');
+
+            pTitle.textContent = 'Mengunduh Ulang Data...';
+            pPercent.textContent = '35%';
+            pFill.className = 'progress-bar-fill';
+            pFill.style.width = '35%';
+
+            setTimeout(() => {
+                setSyncState('success');
+                alert('Sinkronisasi ulang berhasil! Formulir survey telah siap.');
+            }, 1000);
+        }
+
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                const downloadQuery = currentStatus === 'success' ? `?downloaded=${encodeURIComponent(surveyParam)}` : '';
+                window.location.href = `list-survey.html${downloadQuery}`;
+            }, 300);
+        }
+
+        function finishSyncSurvey() {
+            goBack();
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Sinkronisasi Data Survey:</strong> Menampilkan status Berhasil atau Gagal pada proses unduh data survey.</li>
+        <li><strong>Error Download Bottom Sheet:</strong> Jika status Gagal, kartu/badge dapat diklik untuk menampilkan pesan error bantuan helpdesk dan opsi Sinkronisasi Ulang.</li>
+      </ul>
+    </div>
+
+</body>
+</html>

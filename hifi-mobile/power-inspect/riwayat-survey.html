@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Riwayat Hasil Inspeksi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --header-blue: #0b4884;
+            --header-blue-dark: #083868;
+            --primary-blue: #0b4884;
+            --primary-blue-hover: #083868;
+            --primary-light: #e8f3ff;
+            --text-main: #0f172a;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #475569;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            --warning-color: #f59e0b;
+            --orange-color: #d97706;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Floating Back to Catalog Button */
+        .btn-back-catalog {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #1e293b;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+            z-index: 99999;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+        }
+        .btn-back-catalog:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+        }
+
+        /* App Header (Uniform with list-aset & sync-hasil-inspeksi) */
+        .app-header {
+            padding: 16px 20px 14px;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .header-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .header-sub {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            letter-spacing: 0.3px;
+        }
+
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: #fee2e2;
+            color: var(--danger-color);
+            border-color: #fca5a5;
+        }
+
+        /* Search Input */
+        .search-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .search-input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 9px 38px 9px 14px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+        }
+        .search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* Filter Chips (Gagal, Sedang Berlangsung, Berhasil) */
+        .filter-chips-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-chips-row::-webkit-scrollbar { display: none; }
+
+        .chip-filter-btn {
+            flex: 1;
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 11.5px;
+            font-weight: 800;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .chip-filter-btn:hover {
+            border-color: #cbd5e1;
+        }
+
+        .chip-filter-btn.active-error {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+        }
+
+        .chip-filter-btn.active-progress {
+            background: #d97706;
+            color: #ffffff;
+            border-color: #d97706;
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+        }
+
+        .chip-filter-btn.active-success {
+            background: #059669;
+            color: #ffffff;
+            border-color: #059669;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+        }
+
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* History Cards List */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-modern-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .history-modern-card:hover {
+            border-color: #bfdbfe;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(11, 72, 132, 0.08);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2px;
+        }
+
+        .history-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-item-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .history-form-sub {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .card-action-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Status Badges */
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10.5px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge-gagal {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .badge-selesai {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-proses {
+            background: #fff7ed;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+
+        .btn-view-detail {
+            padding: 5px 14px;
+            border-radius: 8px;
+            background: #e8f3ff;
+            border: 1.5px solid #90caf9;
+            color: #0b4884;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-view-detail:hover {
+            background: #bce0fd;
+        }
+
+        .dotted-divider {
+            border-top: 1.5px dotted #cbd5e1;
+            margin: 12px 0;
+        }
+
+        .history-grid-table {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .grid-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .grid-label {
+            color: #64748b;
+            font-weight: 500;
+            font-size: 11.5px;
+        }
+
+        .grid-value {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 12px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Back to Catalog Portal Button -->
+    <a href="../../hifi-home/home.html" class="btn-back-catalog" title="Kembali ke Catalog Portal">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Catalog</span>
+    </a>
+
+    <div class="mobile-container">
+        
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-top-row">
+                <div class="header-left-group">
+                    <button class="action-btn" onclick="goBack()" title="Kembali">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div class="header-title-group">
+                        <div class="header-name">Riwayat Hasil Inspeksi</div>
+                        <div class="header-sub">SURVEY & PROGRAM INSPEKSI</div>
+                    </div>
+                </div>
+                <div class="action-btn" onclick="clearHistoryAlert()" title="Hapus Riwayat">
+                    <i class="fa-regular fa-trash-can"></i>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari nomor survey, aset, atau unit..." onkeyup="filterHistoryRealtime()">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            </div>
+
+            <!-- Status Filter Buttons (Gagal, Sedang Berlangsung, Berhasil) -->
+            <div class="filter-chips-row">
+                <button class="chip-filter-btn" id="btnFilterGagal" onclick="toggleStatusFilter('gagal')">Gagal</button>
+                <button class="chip-filter-btn" id="btnFilterProses" onclick="toggleStatusFilter('proses')">Sedang Berlangsung</button>
+                <button class="chip-filter-btn" id="btnFilterBerhasil" onclick="toggleStatusFilter('berhasil')">Berhasil</button>
+            </div>
+        </div>
+
+        <!-- Content Scroll (No Bottom Nav) -->
+        <div class="content-scroll">
+            
+            <div class="history-list" id="historyContainer">
+                
+                <!-- Card 1: Program Inspeksi (Gagal) -> Wireframe Item 1 -->
+                <div class="history-modern-card" data-status="gagal" onclick="viewHistoryDetail('SVY202400000002', 'Current Transformer', 'gagal')">
+                    <div class="card-header-row">
+                        <div class="history-title-group">
+                            <div class="history-item-title">Current Transformer</div>
+                            <div class="history-form-sub">Form IL1 - CT - Bulanan</div>
+                        </div>
+                        <div class="card-action-group">
+                            <span class="badge-status badge-gagal">Gagal</span>
+                            <button class="btn-view-detail" onclick="viewHistoryDetail('SVY202400000002', 'Current Transformer', 'gagal'); event.stopPropagation();">Lihat</button>
+                        </div>
+                    </div>
+
+                    <div class="dotted-divider"></div>
+
+                    <div class="history-grid-table">
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit Creator</span>
+                            <span class="grid-value">Unit Induk (JBM)</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Mulai Inspeksi</span>
+                            <span class="grid-value">10 Mar 2024, 10:30</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Berhasil Inspeksi</span>
+                            <span class="grid-value">10 Mar 2024, 10:30</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Nomor Survey</span>
+                            <span class="grid-value">SVY202400000002</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Tipe Survey</span>
+                            <span class="grid-value">Program Inspeksi</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit</span>
+                            <span class="grid-value">GI 150kV Mampang</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Bay</span>
+                            <span class="grid-value">TRF#3 150/20kV</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Survey Ketersediaan (Berhasil / Selesai Server) -> Wireframe Item 2 -->
+                <div class="history-modern-card" data-status="berhasil" onclick="viewHistoryDetail('SVY202400000001', 'Anti Blackout', 'berhasil')">
+                    <div class="card-header-row">
+                        <div class="history-title-group">
+                            <div class="history-item-title">Anti Blackout</div>
+                        </div>
+                        <div class="card-action-group">
+                            <span class="badge-status badge-selesai">Selesai Server</span>
+                            <button class="btn-view-detail" onclick="viewHistoryDetail('SVY202400000001', 'Anti Blackout', 'berhasil'); event.stopPropagation();">Lihat</button>
+                        </div>
+                    </div>
+
+                    <div class="dotted-divider"></div>
+
+                    <div class="history-grid-table">
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit Creator</span>
+                            <span class="grid-value">PLN Kantor Pusat</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Mulai Inspeksi</span>
+                            <span class="grid-value">10 Mar 2024, 10:30</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Berhasil Inspeksi</span>
+                            <span class="grid-value">10 Mar 2024, 10:30</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Nomor Survey</span>
+                            <span class="grid-value">SVY202400000001</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Tipe Survey</span>
+                            <span class="grid-value">Survey Ketersediaan</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit</span>
+                            <span class="grid-value">GI 150kV Mampang</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Bay</span>
+                            <span class="grid-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Survey Ketersediaan (Sedang Berlangsung) -->
+                <div class="history-modern-card" data-status="proses" onclick="viewHistoryDetail('SVY202400000001', 'Ketersediaan Pengamanan', 'proses')">
+                    <div class="card-header-row">
+                        <div class="history-title-group">
+                            <div class="history-item-title">Ketersediaan Pengamanan</div>
+                        </div>
+                        <div class="card-action-group">
+                            <span class="badge-status badge-proses">Sedang Berlangsung</span>
+                            <button class="btn-view-detail" onclick="viewHistoryDetail('SVY202400000001', 'Ketersediaan Pengamanan', 'proses'); event.stopPropagation();">Lanjutkan</button>
+                        </div>
+                    </div>
+
+                    <div class="dotted-divider"></div>
+
+                    <div class="history-grid-table">
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit Creator</span>
+                            <span class="grid-value">PLN Kantor Pusat</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Mulai Inspeksi</span>
+                            <span class="grid-value">20 Agu 2026, 14:15</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Berhasil Inspeksi</span>
+                            <span class="grid-value">Dalam Proses</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Nomor Survey</span>
+                            <span class="grid-value">SVY202400000001</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Tipe Survey</span>
+                            <span class="grid-value">Survey Ketersediaan</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit</span>
+                            <span class="grid-value">GI 150kV Mampang</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Bay</span>
+                            <span class="grid-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        let activeFilter = 'all';
+
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'list-survey.html';
+            }, 300);
+        }
+
+        function clearHistoryAlert() {
+            if (confirm('Apakah Anda yakin ingin membersihkan seluruh cache riwayat survey offline?')) {
+                alert('Cache riwayat survey offline berhasil dibersihkan.');
+            }
+        }
+
+        function toggleStatusFilter(status) {
+            const btnGagal = document.getElementById('btnFilterGagal');
+            const btnProses = document.getElementById('btnFilterProses');
+            const btnBerhasil = document.getElementById('btnFilterBerhasil');
+
+            if (activeFilter === status) {
+                activeFilter = 'all';
+                btnGagal.className = 'chip-filter-btn';
+                btnProses.className = 'chip-filter-btn';
+                btnBerhasil.className = 'chip-filter-btn';
+            } else {
+                activeFilter = status;
+                btnGagal.className = status === 'gagal' ? 'chip-filter-btn active-error' : 'chip-filter-btn';
+                btnProses.className = status === 'proses' ? 'chip-filter-btn active-progress' : 'chip-filter-btn';
+                btnBerhasil.className = status === 'berhasil' ? 'chip-filter-btn active-success' : 'chip-filter-btn';
+            }
+
+            applyCardsFilter();
+        }
+
+        function filterHistoryRealtime() {
+            applyCardsFilter();
+        }
+
+        function applyCardsFilter() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.history-modern-card');
+
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const cardText = card.innerText.toLowerCase();
+
+                const statusMatch = (activeFilter === 'all' || cardStatus === activeFilter);
+                const queryMatch = cardText.includes(query);
+
+                if (statusMatch && queryMatch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function viewHistoryDetail(surveyNo, title, status) {
+            alert(`Membuka ringkasan riwayat hasil untuk ${title} (${surveyNo}) - Status: ${status}`);
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Riwayat Hasil Inspeksi:</strong> Menampilkan riwayat hasil survey secara clean tanpa bottom nav bar.</li>
+        <li><strong>Filter Status:</strong> Chip filter status Gagal, Sedang Berlangsung, dan Berhasil.</li>
+      </ul>
+    </div>
+
+</body>
+</html>
