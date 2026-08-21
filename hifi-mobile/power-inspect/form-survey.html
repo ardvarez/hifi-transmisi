@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Power Inspect - Formulir Survey Ketersediaan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -32,7 +32,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -502,6 +502,124 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
             margin-bottom: 14px;
             overflow: hidden;
+        }
+
+        /* Multi-Photo Thumbnail Gallery inside Parameters */
+        .param-photo-gallery {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .param-photo-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+        .param-photo-strip::-webkit-scrollbar { height: 4px; }
+        .param-photo-strip::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        .param-thumb-item {
+            position: relative;
+            width: 72px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .param-thumb-img-box {
+            width: 72px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #f1f5f9;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .param-thumb-img-box:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .param-thumb-img-box svg,
+        .param-thumb-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .param-thumb-del-btn {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.9);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8.5px;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+            transition: transform 0.15s;
+        }
+
+        .param-thumb-del-btn:hover {
+            transform: scale(1.15);
+            background: #dc2626;
+        }
+
+        .param-thumb-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #64748b;
+            max-width: 72px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .param-add-photo-btn {
+            width: 72px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1.5px dashed #cbd5e1;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .param-add-photo-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: #eff6ff;
+        }
+
+        .param-add-photo-btn i {
+            font-size: 15px;
+            color: var(--primary-blue);
         }
 
         .photo-recap-header {
@@ -977,14 +1095,14 @@
                         <input type="date" class="form-input-text" value="2024-10-31">
                     </div>
 
-                    <!-- Foto Dokumentasi APAR -->
+                    <!-- Multi-Photo Gallery: APAR -->
                     <div class="form-group">
                         <label class="form-label">Dokumentasi Foto APAR</label>
-                        <div class="photo-upload-box" onclick="triggerCamera('APAR')">
-                            <div class="camera-icon-circle">
-                                <i class="fa-solid fa-camera"></i>
+                        <input type="file" id="fileInput_apar" accept="image/*" style="display:none;" onchange="handleFileUpload('apar', event)">
+                        <div class="param-photo-gallery">
+                            <div class="param-photo-strip" id="photoStrip_apar">
+                                <!-- Dynamic mini thumbnails injected via JS -->
                             </div>
-                            <span class="upload-hint-text" id="hintApar">Ambil Foto APAR & Barometer</span>
                         </div>
                     </div>
                 </div>
@@ -1070,14 +1188,14 @@
                         <input type="date" class="form-input-text" value="2024-10-31">
                     </div>
 
-                    <!-- Foto Dokumentasi Fire Sprinkle -->
+                    <!-- Multi-Photo Gallery: Fire Sprinkle -->
                     <div class="form-group">
                         <label class="form-label">Dokumentasi Foto Fire Sprinkle</label>
-                        <div class="photo-upload-box" onclick="triggerCamera('Fire Sprinkle')">
-                            <div class="camera-icon-circle">
-                                <i class="fa-solid fa-camera"></i>
+                        <input type="file" id="fileInput_sprinkle" accept="image/*" style="display:none;" onchange="handleFileUpload('sprinkle', event)">
+                        <div class="param-photo-gallery">
+                            <div class="param-photo-strip" id="photoStrip_sprinkle">
+                                <!-- Dynamic mini thumbnails injected via JS -->
                             </div>
-                            <span class="upload-hint-text" id="hintSprinkle">Ambil Foto Valve / Nozzle Sprinkle</span>
                         </div>
                     </div>
                 </div>
@@ -1089,53 +1207,10 @@
                     <div class="photo-recap-title">
                         <i class="fa-solid fa-images" style="color: var(--primary-blue);"></i> Rekap Foto Dokumentasi
                     </div>
-                    <span class="photo-recap-badge" id="recapCountBadge">2 Foto Terlampir</span>
+                    <span class="photo-recap-badge" id="recapCountBadge">0 Foto</span>
                 </div>
                 <div class="photo-recap-grid" id="recapPhotoGrid">
-                    <!-- Recap Item 1: APAR -->
-                    <div class="photo-recap-item" id="recapItemApar" onclick="openPhotoDetail('apar')">
-                        <div class="photo-recap-thumb-box">
-                            <!-- SVG Representation of APAR -->
-                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
-                                <rect width="160" height="100" fill="#e2e8f0"/>
-                                <rect x="68" y="28" width="24" height="58" rx="6" fill="#ef4444"/>
-                                <rect x="74" y="16" width="12" height="12" rx="2" fill="#334155"/>
-                                <line x1="80" y1="16" x2="80" y2="10" stroke="#0f172a" stroke-width="3"/>
-                                <circle cx="86" cy="22" r="4" fill="#fbbf24"/>
-                                <path d="M74 24 Q60 30 64 65" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
-                                <rect x="72" y="45" width="16" height="22" rx="2" fill="#ffffff" opacity="0.9"/>
-                            </svg>
-                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('apar'); event.stopPropagation();" title="Lihat Detail Foto">
-                                <i class="fa-solid fa-expand"></i>
-                            </div>
-                        </div>
-                        <div class="photo-recap-info">
-                            <span class="photo-recap-name">APAR & Barometer</span>
-                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 10:32 • 1.8 MB</span>
-                        </div>
-                    </div>
-
-                    <!-- Recap Item 2: Fire Sprinkle -->
-                    <div class="photo-recap-item" id="recapItemSprinkle" onclick="openPhotoDetail('sprinkle')">
-                        <div class="photo-recap-thumb-box">
-                            <!-- SVG Representation of Sprinkle Valve -->
-                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
-                                <rect width="160" height="100" fill="#e2e8f0"/>
-                                <rect x="72" y="10" width="16" height="78" fill="#94a3b8"/>
-                                <circle cx="80" cy="50" r="14" fill="#0284c7"/>
-                                <circle cx="80" cy="50" r="8" fill="#ffffff"/>
-                                <circle cx="80" cy="50" r="4" fill="#0284c7"/>
-                                <line x1="45" y1="50" x2="115" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
-                            </svg>
-                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('sprinkle'); event.stopPropagation();" title="Lihat Detail Foto">
-                                <i class="fa-solid fa-expand"></i>
-                            </div>
-                        </div>
-                        <div class="photo-recap-info">
-                            <span class="photo-recap-name">Valve Sprinkle</span>
-                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 10:35 • 2.4 MB</span>
-                        </div>
-                    </div>
+                    <!-- Dynamic Recap Items Injected via JS -->
                 </div>
 
                 <!-- Empty State Placeholder (Hidden by default) -->
@@ -1272,104 +1347,244 @@
         });
 
         // Photo Detail Activity Logic
-        let currentPhotoType = null;
-        let activePhotos = {
-            apar: {
-                id: 'apar',
-                name: 'APAR & Barometer',
-                waktu: '21 Agu 2026, 10:32 WIB',
-                ukuran: '1.8 MB (High Resolution)',
-                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
-                        <rect width="300" height="240" fill="#0f172a"/>
-                        <!-- APAR Tube Body -->
-                        <rect x="120" y="60" width="60" height="140" rx="14" fill="#dc2626"/>
-                        <!-- Valve & Handle -->
-                        <rect x="135" y="32" width="30" height="28" rx="4" fill="#475569"/>
-                        <line x1="150" y1="32" x2="150" y2="16" stroke="#e2e8f0" stroke-width="6"/>
-                        <line x1="130" y1="20" x2="170" y2="20" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
-                        <!-- Gauge Pressure Meter -->
-                        <circle cx="170" cy="46" r="10" fill="#ffffff"/>
-                        <circle cx="170" cy="46" r="8" fill="#10b981"/>
-                        <line x1="170" y1="46" x2="173" y2="41" stroke="#ffffff" stroke-width="2"/>
-                        <!-- Hose -->
-                        <path d="M135 48 Q95 65 105 160" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
-                        <!-- Label Sticker -->
-                        <rect x="130" y="95" width="40" height="55" rx="4" fill="#ffffff" opacity="0.95"/>
-                        <text x="135" y="115" font-size="10" font-weight="bold" fill="#dc2626">DCP 6KG</text>
-                        <text x="135" y="130" font-size="8" font-weight="bold" fill="#334155">PLN UIT JBM</text>
-                      </svg>`
-            },
-            sprinkle: {
-                id: 'sprinkle',
-                name: 'Valve & Nozzle Sprinkle',
-                waktu: '21 Agu 2026, 10:35 WIB',
-                ukuran: '2.4 MB (High Resolution)',
-                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
-                        <rect width="300" height="240" fill="#0f172a"/>
-                        <!-- Main Pipe -->
-                        <rect x="135" y="20" width="30" height="200" fill="#64748b"/>
-                        <line x1="50" y1="120" x2="250" y2="120" stroke="#64748b" stroke-width="20" stroke-linecap="round"/>
-                        <!-- Valve Wheel -->
-                        <circle cx="150" cy="120" r="32" fill="#0284c7"/>
-                        <circle cx="150" cy="120" r="18" fill="#0f172a"/>
-                        <circle cx="150" cy="120" r="8" fill="#38bdf8"/>
-                        <!-- Spray Nozzles -->
-                        <polygon points="150,220 135,235 165,235" fill="#f59e0b"/>
-                        <text x="100" y="90" font-size="11" font-weight="bold" fill="#38bdf8">MAIN SPRINKLE VALVE</text>
-                      </svg>`
-            }
+        // Multi-Photo Gallery & State Management for Survey
+        let surveyPhotos = {
+            apar: [
+                {
+                    id: 'apar_1',
+                    sectionKey: 'apar',
+                    name: 'Foto Fisik Tabung APAR',
+                    komponen: 'APAR & Barometer',
+                    waktu: '21 Agu 2026, 10:32 WIB',
+                    ukuran: '1.8 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="120" y="60" width="60" height="140" rx="14" fill="#dc2626"/>
+                            <rect x="135" y="32" width="30" height="28" rx="4" fill="#475569"/>
+                            <line x1="150" y1="32" x2="150" y2="16" stroke="#e2e8f0" stroke-width="6"/>
+                            <line x1="130" y1="20" x2="170" y2="20" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+                            <circle cx="170" cy="46" r="10" fill="#ffffff"/>
+                            <circle cx="170" cy="46" r="8" fill="#10b981"/>
+                            <line x1="170" y1="46" x2="173" y2="41" stroke="#ffffff" stroke-width="2"/>
+                            <path d="M135 48 Q95 65 105 160" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+                            <rect x="130" y="95" width="40" height="55" rx="4" fill="#ffffff" opacity="0.95"/>
+                            <text x="135" y="115" font-size="10" font-weight="bold" fill="#dc2626">DCP 6KG</text>
+                            <text x="135" y="130" font-size="8" font-weight="bold" fill="#334155">PLN UIT</text>
+                          </svg>`
+                },
+                {
+                    id: 'apar_2',
+                    sectionKey: 'apar',
+                    name: 'Foto Gauge Barometer APAR',
+                    komponen: 'APAR & Barometer',
+                    waktu: '21 Agu 2026, 10:33 WIB',
+                    ukuran: '1.5 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <circle cx="150" cy="120" r="70" fill="#f8fafc" stroke="#64748b" stroke-width="6"/>
+                            <circle cx="150" cy="120" r="58" fill="#ffffff"/>
+                            <path d="M 115 120 A 40 40 0 0 1 185 120" fill="none" stroke="#10b981" stroke-width="12"/>
+                            <circle cx="150" cy="120" r="8" fill="#1e293b"/>
+                            <line x1="150" y1="120" x2="160" y2="90" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                            <text x="135" y="145" font-size="12" font-weight="bold" fill="#059669">14 BAR</text>
+                          </svg>`
+                }
+            ],
+            sprinkle: [
+                {
+                    id: 'sprinkle_1',
+                    sectionKey: 'sprinkle',
+                    name: 'Foto Valve & Nozzle Sprinkle',
+                    komponen: 'Fire Sprinkle System',
+                    waktu: '21 Agu 2026, 10:35 WIB',
+                    ukuran: '2.4 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="135" y="20" width="30" height="200" fill="#64748b"/>
+                            <line x1="50" y1="120" x2="250" y2="120" stroke="#64748b" stroke-width="20" stroke-linecap="round"/>
+                            <circle cx="150" cy="120" r="32" fill="#0284c7"/>
+                            <circle cx="150" cy="120" r="18" fill="#0f172a"/>
+                            <circle cx="150" cy="120" r="8" fill="#38bdf8"/>
+                            <polygon points="150,220 135,235 165,235" fill="#f59e0b"/>
+                            <text x="100" y="90" font-size="11" font-weight="bold" fill="#38bdf8">MAIN SPRINKLE VALVE</text>
+                          </svg>`
+                }
+            ]
         };
 
-        function openPhotoDetail(photoType) {
-            const photo = activePhotos[photoType];
-            if (!photo) return;
-            currentPhotoType = photoType;
-            document.getElementById('actPhotoTitle').textContent = photo.name;
-            document.getElementById('actMetaKomponen').textContent = photo.name;
-            document.getElementById('actMetaWaktu').textContent = photo.waktu;
-            document.getElementById('actMetaUkuran').textContent = photo.ukuran;
-            document.getElementById('actImageWrapper').innerHTML = photo.svg;
+        let currentActiveSurveyPhoto = null;
+
+        function renderAllSurveyGalleries() {
+            ['apar', 'sprinkle'].forEach(secKey => {
+                const strip = document.getElementById(`photoStrip_${secKey}`);
+                if (!strip) return;
+                
+                const photos = surveyPhotos[secKey] || [];
+                let html = '';
+                
+                photos.forEach((photo, idx) => {
+                    html += `
+                        <div class="param-thumb-item" onclick="openPhotoDetail('${photo.id}')">
+                            <div class="param-thumb-img-box">
+                                ${photo.svg}
+                                <div class="param-thumb-del-btn" onclick="removeSurveyPhotoById('${secKey}', '${photo.id}'); event.stopPropagation();" title="Hapus Foto">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </div>
+                            </div>
+                            <span class="param-thumb-label">Foto ${idx + 1}</span>
+                        </div>
+                    `;
+                });
+
+                // Append "+ Tambah Foto" button
+                html += `
+                    <div class="param-add-photo-btn" onclick="triggerAddSurveyPhoto('${secKey}')" title="Tambah Foto Dokumentasi">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>+ Foto</span>
+                    </div>
+                `;
+
+                strip.innerHTML = html;
+            });
+
+            renderSurveyRekapPhotos();
+        }
+
+        function renderSurveyRekapPhotos() {
+            const rekapGrid = document.getElementById('recapPhotoGrid');
+            const emptyState = document.getElementById('recapEmptyState');
+            const countBadge = document.getElementById('recapCountBadge');
+            
+            let allPhotos = [];
+            Object.values(surveyPhotos).forEach(list => {
+                allPhotos = allPhotos.concat(list);
+            });
+
+            const total = allPhotos.length;
+            countBadge.textContent = total === 0 ? '0 Foto' : `${total} Foto Terlampir`;
+
+            if (total === 0) {
+                rekapGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            rekapGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            let html = '';
+            allPhotos.forEach(photo => {
+                html += `
+                    <div class="photo-recap-item" onclick="openPhotoDetail('${photo.id}')">
+                        <div class="photo-recap-thumb-box">
+                            ${photo.svg}
+                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('${photo.id}'); event.stopPropagation();" title="Lihat Detail Foto">
+                                <i class="fa-solid fa-expand"></i>
+                            </div>
+                        </div>
+                        <div class="photo-recap-info">
+                            <span class="photo-recap-name">${photo.name}</span>
+                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> ${photo.waktu.split(',')[1] || ''}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            rekapGrid.innerHTML = html;
+        }
+
+        function triggerAddSurveyPhoto(secKey) {
+            const input = document.getElementById(`fileInput_${secKey}`);
+            if (input) {
+                input.click();
+            }
+        }
+
+        function handleFileUpload(secKey, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const newId = `s_${Date.now()}`;
+            const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            const newPhoto = {
+                id: newId,
+                sectionKey: secKey,
+                name: file.name.replace(/\.[^/.]+$/, ""),
+                komponen: secKey === 'apar' ? 'APAR & Barometer' : 'Fire Sprinkle System',
+                waktu: `21 Agu 2026, ${timeStr} WIB`,
+                ukuran: `${(file.size / (1024 * 1024)).toFixed(1)} MB (Camera Upload)`,
+                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                        <rect width="300" height="240" fill="#0f172a"/>
+                        <rect x="40" y="40" width="220" height="150" rx="10" fill="#334155" stroke="#38bdf8" stroke-width="3"/>
+                        <circle cx="150" cy="115" r="28" fill="#0284c7"/>
+                        <i class="fa-solid fa-camera" style="font-size:30px; color:#ffffff;"></i>
+                        <text x="85" y="175" font-size="11" font-weight="bold" fill="#ffffff">${file.name.substring(0, 16)}</text>
+                      </svg>`
+            };
+
+            if (!surveyPhotos[secKey]) surveyPhotos[secKey] = [];
+            surveyPhotos[secKey].push(newPhoto);
+            
+            // Reset input
+            event.target.value = '';
+
+            renderAllSurveyGalleries();
+            alert(`Foto "${file.name}" berhasil ditambahkan.`);
+        }
+
+        function removeSurveyPhotoById(secKey, photoId) {
+            if (confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
+                surveyPhotos[secKey] = surveyPhotos[secKey].filter(p => p.id !== photoId);
+                renderAllSurveyGalleries();
+            }
+        }
+
+        function openPhotoDetail(photoId) {
+            let foundPhoto = null;
+            Object.values(surveyPhotos).forEach(list => {
+                const item = list.find(p => p.id === photoId);
+                if (item) foundPhoto = item;
+            });
+
+            if (!foundPhoto) return;
+            currentActiveSurveyPhoto = foundPhoto;
+
+            document.getElementById('actPhotoTitle').textContent = foundPhoto.name;
+            document.getElementById('actMetaKomponen').textContent = foundPhoto.komponen;
+            document.getElementById('actMetaWaktu').textContent = foundPhoto.waktu;
+            document.getElementById('actMetaUkuran').textContent = foundPhoto.ukuran;
+            document.getElementById('actImageWrapper').innerHTML = foundPhoto.svg;
             document.getElementById('photoDetailActivity').classList.add('show');
         }
 
         function closePhotoDetail() {
             document.getElementById('photoDetailActivity').classList.remove('show');
-            currentPhotoType = null;
+            currentActiveSurveyPhoto = null;
         }
 
         function deleteCurrentPhoto() {
-            if (!currentPhotoType) return;
-            if (confirm(`Apakah Anda yakin ingin menghapus foto "${activePhotos[currentPhotoType].name}"?`)) {
-                // Delete from DOM
-                const elementId = currentPhotoType === 'apar' ? 'recapItemApar' : 'recapItemSprinkle';
-                const el = document.getElementById(elementId);
-                if (el) el.remove();
-                delete activePhotos[currentPhotoType];
-
-                // Update counter
-                const remaining = Object.keys(activePhotos).length;
-                const badge = document.getElementById('recapCountBadge');
-                if (remaining === 0) {
-                    badge.textContent = '0 Foto';
-                    document.getElementById('recapPhotoGrid').style.display = 'none';
-                    document.getElementById('recapEmptyState').style.display = 'block';
-                } else {
-                    badge.textContent = `${remaining} Foto Terlampir`;
-                }
-
-                alert('Foto dokumentasi berhasil dihapus.');
+            if (!currentActiveSurveyPhoto) return;
+            if (confirm(`Apakah Anda yakin ingin menghapus foto "${currentActiveSurveyPhoto.name}"?`)) {
+                const { sectionKey, id } = currentActiveSurveyPhoto;
+                surveyPhotos[sectionKey] = surveyPhotos[sectionKey].filter(p => p.id !== id);
+                renderAllSurveyGalleries();
                 closePhotoDetail();
+                alert('Foto dokumentasi berhasil dihapus.');
             }
         }
 
         function retakeCurrentPhoto() {
-            alert(`Membuka kamera untuk mengambil ulang foto ${activePhotos[currentPhotoType].name}.`);
+            if (!currentActiveSurveyPhoto) return;
+            alert(`Membuka kamera untuk mengambil ulang foto ${currentActiveSurveyPhoto.name}.`);
             closePhotoDetail();
         }
 
-        function triggerCamera(itemName) {
-            alert(`Membuka kamera untuk foto dokumentasi ${itemName}. Foto terlampir.`);
-        }
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllSurveyGalleries();
+        });
+        renderAllSurveyGalleries();
 
         function saveSurveyEntry() {
             alert('Hasil pengisian survey baru berhasil disimpan (konsep: insert data baru). Total mengisi survey bertambah.');

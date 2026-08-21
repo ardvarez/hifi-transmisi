@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Power Inspect - Form Inspeksi Rutin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -29,7 +29,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -322,41 +322,122 @@
             box-shadow: 0 0 0 1px #ef4444;
         }
 
-        /* Photo Upload Box inside Test Param */
-        .param-photo-box {
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            background: #f8fafc;
+        /* Multi-Photo Thumbnail Gallery inside Parameters */
+        .param-photo-gallery {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .param-photo-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+        .param-photo-strip::-webkit-scrollbar { height: 4px; }
+        .param-photo-strip::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        .param-thumb-item {
+            position: relative;
+            width: 72px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
             cursor: pointer;
+        }
+
+        .param-thumb-img-box {
+            width: 72px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #f1f5f9;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s;
+        }
+
+        .param-thumb-img-box:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .param-thumb-img-box svg,
+        .param-thumb-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .param-thumb-del-btn {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.9);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8.5px;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+            transition: transform 0.15s;
+        }
+
+        .param-thumb-del-btn:hover {
+            transform: scale(1.15);
+            background: #dc2626;
+        }
+
+        .param-thumb-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #64748b;
+            max-width: 72px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .param-add-photo-btn {
+            width: 72px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1.5px dashed #cbd5e1;
+            background: #f8fafc;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s;
         }
-        .param-photo-box:hover {
+
+        .param-add-photo-btn:hover {
             border-color: var(--primary-blue);
+            color: var(--primary-blue);
             background: #eff6ff;
         }
 
-        .param-photo-icon {
-            font-size: 22px;
-            color: #64748b;
-        }
-
-        .param-photo-preview {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 11.5px;
-            color: #065f46;
-            font-weight: 700;
+        .param-add-photo-btn i {
+            font-size: 15px;
+            color: var(--primary-blue);
         }
 
         /* Numeric / Unit Input Group */
@@ -1099,13 +1180,14 @@
                         <button type="button" class="param-seg-btn active-sesuai" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
                         <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
                     </div>
-                    <input type="file" id="filePhoto1" accept="image/*" style="display:none;" onchange="handleParamPhoto(1, event)">
-                    <div class="param-photo-box" id="boxPhoto1" onclick="document.getElementById('filePhoto1').click()">
-                        <i class="fa-solid fa-camera param-photo-icon"></i>
-                    </div>
-                    <div class="param-photo-preview" id="prevPhoto1">
-                        <span><i class="fa-solid fa-image"></i> <span id="namePhoto1">foto_alarm.jpg</span></span>
-                        <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#ef4444;" onclick="removeParamPhoto(1)"></i>
+                    
+                    <input type="file" id="fileInput_param1" accept="image/*" style="display:none;" onchange="handleFileUpload('param1', event)">
+                    
+                    <!-- Multi-Photo Thumbnail Strip -->
+                    <div class="param-photo-gallery">
+                        <div class="param-photo-strip" id="photoStrip_param1">
+                            <!-- Dynamic mini thumbnails injected via JS -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1123,13 +1205,14 @@
                         <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
                         <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
                     </div>
-                    <input type="file" id="filePhoto2" accept="image/*" style="display:none;" onchange="handleParamPhoto(2, event)">
-                    <div class="param-photo-box" id="boxPhoto2" onclick="document.getElementById('filePhoto2').click()">
-                        <i class="fa-solid fa-camera param-photo-icon"></i>
-                    </div>
-                    <div class="param-photo-preview" id="prevPhoto2">
-                        <span><i class="fa-solid fa-image"></i> <span id="namePhoto2">foto_nontripping.jpg</span></span>
-                        <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#ef4444;" onclick="removeParamPhoto(2)"></i>
+                    
+                    <input type="file" id="fileInput_param2" accept="image/*" style="display:none;" onchange="handleFileUpload('param2', event)">
+                    
+                    <!-- Multi-Photo Thumbnail Strip -->
+                    <div class="param-photo-gallery">
+                        <div class="param-photo-strip" id="photoStrip_param2">
+                            <!-- Dynamic mini thumbnails injected via JS -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1153,13 +1236,13 @@
                         <span class="param-unit-label">Ampere</span>
                     </div>
 
-                    <input type="file" id="filePhoto3" accept="image/*" style="display:none;" onchange="handleParamPhoto(3, event)">
-                    <div class="param-photo-box" id="boxPhoto3" onclick="document.getElementById('filePhoto3').click()">
-                        <i class="fa-solid fa-camera param-photo-icon"></i>
-                    </div>
-                    <div class="param-photo-preview" id="prevPhoto3">
-                        <span><i class="fa-solid fa-image"></i> <span id="namePhoto3">foto_relay.jpg</span></span>
-                        <i class="fa-solid fa-trash-can" style="cursor:pointer; color:#ef4444;" onclick="removeParamPhoto(3)"></i>
+                    <input type="file" id="fileInput_param3" accept="image/*" style="display:none;" onchange="handleFileUpload('param3', event)">
+                    
+                    <!-- Multi-Photo Thumbnail Strip -->
+                    <div class="param-photo-gallery">
+                        <div class="param-photo-strip" id="photoStrip_param3">
+                            <!-- Dynamic mini thumbnails injected via JS -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1170,67 +1253,10 @@
                     <div class="photo-recap-title">
                         <i class="fa-solid fa-images" style="color: var(--primary-blue);"></i> Rekap Foto Dokumentasi
                     </div>
-                    <span class="photo-recap-badge" id="recapCountBadge">3 Foto Terlampir</span>
+                    <span class="photo-recap-badge" id="recapCountBadge">0 Foto</span>
                 </div>
                 <div class="photo-recap-grid" id="recapPhotoGrid">
-                    <!-- Photo 1: Uji Non-Tripping -->
-                    <div class="photo-recap-item" id="recapItemParam1" onclick="openPhotoDetail('param1')">
-                        <div class="photo-recap-thumb-box">
-                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
-                                <rect width="160" height="100" fill="#e2e8f0"/>
-                                <rect x="35" y="20" width="90" height="60" rx="8" fill="#334155"/>
-                                <circle cx="55" cy="50" r="10" fill="#10b981"/>
-                                <circle cx="80" cy="50" r="10" fill="#ef4444"/>
-                                <circle cx="105" cy="50" r="10" fill="#f59e0b"/>
-                            </svg>
-                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('param1'); event.stopPropagation();" title="Lihat Detail Foto">
-                                <i class="fa-solid fa-expand"></i>
-                            </div>
-                        </div>
-                        <div class="photo-recap-info">
-                            <span class="photo-recap-name">Param 1: Non-Tripping</span>
-                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 09:15</span>
-                        </div>
-                    </div>
-
-                    <!-- Photo 2: Relay Proteksi -->
-                    <div class="photo-recap-item" id="recapItemParam2" onclick="openPhotoDetail('param2')">
-                        <div class="photo-recap-thumb-box">
-                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
-                                <rect width="160" height="100" fill="#e2e8f0"/>
-                                <rect x="30" y="15" width="100" height="70" rx="4" fill="#1e293b"/>
-                                <rect x="40" y="25" width="80" height="35" rx="3" fill="#0f172a"/>
-                                <text x="50" y="48" fill="#38bdf8" font-size="14" font-weight="bold" font-family="monospace">5.02 A</text>
-                            </svg>
-                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('param2'); event.stopPropagation();" title="Lihat Detail Foto">
-                                <i class="fa-solid fa-expand"></i>
-                            </div>
-                        </div>
-                        <div class="photo-recap-info">
-                            <span class="photo-recap-name">Param 2: Individu Relay</span>
-                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 09:22</span>
-                        </div>
-                    </div>
-
-                    <!-- Photo 3: Nameplate / Serial -->
-                    <div class="photo-recap-item" id="recapItemParam3" onclick="openPhotoDetail('param3')">
-                        <div class="photo-recap-thumb-box">
-                            <svg viewBox="0 0 160 100" width="100%" height="100%" style="background:#f1f5f9;">
-                                <rect width="160" height="100" fill="#e2e8f0"/>
-                                <rect x="25" y="20" width="110" height="60" rx="4" fill="#94a3b8"/>
-                                <rect x="35" y="30" width="90" height="8" rx="2" fill="#475569"/>
-                                <rect x="35" y="44" width="70" height="6" rx="2" fill="#475569"/>
-                                <rect x="35" y="56" width="50" height="6" rx="2" fill="#475569"/>
-                            </svg>
-                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('param3'); event.stopPropagation();" title="Lihat Detail Foto">
-                                <i class="fa-solid fa-expand"></i>
-                            </div>
-                        </div>
-                        <div class="photo-recap-info">
-                            <span class="photo-recap-name">Nameplate OCR</span>
-                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> 09:30</span>
-                        </div>
-                    </div>
+                    <!-- Dynamic Recap Items Injected via JS -->
                 </div>
 
                 <!-- Empty State Placeholder (Hidden by default) -->
@@ -1481,126 +1507,275 @@
             }, 250);
         }
 
-        // Photo Detail Activity Logic
-        let currentPhotoType = null;
-        let activePhotos = {
-            param1: {
-                id: 'param1',
-                name: 'Param 1: Uji Non-Tripping',
-                param: 'Pengujian fungsi non tripping sistem proteksi',
-                waktu: '21 Agu 2026, 09:15 WIB',
-                ukuran: '1.9 MB (High Resolution)',
-                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
-                        <rect width="300" height="240" fill="#0f172a"/>
-                        <!-- Test Box / Relay Front Panel -->
-                        <rect x="50" y="40" width="200" height="150" rx="12" fill="#334155" stroke="#475569" stroke-width="4"/>
-                        <!-- Indicator LEDs -->
-                        <circle cx="90" cy="90" r="14" fill="#10b981"/>
-                        <circle cx="150" cy="90" r="14" fill="#ef4444"/>
-                        <circle cx="210" cy="90" r="14" fill="#f59e0b"/>
-                        <text x="75" y="125" font-size="9" fill="#94a3b8" font-weight="bold">HEALTHY</text>
-                        <text x="142" y="125" font-size="9" fill="#94a3b8" font-weight="bold">TRIP</text>
-                        <text x="198" y="125" font-size="9" fill="#94a3b8" font-weight="bold">ALARM</text>
-                        <!-- Selector Switch -->
-                        <circle cx="150" cy="155" r="16" fill="#1e293b" stroke="#cbd5e1" stroke-width="3"/>
-                        <line x1="150" y1="155" x2="160" y2="145" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
-                        <text x="70" y="215" font-size="11" font-weight="bold" fill="#38bdf8">UJI NON-TRIPPING RELAY</text>
-                      </svg>`
-            },
-            param2: {
-                id: 'param2',
-                name: 'Param 2: Individu Relay (5.02 A)',
-                param: 'Pengujian individu relay proteksi',
-                waktu: '21 Agu 2026, 09:22 WIB',
-                ukuran: '2.1 MB (High Resolution)',
-                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
-                        <rect width="300" height="240" fill="#0f172a"/>
-                        <!-- Digital Test Set Secondary Injection -->
-                        <rect x="40" y="30" width="220" height="170" rx="8" fill="#1e293b" stroke="#334155" stroke-width="3"/>
-                        <rect x="60" y="50" width="180" height="70" rx="6" fill="#020617"/>
-                        <text x="75" y="95" font-size="28" font-weight="bold" fill="#38bdf8" font-family="monospace">5.02 A</text>
-                        <text x="195" y="75" font-size="10" font-weight="bold" fill="#10b981">I-PICKUP</text>
-                        <text x="195" y="92" font-size="10" font-weight="bold" fill="#f59e0b">t: 0.12s</text>
-                        <!-- Injection Terminals -->
-                        <circle cx="80" cy="160" r="10" fill="#dc2626"/>
-                        <circle cx="125" cy="160" r="10" fill="#eab308"/>
-                        <circle cx="170" cy="160" r="10" fill="#2563eb"/>
-                        <circle cx="215" cy="160" r="10" fill="#000000"/>
-                      </svg>`
-            },
-            param3: {
-                id: 'param3',
-                name: 'Nameplate Aset OCR',
-                param: 'Verifikasi Nameplate & Serial Number',
-                waktu: '21 Agu 2026, 09:30 WIB',
-                ukuran: '1.7 MB (High Resolution)',
-                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
-                        <rect width="300" height="240" fill="#0f172a"/>
-                        <!-- Nameplate Metallic Plate -->
-                        <rect x="40" y="35" width="220" height="160" rx="6" fill="#94a3b8" stroke="#cbd5e1" stroke-width="3"/>
-                        <rect x="50" y="45" width="200" height="140" fill="#f1f5f9"/>
-                        <!-- Logo & Brand Header -->
-                        <rect x="60" y="55" width="40" height="16" rx="2" fill="#0284c7"/>
-                        <text x="65" y="67" font-size="9" font-weight="bold" fill="#ffffff">GE GRID</text>
-                        <text x="110" y="68" font-size="11" font-weight="bold" fill="#0f172a">MICOM P14D</text>
-                        <line x1="60" y1="78" x2="240" y2="78" stroke="#cbd5e1" stroke-width="1.5"/>
-                        <!-- Serial Info Table -->
-                        <text x="60" y="96" font-size="10" font-weight="bold" fill="#334155">S/N: 36163288/08/22</text>
-                        <text x="60" y="114" font-size="10" font-weight="bold" fill="#334155">Vn: 100-120V AC/DC</text>
-                        <text x="60" y="132" font-size="10" font-weight="bold" fill="#334155">In: 1A / 5A 50/60Hz</text>
-                        <text x="60" y="150" font-size="10" font-weight="bold" fill="#334155">BAY: PHT SUKOLILO #1</text>
-                        <rect x="60" y="160" width="180" height="16" fill="#e2e8f0" rx="2"/>
-                        <text x="75" y="172" font-size="8" font-weight="bold" fill="#047857">PLN UIT JBM • ULTG SURABAYA</text>
-                      </svg>`
-            }
+        // Multi-Photo Gallery & State Management
+        let paramPhotos = {
+            param1: [
+                {
+                    id: 'p1_1',
+                    paramKey: 'param1',
+                    name: 'Foto Indikator Alarm',
+                    param: 'Pengujian fungsi alarm dan perekam',
+                    waktu: '21 Agu 2026, 09:12 WIB',
+                    ukuran: '1.6 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="50" y="40" width="200" height="150" rx="12" fill="#334155" stroke="#475569" stroke-width="4"/>
+                            <circle cx="90" cy="90" r="14" fill="#10b981"/>
+                            <circle cx="150" cy="90" r="14" fill="#ef4444"/>
+                            <circle cx="210" cy="90" r="14" fill="#f59e0b"/>
+                            <text x="75" y="125" font-size="9" fill="#94a3b8" font-weight="bold">HEALTHY</text>
+                            <text x="142" y="125" font-size="9" fill="#94a3b8" font-weight="bold">TRIP</text>
+                            <text x="198" y="125" font-size="9" fill="#94a3b8" font-weight="bold">ALARM</text>
+                          </svg>`
+                },
+                {
+                    id: 'p1_2',
+                    paramKey: 'param1',
+                    name: 'Foto Panel Annunciator',
+                    param: 'Pengujian fungsi alarm dan perekam',
+                    waktu: '21 Agu 2026, 09:14 WIB',
+                    ukuran: '2.0 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="40" y="40" width="220" height="150" rx="8" fill="#1e293b" stroke="#475569" stroke-width="3"/>
+                            <line x1="40" y1="115" x2="260" y2="115" stroke="#475569" stroke-width="2"/>
+                            <circle cx="80" cy="78" r="12" fill="#f59e0b"/>
+                            <circle cx="150" cy="78" r="12" fill="#10b981"/>
+                            <circle cx="220" cy="78" r="12" fill="#ef4444"/>
+                            <text x="65" y="150" font-size="12" font-weight="bold" fill="#38bdf8">ANNUNCIATOR OK</text>
+                          </svg>`
+                }
+            ],
+            param2: [
+                {
+                    id: 'p2_1',
+                    paramKey: 'param2',
+                    name: 'Foto Uji Non-Tripping',
+                    param: 'Pengujian fungsi non tripping sistem proteksi',
+                    waktu: '21 Agu 2026, 09:18 WIB',
+                    ukuran: '1.9 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="50" y="40" width="200" height="150" rx="12" fill="#334155" stroke="#475569" stroke-width="4"/>
+                            <circle cx="150" cy="115" r="30" fill="#10b981"/>
+                            <polyline points="135,115 145,125 165,105" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+                            <text x="80" y="180" font-size="11" font-weight="bold" fill="#38bdf8">NON-TRIP TEST PASS</text>
+                          </svg>`
+                }
+            ],
+            param3: [
+                {
+                    id: 'p3_1',
+                    paramKey: 'param3',
+                    name: 'Foto Display Arus Uji (5.02A)',
+                    param: 'Pengujian individu relay proteksi',
+                    waktu: '21 Agu 2026, 09:22 WIB',
+                    ukuran: '2.1 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="40" y="30" width="220" height="170" rx="8" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+                            <rect x="60" y="50" width="180" height="70" rx="6" fill="#020617"/>
+                            <text x="75" y="95" font-size="28" font-weight="bold" fill="#38bdf8" font-family="monospace">5.02 A</text>
+                            <text x="195" y="75" font-size="10" font-weight="bold" fill="#10b981">I-PICKUP</text>
+                          </svg>`
+                },
+                {
+                    id: 'p3_2',
+                    paramKey: 'param3',
+                    name: 'Foto Wiring Injeksi Sekunder',
+                    param: 'Pengujian individu relay proteksi',
+                    waktu: '21 Agu 2026, 09:25 WIB',
+                    ukuran: '1.7 MB (High Resolution)',
+                    svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                            <rect width="300" height="240" fill="#0f172a"/>
+                            <rect x="40" y="35" width="220" height="160" rx="6" fill="#94a3b8" stroke="#cbd5e1" stroke-width="3"/>
+                            <line x1="50" y1="70" x2="250" y2="170" stroke="#dc2626" stroke-width="8"/>
+                            <line x1="50" y1="120" x2="250" y2="120" stroke="#eab308" stroke-width="8"/>
+                            <line x1="50" y1="170" x2="250" y2="70" stroke="#2563eb" stroke-width="8"/>
+                            <text x="75" y="55" font-size="11" font-weight="bold" fill="#0f172a">WIRING TEST LEADS</text>
+                          </svg>`
+                }
+            ]
         };
 
-        function openPhotoDetail(photoType) {
-            const photo = activePhotos[photoType];
-            if (!photo) return;
-            currentPhotoType = photoType;
-            document.getElementById('actPhotoTitle').textContent = photo.name;
-            document.getElementById('actMetaKomponen').textContent = photo.param;
-            document.getElementById('actMetaWaktu').textContent = photo.waktu;
-            document.getElementById('actMetaUkuran').textContent = photo.ukuran;
-            document.getElementById('actImageWrapper').innerHTML = photo.svg;
+        let currentActivePhotoObj = null;
+
+        // Render mini thumbnails inside each parameter card
+        function renderAllParamGalleries() {
+            ['param1', 'param2', 'param3'].forEach(paramKey => {
+                const strip = document.getElementById(`photoStrip_${paramKey}`);
+                if (!strip) return;
+                
+                const photos = paramPhotos[paramKey] || [];
+                let html = '';
+                
+                photos.forEach((photo, idx) => {
+                    html += `
+                        <div class="param-thumb-item" onclick="openPhotoDetail('${photo.id}')">
+                            <div class="param-thumb-img-box">
+                                ${photo.svg}
+                                <div class="param-thumb-del-btn" onclick="removeParamPhotoById('${paramKey}', '${photo.id}'); event.stopPropagation();" title="Hapus Foto">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </div>
+                            </div>
+                            <span class="param-thumb-label">Foto ${idx + 1}</span>
+                        </div>
+                    `;
+                });
+
+                // Append "+ Tambah Foto" button
+                html += `
+                    <div class="param-add-photo-btn" onclick="triggerAddParamPhoto('${paramKey}')" title="Tambah Foto Dokumentasi">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>+ Foto</span>
+                    </div>
+                `;
+
+                strip.innerHTML = html;
+            });
+
+            renderRekapPhotos();
+        }
+
+        // Render Rekap Foto Dokumentasi Card
+        function renderRekapPhotos() {
+            const rekapGrid = document.getElementById('recapPhotoGrid');
+            const emptyState = document.getElementById('recapEmptyState');
+            const countBadge = document.getElementById('recapCountBadge');
+            
+            let allPhotos = [];
+            Object.values(paramPhotos).forEach(list => {
+                allPhotos = allPhotos.concat(list);
+            });
+
+            const total = allPhotos.length;
+            countBadge.textContent = total === 0 ? '0 Foto' : `${total} Foto Terlampir`;
+
+            if (total === 0) {
+                rekapGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            rekapGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            let html = '';
+            allPhotos.forEach(photo => {
+                html += `
+                    <div class="photo-recap-item" onclick="openPhotoDetail('${photo.id}')">
+                        <div class="photo-recap-thumb-box">
+                            ${photo.svg}
+                            <div class="photo-recap-zoom-btn" onclick="openPhotoDetail('${photo.id}'); event.stopPropagation();" title="Lihat Detail Foto">
+                                <i class="fa-solid fa-expand"></i>
+                            </div>
+                        </div>
+                        <div class="photo-recap-info">
+                            <span class="photo-recap-name">${photo.name}</span>
+                            <span class="photo-recap-sub"><i class="fa-regular fa-clock"></i> ${photo.waktu.split(',')[1] || ''}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            rekapGrid.innerHTML = html;
+        }
+
+        // Trigger file input or mock upload for multi-photo
+        function triggerAddParamPhoto(paramKey) {
+            const input = document.getElementById(`fileInput_${paramKey}`);
+            if (input) {
+                input.click();
+            }
+        }
+
+        function handleFileUpload(paramKey, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const newId = `p_${Date.now()}`;
+            const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            const newPhoto = {
+                id: newId,
+                paramKey: paramKey,
+                name: file.name.replace(/\.[^/.]+$/, ""),
+                param: paramKey === 'param1' ? 'Pengujian alarm & perekam' : (paramKey === 'param2' ? 'Pengujian non tripping' : 'Pengujian individu relay'),
+                waktu: `21 Agu 2026, ${timeStr} WIB`,
+                ukuran: `${(file.size / (1024 * 1024)).toFixed(1)} MB (Camera Upload)`,
+                svg: `<svg viewBox="0 0 300 240" width="100%" height="100%" style="background:#1e293b;">
+                        <rect width="300" height="240" fill="#0f172a"/>
+                        <rect x="40" y="40" width="220" height="150" rx="10" fill="#334155" stroke="#38bdf8" stroke-width="3"/>
+                        <circle cx="150" cy="115" r="28" fill="#0284c7"/>
+                        <i class="fa-solid fa-camera" style="font-size:30px; color:#ffffff;"></i>
+                        <text x="85" y="175" font-size="11" font-weight="bold" fill="#ffffff">${file.name.substring(0, 16)}</text>
+                      </svg>`
+            };
+
+            if (!paramPhotos[paramKey]) paramPhotos[paramKey] = [];
+            paramPhotos[paramKey].push(newPhoto);
+            
+            // Reset input
+            event.target.value = '';
+
+            renderAllParamGalleries();
+            alert(`Foto "${file.name}" berhasil ditambahkan ke parameter.`);
+        }
+
+        function removeParamPhotoById(paramKey, photoId) {
+            if (confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
+                paramPhotos[paramKey] = paramPhotos[paramKey].filter(p => p.id !== photoId);
+                renderAllParamGalleries();
+            }
+        }
+
+        // Open Fullscreen Photo Detail Activity
+        function openPhotoDetail(photoId) {
+            let foundPhoto = null;
+            Object.values(paramPhotos).forEach(list => {
+                const item = list.find(p => p.id === photoId);
+                if (item) foundPhoto = item;
+            });
+
+            if (!foundPhoto) return;
+            currentActivePhotoObj = foundPhoto;
+
+            document.getElementById('actPhotoTitle').textContent = foundPhoto.name;
+            document.getElementById('actMetaKomponen').textContent = foundPhoto.param;
+            document.getElementById('actMetaWaktu').textContent = foundPhoto.waktu;
+            document.getElementById('actMetaUkuran').textContent = foundPhoto.ukuran;
+            document.getElementById('actImageWrapper').innerHTML = foundPhoto.svg;
             document.getElementById('photoDetailActivity').classList.add('show');
         }
 
         function closePhotoDetail() {
             document.getElementById('photoDetailActivity').classList.remove('show');
-            currentPhotoType = null;
+            currentActivePhotoObj = null;
         }
 
         function deleteCurrentPhoto() {
-            if (!currentPhotoType) return;
-            if (confirm(`Apakah Anda yakin ingin menghapus foto "${activePhotos[currentPhotoType].name}"?`)) {
-                // Delete from DOM
-                const elementId = currentPhotoType === 'param1' ? 'recapItemParam1' : (currentPhotoType === 'param2' ? 'recapItemParam2' : 'recapItemParam3');
-                const el = document.getElementById(elementId);
-                if (el) el.remove();
-                delete activePhotos[currentPhotoType];
-
-                // Update counter
-                const remaining = Object.keys(activePhotos).length;
-                const badge = document.getElementById('recapCountBadge');
-                if (remaining === 0) {
-                    badge.textContent = '0 Foto';
-                    document.getElementById('recapPhotoGrid').style.display = 'none';
-                    document.getElementById('recapEmptyState').style.display = 'block';
-                } else {
-                    badge.textContent = `${remaining} Foto Terlampir`;
-                }
-
-                alert('Foto dokumentasi berhasil dihapus.');
+            if (!currentActivePhotoObj) return;
+            if (confirm(`Apakah Anda yakin ingin menghapus foto "${currentActivePhotoObj.name}"?`)) {
+                const { paramKey, id } = currentActivePhotoObj;
+                paramPhotos[paramKey] = paramPhotos[paramKey].filter(p => p.id !== id);
+                renderAllParamGalleries();
                 closePhotoDetail();
+                alert('Foto dokumentasi berhasil dihapus.');
             }
         }
 
         function retakeCurrentPhoto() {
-            alert(`Membuka kamera untuk mengambil ulang foto ${activePhotos[currentPhotoType].name}.`);
+            if (!currentActivePhotoObj) return;
+            alert(`Membuka kamera untuk mengambil ulang foto ${currentActivePhotoObj.name}.`);
             closePhotoDetail();
         }
+
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllParamGalleries();
+        });
+        // Call immediately
+        renderAllParamGalleries();
 
         function finishForm() {
             document.getElementById('modalSuccess').classList.remove('show');
