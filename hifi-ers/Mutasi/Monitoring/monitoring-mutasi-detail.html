@@ -1264,6 +1264,7 @@
       var panel = document.getElementById('sk-panel');
       if (backdrop && panel) {
         backdrop.style.display = 'block';
+        setTimeout(function () { backdrop.classList.add('open'); }, 10);
         panel.style.transform = 'translateX(0)';
         document.body.style.overflow = 'hidden';
       }
@@ -1273,9 +1274,15 @@
       var backdrop = document.getElementById('sk-backdrop');
       var panel = document.getElementById('sk-panel');
       if (backdrop && panel) {
-        backdrop.style.display = 'none';
+        backdrop.classList.remove('open');
         panel.style.transform = 'translateX(100%)';
-        document.body.style.overflow = '';
+        setTimeout(function () { backdrop.style.display = 'none'; }, 300);
+        
+        var detPanel = document.getElementById('det-panel');
+        var isDetOpen = (detPanel && detPanel.style.transform === 'translateX(0px)');
+        if (!isDetOpen) {
+          document.body.style.overflow = '';
+        }
       }
     }
 
@@ -5628,6 +5635,37 @@
         document.body.style.overflow = '';
       }
     }
+
+    // GLOBAL ESCAPE KEY LISTENER FOR SMOOTH MODAL DISMISSAL
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        var evBackdrop = document.getElementById('ev-backdrop');
+        if (evBackdrop && evBackdrop.style.display !== 'none' && evBackdrop.style.display !== '') {
+          closeEvidenceModal();
+          return;
+        }
+        var skBackdrop = document.getElementById('sk-backdrop');
+        if (skBackdrop && skBackdrop.style.display !== 'none' && skBackdrop.style.display !== '') {
+          closeSetKomponen();
+          return;
+        }
+        var rhBackdrop = document.getElementById('rh-backdrop');
+        if (rhBackdrop && rhBackdrop.style.display !== 'none' && rhBackdrop.style.display !== '') {
+          closeReturnHistoryModal();
+          return;
+        }
+        var shipBackdrop = document.getElementById('ship-docs-backdrop');
+        if (shipBackdrop && shipBackdrop.style.display !== 'none' && shipBackdrop.style.display !== '') {
+          closeShipmentDocsModal();
+          return;
+        }
+        var detBackdrop = document.getElementById('det-backdrop');
+        if (detBackdrop && detBackdrop.style.display !== 'none' && detBackdrop.style.display !== '') {
+          closeDetailPanel();
+          return;
+        }
+      }
+    });
   </script>
 
   <!-- DETAIL PANEL (COPIED EXACTLY FROM PREVIEW PAGE) -->

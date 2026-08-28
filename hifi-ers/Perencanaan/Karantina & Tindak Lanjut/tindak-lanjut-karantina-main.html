@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tindak Lanjut Karantina - PLN ERS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --pln-blue: #0A58CA;
+  --pln-blue-mid: #0d6efd;
+  --pln-blue-light: #E7F1FF;
+  --pln-blue-dark: #003B8E;
+  --pln-yellow: #F7A800;
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --surface: #F1F5F9;
+  --border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-hint: #94A3B8;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --sidebar-w: 64px;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --success: #16A34A;
+  --success-light: #DCFCE7;
+  --warning: #D97706;
+  --warning-light: #FEF3C7;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .page-title, .section-label, .card-title, .logo span {
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--pln-blue-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0;
+  gap: 8px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.sidebar .logo {
+  width: 38px;
+  height: 38px;
+  background: var(--pln-yellow);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.sidebar .logo svg {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.nav-icon:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.nav-icon.active {
+  background: rgba(247, 168, 0, 0.2);
+  color: var(--pln-yellow);
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* MAIN CONTENT */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.topbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.breadcrumb {
+  font-size: 12px;
+  color: var(--text-hint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb a {
+  color: var(--pln-blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border-radius: 30px;
+  border: 1px solid var(--border);
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--pln-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.content {
+  padding: 24px clamp(16px, 2.5vw, 36px) 32px;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 8px 18px;
+  width: 320px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.search-box:focus-within {
+  border-color: var(--pln-blue);
+  box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.12);
+}
+
+.search-box svg {
+  color: var(--text-hint);
+  flex-shrink: 0;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.btn-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-filter:hover, .btn-filter.active {
+  background: var(--pln-blue-light);
+  border-color: var(--pln-blue);
+  color: var(--pln-blue);
+}
+
+.table-card {
+  background: var(--card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+thead th {
+  background: #F8FAFC;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 14px 18px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:hover {
+  background: #F8FAFC;
+}
+
+tbody td {
+  padding: 16px 18px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.tower-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tower-item {
+  font-weight: 500;
+}
+
+.tower-sub {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.badge-set {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: var(--surface);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.status-waiting {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+.status-waiting .status-dot { background: #D97706; }
+
+.status-done {
+  background: #DCFCE7;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+}
+.status-done .status-dot { background: #16A34A; }
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--pln-blue);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-action:hover {
+  background: var(--pln-blue);
+  color: #FFFFFF;
+  border-color: var(--pln-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(10, 88, 202, 0.2);
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn.active {
+  background: var(--pln-blue);
+  color: #FFFFFF;
+  border-color: var(--pln-blue);
+}
+
+.page-btn:hover:not(.active) {
+  background: var(--surface);
+}
+
+/* FILTER DRAWER / MODAL */
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 320px;
+  z-index: 100;
+  display: none;
+}
+
+.filter-dropdown.show {
+  display: block;
+}
+
+.filter-field {
+  margin-bottom: 14px;
+}
+
+.filter-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.filter-field select, .filter-field input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  outline: none;
+  background: var(--surface);
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.btn-secondary {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--pln-blue);
+  background: var(--pln-blue);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="6" fill="#F7A800" />
+        <path d="M8 22V10l8 6 8-6v12" stroke="#003B8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <a href="../../../hifi-home/home.html" class="nav-icon" title="Dashboard Home">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+    </a>
+    <a href="../Transaksi/mainpage_perencanaan_operasi.html" class="nav-icon" title="Perencanaan Operasi">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    </a>
+    <a href="tindak-lanjut-karantina-main.html" class="nav-icon active" title="Tindak Lanjut Karantina">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+    </a>
+    <div class="sidebar-bottom">
+      <div class="nav-icon" title="Pengaturan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="breadcrumb">
+          <a href="../Transaksi/mainpage_perencanaan_operasi.html">Perencanaan Operasi ERS</a>
+          <span>/</span>
+          <span>Karantina & Tindak Lanjut</span>
+          <span>/</span>
+          <span style="color:var(--text-primary); font-weight:600;">Tindak Lanjut Karantina</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span>Sistem Informasi Manajemen Transmisi & ERS</span>
+        <div class="user-badge">
+          <div class="user-avatar" style="background:#0A58CA;">BP</div>
+          <div style="text-align:left;">
+            <div style="font-weight:700; color:var(--text-primary); font-size:12.5px; line-height:1.2;">Bambang Pratama</div>
+            <div style="font-size:10.5px; color:var(--text-secondary);">MSB Fashar UIT JBB</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="page-header">
+        <h1 class="page-title">Tindak Lanjut Karantina</h1>
+      </div>
+
+      <!-- FILTER & SEARCH -->
+      <div class="filter-toolbar">
+        <div style="display:flex; align-items:center; gap:12px; position:relative;">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Cari Nomor Perencanaan / Permit..." onkeyup="filterTable()">
+          </div>
+
+          <button class="btn-filter" id="btnFilterToggle" onclick="toggleFilterDropdown()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <span>Filter</span>
+          </button>
+
+          <!-- Dropdown Filter -->
+          <div class="filter-dropdown" id="filterDropdown">
+            <div class="filter-field">
+              <label>Status</label>
+              <select id="filterStatus" onchange="filterTable()">
+                <option value="">Semua Status</option>
+                <option value="Menunggu Tindak Lanjut">Menunggu Tindak Lanjut</option>
+                <option value="Selesai Tindak Lanjut">Selesai Tindak Lanjut</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label>Tower ERS</label>
+              <select id="filterTower" onchange="filterTable()">
+                <option value="">Semua Tower</option>
+                <option value="Lindsey">Lindsey</option>
+                <option value="Tower Solution">Tower Solution</option>
+                <option value="Kema">Kema</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn-secondary" onclick="resetFilter()">Reset</button>
+              <button class="btn-primary" onclick="toggleFilterDropdown()">Terapkan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table id="mainTable">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">No</th>
+                <th>Nomor Perencanaan TE</th>
+                <th>Nomor Permit Bongkar</th>
+                <th>Tower ERS</th>
+                <th style="text-align: center;">Total Set</th>
+                <th>Tanggal Rencana</th>
+                <th>Status</th>
+                <th style="text-align: center; width: 80px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align: center; font-weight: 600;">1</td>
+                <td><strong style="color:var(--pln-blue);">PTE202501001</strong></td>
+                <td>RTR202501001</td>
+                <td>
+                  <div class="tower-list">
+                    <span class="tower-item">Lindsey - 150kV - Tension</span>
+                    <span class="tower-sub">Tower Solution - 150kV - Tension</span>
+                  </div>
+                </td>
+                <td style="text-align: center;"><span class="badge-set">2</span></td>
+                <td>06 Maret 2026</td>
+                <td>
+                  <span class="status-badge status-waiting">
+                    <span class="status-dot"></span>Menunggu Tindak Lanjut
+                  </span>
+                </td>
+                <td style="text-align: center;">
+                  <a href="tindak-lanjut-karantina-detail.html?id=PTE202501001" class="btn-action" title="Detail Tindak Lanjut Karantina">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center; font-weight: 600;">2</td>
+                <td><strong style="color:var(--pln-blue);">PTE202501002</strong></td>
+                <td>RTR202501002</td>
+                <td>
+                  <div class="tower-list">
+                    <span class="tower-item">Tower Solution - 150kV - Suspension</span>
+                  </div>
+                </td>
+                <td style="text-align: center;"><span class="badge-set">2</span></td>
+                <td>07 Maret 2026</td>
+                <td>
+                  <span class="status-badge status-waiting">
+                    <span class="status-dot"></span>Menunggu Tindak Lanjut
+                  </span>
+                </td>
+                <td style="text-align: center;">
+                  <a href="tindak-lanjut-karantina-detail.html?id=PTE202501002" class="btn-action" title="Detail Tindak Lanjut Karantina">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center; font-weight: 600;">3</td>
+                <td><strong style="color:var(--pln-blue);">PTE202501003</strong></td>
+                <td>RTR202501003</td>
+                <td>
+                  <div class="tower-list">
+                    <span class="tower-item">Kema - 150kV - Suspension</span>
+                  </div>
+                </td>
+                <td style="text-align: center;"><span class="badge-set">4</span></td>
+                <td>08 Maret 2026</td>
+                <td>
+                  <span class="status-badge status-waiting">
+                    <span class="status-dot"></span>Menunggu Tindak Lanjut
+                  </span>
+                </td>
+                <td style="text-align: center;">
+                  <a href="tindak-lanjut-karantina-detail.html?id=PTE202501003" class="btn-action" title="Detail Tindak Lanjut Karantina">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center; font-weight: 600;">4</td>
+                <td><strong style="color:var(--pln-blue);">PTE202501004</strong></td>
+                <td>RTR202501004</td>
+                <td>
+                  <div class="tower-list">
+                    <span class="tower-item">Lindsey - 150kV - Tension</span>
+                  </div>
+                </td>
+                <td style="text-align: center;"><span class="badge-set">1</span></td>
+                <td>01 Maret 2026</td>
+                <td>
+                  <span class="status-badge status-done">
+                    <span class="status-dot"></span>Selesai Tindak Lanjut
+                  </span>
+                </td>
+                <td style="text-align: center;">
+                  <a href="tindak-lanjut-karantina-detail.html?id=PTE202501004" class="btn-action" title="Detail Tindak Lanjut Karantina">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-container">
+          <div>Menampilkan 1 hingga 4 dari 4 data</div>
+          <div class="pagination-controls">
+            <button class="page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- NOTES & VALIDASI FAB & PANEL -->
+  <style>
+    .notes-fab {
+      position: fixed;
+      bottom: 24px;
+      left: 88px;
+      width: 56px;
+      height: 56px;
+      background: var(--pln-blue, #0A58CA);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(10, 88, 202, 0.4);
+      z-index: 9999;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .notes-fab:hover {
+      transform: scale(1.08);
+      background: var(--pln-blue-mid, #0d6efd);
+    }
+    .notes-panel {
+      position: fixed;
+      bottom: 92px;
+      left: 88px;
+      width: 360px;
+      max-height: 520px;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.15);
+      z-index: 9998;
+      transform: translateY(20px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .notes-panel.active {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+    .notes-panel h3 {
+      margin: 0 0 14px 0;
+      font-family: 'Outfit', sans-serif;
+      color: var(--pln-blue, #0A58CA);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+    }
+    .notes-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-primary);
+      margin: 12px 0 6px 0;
+    }
+    .notes-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12.5px;
+      color: var(--text-secondary, #475569);
+      line-height: 1.6;
+    }
+    .notes-panel li {
+      margin-bottom: 6px;
+    }
+  </style>
+  
+  <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')" title="Buka Catatan & Validasi">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+  </div>
+  
+  <div class="notes-panel" id="notesPanel">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      Notes & Validasi (Mainpage)
+    </h3>
+    <div class="notes-section-title">📌 Catatan:</div>
+    <ul>
+      <li>Halaman ini menampilkan daftar perencanaan operasi ERS yang telah memiliki dokumen permit bongkar dan status karantina.</li>
+      <li>Setiap baris data mencakup nomor perencanaan, nomor permit bongkar, varian tower ERS, total set, dan tanggal rencana.</li>
+      <li>Klik tombol <strong>Aksi (Lihat Detail)</strong> untuk membuka halaman formulir alokasi tindak lanjut karantina aksesoris.</li>
+    </ul>
+    <div class="notes-section-title">⚡ Validasi:</div>
+    <ul>
+      <li>Data yang muncul difilter berdasarkan tiket permit bongkar yang telah selesai/masuk status karantina.</li>
+      <li>Perencanaan dengan status <em>Menunggu Tindak Lanjut</em> memerlukan tindakan alokasi aksesoris karantina sebelum dapat diarsipkan.</li>
+    </ul>
+  </div>
+
+  <script>
+    function toggleFilterDropdown() {
+      const dd = document.getElementById('filterDropdown');
+      dd.classList.toggle('show');
+    }
+
+    function resetFilter() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterTower').value = '';
+      filterTable();
+    }
+
+    function filterTable() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      const statusVal = document.getElementById('filterStatus').value.toLowerCase();
+      const towerVal = document.getElementById('filterTower').value.toLowerCase();
+      
+      const rows = document.querySelectorAll('#mainTable tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const matchesSearch = text.includes(searchVal);
+        const matchesStatus = statusVal === '' || text.includes(statusVal);
+        const matchesTower = towerVal === '' || text.includes(towerVal);
+
+        if (matchesSearch && matchesStatus && matchesTower) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('filterDropdown');
+      const btn = document.getElementById('btnFilterToggle');
+      if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
