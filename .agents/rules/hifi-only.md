@@ -18,3 +18,4 @@ trigger: always_on
   - **Checkbox (Multi Select)**: Pakai konsep dropdown combobox dengan opsi multi-check (Multi-Select Checklist Dropdown).
   - **Number**: Sesuaikan tipe data (Integer tanpa desimal atau Double/Float dengan desimal dan step).
   - **Text Input & Text Area**: Mengikuti styling input PLN yang seragam.
+- Pastikan pengecekan tag sebelum trigger selesai ke user, biar ga ada bug ataupun error dari FE
