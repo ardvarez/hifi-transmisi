@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pusat Notifikasi - PLN Transmisi Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --header-blue: #0b4884;
+            --primary-blue: #0284c7;
+            --primary-blue-hover: #0369a1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --purple-color: #9333ea;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        /* Mockup Container iPhone/Android Frame */
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            height: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            background: var(--header-blue);
+            z-index: 50;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        /* Activity Header */
+        .activity-header {
+            background: linear-gradient(135deg, var(--header-blue) 0%, #0369a1 100%);
+            padding: 8px 18px 16px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 16px rgba(11, 72, 132, 0.25);
+            z-index: 40;
+        }
+
+        .header-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-back {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-back:active {
+            transform: scale(0.92);
+        }
+
+        .header-title-box {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .header-title-box h1 {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+
+        .header-title-box p {
+            font-size: 11px;
+            color: #bae6fd;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-header-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-header-action:active {
+            transform: scale(0.92);
+        }
+
+        /* Search & Filter Bar inside Header */
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 12px 9px 36px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            font-size: 12px;
+            outline: none;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+        }
+
+        .search-input::placeholder {
+            color: #e0f2fe;
+            font-weight: 500;
+        }
+
+        .search-input:focus {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bae6fd;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        /* App Grouping Filter Tabs */
+        .app-tabs-bar {
+            background: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            z-index: 30;
+        }
+
+        .app-tabs-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .app-tab-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .app-tab-pill.active {
+            background: var(--header-blue);
+            color: #ffffff;
+            border-color: var(--header-blue);
+            box-shadow: 0 2px 8px rgba(11, 72, 132, 0.25);
+        }
+
+        .app-tab-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .app-tab-pill.active .app-tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
+
+        /* Quick Filter Chips (Hari ini, Belum Dibaca, dll) */
+        .filter-chips-row {
+            padding: 8px 16px;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: #f8fafc;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .filter-chips-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quick-chip {
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .quick-chip.active {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #3b82f6;
+        }
+
+        /* Main Content List Container */
+        .notif-content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notif-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 4px 2px;
+        }
+
+        .notif-group-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .notif-group-count {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        /* Large Notification Card */
+        .notif-card-large {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 14px 16px;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .notif-card-large:active {
+            transform: scale(0.99);
+        }
+
+        .notif-card-large.unread {
+            border-left: 4px solid var(--primary-blue);
+            background: #ffffff;
+        }
+
+        .notif-card-large.unread::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .card-top-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .card-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-icon-box.inspeksi { background: #eff6ff; color: #2563eb; }
+        .card-icon-box.ers { background: #f3e8ff; color: #9333ea; }
+        .card-icon-box.ffe { background: #fee2e2; color: #ef4444; }
+        .card-icon-box.survey { background: #d1fae5; color: #059669; }
+        .card-icon-box.newpst { background: #fef3c7; color: #d97706; }
+        .card-icon-box.system { background: #f1f5f9; color: #475569; }
+
+        .card-header-info {
+            flex: 1;
+            min-width: 0;
+            padding-right: 14px;
+        }
+
+        .card-app-tag-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .app-badge-tag {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .app-badge-tag.inspeksi { background: #dbeafe; color: #1d4ed8; }
+        .app-badge-tag.ers { background: #f3e8ff; color: #7e22ce; }
+        .app-badge-tag.ffe { background: #fee2e2; color: #b91c1c; }
+        .app-badge-tag.survey { background: #d1fae5; color: #047857; }
+        .app-badge-tag.newpst { background: #fef3c7; color: #b45309; }
+        .app-badge-tag.system { background: #e2e8f0; color: #334155; }
+
+        .priority-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .priority-badge.high { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .priority-badge.warning { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .priority-badge.normal { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+        .card-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.45;
+        }
+
+        /* Parameter Data Chips Box inside Large Card */
+        .card-param-box {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 10.5px;
+        }
+
+        .param-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+        }
+
+        .param-item strong {
+            color: #1e293b;
+        }
+
+        /* Card Action Footer */
+        .card-footer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 6px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .card-time {
+            font-size: 10.5px;
+            color: #94a3b8;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-action-btn {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .card-action-btn:active {
+            background: #dbeafe;
+        }
+
+        /* Empty State */
+        .empty-state-box {
+            text-align: center;
+            padding: 40px 20px;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px dashed #cbd5e1;
+            margin-top: 10px;
+        }
+
+        .empty-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+
+        /* Bottom Fixed Navigation Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px 8px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 3px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: var(--header-blue);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 4px;
+            background: #000000;
+            border-radius: 2px;
+            z-index: 110;
+        }
+
+        /* Settings Drawer Modal */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 200;
+            display: flex;
+            align-items: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            height: 82vh;
+            max-height: 85vh;
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 16px 20px 24px;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 36px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+        }
+
+        .notif-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+        }
+
+        .ios-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .ios-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .ios-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .ios-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .ios-switch input:checked + .ios-slider {
+            background-color: var(--header-blue);
+        }
+
+        .ios-switch input:checked + .ios-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Toast Container */
+        .mobile-toast {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            right: 20px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            z-index: 1000;
+            transform: translateY(-80px);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+
+        .mobile-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Activity Header -->
+        <div class="activity-header">
+            <div class="header-top-row">
+                <a href="./catalog-mobile.html" class="btn-back" title="Kembali ke Beranda">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1>Pusat Notifikasi</h1>
+                    <p>PLN Transmisi Mobile • GI Mampang</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-header-action" onclick="markAllAsRead()" title="Tandai Semua Dibaca">
+                        <i class="fa-solid fa-check-double"></i>
+                    </button>
+                    <button class="btn-header-action" onclick="openSettingsModal()" title="Pengaturan Notifikasi">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari notifikasi, GI, atau anomali..." oninput="handleSearch(this.value)">
+            </div>
+        </div>
+
+        <!-- App Category Filter Tabs (Scrollable Horizontal) -->
+        <div class="app-tabs-bar" id="appTabsBar">
+            <div class="app-tab-pill active" onclick="switchAppTab('all', this)">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Semua</span>
+                <span class="app-tab-badge" id="badgeAll">6</span>
+            </div>
+            <div class="app-tab-pill" onclick="switchAppTab('inspeksi', this)">
+                <i class="fa-solid fa-clipboard-check" style="color: #2563eb;"></i>
+                <span>Power Inspect</span>
+                <span class="app-tab-badge">2</span>
+            </div>
+            <div class="app-tab-pill" onclick="switchAppTab('ers', this)">
+                <i class="fa-solid fa-tower-observation" style="color: #9333ea;"></i>
+                <span>ERS Mobile</span>
+                <span class="app-tab-badge">2</span>
+            </div>
+            <div class="app-tab-pill" onclick="switchAppTab('ffe', this)">
+                <i class="fa-solid fa-fire-extinguisher" style="color: #dc2626;"></i>
+                <span>FFE Transmisi</span>
+                <span class="app-tab-badge">1</span>
+            </div>
+            <div class="app-tab-pill" onclick="switchAppTab('survey', this)">
+                <i class="fa-solid fa-compass-drafting" style="color: #059669;"></i>
+                <span>SURVEY Mobile</span>
+                <span class="app-tab-badge">2</span>
+            </div>
+            <div class="app-tab-pill" onclick="switchAppTab('newpst', this)">
+                <i class="fa-solid fa-database" style="color: #d97706;"></i>
+                <span>NEWPST</span>
+                <span class="app-tab-badge">0</span>
+            </div>
+        </div>
+
+        <!-- Quick Filter Chips -->
+        <div class="filter-chips-row">
+            <div class="quick-chip active" onclick="setQuickFilter('all', this)">Semua Status</div>
+            <div class="quick-chip" onclick="setQuickFilter('unread', this)">Belum Dibaca</div>
+            <div class="quick-chip" onclick="setQuickFilter('priority', this)">Prioritas / Warning</div>
+            <div class="quick-chip" onclick="setQuickFilter('today', this)">Hari Ini</div>
+        </div>
+
+        <!-- Notif Stream Content Area -->
+        <div class="notif-content-area" id="notifStream">
+            <!-- Populated dynamically by JavaScript -->
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="./catalog-mobile.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="./notifikasi-catalog-mobile.html" class="nav-item active">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifikasi</span>
+            </a>
+            <a href="./catalog-mobile.html" class="nav-item">
+                <i class="fa-regular fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </nav>
+
+        <!-- iOS Bottom Bar Line -->
+        <div class="ios-bar"></div>
+
+        <!-- In-App Toast -->
+        <div class="mobile-toast" id="mobileToast">
+            <i class="fa-solid fa-circle-check" style="color: #4ade80; font-size: 16px;"></i>
+            <span id="toastMessage">Notifikasi diperbarui</span>
+        </div>
+
+        <!-- Settings Bottom Sheet Modal -->
+        <div class="modal-overlay" id="settingsModal" onclick="closeSettingsModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeSettingsModalDirect()"></div>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <div style="font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-sliders" style="color: var(--primary-blue);"></i> Pengaturan Notifikasi per Aplikasi
+                    </div>
+                    <button type="button" onclick="closeSettingsModalDirect()" style="background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer;">
+                        <i class="fa-solid fa-xmark" style="font-size: 13px;"></i>
+                    </button>
+                </div>
+
+                <p style="font-size: 11.5px; color: #64748b; margin-bottom: 12px;">
+                    Aktifkan atau nonaktifkan push notifikasi untuk masing-masing modul aplikasi transmisi sesuai kebutuhan Anda.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: calc(82vh - 160px);" id="settingsList">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div style="margin-top: auto; padding-top: 14px;">
+                    <button onclick="closeSettingsModalDirect()" style="width: 100%; padding: 12px; background: var(--header-blue); color: white; border: none; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                        Simpan Pengaturan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* Comprehensive Notifications Dataset */
+        let notificationsList = [
+            {
+                id: 'notif-1',
+                app: 'inspeksi',
+                appName: 'Power Inspect',
+                title: 'Jadwal Inspeksi Rutin Bay GI Mampang',
+                desc: '14 Bay transmisi dan 4 Trafo 150/20kV terdaftar dalam jadwal inspeksi level 1 hari ini. Pastikan Anda mengunduh form offline sebelum menuju switchyard.',
+                icon: 'fa-clipboard-check',
+                priority: 'normal',
+                priorityLabel: 'Jadwal Hari Ini',
+                time: '12 menit yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Gardu Induk', val: 'GI Mampang 150kV' },
+                    { label: 'Bay', val: 'Bay Trafo 1, 2 & Koppel' },
+                    { label: 'Target', val: '14 Item' }
+                ],
+                actionText: 'Buka Jadwal & Sync',
+                actionUrl: './power-inspect/sync-jadwal.html'
+            },
+            {
+                id: 'notif-2',
+                app: 'inspeksi',
+                appName: 'Power Inspect',
+                title: 'Temuan Anomali Thermovisi Delta T > 15°C',
+                desc: 'Terdeteksi kenaikan temperatur abnormal pada Klem Sambungan Busbar Bay Trafo 2 (TBT 18.4°C). Diperlukan verifikasi thermovisi ulang dan pembuatan WO Pemeliharaan Korektif.',
+                icon: 'fa-triangle-exclamation',
+                priority: 'high',
+                priorityLabel: 'Warning CBM',
+                time: '48 menit yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Peralatan', val: 'Klem Busbar Trafo 2' },
+                    { label: 'Delta Temp', val: '18.4°C (Kritis)' },
+                    { label: 'Status', val: 'Belum WO' }
+                ],
+                actionText: 'Detail Temuan Anomali',
+                actionUrl: './power-inspect/notifikasi-mobile.html'
+            },
+            {
+                id: 'notif-3',
+                app: 'ers',
+                appName: 'ERS Mobile',
+                title: 'Persetujuan Disposisi Mutasi Tower #ERS-082',
+                desc: 'Permohonan peminjaman 1 set tower darurat tipe Suspension T-150kV untuk UPT Cawang telah disetujui oleh Dispatcher Penyaluran UIP3B JBB.',
+                icon: 'fa-tower-observation',
+                priority: 'normal',
+                priorityLabel: 'Mutasi Approved',
+                time: '2 jam yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'No. Disposisi', val: '#ERS-MUT-2026-08' },
+                    { label: 'Asal', val: 'Gudang Regional JBB' },
+                    { label: 'Tujuan', val: 'GI Cawang / SUTT 150kV' }
+                ],
+                actionText: 'Lihat Berita Acara',
+                actionUrl: './ers/home-mobile.html'
+            },
+            {
+                id: 'notif-4',
+                app: 'ers',
+                appName: 'ERS Mobile',
+                title: 'Jadwal Stock Opname Material ERS Q3',
+                desc: 'Pelaksanaan inventarisasi berkala komponen guy wire, mast base, dan crossarm ERS di Gudang ULTG Cawang dijadwalkan pada hari Jumat.',
+                icon: 'fa-boxes-stacked',
+                priority: 'normal',
+                priorityLabel: 'Logistik',
+                time: '5 jam yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: false,
+                params: [
+                    { label: 'Lokasi Gudang', val: 'ULTG Cawang' },
+                    { label: 'Periode', val: 'Triwulan 3 - 2026' }
+                ],
+                actionText: 'Buka Modul Stock Opname',
+                actionUrl: './ers/Stock Opname/home-mobile.html'
+            },
+            {
+                id: 'notif-5',
+                app: 'ffe',
+                appName: 'FFE Transmisi',
+                title: 'Masa Uji Tabung APAR 30 Hari Jatuh Tempo',
+                desc: '3 tabung APAR tipe CO2 25kg di Ruang Kontrol GI Mampang dan Ruang Relay GIS Kuningan mendekati masa inspeksi hydrostatic test 3 tahunan.',
+                icon: 'fa-fire-extinguisher',
+                priority: 'warning',
+                priorityLabel: 'Kadaluwarsa',
+                time: 'Kemarin, 14:20',
+                dateGroup: 'Kemarin & Sebelumnya',
+                isUnread: false,
+                params: [
+                    { label: 'Peralatan', val: '3x APAR CO2 25kg' },
+                    { label: 'Lokasi', val: 'GI Mampang & GIS Kuningan' }
+                ],
+                actionText: 'Checklist Pemadam',
+                actionUrl: '#'
+            },
+            {
+                id: 'notif-6',
+                app: 'survey',
+                appName: 'SURVEY Mobile',
+                title: 'Permintaan Survei Ketersediaan Bay GI Senayan',
+                desc: 'Terdapat permintaan survei lapangan baru untuk verifikasi ketersediaan ruang lahan, kapasitas busbar, dan kesiapan bay 150kV penambahan feeder GI Senayan.',
+                icon: 'fa-compass-drafting',
+                priority: 'normal',
+                priorityLabel: 'Ketersediaan Lahan',
+                time: 'Kemarin, 09:15',
+                dateGroup: 'Kemarin & Sebelumnya',
+                isUnread: true,
+                params: [
+                    { label: 'No. Request', val: '#SRV-REQ-2026-09' },
+                    { label: 'Tipe Survei', val: 'Ketersediaan Bay / Lahan' },
+                    { label: 'Unit Pemohon', val: 'Perencanaan UIP3B' }
+                ],
+                actionText: 'Buka Form Survei',
+                actionUrl: './power-inspect/sync-survey.html'
+            },
+            {
+                id: 'notif-7',
+                app: 'survey',
+                appName: 'SURVEY Mobile',
+                title: 'Survei Riset & Kajian Geoteknik Pondasi Tower',
+                desc: 'Penugasan survei riset dan pengujian daya dukung tanah (Cone Penetration Test) pada span T.21 - T.25 jalur transmisi untuk kajian mitigasi pergerakan tanah.',
+                icon: 'fa-flask-vial',
+                priority: 'normal',
+                priorityLabel: 'Kebutuhan Riset',
+                time: '2 hari yang lalu',
+                dateGroup: 'Kemarin & Sebelumnya',
+                isUnread: false,
+                params: [
+                    { label: 'Tipe Riset', val: 'Kajian Geoteknik & Tanah' },
+                    { label: 'Lokasi Span', val: 'Tower T.21 - T.25 Cawang' },
+                    { label: 'Dokumen', val: 'TOR Riset Terlampir' }
+                ],
+                actionText: 'Detail Kajian Riset',
+                actionUrl: './power-inspect/sync-survey.html'
+            }
+        ];
+
+        /* App Notification Settings */
+        const appNotifSettings = {
+            inspeksi: { name: 'Power Inspect (Inspeksi)', desc: 'Jadwal inspeksi harian, reminder sync & anomali CBM', enabled: true, icon: 'fa-clipboard-check', color: '#2563eb', bg: '#eff6ff' },
+            ers: { name: 'ERS (Emergency System)', desc: 'Disposisi mutasi tower, permohonan material & stock opname', enabled: true, icon: 'fa-tower-observation', color: '#9333ea', bg: '#f3e8ff' },
+            ffe: { name: 'FFE (Fire Fighting Equipment)', desc: 'Peringatan tabung APAR jatuh tempo & uji pompa hydrant', enabled: true, icon: 'fa-fire-extinguisher', color: '#dc2626', bg: '#fee2e2' },
+            survey: { name: 'SURVEY Mobile (Survei Lapangan)', desc: 'Permintaan survei baru, ketersediaan lahan/bay, & kajian riset transmisi', enabled: true, icon: 'fa-compass-drafting', color: '#059669', bg: '#d1fae5' },
+            newpst: { name: 'NEWPST Master Data', desc: 'Pembaruan katalog master asset sarana penyaluran', enabled: false, icon: 'fa-database', color: '#d97706', bg: '#fef3c7' }
+        };
+
+        let currentAppFilter = 'all';
+        let currentQuickFilter = 'all';
+        let currentSearchQuery = '';
+
+        function renderNotifStream() {
+            const container = document.getElementById('notifStream');
+            if (!container) return;
+
+            let filtered = notificationsList.filter(item => {
+                // App Filter
+                if (currentAppFilter !== 'all' && item.app !== currentAppFilter) return false;
+                // Quick Filter
+                if (currentQuickFilter === 'unread' && !item.isUnread) return false;
+                if (currentQuickFilter === 'priority' && item.priority === 'normal') return false;
+                if (currentQuickFilter === 'today' && item.dateGroup !== 'Hari Ini') return false;
+                // Search Query
+                if (currentSearchQuery.trim() !== '') {
+                    const q = currentSearchQuery.toLowerCase();
+                    const matchTitle = item.title.toLowerCase().includes(q);
+                    const matchDesc = item.desc.toLowerCase().includes(q);
+                    const matchApp = item.appName.toLowerCase().includes(q);
+                    if (!matchTitle && !matchDesc && !matchApp) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-box">
+                        <div class="empty-icon">
+                            <i class="fa-regular fa-bell-slash"></i>
+                        </div>
+                        <h3 style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">Tidak Ada Notifikasi</h3>
+                        <p style="font-size: 11.5px; color: #64748b; max-width: 260px; margin: 0 auto;">Tidak ada pesan yang sesuai dengan filter atau kata kunci pencarian Anda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Grouping by dateGroup
+            const groups = {};
+            filtered.forEach(item => {
+                if (!groups[item.dateGroup]) groups[item.dateGroup] = [];
+                groups[item.dateGroup].push(item);
+            });
+
+            let html = '';
+            for (const groupName in groups) {
+                html += `
+                    <div class="notif-group-header">
+                        <span class="notif-group-title">
+                            <i class="fa-regular fa-calendar-check" style="color: var(--primary-blue);"></i> ${groupName}
+                        </span>
+                        <span class="notif-group-count">${groups[groupName].length} Notifikasi</span>
+                    </div>
+                `;
+
+                groups[groupName].forEach(item => {
+                    html += `
+                        <div class="notif-card-large ${item.isUnread ? 'unread' : ''}" onclick="openNotifItem('${item.id}', '${item.actionUrl}')">
+                            <div class="card-top-row">
+                                <div class="card-icon-box ${item.app}">
+                                    <i class="fa-solid ${item.icon}"></i>
+                                </div>
+                                <div class="card-header-info">
+                                    <div class="card-app-tag-row">
+                                        <span class="app-badge-tag ${item.app}">${item.appName}</span>
+                                        ${item.priority === 'high' ? '<span class="priority-badge high"><i class="fa-solid fa-circle-exclamation"></i> Kritis</span>' : ''}
+                                        ${item.priority === 'warning' ? '<span class="priority-badge warning"><i class="fa-solid fa-triangle-exclamation"></i> Perhatian</span>' : ''}
+                                        <span class="priority-badge normal">${item.priorityLabel}</span>
+                                    </div>
+                                    <div class="card-title">${item.title}</div>
+                                    <div class="card-desc">${item.desc}</div>
+                                </div>
+                            </div>
+
+                            ${item.params && item.params.length > 0 ? `
+                                <div class="card-param-box">
+                                    ${item.params.map(p => `
+                                        <div class="param-item">
+                                            <span>${p.label}:</span>
+                                            <strong>${p.val}</strong>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+
+                            <div class="card-footer-row">
+                                <span class="card-time">
+                                    <i class="fa-regular fa-clock"></i> ${item.time}
+                                </span>
+                                <a href="${item.actionUrl}" class="card-action-btn" onclick="event.stopPropagation()">
+                                    <span>${item.actionText}</span>
+                                    <i class="fa-solid fa-arrow-right" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function switchAppTab(appKey, el) {
+            currentAppFilter = appKey;
+            const pills = document.querySelectorAll('#appTabsBar .app-tab-pill');
+            pills.forEach(p => p.classList.remove('active'));
+            if (el) el.classList.add('active');
+            renderNotifStream();
+        }
+
+        function setQuickFilter(key, el) {
+            currentQuickFilter = key;
+            const chips = document.querySelectorAll('.filter-chips-row .quick-chip');
+            chips.forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+            renderNotifStream();
+        }
+
+        function handleSearch(val) {
+            currentSearchQuery = val;
+            renderNotifStream();
+        }
+
+        function openNotifItem(id, url) {
+            const item = notificationsList.find(i => i.id === id);
+            if (item) {
+                item.isUnread = false;
+                renderNotifStream();
+            }
+            if (url && url !== '#') {
+                window.location.href = url;
+            } else {
+                showToast('Membuka detail notifikasi...', 'fa-bell', '#2563eb');
+            }
+        }
+
+        function markAllAsRead() {
+            notificationsList.forEach(i => i.isUnread = false);
+            renderNotifStream();
+            showToast('Semua notifikasi ditandai telah dibaca', 'fa-check-double', '#10b981');
+        }
+
+        function openSettingsModal() {
+            const container = document.getElementById('settingsList');
+            if (container) {
+                container.innerHTML = Object.keys(appNotifSettings).map(key => {
+                    const app = appNotifSettings[key];
+                    return `
+                        <div class="notif-toggle-row">
+                            <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                                <div style="width: 36px; height: 36px; border-radius: 12px; background: ${app.bg}; color: ${app.color}; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+                                    <i class="fa-solid ${app.icon}"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12.5px; font-weight: 800; color: #0f172a;">${app.name}</div>
+                                    <div style="font-size: 10px; color: #64748b; margin-top: 1px;">${app.desc}</div>
+                                </div>
+                            </div>
+                            <label class="ios-switch">
+                                <input type="checkbox" ${app.enabled ? 'checked' : ''} onchange="toggleSettings('${key}', this)">
+                                <span class="ios-slider"></span>
+                            </label>
+                        </div>
+                    `;
+                }).join('');
+            }
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function toggleSettings(key, checkbox) {
+            if (appNotifSettings[key]) {
+                appNotifSettings[key].enabled = checkbox.checked;
+                const status = checkbox.checked ? 'diaktifkan' : 'dinonaktifkan';
+                showToast(`Notifikasi ${appNotifSettings[key].name} ${status}`, checkbox.checked ? 'fa-bell' : 'fa-bell-slash', checkbox.checked ? '#2563eb' : '#dc2626');
+            }
+        }
+
+        function closeSettingsModalDirect() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function closeSettingsModal(event) {
+            if (event.target.id === 'settingsModal') {
+                closeSettingsModalDirect();
+            }
+        }
+
+        function showToast(msg, icon = 'fa-circle-check', color = '#4ade80') {
+            const toast = document.getElementById('mobileToast');
+            const toastMsg = document.getElementById('toastMessage');
+            if (toast && toastMsg) {
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:16px;"></i> <span>${msg}</span>`;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2800);
+            }
+        }
+
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNotifStream();
+        });
+        renderNotifStream();
+    </script>
+</body>
+
+</html>
