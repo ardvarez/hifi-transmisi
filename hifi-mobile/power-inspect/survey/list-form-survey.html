@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Power Inspect - Form Aset Tidak Sesuai</title>
+    <title>Power Inspect - List Formulir Survey</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f4f6fb;
+            --bg-color: #f0f4f8;
             --card-bg: #ffffff;
-            --primary-blue: #1a65d6;
-            --primary-blue-hover: #134db0;
-            --primary-light: #eef4ff;
-            --text-main: #1e293b;
+            --header-blue: #0b4884;
+            --header-blue-dark: #083868;
+            --primary-blue: #0b4884;
+            --primary-blue-hover: #083868;
+            --primary-light: #e8f3ff;
+            --text-main: #0f172a;
+            --text-dark: #0f172a;
             --text-muted: #64748b;
+            --text-sub: #475569;
             --border-color: #e2e8f0;
-            --success-color: #10b981;
+            --success-color: #059669;
             --warning-color: #f59e0b;
+            --orange-color: #d97706;
             --danger-color: #ef4444;
-            --purple-color: #8b5cf6;
         }
 
         * {
@@ -74,17 +78,47 @@
             }
         }
 
-        /* App Header */
-        .app-header {
-            padding: 18px 20px 14px;
-            display: flex;
-            justify-content: space-between;
+        /* Floating Back to Catalog Button */
+        .btn-back-catalog {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
             align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #1e293b;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+            z-index: 99999;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+        }
+        .btn-back-catalog:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+        }
+
+        /* App Header (Uniform) */
+        .app-header {
+            padding: 16px 20px 14px;
             background-color: #ffffff;
             border-bottom: 1px solid var(--border-color);
             z-index: 10;
         }
-        
+
+        .header-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
         .header-left-group {
             display: flex;
             align-items: center;
@@ -95,14 +129,27 @@
             display: flex;
             flex-direction: column;
         }
-        
-        .header-name { 
-            font-weight: 800; 
-            font-size: 15.5px; 
-            color: var(--text-main); 
+
+        .header-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
             line-height: 1.2;
         }
-        
+
+        .header-sub {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            letter-spacing: 0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .action-btn {
             width: 36px; 
             height: 36px;
@@ -115,6 +162,8 @@
             color: var(--text-main);
             font-size: 14px;
             cursor: pointer;
+            text-decoration: none;
+            position: relative;
             transition: all 0.2s;
         }
         .action-btn:hover {
@@ -123,346 +172,322 @@
             border-color: #bfdbfe;
         }
 
+        .sync-badge-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f59e0b;
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid #ffffff;
+            line-height: 1;
+        }
+
+        /* Search & Filter Row */
+        .search-filter-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-input-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 9px 34px 9px 12px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+        }
+
+        .search-icon-inside {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .btn-filter-trigger {
+            padding: 9px 14px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1.5px solid var(--primary-blue);
+            color: var(--primary-blue);
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-filter-trigger:hover {
+            background: #eff6ff;
+        }
+
         /* Content Scroll */
         .content-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 18px 20px;
+            padding: 14px 18px 80px;
             scrollbar-width: none;
         }
         .content-scroll::-webkit-scrollbar { display: none; }
 
-        /* Asset Meta Details Box */
-        .asset-detail-card {
+        /* Unit Hierarchy Banner */
+        .hierarchy-badge-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 9px 12px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+        }
+        .hierarchy-title {
+            color: #1e3a8a;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hierarchy-tag {
+            background: #1a65d6;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        /* Form Survey Cards */
+        .form-cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-survey-card {
             background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 16px 18px;
-            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .form-survey-card:hover {
+            border-color: #bfdbfe;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(11, 72, 132, 0.08);
+        }
+
+        .card-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .form-name-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* Action Buttons on Form Card */
+        .btn-start-form {
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: var(--primary-blue);
+            border: 1.5px solid var(--primary-blue);
+            color: #ffffff;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 3px 8px rgba(11, 72, 132, 0.25);
+        }
+        .btn-start-form:active {
+            background: var(--primary-blue-hover);
+        }
+
+        .btn-in-progress-form {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: #fff7ed;
+            border: 1.5px solid #fed7aa;
+            color: #d97706;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-in-progress-form:hover {
+            background: #ffedd5;
+        }
+
+        .dotted-divider {
+            border-top: 1.5px dotted #cbd5e1;
+            margin: 12px 0;
+        }
+
+        .form-grid-table {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .grid-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .grid-label {
+            color: #64748b;
+            font-weight: 500;
             font-size: 11.5px;
         }
 
-        .detail-grid-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .detail-col-left, .detail-col-right {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .detail-col-right {
+        .grid-value {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 12px;
             text-align: right;
-            align-items: flex-end;
         }
 
-        .detail-lbl {
-            color: #94a3b8;
-            font-size: 10.5px;
-            font-weight: 500;
-        }
-        .detail-val {
-            font-weight: 700;
-            color: var(--text-main);
-            font-size: 12px;
-        }
-
-        .detail-full-row {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            margin-top: 6px;
-            padding-top: 8px;
-            border-top: 1px dashed #e2e8f0;
-        }
-
-        /* Form Card: Asset Tidak Sesuai */
-        .form-section-card {
-            background: #ffffff;
-            border: 1px solid #dbeafe;
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.03);
-            margin-bottom: 16px;
-        }
-
-        .form-section-title {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 14px;
-        }
-
-        /* Segmented Toggle */
-        .segmented-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .seg-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 12.5px;
-            font-weight: 700;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            color: #94a3b8;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .seg-btn.active {
-            border-color: #2563eb;
-            background: #eff6ff;
-            color: #1d4ed8;
-            box-shadow: 0 0 0 1px #2563eb;
-        }
-
-        /* Form Controls */
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: #475569;
-            margin-bottom: 6px;
-        }
-
-        .form-select, .form-input, .form-textarea {
-            width: 100%;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            padding: 11px 14px;
-            font-size: 12.5px;
-            color: var(--text-main);
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .form-select:focus, .form-input:focus, .form-textarea:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
-        }
-
-        .form-textarea {
-            resize: none;
-            line-height: 1.45;
-        }
-
-        /* Photo Upload Mockup */
-        .photo-upload-box {
-            border: 2px dashed #cbd5e1;
-            border-radius: 14px;
-            padding: 16px 14px;
-            text-align: center;
-            background: #f8fafc;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .photo-upload-box:hover {
-            border-color: var(--primary-blue);
-            background: #eff6ff;
-        }
-
-        .photo-upload-icon {
-            font-size: 24px;
-            color: var(--primary-blue);
-            margin-bottom: 6px;
-        }
-
-        .photo-upload-text {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 2px;
-        }
-
-        .photo-upload-sub {
-            font-size: 10.5px;
-            color: var(--text-muted);
-        }
-
-        .photo-preview-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-top: 8px;
-        }
-
-        .photo-preview-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .photo-thumb {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: #10b981;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .btn-remove-photo {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        /* Bottom Sticky Bar */
-        .bottom-action-bar {
-            padding: 14px 20px;
-            background: #ffffff;
-            border-top: 1px solid var(--border-color);
-            z-index: 10;
-        }
-
-        .btn-submit-main {
-            width: 100%;
-            padding: 13px;
-            background: #1a65d6;
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            font-size: 13.5px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-submit-main:active {
-            background: #134db0;
-        }
-
-        /* Success Modal */
-        .modal-overlay {
+        /* Bottom Sheet Filter Modal */
+        .bottom-sheet-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(4px);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-end;
             z-index: 10000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s ease;
             border-radius: inherit;
-            padding: 20px;
         }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .bottom-sheet-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-        .modal-box {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 24px;
+        .bottom-sheet-card {
             width: 100%;
-            max-width: 340px;
-            text-align: center;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
-            animation: slideUpModal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 16px 20px 24px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bottom-sheet-overlay.show .bottom-sheet-card {
+            transform: translateY(0);
         }
 
-        @keyframes slideUpModal {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-icon-success {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #ecfdf5;
-            color: #10b981;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
+        .drag-handle {
+            width: 44px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 4px;
             margin: 0 auto 14px;
-            border: 2px solid #a7f3d0;
         }
 
-        .modal-title {
+        .filter-sheet-title {
             font-size: 16px;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .modal-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.45;
-            margin-bottom: 18px;
-        }
-
-        .modal-icon-confirm {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #fef3c7;
-            color: #d97706;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            margin: 0 auto 14px;
-            border: 2px solid #fde68a;
+            gap: 8px;
         }
 
-        .btn-cancel-modal {
+        .filter-form-group {
+            margin-bottom: 14px;
+        }
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            display: block;
+        }
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+        }
+        .filter-select:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+        }
+
+        .sheet-action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .btn-sheet-reset {
             flex: 1;
             padding: 12px;
-            background: #f1f5f9;
-            color: #475569;
-            border: none;
             border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            color: #475569;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
         }
-        .btn-cancel-modal:active {
-            background: #e2e8f0;
-        }
-
-        .btn-confirm-save-modal {
-            flex: 1.3;
+        .btn-sheet-apply {
+            flex: 1.4;
             padding: 12px;
-            background: #1a65d6;
-            color: white;
-            border: none;
             border-radius: 12px;
+            border: none;
+            background: var(--primary-blue);
+            color: #ffffff;
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(11, 72, 132, 0.25);
+            transition: background 0.2s;
         }
-        .btn-confirm-save-modal:active {
-            background: #134db0;
+        .btn-sheet-apply:hover {
+            background: var(--primary-blue-hover);
         }
     
         
@@ -1065,300 +1090,256 @@
 </head>
 <body>
 
+    <!-- Floating Back to Catalog Portal Button -->
+    <a href="../../../hifi-home/home.html" class="btn-back-catalog" title="Kembali ke Catalog Portal">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Catalog</span>
+    </a>
+
     <div class="mobile-container">
         
-        <!-- Confirm Save Modal (Inside Frame) -->
-        <div id="modalConfirmSave" class="modal-overlay">
-            <div class="modal-box">
-                <div class="modal-icon-confirm">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+        <!-- Filter Bottom Sheet Modal -->
+        <div id="filterModal" class="bottom-sheet-overlay" onclick="closeFilterSheet()">
+            <div class="bottom-sheet-card" onclick="event.stopPropagation()">
+                <div class="drag-handle"></div>
+                <div class="filter-sheet-title">
+                    <i class="fa-solid fa-sliders" style="color: var(--primary-blue);"></i> Filter Formulir & Unit
                 </div>
-                <div class="modal-title">Konfirmasi Simpan</div>
-                <div class="modal-desc">
-                    Apakah Anda yakin ingin menyimpan laporan ketidaksesuaian aset ini? Data akan dicatat sebagai anomali aset lapangan.
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-cancel-modal" onclick="closeConfirmSaveModal()">Batal</button>
-                    <button class="btn-confirm-save-modal" onclick="proceedSaveKetidaksesuaian()">Ya, Simpan</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Success Modal (Inside Frame) -->
-        <div id="modalSuccess" class="modal-overlay">
-            <div class="modal-box">
-                <div class="modal-icon-success">
-                    <i class="fa-solid fa-circle-check"></i>
+                <div class="filter-form-group">
+                    <label class="filter-label">Pilih Unit Kerja</label>
+                    <select id="filterUnitSelect" class="filter-select">
+                        <option value="all">Semua Unit (GI & GIS Mampang)</option>
+                        <option value="GI 150kV Mampang">GI 150kV Mampang</option>
+                        <option value="GIS 150kV Mampang">GIS 150kV Mampang</option>
+                    </select>
                 </div>
-                <div class="modal-title">Data Anomali Tersimpan!</div>
-                <div class="modal-desc">
-                    Laporan ketidaksesuaian aset telah berhasil dicatat dan tersimpan dalam riwayat inspeksi.
+
+                <div class="filter-form-group">
+                    <label class="filter-label">Pilih Jenis Formulir</label>
+                    <select id="filterFormSelect" class="filter-select">
+                        <option value="all">Semua Formulir</option>
+                        <option value="Ketersediaan Pengamanan">Ketersediaan Pengamanan</option>
+                        <option value="Anti Blackout">Anti Blackout</option>
+                    </select>
                 </div>
-                <button class="btn-submit-main" onclick="finishKetidaksesuaian()">
-                    Kembali ke Daftar Aset <i class="fa-solid fa-arrow-right"></i>
-                </button>
+
+                <div class="sheet-action-row">
+                    <button class="btn-sheet-reset" onclick="resetFilter()">Reset</button>
+                    <button class="btn-sheet-apply" onclick="applyFilter()">Terapkan Filter</button>
+                </div>
             </div>
         </div>
 
         <!-- App Header -->
         <div class="app-header">
-            <div class="header-left-group">
-                <button class="action-btn" onclick="goBack()" title="Kembali">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <div class="header-title-group">
-                    <div class="header-name" id="headerAssetName">Over Current Relay</div>
+            <div class="header-top-row">
+                <div class="header-left-group">
+                    <button class="action-btn" onclick="goBack()" title="Kembali">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div class="header-title-group">
+                        <div class="header-name" id="surveyHeaderTitle">SVY202400000001</div>
+                        <div class="header-sub">LIST FORMULIR SURVEY</div>
+                    </div>
                 </div>
+                <div class="header-actions">
+                    <div class="action-btn" onclick="window.location.href='../inspeksi-rutin/list-wo-sync.html'" title="Upload Hasil Offline">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span class="sync-badge-count">3</span>
+                    </div>
+                    <div class="action-btn" onclick="window.location.href='../notifikasi-mobile.html'" title="Notifikasi">
+                        <i class="fa-regular fa-bell"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter Row -->
+            <div class="search-filter-row">
+                <div class="search-input-box">
+                    <input type="text" id="formSearchInput" class="search-input" placeholder="Cari formulir atau unit..." onkeyup="filterCardsRealtime()">
+                    <i class="fa-solid fa-magnifying-glass search-icon-inside"></i>
+                </div>
+                <button class="btn-filter-trigger" onclick="openFilterSheet()">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
             </div>
         </div>
 
         <!-- Content Scroll -->
         <div class="content-scroll">
             
-            <!-- Asset Meta Details Card -->
-            <div class="asset-detail-card">
-                <div class="detail-grid-row">
-                    <div class="detail-col-left">
-                        <span class="detail-lbl">Bay</span>
-                        <span class="detail-val" id="lblBay">PHT 150KV SUKOLILO #1</span>
-                    </div>
-                    <div class="detail-col-right">
-                        <span class="detail-lbl">Serial</span>
-                        <span class="detail-val" id="lblSerial">36163288/08/22</span>
-                    </div>
+            <!-- Unit Hierarchy Scope Card -->
+            <div class="hierarchy-badge-box">
+                <div class="hierarchy-title">
+                    <i class="fa-solid fa-sitemap" style="color: var(--primary-blue);"></i> Cakupan: ULTG Mampang
                 </div>
-
-                <div class="detail-grid-row">
-                    <div class="detail-col-left">
-                        <span class="detail-lbl">Penempatan</span>
-                        <span class="detail-val" id="lblPenempatan">-</span>
-                    </div>
-                    <div class="detail-col-right">
-                        <span class="detail-lbl">Merk</span>
-                        <span class="detail-val" id="lblMerk">GE</span>
-                    </div>
-                </div>
-
-                <div class="detail-grid-row">
-                    <div class="detail-col-left">
-                        <span class="detail-lbl">Phasa</span>
-                        <span class="detail-val" id="lblPhasa">Phasa - R</span>
-                    </div>
-                    <div class="detail-col-right">
-                        <span class="detail-lbl">Tipe</span>
-                        <span class="detail-val" id="lblTipe">MICOM P14D</span>
-                    </div>
-                </div>
-
-                <div class="detail-full-row">
-                    <span class="detail-lbl">Formulir</span>
-                    <span class="detail-val" id="lblFormulir">Form IL3 - Pemeliharaan Sistem Proteksi OCR - 2 Tahunan</span>
-                </div>
-
-                <div class="detail-full-row">
-                    <span class="detail-lbl">Inspeksi terakhir</span>
-                    <span class="detail-val" id="lblLastInspect">1 - Very Good | 06 Maret 2026</span>
-                </div>
+                <span class="hierarchy-tag">Creator: PLN Kantor Pusat</span>
             </div>
 
-            <!-- Form Card: Asset Tidak Sesuai -->
-            <div class="form-section-card">
-                <div class="form-section-title">Asset tidak sesuai</div>
+            <!-- Form Survey Cards List -->
+            <div class="form-cards-list" id="formCardsContainer">
+                
+                <!-- Card 1: Ketersediaan Pengamanan (GI Mampang) -->
+                <div class="form-survey-card" data-unit="GI 150kV Mampang" data-form="Ketersediaan Pengamanan" onclick="startFillingForm(1, 'Ketersediaan Pengamanan', 'GI 150kV Mampang')">
+                    <div class="card-top-row">
+                        <div class="form-name-title">Ketersediaan Pengamanan</div>
+                        <button class="btn-start-form" id="btnForm1" onclick="startFillingForm(1, 'Ketersediaan Pengamanan', 'GI 150kV Mampang'); event.stopPropagation();">
+                            Mulai
+                        </button>
+                    </div>
 
-                <!-- Segmented Toggle -->
-                <div class="segmented-row">
-                    <button class="seg-btn" type="button" onclick="switchToSesuai()">Sesuai</button>
-                    <button class="seg-btn active" type="button">Tidak Sesuai</button>
-                </div>
+                    <div class="dotted-divider"></div>
 
-                <!-- Dropdown Klasifikasi -->
-                <div class="form-group">
-                    <label class="form-label">Klasifikasi Aset Tidak Sesuai</label>
-                    <select id="selectKlasifikasi" class="form-select" onchange="handleClassificationChange()">
-                        <option value="identitas" selected>Identitas Aset</option>
-                        <option value="lokasi">Lokasi berbeda</option>
-                        <option value="tidak_ada">Aset tidak ada</option>
-                    </select>
-                </div>
-
-                <!-- Container 1: Identitas Aset -->
-                <div id="sectionIdentitas">
-                    <div class="form-group">
-                        <label class="form-label">Merk</label>
-                        <input type="text" id="inputMerk" class="form-input" placeholder="Masukkan merk fisik aset...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tipe</label>
-                        <input type="text" id="inputTipe" class="form-input" placeholder="Masukkan tipe fisik aset...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Serial Number</label>
-                        <input type="text" id="inputSerial" class="form-input" placeholder="Masukkan nomor serial fisik...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Phasa</label>
-                        <input type="text" id="inputPhasa" class="form-input" placeholder="Masukkan phasa fisik (cth: R / S / T / RST)...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea id="inputDeskripsiIdentitas" class="form-textarea" rows="3" placeholder="Tuliskan catatan tambahan mengenai ketidaksesuaian identitas aset..."></textarea>
-                    </div>
-                </div>
-
-                <!-- Container 2: Lokasi Berbeda -->
-                <div id="sectionLokasi" style="display: none;">
-                    <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea id="inputDeskripsiLokasi" class="form-textarea" rows="4" placeholder="Jelaskan detail lokasi aset atau perpindahan bay sebenarnya di lapangan..."></textarea>
-                    </div>
-                </div>
-
-                <!-- Container 3: Aset Tidak Ada -->
-                <div id="sectionTidakAda" style="display: none;">
-                    <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea id="inputDeskripsiTidakAda" class="form-textarea" rows="4" placeholder="Jelaskan kondisi ketiadaan aset fisik di lapangan (cth: sedang dibongkar/peremajaan)..."></textarea>
-                    </div>
-                </div>
-
-                <!-- Photo Evidence Upload -->
-                <div class="form-group" style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
-                    <label class="form-label">Foto Bukti Ketidaksesuaian</label>
-                    <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="handlePhotoSelected(event)">
-                    <div class="photo-upload-box" id="uploadTriggerBox" onclick="document.getElementById('photoInput').click()">
-                        <div class="photo-upload-icon">
-                            <i class="fa-solid fa-camera"></i>
+                    <div class="form-grid-table">
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit</span>
+                            <span class="grid-value">GI 150kV Mampang</span>
                         </div>
-                        <div class="photo-upload-text">Ambil Foto / Unggah Bukti</div>
-                        <div class="photo-upload-sub">Klik untuk mengambil foto nameplate / kondisi lapangan</div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Tanggal Diperbarui</span>
+                            <span class="grid-value">31 Oktober 2024</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Total Mengisi</span>
+                            <span class="grid-value">1</span>
+                        </div>
                     </div>
-                    <div id="photoPreviewContainer" style="display: none;">
-                        <div class="photo-preview-box">
-                            <div class="photo-preview-info">
-                                <div class="photo-thumb">
-                                    <i class="fa-solid fa-image"></i>
-                                </div>
-                                <div>
-                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-main);" id="photoFileName">foto_bukti_anomali.jpg</div>
-                                    <div style="font-size: 10px; color: var(--text-muted);" id="photoTimestamp">Baru saja • 1.4 MB</div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn-remove-photo" onclick="removePhoto()" title="Hapus foto">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                </div>
+
+                <!-- Card 2: Anti Blackout (GI Mampang - Sedang Berlangsung) -->
+                <div class="form-survey-card" data-unit="GI 150kV Mampang" data-form="Anti Blackout" onclick="startFillingForm(2, 'Anti Blackout', 'GI 150kV Mampang')">
+                    <div class="card-top-row">
+                        <div class="form-name-title">Anti Blackout</div>
+                        <button class="btn-in-progress-form" id="btnForm2" onclick="startFillingForm(2, 'Anti Blackout', 'GI 150kV Mampang'); event.stopPropagation();">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 10px;"></i> Sedang Berlangsung
+                        </button>
+                    </div>
+
+                    <div class="dotted-divider"></div>
+
+                    <div class="form-grid-table">
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit</span>
+                            <span class="grid-value">GI 150kV Mampang</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Tanggal Diperbarui</span>
+                            <span class="grid-value">31 Oktober 2024</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Total Mengisi</span>
+                            <span class="grid-value">1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Anti Blackout (GIS Mampang) -->
+                <div class="form-survey-card" data-unit="GIS 150kV Mampang" data-form="Anti Blackout" onclick="startFillingForm(3, 'Anti Blackout', 'GIS 150kV Mampang')">
+                    <div class="card-top-row">
+                        <div class="form-name-title">Anti Blackout</div>
+                        <button class="btn-start-form" id="btnForm3" onclick="startFillingForm(3, 'Anti Blackout', 'GIS 150kV Mampang'); event.stopPropagation();">
+                            Mulai
+                        </button>
+                    </div>
+
+                    <div class="dotted-divider"></div>
+
+                    <div class="form-grid-table">
+                        <div class="grid-row-item">
+                            <span class="grid-label">Unit</span>
+                            <span class="grid-value">GIS 150kV Mampang</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Tanggal Diperbarui</span>
+                            <span class="grid-value">31 Oktober 2024</span>
+                        </div>
+                        <div class="grid-row-item">
+                            <span class="grid-label">Total Mengisi</span>
+                            <span class="grid-value">1</span>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-        </div>
-
-        <!-- Sticky Bottom Action Button -->
-        <div class="bottom-action-bar">
-            <button class="btn-submit-main" onclick="submitKetidaksesuaian()">
-                Simpan
-            </button>
         </div>
 
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const assetParam = urlParams.get('asset') || 'OCR-150-SKL-01';
-        const nameParam = urlParams.get('name') || 'Over Current Relay';
-        const bayParam = urlParams.get('bay') || 'PHT 150KV SUKOLILO #1';
-        const woParam = urlParams.get('wo') || 'INS202600131960';
-        const giParam = urlParams.get('gi') || 'GI 150KV KALISARI';
-        const phasaParam = urlParams.get('phasa') || 'Phasa - R';
-        const merkParam = urlParams.get('merk') || 'GE';
-        const serialParam = urlParams.get('serial') || '36163288/08/22';
-        const tipeParam = urlParams.get('tipe') || 'MICOM P14D';
-
-        document.getElementById('headerAssetName').textContent = nameParam;
-        document.getElementById('lblBay').textContent = bayParam;
-        document.getElementById('lblSerial').textContent = serialParam;
-        document.getElementById('lblMerk').textContent = merkParam;
-        document.getElementById('lblPhasa').textContent = phasaParam;
-        document.getElementById('lblTipe').textContent = tipeParam;
+        const surveyParam = urlParams.get('survey') || 'SVY202400000001';
+        document.getElementById('surveyHeaderTitle').textContent = surveyParam;
 
         function goBack() {
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
             setTimeout(() => {
-                window.location.href = `list-aset.html?bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}`;
+                window.location.href = 'list-survey.html';
             }, 300);
         }
 
-        function switchToSesuai() {
+        function startFillingForm(id, formName, unitName) {
+            const btn = document.getElementById(`btnForm${id}`);
+            if (btn) {
+                btn.className = 'btn-in-progress-form';
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 10px;"></i> Sedang Berlangsung';
+            }
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
             setTimeout(() => {
-                window.location.href = `form-inspeksi.html?asset=${encodeURIComponent(assetParam)}&name=${encodeURIComponent(nameParam)}&bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}`;
+                window.location.href = `form-survey.html?survey=${encodeURIComponent(surveyParam)}&form=${encodeURIComponent(formName)}&unit=${encodeURIComponent(unitName)}`;
             }, 300);
         }
 
-        function handleClassificationChange() {
-            const val = document.getElementById('selectKlasifikasi').value;
-            const secIdentitas = document.getElementById('sectionIdentitas');
-            const secLokasi = document.getElementById('sectionLokasi');
-            const secTidakAda = document.getElementById('sectionTidakAda');
-
-            secIdentitas.style.display = 'none';
-            secLokasi.style.display = 'none';
-            secTidakAda.style.display = 'none';
-
-            if (val === 'identitas') {
-                secIdentitas.style.display = 'block';
-            } else if (val === 'lokasi') {
-                secLokasi.style.display = 'block';
-            } else if (val === 'tidak_ada') {
-                secTidakAda.style.display = 'block';
-            }
+        function openFilterSheet() {
+            document.getElementById('filterModal').classList.add('show');
         }
 
-        // Photo Upload Handling
-        function handlePhotoSelected(event) {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById('photoFileName').textContent = file.name;
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-                document.getElementById('photoTimestamp').textContent = `Tersimpan • ${sizeMb} MB • ${timeStr}`;
-                document.getElementById('photoPreviewContainer').style.display = 'block';
-                document.getElementById('uploadTriggerBox').style.display = 'none';
-            }
+        function closeFilterSheet() {
+            document.getElementById('filterModal').classList.remove('show');
         }
 
-        function removePhoto() {
-            document.getElementById('photoInput').value = '';
-            document.getElementById('photoPreviewContainer').style.display = 'none';
-            document.getElementById('uploadTriggerBox').style.display = 'block';
+        function applyFilter() {
+            closeFilterSheet();
+            const unitVal = document.getElementById('filterUnitSelect').value;
+            const formVal = document.getElementById('filterFormSelect').value;
+            const cards = document.querySelectorAll('.form-survey-card');
+
+            cards.forEach(card => {
+                const cardUnit = card.getAttribute('data-unit');
+                const cardForm = card.getAttribute('data-form');
+
+                const unitMatch = (unitVal === 'all' || cardUnit === unitVal);
+                const formMatch = (formVal === 'all' || cardForm === formVal);
+
+                if (unitMatch && formMatch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
-        function submitKetidaksesuaian() {
-            document.getElementById('modalConfirmSave').classList.add('show');
+        function resetFilter() {
+            document.getElementById('filterUnitSelect').value = 'all';
+            document.getElementById('filterFormSelect').value = 'all';
+            applyFilter();
         }
 
-        function closeConfirmSaveModal() {
-            document.getElementById('modalConfirmSave').classList.remove('show');
-        }
+        function filterCardsRealtime() {
+            const query = document.getElementById('formSearchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.form-survey-card');
 
-        function proceedSaveKetidaksesuaian() {
-            closeConfirmSaveModal();
-            setTimeout(() => {
-                document.getElementById('modalSuccess').classList.add('show');
-            }, 200);
-        }
-
-        function finishKetidaksesuaian() {
-            document.getElementById('modalSuccess').classList.remove('show');
-            const container = document.querySelector('.mobile-container');
-            container.classList.add('page-slide-out');
-            setTimeout(() => {
-                window.location.href = `form-inspeksi.html?asset=${encodeURIComponent(assetParam)}&name=${encodeURIComponent(nameParam)}&bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}`;
-            }, 300);
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 
@@ -1442,8 +1423,9 @@
         Notes & Validasi
       </h3>
       <ul>
-        <li><strong>Form Aset Tidak Sesuai:</strong> Mengakomodasi pelaporan data aset fisik lapangan yang berbeda dengan master data PLN.</li>
-        <li><strong>Klasifikasi Dinamis:</strong> Formulir input menyesuaikan pilihan klasifikasi (Identitas Aset, Lokasi Berbeda, Aset Tidak Ada).</li>
+        <li><strong>Hirarki Unit:</strong> Menampilkan daftar formulir dan unit terendah sesuai level login user (UIT, UPT, ULTG, hingga Single/Multi GI).</li>
+        <li><strong>Filter Formulir & Unit:</strong> Filter modal untuk memfilter berdasarkan nama unit dan jenis formulir.</li>
+        <li><strong>Status Pengisian:</strong> Tombol Mulai otomatis berubah menjadi 'Sedang Berlangsung' jika pengisian sempat ditinggalkan/back.</li>
       </ul>
     </div>
 

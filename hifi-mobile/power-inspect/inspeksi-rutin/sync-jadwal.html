@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ERS (Tower Emergency) - Pembongkaran Mobile</title>
+    <title>Power Inspect - Sinkronisasi Jadwal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-canvas: #f4f6fc;
+            --bg-color: #f4f6fb;
             --card-bg: #ffffff;
-            --primary-blue: #2563eb;
-            --primary-blue-dark: #1d4ed8;
-            --text-dark: #0f172a;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --input-bg: #f1f5f9;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #cbd5e1;
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 10px 0;
         }
 
@@ -40,24 +43,26 @@
             width: 100%;
             max-width: 420px;
             height: 100vh;
-            background-color: var(--bg-canvas);
-            position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
             box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
-            animation: pageFadeIn 0.2s ease-out;
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        @keyframes pageFadeIn {
-            from {
-                opacity: 0.9;
-                transform: scale(0.996);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out {
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-20%); opacity: 0; }
         }
 
         @media (min-width: 440px) {
@@ -69,638 +74,464 @@
             }
         }
 
-        /* iOS Status Bar */
-        .status-bar {
+        /* App Header */
+        .app-header {
+            padding: 18px 20px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 24px 6px;
-            color: var(--text-dark);
-            font-size: 14px;
-            font-weight: 700;
             background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
             z-index: 10;
         }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        .status-icons {
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 15px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            letter-spacing: 0.3px;
+        }
+        
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        /* Main Content List */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* Simulation Controls Card */
+        .simulation-controls {
+            background-color: #ffffff;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .simulation-title {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
         }
 
-        /* Top Header */
-        .header-section {
-            background: #ffffff;
-            padding: 14px 20px 10px;
+        .radio-group {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 14px;
         }
 
-        .header-titles {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .title-with-back {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 2px;
-        }
-
-        .back-home-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .back-home-btn:hover {
-            background: #e2e8f0;
-            color: var(--primary-blue);
-        }
-
-        .main-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-dark);
-            letter-spacing: -0.3px;
-        }
-
-        .sub-title {
+        .radio-label {
             font-size: 13px;
             font-weight: 600;
-            color: var(--primary-blue);
-            margin-left: 42px;
-        }
-
-        .notif-bell-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--text-dark);
-            font-size: 16px;
-            position: relative;
+            gap: 6px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            text-decoration: none;
+            color: var(--text-main);
         }
 
-        .notif-badge-dot {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 7px;
-            height: 7px;
-            background-color: #ef4444;
-            border-radius: 50%;
-        }
-
-        /* Search and Filter Section */
-        .search-filter-section {
-            background: #ffffff;
-            padding: 10px 20px 16px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .search-input-box {
-            flex: 1;
-            background: var(--input-bg);
-            border-radius: 14px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .search-input-box:focus-within {
-            border-color: var(--primary-blue);
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .search-input-box input {
-            border: none;
-            outline: none;
-            background: transparent;
+        .btn-start {
             width: 100%;
-            font-size: 14px;
-            color: var(--text-dark);
-            font-weight: 500;
-        }
-
-        .search-input-box input::placeholder {
-            color: #94a3b8;
-        }
-
-        .search-input-box i {
-            color: #94a3b8;
-            font-size: 15px;
-        }
-
-        .filter-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
+            padding: 12px;
+            background-color: #1a65d6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary-blue);
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            flex-shrink: 0;
-            transition: background 0.2s;
+            gap: 8px;
         }
 
-        .filter-btn:active {
-            background: #f8fafc;
+        .btn-start:active { transform: scale(0.98); background-color: #134db0; }
+        .btn-start:disabled {
+            background-color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
-        /* App Body / Content Area */
-        .app-body {
-            flex: 1;
+        /* List Container */
+        .list-container {
             display: flex;
             flex-direction: column;
-            padding: 16px;
-            overflow-y: auto;
-            position: relative;
-            background-color: var(--bg-canvas);
-            padding-bottom: 24px;
-            scrollbar-width: none;
+            gap: 10px;
         }
 
-        .app-body::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Data Card Styling */
-        .ers-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 18px 20px;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: transform 0.2s;
-        }
-
-        .ers-card:active {
-            transform: scale(0.99);
-        }
-
-        .card-header {
+        /* Sync Card Styles */
+        .sync-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px dashed #e2e8f0;
+            align-items: flex-start;
+            gap: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.25s ease;
         }
 
-        .card-id {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--text-dark);
-            letter-spacing: -0.2px;
+        /* Status: Waiting */
+        .sync-card.waiting {
+            background-color: #ffffff;
+            border-color: var(--border-color);
         }
-
-        /* Status Badge Variants */
-        .badge-status {
-            padding: 5px 14px;
+        .sync-card.waiting .icon-wrapper {
+            background-color: #f1f5f9;
+            color: #64748b;
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-block;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .sync-card.waiting .badge {
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
         }
 
-        .badge-mulai {
-            background: #2563eb;
-            color: #ffffff;
+        /* Status: Processing */
+        .sync-card.processing {
+            background-color: #fffbeb;
+            border-color: #fde68a;
+        }
+        .sync-card.processing .icon-wrapper {
+            background-color: #fef3c7;
+            color: #d97706;
+            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+        .sync-card.processing .badge {
+            background-color: #fde68a;
+            color: #b45309;
         }
 
-        .badge-dikirim {
-            background: #fff7ed;
-            color: #ea580c;
-            border: 1px solid #ffedd5;
+        /* Status: Success */
+        .sync-card.success {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
         }
-
-        .badge-siap {
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #dbeafe;
+        .sync-card.success .icon-wrapper {
+            background-color: #10b981;
+            color: white;
+            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
         }
-
-        .badge-pasang {
-            background: #e0f2fe;
-            color: #0284c7;
-            border: 1px solid #bae6fd;
-        }
-
-        .badge-server {
-            background: #dcfce7;
+        .sync-card.success .badge {
+            background-color: #dcfce7;
             color: #15803d;
             border: 1px solid #bbf7d0;
         }
 
-        /* Card Details Rows */
-        .card-details {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 18px;
+        /* Status: Danger */
+        .sync-card.danger {
+            background-color: #fef2f2;
+            border-color: #fecaca;
         }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .detail-label {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .detail-val {
-            color: var(--text-dark);
-            font-weight: 700;
-        }
-
-        /* Card Actions */
-        .card-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 10px;
+        .sync-card.danger .icon-wrapper {
+            background-color: #ef4444;
+            color: white;
             border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-outline {
-            background: #ffffff;
-            border: 1.5px solid #2563eb;
-            color: #2563eb;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            border: 1.5px solid #2563eb;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        }
-
-        /* Bottom Navigation Bar */
-        
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #94a3b8;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            gap: 4px;
-            text-decoration: none;
-            width: 24%;
-            transition: color 0.2s;
-        }
-
-        .nav-item.active {
-            color: var(--primary-blue);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        /* iOS Bottom Bar Line */
-        .ios-bar {
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 4px;
-            background: #000000;
-            border-radius: 2px;
-            z-index: 101;
-        }
-
-        /* Smooth Drawer Filter Modal Overlay */
-        .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            z-index: 999;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1),
-                        visibility 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-overlay.active .modal-drawer {
-            transform: translateY(0);
-        }
-
-        .modal-drawer {
-            width: 100%;
-            max-width: 420px;
-            background: #ffffff;
-            border-top-left-radius: 28px;
-            border-top-right-radius: 28px;
-            padding: 20px 24px 24px;
-            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
-            transform: translateY(100%);
-            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-            will-change: transform;
-            max-height: 88vh;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-
-        .modal-drawer::-webkit-scrollbar {
-            display: none;
-        }
-
-        .drawer-handle {
-            width: 40px;
-            height: 4px;
-            background: #cbd5e1;
-            border-radius: 2px;
-            margin: 0 auto 16px;
-        }
-
-        /* Location Bottom Sheet Styling */
-        .location-bottom-sheet {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            text-align: left;
-        }
-
-        .location-sheet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2px;
-        }
-
-        .location-sheet-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-
-        .location-count-badge {
-            font-size: 12px;
-            font-weight: 700;
-            color: #2563eb;
-            background: #eff6ff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            border: 1px solid #dbeafe;
-        }
-
-        .location-subtitle {
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 500;
-            margin-top: -8px;
-        }
-
-        .location-items-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 340px;
-            overflow-y: auto;
-            padding-right: 2px;
-            scrollbar-width: none;
-        }
-
-        .location-items-list::-webkit-scrollbar {
-            display: none;
-        }
-
-        .location-item-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .location-item-card:hover {
-            border-color: #cbd5e1;
-            background: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
-
-        .location-icon-wrapper {
             width: 40px;
             height: 40px;
-            border-radius: 12px;
-            background: #eff6ff;
-            color: #2563eb;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 15px;
             flex-shrink: 0;
         }
+        .sync-card.danger .badge {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
 
-        .location-item-info {
+        /* Card Content layout */
+        .card-content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
         }
-
-        .location-item-title {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.3;
-        }
-
-        .location-item-sub {
-            font-size: 12px;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        /* Bottom Sheet Filter Styling */
-        .filter-bottom-sheet {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            text-align: left;
-        }
-
-        .filter-drawer-title {
-            font-size: 20px;
+        .card-title {
+            font-size: 14px;
             font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 2px;
-            letter-spacing: -0.3px;
+            margin-bottom: 3px;
+            color: var(--text-main);
         }
-
-        .filter-section {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .card-subtitle {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            line-height: 1.35;
         }
-
-        .filter-section-label {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .chips-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip-item {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
             border-radius: 12px;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-            outline: none;
+            font-size: 10.5px;
+            font-weight: 700;
         }
 
-        .chip-item.active {
-            border: 1.5px solid #2563eb;
-            color: #2563eb;
-            background: #eff6ff;
+        /* Animation for processing */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .icon-spin {
+            animation: spin 1.2s linear infinite;
         }
 
-        .input-with-icon {
-            position: relative;
-            width: 100%;
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #10b981;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 13.5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            width: 90%;
+            max-width: 420px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-
-        .filter-input-field {
-            width: 100%;
-            height: 48px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 0 16px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
-            background: #ffffff;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+        .toast.show {
+            top: 24px;
         }
-
-        .filter-input-field:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .filter-input-field::placeholder {
-            color: #94a3b8;
-        }
-
-        .input-with-icon .filter-input-field {
-            padding-right: 44px;
-        }
-
-        .filter-select-field {
-            appearance: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-
-        .input-right-icon {
-            position: absolute;
-            right: 16px;
-            color: #2563eb;
+        .toast i {
             font-size: 16px;
+        }
+
+        /* Modal Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
             pointer-events: none;
+            transition: opacity 0.3s;
         }
-
-        .btn-filter-submit {
-            width: 100%;
-            height: 50px;
-            background: #2563eb;
-            color: #ffffff;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 360px;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            background: #fee2e2;
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 16px;
+        }
+        .modal-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+        .modal-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn-outline {
+            padding: 12px;
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
-            margin-top: 6px;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-            transition: background 0.2s, transform 0.1s;
+            transition: all 0.2s;
+        }
+        .btn-outline:active {
+            background: #f8fafc;
+        }
+        .btn-danger {
+            padding: 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+        .btn-danger:active {
+            background: #dc2626;
         }
 
-        .btn-filter-submit:active {
-            background: #1d4ed8;
-            transform: scale(0.99);
-        }
     
+        
+        /* Power Inspect Deep Component Specifics */
+        body.dark-mode .app-header {
+            background: #0f172a !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        body.dark-mode .search-box,
+        body.dark-mode .search-container,
+        body.dark-mode .search-bar-wrap {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .search-box input {
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .filter-chip,
+        body.dark-mode .chip-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .filter-chip.active,
+        body.dark-mode .chip-item.active {
+            background: #0284c7 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .param-card,
+        body.dark-mode .parameter-card,
+        body.dark-mode .accordion-item,
+        body.dark-mode .photo-box,
+        body.dark-mode .upload-card,
+        body.dark-mode .rekap-card,
+        body.dark-mode .sync-item-card,
+        body.dark-mode .queue-item,
+        body.dark-mode .wo-list-card,
+        body.dark-mode .bay-item-card,
+        body.dark-mode .cbm-card,
+        body.dark-mode .survey-item-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .param-header,
+        body.dark-mode .accordion-header {
+            background: #0f172a !important;
+            border-bottom-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .action-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
         
         
         
@@ -1547,359 +1378,233 @@
     </script>
 
 </head>
-
 <body>
 
+    <!-- Toast Success Notification -->
+    <div id="toastSuccess" class="toast">
+        <i class="fas fa-check-circle"></i> Berhasil sinkronisasi seluruh data Jadwal
+    </div>
+
+    <!-- Toast Report Notification -->
+    <div id="toastReport" class="toast">
+        <i class="fas fa-check-circle"></i> Berhasil mengirim laporan gagal
+    </div>
+
+    <!-- Modal Failed Sync -->
+    <div id="modalFailed" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <div class="modal-title">Sinkronisasi Selesai</div>
+            <div class="modal-text">
+                Sinkronisasi selesai dengan kendala, terdapat data jadwal yang gagal terdownload dari server. Silakan pilih tindakan:
+            </div>
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="sendReportAndRoute()">Kirim Laporan Gagal</button>
+                <button class="btn-outline" onclick="resetAndStart()">Sinkron Ulang</button>
+            </div>
+        </div>
+    </div>
+
     <div class="mobile-container">
-        <!-- iOS Status Bar -->
-        <div class="status-bar">
-            <span>9:41 AM</span>
-            <div class="status-icons">
-                <i class="fa-solid fa-signal"></i>
-                <i class="fa-solid fa-wifi"></i>
-                <i class="fa-solid fa-battery-full"></i>
-            </div>
-        </div>
-
-        <!-- Top Header -->
-        <div class="header-section">
-            <div class="header-titles">
-                <div class="title-with-back">
-                    <a href="../home-mobile.html" class="back-home-btn" title="Kembali ke Dashboard ERS">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                    <h1 class="main-title">ERS (Tower Emergency)</h1>
-                </div>
-                <span class="sub-title">Pembongkaran</span>
-            </div>
-            <a href="../../power-inspect/notifikasi-mobile.html" class="notif-bell-btn" title="Notifikasi">
-                <i class="fa-regular fa-bell"></i>
-                <span class="notif-badge-dot"></span>
-            </a>
-        </div>
-
-        <!-- Search & Filter Bar -->
-        <div class="search-filter-section">
-            <div class="search-input-box">
-                <input type="text" id="ersSearchInput" placeholder="Cari data pembongkaran..." oninput="filterData(this.value)">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <button class="filter-btn" onclick="openFilterModalDrawer()" title="Filter Data">
-                <i class="fa-solid fa-filter"></i>
-            </button>
-        </div>
-
-        <!-- App Body / Content Area -->
-        <div class="app-body" id="ersContentArea">
-            <!-- Dynamic Cards -->
-        </div>
-
-        <!-- Bottom Navigation Bar -->
         
-
-        <!-- iOS Bottom Indicator Line -->
-        <div class="ios-bar"></div>
-
-        <!-- Filter / Location Modal Drawer Component -->
-        <div class="modal-overlay" id="filterModal" onclick="closeFilterModal(event)">
-            <div class="modal-drawer" onclick="event.stopPropagation()">
-                <div class="drawer-handle"></div>
-                <div id="drawerModalContent">
-                    <!-- Injected dynamically via JavaScript -->
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <button class="action-btn" onclick="transitionTo('dashboard-mobile.html')" title="Kembali ke Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="header-name">Sinkronisasi Jadwal</div>
+                    <div class="header-sub">TOTAL 66 JADWAL WO INSPEKSI</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Content List -->
+        <div class="content-scroll">
+            
+            <!-- Controls for simulation -->
+            <div class="simulation-controls">
+                <div class="simulation-title">
+                    <i class="fa-solid fa-sliders" style="color: var(--primary-blue);"></i> Skenario Sinkronisasi
+                </div>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="scenario" value="success" checked> Berhasil Seluruhnya
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="scenario" value="failed"> Simulasi Gagal (3 Bulanan)
+                    </label>
+                </div>
+                <button id="btnStart" class="btn-start" onclick="startSync()">
+                    <i class="fa-solid fa-rotate"></i> Mulai Sinkronisasi
+                </button>
+            </div>
+
+            <!-- Sync Task Cards List -->
+            <div class="list-container" id="syncList">
+                <!-- Cards managed by JS -->
             </div>
         </div>
     </div>
 
     <script>
-        const pembongkaranData = [
-            {
-                id: 'DIS20250000001',
-                statusText: 'Mulai',
-                badgeClass: 'badge-mulai',
-                targetPembongkaran: '1 Februari 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Maret 2025',
-                jumlahTE: 2,
-                lokasi: '4'
-            },
-            {
-                id: 'DIS20250000002',
-                statusText: 'Sedang Berlangsung',
-                badgeClass: 'badge-pasang',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '5'
-            },
-            {
-                id: 'DIS20250000003',
-                statusText: 'Selesai Lokal',
-                badgeClass: 'badge-dikirim',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '3'
-            },
-            {
-                id: 'DIS20250000004',
-                statusText: 'Selesai',
-                badgeClass: 'badge-server',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '4'
-            }
+        // Data Jadwal
+        const syncData = [
+            { id: 1, title: '2 Mingguan', count: '7 Jadwal WO Inspeksi' },
+            { id: 2, title: '3 Bulanan', count: '1 Jadwal WO Inspeksi', failKey: true },
+            { id: 3, title: 'Tahunan', count: '3 Jadwal WO Inspeksi' },
+            { id: 4, title: 'Harian', count: '28 Jadwal WO Inspeksi' },
+            { id: 5, title: 'Bulanan', count: '9 Jadwal WO Inspeksi' },
+            { id: 6, title: 'Mingguan', count: '18 Jadwal WO Inspeksi' },
+            { id: 7, title: 'Finalisasi data lokal', count: 'Sinkron inspeksi lama, auto-close expired, dan FCM' }
         ];
 
-        let selectedStatusChips = [];
-        let filterState = {
-            targetPembongkaran: '',
-            targetOperasi: '',
-            lokasi: ''
-        };
+        const listContainer = document.getElementById('syncList');
+        const btnStart = document.getElementById('btnStart');
+        const toast = document.getElementById('toastSuccess');
+        const modal = document.getElementById('modalFailed');
 
-        function renderCards(filterQuery = '') {
-            const container = document.getElementById('ersContentArea');
-            const q = filterQuery.toLowerCase().trim();
-            
-            const filtered = pembongkaranData.filter(item => {
-                // Search Query
-                if (q && !(item.id.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q))) {
-                    return false;
+        // Initialize Cards
+        function renderCards() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const actionParam = urlParams.get('action');
+            const retryPeriod = urlParams.get('period');
+
+            listContainer.innerHTML = '';
+            syncData.forEach(item => {
+                const card = document.createElement('div');
+                
+                if (actionParam === 'retry' && item.id != retryPeriod) {
+                    card.className = 'sync-card success';
+                    card.id = `card-${item.id}`;
+                    card.innerHTML = `
+                        <div class="icon-wrapper">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-subtitle">${item.count}</div>
+                            <div class="badge"><i class="fas fa-check"></i> Selesai</div>
+                        </div>
+                    `;
+                } else {
+                    card.className = 'sync-card waiting';
+                    card.id = `card-${item.id}`;
+                    card.innerHTML = `
+                        <div class="icon-wrapper">
+                            <i class="far fa-clock"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">${item.title}</div>
+                            <div class="card-subtitle">${item.count}</div>
+                            <div class="badge"><i class="far fa-clock"></i> Menunggu</div>
+                        </div>
+                    `;
                 }
-                // Status Chips
-                if (selectedStatusChips.length > 0 && !selectedStatusChips.includes(item.statusText)) {
-                    return false;
-                }
-                // Target Pembongkaran
-                if (filterState.targetPembongkaran && item.targetPembongkaran !== filterState.targetPembongkaran) {
-                    return false;
-                }
-                // Target Operasi
-                if (filterState.targetOperasi && item.targetOperasi !== filterState.targetOperasi) {
-                    return false;
-                }
-                // Lokasi
-                if (filterState.lokasi && item.lokasi !== filterState.lokasi) {
-                    return false;
-                }
-                return true;
+                
+                listContainer.appendChild(card);
             });
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;">
-                        <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
-                        <p>Tidak ada data pembongkaran yang cocok dengan kriteria filter.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
-                <div class="ers-card">
-                    <div class="card-header">
-                        <span class="card-id">${item.id}</span>
-                        <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Target Pembongkaran</span>
-                            <span class="detail-val">${item.targetPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">SLA Pembongkaran</span>
-                            <span class="detail-val">${item.slaPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Target Operasi</span>
-                            <span class="detail-val">${item.targetOperasi}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Jumlah TE</span>
-                            <span class="detail-val">${item.jumlahTE}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Lokasi</span>
-                            <span class="detail-val">${item.lokasi}</span>
-                        </div>
-                    </div>
-                    <div class="card-actions" onclick="event.stopPropagation()">
-                        <button class="btn-action btn-outline" onclick="viewLocation('${item.id}', '${item.lokasi}')">View Lokasi</button>
-                        <button class="btn-action btn-primary" onclick="navigateSmooth('list-pembongkaran.html?id=${item.id}', event)">Lihat Detail</button>
-                    </div>
-                </div>
-            `).join('');
         }
 
-        function filterData(val) { 
-            renderCards(val); 
-        }
-
-        function openModal() {
-            document.getElementById('filterModal').classList.add('active');
-        }
-
-        function closeFilterModal(e) { 
-            if (e.target.id === 'filterModal') closeFilterModalDirect(); 
-        }
-
-        function closeFilterModalDirect() { 
-            document.getElementById('filterModal').classList.remove('active'); 
-        }
-
-        /* View Lokasi Drawer */
-        function viewLocation(id, countStr) {
-            const count = parseInt(countStr, 10) || 4;
-            const startNum = 85;
-            let itemsHtml = '';
-            
-            for (let i = 0; i < count; i++) {
-                const towerNum = String(startNum + i).padStart(4, '0');
-                itemsHtml += `
-                    <div class="location-item-card">
-                        <div class="location-icon-wrapper">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
-                        <div class="location-item-info">
-                            <div class="location-item-title">TOWER SUTT 150kV Ungaran-Weleri #${towerNum}</div>
-                            <div class="location-item-sub">Span #${startNum + i} • SUTT 150kV System</div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="location-bottom-sheet">
-                    <div class="location-sheet-header">
-                        <h2 class="location-sheet-title">Lokasi</h2>
-                        <span class="location-count-badge">${count} Lokasi Tower</span>
-                    </div>
-                    <div class="location-subtitle">Daftar lokasi pembongkaran ERS <strong>${id}</strong></div>
-                    
-                    <div class="location-items-list">
-                        ${itemsHtml}
-                    </div>
-
-                    <button type="button" class="btn-filter-submit" onclick="closeFilterModalDirect()">Tutup</button>
-                </div>
-            `;
-            openModal();
-        }
-
-        /* Filter Drawer */
-        function openFilterModalDrawer() {
-            renderFilterSheetContent();
-            openModal();
-        }
-
-        function renderFilterSheetContent() {
-            const allStatuses = ['Mulai', 'Sedang Berlangsung', 'Selesai Lokal', 'Selesai'];
-            
-            const chipsHtml = allStatuses.map(status => {
-                const isActive = selectedStatusChips.includes(status);
-                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleStatusChip(this, '${status}')">${status}</button>`;
-            }).join('');
-
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="filter-bottom-sheet">
-                    <h2 class="filter-drawer-title">Filter</h2>
-                    
-                    <div class="filter-section">
-                        <label class="filter-section-label">Status</label>
-                        <div class="chips-container">
-                            ${chipsHtml}
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">No. Permit</label>
-                        <input type="text" id="filterNoPermit" class="filter-input-field" placeholder="Masukkan No. Permit" value="${filterState.permit || ''}">
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Pembongkaran</label>
-                        <div class="input-with-icon">
-                            <input type="text" id="filterTargetBongkar" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetPembongkaran || '23 Januari 2026'}">
-                            <i class="fa-regular fa-calendar input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Operasi</label>
-                        <div class="input-with-icon">
-                            <input type="text" id="filterTargetOperasi" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetOperasi || '23 Januari 2026'}">
-                            <i class="fa-regular fa-calendar input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Lokasi</label>
-                        <div class="input-with-icon">
-                            <select id="filterLokasi" class="filter-input-field filter-select-field">
-                                <option value="" ${!filterState.lokasi ? 'selected' : ''}>Pilih Lokasi</option>
-                                <option value="3" ${filterState.lokasi === '3' ? 'selected' : ''}>3</option>
-                                <option value="4" ${filterState.lokasi === '4' ? 'selected' : ''}>4</option>
-                                <option value="5" ${filterState.lokasi === '5' ? 'selected' : ''}>5</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-filter-submit" onclick="applyFilterDrawer()">Filter</button>
-                </div>
-            `;
-        }
-
-        function toggleStatusChip(btn, status) {
-            btn.classList.toggle('active');
-            if (selectedStatusChips.includes(status)) {
-                selectedStatusChips = selectedStatusChips.filter(s => s !== status);
-            } else {
-                selectedStatusChips.push(status);
-            }
-        }
-
-        function applyFilterDrawer() {
-            filterState.targetPembongkaran = document.getElementById('filterTargetBongkar').value.trim();
-            filterState.targetOperasi = document.getElementById('filterTargetOperasi').value.trim();
-            filterState.lokasi = document.getElementById('filterLokasi').value;
-
-            renderCards(document.getElementById('ersSearchInput').value);
-            closeFilterModalDirect();
-        }
-
-        function resetFilterDrawer() {
-            selectedStatusChips = [];
-            filterState = {
-                targetPembongkaran: '',
-                targetOperasi: '',
-                lokasi: ''
-            };
-            renderFilterSheetContent();
-            renderCards(document.getElementById('ersSearchInput').value);
-        }
-
-        function navigateSmooth(url, event) {
-            if (event) event.preventDefault();
-            const container = document.querySelector('.mobile-container');
-            if (container) {
-                container.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
-                container.style.opacity = '0.9';
-                container.style.transform = 'scale(0.996)';
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 100);
-            } else {
-                window.location.href = url;
-            }
-        }
-
+        // Run on load
         renderCards();
+
+        // Sync Logic
+        async function startSync() {
+            btnStart.disabled = true;
+            btnStart.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i> Menyinkronkan...';
+            toast.classList.remove('show');
+            modal.classList.remove('show');
+            renderCards();
+            
+            const isFailScenario = document.querySelector('input[name="scenario"]:checked').value === 'failed';
+            let hasFailure = false;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const actionParam = urlParams.get('action');
+            const retryPeriod = urlParams.get('period');
+
+            for (let i = 0; i < syncData.length; i++) {
+                const item = syncData[i];
+                
+                if (actionParam === 'retry' && item.id != retryPeriod) {
+                    continue;
+                }
+                const card = document.getElementById(`card-${item.id}`);
+                const iconWrap = card.querySelector('.icon-wrapper');
+                const badge = card.querySelector('.badge');
+                
+                card.className = 'sync-card processing';
+                iconWrap.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i>';
+                badge.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i> Memproses';
+
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                await new Promise(r => setTimeout(r, 1100));
+
+                if (isFailScenario && item.failKey) {
+                    card.className = 'sync-card danger';
+                    iconWrap.innerHTML = '<i class="fas fa-times"></i>';
+                    badge.innerHTML = '<i class="fas fa-times"></i> Gagal sinkron';
+                    hasFailure = true;
+                } else {
+                    card.className = 'sync-card success';
+                    iconWrap.innerHTML = '<i class="fas fa-check"></i>';
+                    badge.innerHTML = '<i class="fas fa-check"></i> Selesai';
+                }
+            }
+
+            btnStart.disabled = false;
+            btnStart.innerHTML = '<i class="fa-solid fa-rotate"></i> Mulai Sinkronisasi';
+
+            if (hasFailure) {
+                modal.classList.add('show');
+            } else {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    transitionTo('dashboard-mobile.html');
+                }, 2200);
+            }
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+        }
+
+        function resetAndStart() {
+            closeModal();
+            startSync();
+        }
+
+        function transitionTo(url) {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 300);
+        }
+
+        function sendReportAndRoute() {
+            closeModal();
+            const toastReport = document.getElementById('toastReport');
+            toastReport.classList.add('show');
+            setTimeout(() => {
+                transitionTo('dashboard-mobile.html?status=failed');
+            }, 1800);
+        }
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const actionParam = urlParams.get('action');
+            if (actionParam === 'retry' || actionParam === 'auto') {
+                const successRadio = document.querySelector('input[name="scenario"][value="success"]');
+                if(successRadio) successRadio.checked = true;
+                setTimeout(startSync, 400); 
+            }
+        };
     </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
@@ -1982,10 +1687,10 @@
         Notes & Validasi
       </h3>
       <ul>
-        <!-- TODO: UPDATE NOTES HERE -->
-        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
-        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
-        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+        <li><strong>Simulasi Gagal:</strong> Pilihan skenario "Gagal" digunakan untuk demonstrasi *error-handling*, di mana sistem akan menandai jadwal yang gagal tersinkron.</li>
+        <li><strong>Kirim Laporan Gagal:</strong> Menampilkan notifikasi sukses pengiriman, jeda 2 detik, lalu diarahkan ke halaman utama (*Home*) dengan trigger status gagal.</li>
+        <li><strong>Sinkron Ulang Parsial:</strong> Jika sistem menerima parameter retry dari Notifikasi, hanya jadwal yang gagal yang akan diulang (animasi *loading*), sisanya ditandai selesai (ceklis).</li>
+        <li><strong>Auto-Sync:</strong> Jika parameter *auto* diterima, sistem akan menyimulasikan sinkronisasi penuh secara otomatis.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Power Inspect - Sinkronisasi Jadwal</title>
+    <title>Power Inspect - Inspeksi Rutin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --bg-color: #f4f6fb;
@@ -22,32 +22,31 @@
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #cbd5e1;
-            color: var(--text-main);
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
             padding: 10px 0;
         }
 
         .mobile-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 420px; 
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             background-color: var(--bg-color);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
             animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -57,12 +56,12 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        .page-slide-out {
-            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
         }
-        @keyframes slideOutLeft {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-20%); opacity: 0; }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
         }
 
         @media (min-width: 440px) {
@@ -110,6 +109,11 @@
             letter-spacing: 0.3px;
         }
         
+        .header-actions { 
+            display: flex; 
+            gap: 8px; 
+        }
+        
         .action-btn {
             width: 36px; 
             height: 36px;
@@ -133,253 +137,216 @@
             border-color: #bfdbfe;
         }
 
-        /* Main Content List */
-        .content-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 18px 24px;
-            scrollbar-width: none;
-        }
-        .content-scroll::-webkit-scrollbar { display: none; }
-
-        /* Simulation Controls Card */
-        .simulation-controls {
-            background-color: #ffffff;
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        .notif-dot {
+            display: none;
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid white;
         }
 
-        .simulation-title {
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: var(--text-main);
+        /* Search Section */
+        .search-container {
+            padding: 14px 18px 8px;
+            background-color: var(--bg-color);
+        }
+        
+        .search-box {
             display: flex;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 11px 16px;
             align-items: center;
-            gap: 6px;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 14px;
-        }
-
-        .radio-label {
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            color: var(--text-main);
-        }
-
-        .btn-start {
-            width: 100%;
-            padding: 12px;
-            background-color: #1a65d6;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 13.5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-start:active { transform: scale(0.98); background-color: #134db0; }
-        .btn-start:disabled {
-            background-color: #94a3b8;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        /* List Container */
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* Sync Card Styles */
-        .sync-card {
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            transition: all 0.25s ease;
+            gap: 10px;
         }
-
-        /* Status: Waiting */
-        .sync-card.waiting {
-            background-color: #ffffff;
-            border-color: var(--border-color);
-        }
-        .sync-card.waiting .icon-wrapper {
-            background-color: #f1f5f9;
-            color: #64748b;
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-        .sync-card.waiting .badge {
-            background-color: #f1f5f9;
-            color: #64748b;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* Status: Processing */
-        .sync-card.processing {
-            background-color: #fffbeb;
-            border-color: #fde68a;
-        }
-        .sync-card.processing .icon-wrapper {
-            background-color: #fef3c7;
-            color: #d97706;
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
-            flex-shrink: 0;
-        }
-        .sync-card.processing .badge {
-            background-color: #fde68a;
-            color: #b45309;
-        }
-
-        /* Status: Success */
-        .sync-card.success {
-            background-color: #f0fdf4;
-            border-color: #bbf7d0;
-        }
-        .sync-card.success .icon-wrapper {
-            background-color: #10b981;
-            color: white;
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-        .sync-card.success .badge {
-            background-color: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
-
-        /* Status: Danger */
-        .sync-card.danger {
-            background-color: #fef2f2;
-            border-color: #fecaca;
-        }
-        .sync-card.danger .icon-wrapper {
-            background-color: #ef4444;
-            color: white;
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-        .sync-card.danger .badge {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fca5a5;
-        }
-
-        /* Card Content layout */
-        .card-content {
+        
+        .search-box input {
+            border: none;
+            outline: none;
             flex: 1;
-        }
-        .card-title {
-            font-size: 14px;
-            font-weight: 800;
-            margin-bottom: 3px;
+            font-size: 13.5px;
             color: var(--text-main);
+            background: transparent;
+            font-weight: 500;
         }
-        .card-subtitle {
-            font-size: 11.5px;
+        
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .search-box i {
             color: var(--text-muted);
-            margin-bottom: 8px;
-            line-height: 1.35;
+            font-size: 14px;
         }
-        .badge {
+
+        /* Filter Chips */
+        .filter-chips-row {
+            display: flex;
+            gap: 8px;
+            padding: 8px 18px 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-chips-row::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: #1a65d6;
+            color: white;
+            border-color: #1a65d6;
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+        }
+
+        /* List Content Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 18px 24px;
+            scrollbar-width: none;
+        }
+        .app-content::-webkit-scrollbar { display: none; }
+
+        /* Task Cards */
+        .task-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .task-card:active {
+            transform: scale(0.98);
+            border-color: var(--primary-blue);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .task-title {
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .task-badge-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 10.5px;
-            font-weight: 700;
         }
 
-        /* Animation for processing */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .icon-spin {
-            animation: spin 1.2s linear infinite;
-        }
+        .badge-mulai { background: #dbeafe; color: #1a65d6; }
+        .badge-proses { background: #fef3c7; color: #d97706; }
+        .badge-selesai { background: #dcfce7; color: #166534; }
 
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #10b981;
-            color: white;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 13.5px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-            width: 90%;
-            max-width: 420px;
+        .progress-circle-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #f8fafc;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-        .toast.show {
-            top: 24px;
-        }
-        .toast i {
-            font-size: 16px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            border: 2px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
-        /* Modal Popup */
-        .modal-overlay {
+        .task-stats {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        .stat-row span:last-child {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Notification Flag */
+        .notif-flag {
+            position: absolute;
+            top: -100px;
+            left: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            z-index: 20;
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 4px solid #ef4444;
+        }
+        .notif-flag.show { top: 20px; }
+        .notif-icon { color: #ef4444; font-size: 20px; margin-top: 2px; }
+        .notif-content { flex: 1; }
+        .notif-title { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .notif-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .notif-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 14px; }
+
+        /* Universal Sync Modal Styles */
+        .sync-badge-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f59e0b;
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid #ffffff;
+            line-height: 1;
+        }
+
+        .sync-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.6);
@@ -387,86 +354,161 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 10000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.25s ease;
         }
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .modal-content {
-            background: white;
-            padding: 24px;
+        .sync-modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .sync-modal-card {
+            background: #ffffff;
             border-radius: 24px;
+            padding: 22px;
             width: 90%;
             max-width: 360px;
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.3s;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+            animation: slideUpModal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .modal-overlay.show .modal-content {
-            transform: translateY(0) scale(1);
+
+        @keyframes slideUpModal {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-        .modal-icon {
-            width: 56px;
-            height: 56px;
-            background: #fee2e2;
-            color: #ef4444;
-            border-radius: 50%;
+
+        .sync-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .sync-modal-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #eff6ff;
+            color: #1a65d6;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin: 0 auto 16px;
+            font-size: 20px;
+            border: 1px solid #bfdbfe;
+            flex-shrink: 0;
         }
-        .modal-title {
-            font-size: 17px;
+
+        .sync-modal-title {
+            font-size: 15px;
             font-weight: 800;
-            margin-bottom: 8px;
             color: var(--text-main);
+            line-height: 1.2;
         }
-        .modal-text {
-            font-size: 13px;
+
+        .sync-modal-sub {
+            font-size: 11.5px;
             color: var(--text-muted);
-            margin-bottom: 20px;
-            line-height: 1.5;
+            margin-top: 2px;
         }
-        .modal-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+
+        .sync-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #ecfdf5;
+            color: #059669;
+            margin-bottom: 12px;
         }
-        .btn-outline {
-            padding: 12px;
-            background: transparent;
-            color: var(--text-main);
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+        }
+
+        .sync-item-row {
+            background: #f8fafc;
             border: 1px solid var(--border-color);
             border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .sync-item-info { display: flex; flex-direction: column; }
+        .item-title { font-size: 12px; font-weight: 700; color: var(--text-main); }
+        .item-time { font-size: 10px; color: var(--text-muted); }
+        .sync-item-badge {
+            font-size: 10px;
             font-weight: 700;
-            font-size: 13px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .sync-progress-bar-bg {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .sync-progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #1a65d6;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .sync-progress-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-align: center;
+        }
+
+        .sync-modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-cancel-sync {
+            flex: 1;
+            padding: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .btn-outline:active {
-            background: #f8fafc;
-        }
-        .btn-danger {
-            padding: 12px;
-            background: #ef4444;
+
+        .btn-confirm-sync {
+            flex: 2;
+            padding: 10px;
+            background: #1a65d6;
             color: white;
             border: none;
             border-radius: 12px;
-            font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
+            font-weight: 800;
             cursor: pointer;
-            transition: background 0.2s;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-        }
-        .btn-danger:active {
-            background: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
     
@@ -1070,231 +1112,311 @@
 </head>
 <body>
 
-    <!-- Toast Success Notification -->
-    <div id="toastSuccess" class="toast">
-        <i class="fas fa-check-circle"></i> Berhasil sinkronisasi seluruh data Jadwal
-    </div>
-
-    <!-- Toast Report Notification -->
-    <div id="toastReport" class="toast">
-        <i class="fas fa-check-circle"></i> Berhasil mengirim laporan gagal
-    </div>
-
-    <!-- Modal Failed Sync -->
-    <div id="modalFailed" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-icon">
-                <i class="fas fa-triangle-exclamation"></i>
+    <!-- Universal Sync Modal -->
+    <div id="universalSyncModal" class="sync-modal-overlay">
+        <div class="sync-modal-card">
+            <div class="sync-modal-header">
+                <div class="sync-modal-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="sync-modal-title-box">
+                    <div class="sync-modal-title">Upload Data Offline</div>
+                    <div class="sync-modal-sub">Sinkronisasi hasil inspeksi lokal ke server PLN</div>
+                </div>
             </div>
-            <div class="modal-title">Sinkronisasi Selesai</div>
-            <div class="modal-text">
-                Sinkronisasi selesai dengan kendala, terdapat data jadwal yang gagal terdownload dari server. Silakan pilih tindakan:
+            <div class="sync-status-indicator">
+                <span class="pulse-dot"></span> Mode Online (Siap Kirim)
             </div>
-            <div class="modal-actions">
-                <button class="btn-danger" onclick="sendReportAndRoute()">Kirim Laporan Gagal</button>
-                <button class="btn-outline" onclick="resetAndStart()">Sinkron Ulang</button>
+            <div class="sync-item-row">
+                <div class="sync-item-info">
+                    <span class="item-title">Inspeksi GI Kalisari (Bay Trafo 1)</span>
+                    <span class="item-time">Tersimpan offline • 20 Agu 12:45</span>
+                </div>
+                <span class="sync-item-badge">Siap Upload</span>
+            </div>
+            <div class="sync-item-row">
+                <div class="sync-item-info">
+                    <span class="item-title">Checklist LA Trafo 1 (3 Foto)</span>
+                    <span class="item-time">Tersimpan offline • 20 Agu 13:02</span>
+                </div>
+                <span class="sync-item-badge">Siap Upload</span>
+            </div>
+            <div id="syncProgressBox" style="display:none; margin-top:12px;">
+                <div class="sync-progress-bar-bg">
+                    <div id="syncProgressBar" class="sync-progress-bar-fill"></div>
+                </div>
+                <div class="sync-progress-label">Mengunggah 2 data inspeksi... (80%)</div>
+            </div>
+            <div class="sync-modal-footer">
+                <button class="btn-cancel-sync" onclick="closeUniversalSync()">Tutup</button>
+                <button id="btnStartSync" class="btn-confirm-sync" onclick="startUniversalSyncProcess()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang
+                </button>
             </div>
         </div>
     </div>
 
     <div class="mobile-container">
         
+        <!-- Notification Flag -->
+        <div id="notifFlag" class="notif-flag" onclick="goToNotif()">
+            <div class="notif-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="notif-content">
+                <div class="notif-title">Jadwal Belum Tersinkron</div>
+                <div class="notif-desc">Terdapat beberapa jadwal inspeksi yang belum tersinkronisasi dari server.</div>
+            </div>
+            <button class="notif-close" onclick="closeNotif(event)"><i class="fas fa-times"></i></button>
+        </div>
+
         <!-- App Header -->
         <div class="app-header">
             <div class="header-left-group">
-                <button class="action-btn" onclick="transitionTo('dashboard-mobile.html')" title="Kembali ke Dashboard">
+                <a href="../dashboard-mobile.html" class="action-btn" title="Kembali ke Dashboard Power Inspect">
                     <i class="fa-solid fa-arrow-left"></i>
-                </button>
+                </a>
                 <div class="header-title-group">
-                    <div class="header-name">Sinkronisasi Jadwal</div>
-                    <div class="header-sub">TOTAL 66 JADWAL WO INSPEKSI</div>
+                    <div class="header-name">ardan.test</div>
+                    <div class="header-sub">ULTG SURABAYA UTARA</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <!-- Upload Offline Inspection Button with Counter -->
+                <div class="action-btn" onclick="window.location.href='list-wo-sync.html'" title="Upload Hasil Inspeksi Offline">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="sync-badge-count">3</span>
+                </div>
+                <!-- Notification Bell Button -->
+                <div class="action-btn" id="btnNotification" onclick="goToNotif()" title="Notifikasi">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notifDot" class="notif-dot"></span>
                 </div>
             </div>
         </div>
 
-        <!-- Content List -->
-        <div class="content-scroll">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama Gardu Induk...">
+                <i class="fa-solid fa-sliders" style="cursor: pointer;" title="Filter"></i>
+            </div>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="filter-chips-row">
+            <div class="filter-chip active" onclick="filterChip(this, 'all')">Semua GI (8)</div>
+            <div class="filter-chip" onclick="filterChip(this, '150kv')">150 kV</div>
+            <div class="filter-chip" onclick="filterChip(this, 'gis')">GIS</div>
+            <div class="filter-chip" onclick="filterChip(this, 'trafo')">Trafo</div>
+        </div>
+
+        <!-- List Content -->
+        <div class="app-content" id="taskListContainer">
             
-            <!-- Controls for simulation -->
-            <div class="simulation-controls">
-                <div class="simulation-title">
-                    <i class="fa-solid fa-sliders" style="color: var(--primary-blue);"></i> Skenario Sinkronisasi
+            <!-- Card 1 -->
+            <div class="task-card" onclick="openDetailGI('GI 150KV KALISARI')">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GI 150KV KALISARI</div>
+                        <span class="task-badge-status badge-mulai">
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> Mulai Inspeksi
+                        </span>
+                    </div>
+                    <div class="progress-circle-box">0/4</div>
                 </div>
-                <div class="radio-group">
-                    <label class="radio-label">
-                        <input type="radio" name="scenario" value="success" checked> Berhasil Seluruhnya
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="scenario" value="failed"> Simulasi Gagal (3 Bulanan)
-                    </label>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Work Order (WO)</span><span>2 WO</span></div>
+                    <div class="stat-row"><span>Asset Inspeksi</span><span>4 Peralatan</span></div>
                 </div>
-                <button id="btnStart" class="btn-start" onclick="startSync()">
-                    <i class="fa-solid fa-rotate"></i> Mulai Sinkronisasi
-                </button>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="task-card" onclick="openDetailGI('GIS 150KV WONOKROMO')">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GIS 150KV WONOKROMO</div>
+                        <span class="task-badge-status badge-mulai">
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> Mulai Inspeksi
+                        </span>
+                    </div>
+                    <div class="progress-circle-box">0/5</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Work Order (WO)</span><span>1 WO</span></div>
+                    <div class="stat-row"><span>Asset Inspeksi</span><span>5 Peralatan</span></div>
+                </div>
             </div>
 
-            <!-- Sync Task Cards List -->
-            <div class="list-container" id="syncList">
-                <!-- Cards managed by JS -->
+            <!-- Card 3 -->
+            <div class="task-card" onclick="openDetailGI('GI 150KV SURABAYA SELATAN')">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GI 150KV SURABAYA SELATAN</div>
+                        <span class="task-badge-status badge-mulai">
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> Mulai Inspeksi
+                        </span>
+                    </div>
+                    <div class="progress-circle-box">0/3</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Work Order (WO)</span><span>3 WO</span></div>
+                    <div class="stat-row"><span>Asset Inspeksi</span><span>3 Peralatan</span></div>
+                </div>
             </div>
+
+            <!-- Card 4 -->
+            <div class="task-card" onclick="openDetailGI('GI 150KV RUNGKUT')">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GI 150KV RUNGKUT</div>
+                        <span class="task-badge-status badge-proses">
+                            <i class="fa-solid fa-spinner" style="font-size: 9px;"></i> On Progress
+                        </span>
+                    </div>
+                    <div class="progress-circle-box" style="color: #d97706; border-color: #fde68a;">2/4</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Work Order (WO)</span><span>2 WO</span></div>
+                    <div class="stat-row"><span>Asset Inspeksi</span><span>4 Peralatan</span></div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="task-card" onclick="openDetailGI('GI 150KV WARU')">
+                <div class="task-header">
+                    <div>
+                        <div class="task-title">GI 150KV WARU</div>
+                        <span class="task-badge-status badge-selesai">
+                            <i class="fa-solid fa-check" style="font-size: 9px;"></i> Selesai
+                        </span>
+                    </div>
+                    <div class="progress-circle-box" style="color: #166534; border-color: #bbf7d0;">4/4</div>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-row"><span>Work Order (WO)</span><span>4 WO</span></div>
+                    <div class="stat-row"><span>Asset Inspeksi</span><span>4 Peralatan</span></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // Data Jadwal
-        const syncData = [
-            { id: 1, title: '2 Mingguan', count: '7 Jadwal WO Inspeksi' },
-            { id: 2, title: '3 Bulanan', count: '1 Jadwal WO Inspeksi', failKey: true },
-            { id: 3, title: 'Tahunan', count: '3 Jadwal WO Inspeksi' },
-            { id: 4, title: 'Harian', count: '28 Jadwal WO Inspeksi' },
-            { id: 5, title: 'Bulanan', count: '9 Jadwal WO Inspeksi' },
-            { id: 6, title: 'Mingguan', count: '18 Jadwal WO Inspeksi' },
-            { id: 7, title: 'Finalisasi data lokal', count: 'Sinkron inspeksi lama, auto-close expired, dan FCM' }
-        ];
-
-        const listContainer = document.getElementById('syncList');
-        const btnStart = document.getElementById('btnStart');
-        const toast = document.getElementById('toastSuccess');
-        const modal = document.getElementById('modalFailed');
-
-        // Initialize Cards
-        function renderCards() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const actionParam = urlParams.get('action');
-            const retryPeriod = urlParams.get('period');
-
-            listContainer.innerHTML = '';
-            syncData.forEach(item => {
-                const card = document.createElement('div');
-                
-                if (actionParam === 'retry' && item.id != retryPeriod) {
-                    card.className = 'sync-card success';
-                    card.id = `card-${item.id}`;
-                    card.innerHTML = `
-                        <div class="icon-wrapper">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="card-content">
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-subtitle">${item.count}</div>
-                            <div class="badge"><i class="fas fa-check"></i> Selesai</div>
-                        </div>
-                    `;
-                } else {
-                    card.className = 'sync-card waiting';
-                    card.id = `card-${item.id}`;
-                    card.innerHTML = `
-                        <div class="icon-wrapper">
-                            <i class="far fa-clock"></i>
-                        </div>
-                        <div class="card-content">
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-subtitle">${item.count}</div>
-                            <div class="badge"><i class="far fa-clock"></i> Menunggu</div>
-                        </div>
-                    `;
-                }
-                
-                listContainer.appendChild(card);
-            });
-        }
-
-        // Run on load
-        renderCards();
-
-        // Sync Logic
-        async function startSync() {
-            btnStart.disabled = true;
-            btnStart.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i> Menyinkronkan...';
-            toast.classList.remove('show');
-            modal.classList.remove('show');
-            renderCards();
-            
-            const isFailScenario = document.querySelector('input[name="scenario"]:checked').value === 'failed';
-            let hasFailure = false;
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const actionParam = urlParams.get('action');
-            const retryPeriod = urlParams.get('period');
-
-            for (let i = 0; i < syncData.length; i++) {
-                const item = syncData[i];
-                
-                if (actionParam === 'retry' && item.id != retryPeriod) {
-                    continue;
-                }
-                const card = document.getElementById(`card-${item.id}`);
-                const iconWrap = card.querySelector('.icon-wrapper');
-                const badge = card.querySelector('.badge');
-                
-                card.className = 'sync-card processing';
-                iconWrap.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i>';
-                badge.innerHTML = '<i class="fas fa-sync-alt icon-spin"></i> Memproses';
-
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                await new Promise(r => setTimeout(r, 1100));
-
-                if (isFailScenario && item.failKey) {
-                    card.className = 'sync-card danger';
-                    iconWrap.innerHTML = '<i class="fas fa-times"></i>';
-                    badge.innerHTML = '<i class="fas fa-times"></i> Gagal sinkron';
-                    hasFailure = true;
-                } else {
-                    card.className = 'sync-card success';
-                    iconWrap.innerHTML = '<i class="fas fa-check"></i>';
-                    badge.innerHTML = '<i class="fas fa-check"></i> Selesai';
-                }
-            }
-
-            btnStart.disabled = false;
-            btnStart.innerHTML = '<i class="fa-solid fa-rotate"></i> Mulai Sinkronisasi';
-
-            if (hasFailure) {
-                modal.classList.add('show');
-            } else {
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    transitionTo('dashboard-mobile.html');
-                }, 2200);
-            }
-        }
-
-        function closeModal() {
-            modal.classList.remove('show');
-        }
-
-        function resetAndStart() {
-            closeModal();
-            startSync();
-        }
-
-        function transitionTo(url) {
+        function openDetailGI(giName) {
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
             setTimeout(() => {
-                window.location.href = url;
+                window.location.href = `list-wo.html?gi=${encodeURIComponent(giName)}`;
             }, 300);
         }
 
-        function sendReportAndRoute() {
-            closeModal();
-            const toastReport = document.getElementById('toastReport');
-            toastReport.classList.add('show');
-            setTimeout(() => {
-                transitionTo('dashboard-mobile.html?status=failed');
-            }, 1800);
+        function filterChip(el, filterType) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            const cards = document.querySelectorAll('.task-card');
+            cards.forEach(card => {
+                const title = card.querySelector('.task-title').textContent.toLowerCase();
+                if (filterType === 'all') {
+                    card.style.display = 'block';
+                } else if (filterType === '150kv') {
+                    card.style.display = title.includes('150kv') ? 'block' : 'none';
+                } else if (filterType === 'gis') {
+                    card.style.display = title.includes('gis') ? 'block' : 'none';
+                } else if (filterType === 'trafo') {
+                    card.style.display = title.includes('trafo') || title.includes('kalisari') ? 'block' : 'none';
+                }
+            });
         }
 
-        window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const actionParam = urlParams.get('action');
-            if (actionParam === 'retry' || actionParam === 'auto') {
-                const successRadio = document.querySelector('input[name="scenario"][value="success"]');
-                if(successRadio) successRadio.checked = true;
-                setTimeout(startSync, 400); 
+        // Live Search
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.task-card');
+            cards.forEach(card => {
+                const title = card.querySelector('.task-title').textContent.toLowerCase();
+                card.style.display = title.includes(query) ? 'block' : 'none';
+            });
+        });
+
+        // Check for URL query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+
+        if (status === 'failed') {
+            setTimeout(() => {
+                const notifFlag = document.getElementById('notifFlag');
+                const notifDot = document.getElementById('notifDot');
+                if(notifFlag) notifFlag.classList.add('show');
+                if(notifDot) notifDot.style.display = 'block';
+
+                setTimeout(() => {
+                    if(notifFlag) notifFlag.classList.remove('show');
+                }, 4000);
+            }, 2000);
+        }
+
+        function goBack() {
+            window.location.href = '../dashboard-mobile.html';
+        }
+
+        function closeNotif(event) {
+            if(event) event.stopPropagation();
+            document.getElementById('notifFlag').classList.remove('show');
+        }
+
+        function goToNotif() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = '../notifikasi-mobile.html';
+            }, 300);
+        }
+
+        function triggerUniversalSync() {
+            document.getElementById('universalSyncModal').classList.add('show');
+        }
+
+        function closeUniversalSync() {
+            document.getElementById('universalSyncModal').classList.remove('show');
+        }
+
+        function startUniversalSyncProcess() {
+            const btn = document.getElementById('btnStartSync');
+            const pBox = document.getElementById('syncProgressBox');
+            const pBar = document.getElementById('syncProgressBar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...';
+            pBox.style.display = 'block';
+            
+            let progress = 10;
+            pBar.style.width = progress + '%';
+            const interval = setInterval(() => {
+                progress += 30;
+                pBar.style.width = Math.min(progress, 100) + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.querySelectorAll('.sync-badge-count').forEach(b => b.style.display = 'none');
+                        alert('2 Hasil inspeksi offline berhasil diunggah dan tersinkronisasi ke server pusat PLN!');
+                        closeUniversalSync();
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang';
+                        pBox.style.display = 'none';
+                        pBar.style.width = '0%';
+                    }, 400);
+                }
+            }, 350);
+        }
+
+        function initTheme() {
+            if (localStorage.getItem('pln_mobile_theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
             }
-        };
+        }
+        initTheme();
     </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
@@ -1377,27 +1499,11 @@
         Notes & Validasi
       </h3>
       <ul>
-        <li><strong>Simulasi Gagal:</strong> Pilihan skenario "Gagal" digunakan untuk demonstrasi *error-handling*, di mana sistem akan menandai jadwal yang gagal tersinkron.</li>
-        <li><strong>Kirim Laporan Gagal:</strong> Menampilkan notifikasi sukses pengiriman, jeda 2 detik, lalu diarahkan ke halaman utama (*Home*) dengan trigger status gagal.</li>
-        <li><strong>Sinkron Ulang Parsial:</strong> Jika sistem menerima parameter retry dari Notifikasi, hanya jadwal yang gagal yang akan diulang (animasi *loading*), sisanya ditandai selesai (ceklis).</li>
-        <li><strong>Auto-Sync:</strong> Jika parameter *auto* diterima, sistem akan menyimulasikan sinkronisasi penuh secara otomatis.</li>
+        <li><strong>Desain Seragam:</strong> Tone dan styling diselaraskan dengan Dashboard Power Inspect (Plus Jakarta Sans, border halus, badge modern).</li>
+        <li><strong>Filter Chips:</strong> Fitur filter cepat (Semua GI, 150kV, GIS, Trafo) untuk mempermudah pencarian aset di lapangan.</li>
+        <li><strong>Akses & Navigasi:</strong> Tombol Back langsung kembali ke Dashboard Power Inspect Catalog (`dashboard-mobile.html`).</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
-
-    <script>
-        (function() {
-            function applyTheme() {
-                if (localStorage.getItem('pln_mobile_theme') === 'dark') {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
-            }
-            applyTheme();
-            window.addEventListener('DOMContentLoaded', applyTheme);
-        })();
-    </script>
-
 </body>
 </html>

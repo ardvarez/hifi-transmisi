@@ -485,6 +485,60 @@ tbody tr:last-child td { border-bottom: none; }
                     </div>
                 </div>
 
+                <!-- TABEL LOKASI TRANSIT -->
+                <div id="transitSection" style="display: none; margin-top: 24px;">
+                    <div class="section-label">Lokasi Transit Barang (Sebelum Kembali ke Lokasi Semula)</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:40px; text-align:center;">No</th>
+                                    <th style="min-width: 200px;">Unit Pengelola Transmisi (UPT) <span style="color:var(--danger);">*</span></th>
+                                    <th style="min-width: 200px;">ULTG (Opsional)</th>
+                                    <th style="min-width: 200px;">Gardu Induk (Opsional)</th>
+                                    <th>Keterangan Transit (Opsional)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transitTableBody">
+                                <tr>
+                                    <td style="text-align:center;">1</td>
+                                    <td>
+                                        <select class="table-input" id="t_transitUpt">
+                                            <option value="" selected disabled>Pilih UPT (Wajib)</option>
+                                            <option value="UPT Gandul">UPT Gandul</option>
+                                            <option value="UPT Cawang">UPT Cawang</option>
+                                            <option value="UPT Pulogadung">UPT Pulogadung</option>
+                                            <option value="UPT Bogor">UPT Bogor</option>
+                                            <option value="UPT Cirebon">UPT Cirebon</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="table-input" id="t_transitUltg">
+                                            <option value="" selected>-- Pilih ULTG (Opsional) --</option>
+                                            <option value="ULTG Gandul">ULTG Gandul</option>
+                                            <option value="ULTG Depok">ULTG Depok</option>
+                                            <option value="ULTG Cibinong">ULTG Cibinong</option>
+                                            <option value="ULTG Cawang">ULTG Cawang</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="table-input" id="t_transitGi">
+                                            <option value="" selected>-- Pilih Gardu Induk (Opsional) --</option>
+                                            <option value="GI Gandul 150kV">GI Gandul 150kV</option>
+                                            <option value="GITET Gandul 500kV">GITET Gandul 500kV</option>
+                                            <option value="GI Depok 150kV">GI Depok 150kV</option>
+                                            <option value="GI Cawang 150kV">GI Cawang 150kV</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="table-input" id="t_transitKet" placeholder="Contoh: Area Lapangan Switchyard / Gudang Transit">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="footer-actions">
                     <button class="btn-outline" style="min-width: 100px;">Draft</button>
                     <button class="btn-submit" style="min-width: 100px;" onclick="submitForm()">Submit</button>
@@ -744,13 +798,6 @@ tbody tr:last-child td { border-bottom: none; }
                             </div>
                         </div>
                         <div class="form-group pg-field">
-                            <label class="form-label">Gudang Tujuan</label>
-                            <select class="form-control" id="f_gudang">
-                                <option value="" selected disabled>Pilih Gudang Tujuan</option>
-                                <option value="Gudang UPT Gandul">Gudang UPT Gandul</option>
-                            </select>
-                        </div>
-                        <div class="form-group pg-field">
                             <label class="form-label">PIC Pengecekan</label>
                             <select class="form-control" id="f_picCheck">
                                 <option value="" selected disabled>Pilih PIC Pengecekan</option>
@@ -826,26 +873,19 @@ tbody tr:last-child td { border-bottom: none; }
                             </select>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">PIC Pengecekan</label>
+                            <select class="form-control" id="f_picCheck">
+                                <option value="" selected disabled>Pilih PIC Pengecekan</option>
+                                <option value="Mikel Susanto">Mikel Susanto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Tanggal Estimasi Berangkat</label>
                             <input type="date" class="form-control" id="f_tglBrkt">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Tanggal Estimasi Tiba</label>
                             <input type="date" class="form-control" id="f_tglTiba">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Gudang Tujuan</label>
-                            <select class="form-control" id="f_gudang">
-                                <option value="" selected disabled>Pilih Gudang Tujuan</option>
-                                <option value="Gudang UPT Gandul">Gudang UPT Gandul</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">PIC Pengecekan</label>
-                            <select class="form-control" id="f_picCheck">
-                                <option value="" selected disabled>Pilih PIC Pengecekan</option>
-                                <option value="Mikel Susanto">Mikel Susanto</option>
-                            </select>
                         </div>
                     `,
                     tableHead: `
@@ -896,6 +936,11 @@ tbody tr:last-child td { border-bottom: none; }
         fields.forEach(f => {
             f.style.display = checked ? 'flex' : 'none';
         });
+
+        const transitSection = document.getElementById('transitSection');
+        if (transitSection) {
+            transitSection.style.display = checked ? 'block' : 'none';
+        }
     }
 
     function renderForm() {
@@ -904,10 +949,12 @@ tbody tr:last-child td { border-bottom: none; }
         
         const config = getFormConfig(tipe);
         const section = document.getElementById('tableSection');
+        const transitSection = document.getElementById('transitSection');
 
         if (!config) {
             document.getElementById('formContainer').innerHTML = '';
             section.style.display = 'none';
+            if (transitSection) transitSection.style.display = 'none';
             return;
         }
         
@@ -925,9 +972,16 @@ tbody tr:last-child td { border-bottom: none; }
             footer.style.display = 'none';
         }
 
-        if(tipe === 'pembongkaran') {
-            togglePengembalianFields();
+        if (transitSection) {
+            if (tipe === 'pengembalian') {
+                transitSection.style.display = 'block';
+            } else if (tipe === 'pembongkaran') {
+                togglePengembalianFields();
+            } else {
+                transitSection.style.display = 'none';
+            }
         }
+
         updateDeleteButtons();
     }
 
@@ -1151,9 +1205,6 @@ tbody tr:last-child td { border-bottom: none; }
         const selPic = document.getElementById('f_pic');
         if (selPic) selPic.value = 'TIM ERS UIT JBB';
 
-        const selGudang = document.getElementById('f_gudang');
-        if (selGudang) selGudang.value = 'Gudang UPT Gandul';
-
         const selPicCheck = document.getElementById('f_picCheck');
         if (selPicCheck) selPicCheck.value = 'Mikel Susanto';
 
@@ -1165,6 +1216,18 @@ tbody tr:last-child td { border-bottom: none; }
         
         const selPermitBongkar = document.getElementById('f_permitBongkar');
         if (selPermitBongkar) selPermitBongkar.value = 'DIS2025xxxx';
+
+        const transitUpt = document.getElementById('t_transitUpt');
+        if (transitUpt) transitUpt.value = 'UPT Gandul';
+
+        const transitUltg = document.getElementById('t_transitUltg');
+        if (transitUltg) transitUltg.value = 'ULTG Gandul';
+
+        const transitGi = document.getElementById('t_transitGi');
+        if (transitGi) transitGi.value = 'GI Gandul 150kV';
+
+        const transitKet = document.getElementById('t_transitKet');
+        if (transitKet) transitKet.value = 'Switchyard Area Gandul';
 
         if (tipe === 'pemasangan') {
             const tm1 = document.getElementById('t_tglMulai1');
@@ -1208,7 +1271,7 @@ tbody tr:last-child td { border-bottom: none; }
             }
         });
 
-        // Cek tabel
+        // Cek tabel utama
         const tableInputs = document.querySelectorAll('#tableBody .table-input');
         tableInputs.forEach(input => {
             if (!input.value) {
@@ -1216,8 +1279,17 @@ tbody tr:last-child td { border-bottom: none; }
             }
         });
 
+        // Cek tabel transit jika aktif
+        const transitSection = document.getElementById('transitSection');
+        if (transitSection && transitSection.style.display !== 'none') {
+            const uptInput = document.getElementById('t_transitUpt');
+            if (uptInput && !uptInput.value) {
+                isValid = false;
+            }
+        }
+
         if (!isValid) {
-            alert('Validasi Gagal! Harap lengkapi seluruh field wajib (termasuk pada tabel) sebelum men-submit.');
+            alert('Validasi Gagal! Harap lengkapi seluruh field wajib (termasuk UPT pada tabel transit jika aktif) sebelum men-submit.');
         } else {
             alert('Sukses! Data perizinan berhasil disubmit.');
         }
@@ -1305,8 +1377,9 @@ tbody tr:last-child td { border-bottom: none; }
       </h3>
       <ul>
         <li><strong>Alur:</strong> Secara alur data akan mengalir dari pemasangan, pembongkaran lalu pengembalian.</li>
+        <li><strong>Lokasi Transit:</strong> Pada pengembalian/pembongkaran, lokasi transit barang dipilih via tabel transit (minimal pilih UPT, opsi ULTG dan GI opsional).</li>
         <li><strong>Tanggal:</strong> Digunakan sebagai acuan saja belum menjadi target penyelesaian atau action, dan bisa diisi mundur (backdate).</li>
-        <li><strong>Validasi:</strong> Seluruh field wajib diisi, kecuali yang bertanda (Opsional). Sistem akan memvalidasi form dan tabel sebelum submit.</li>
+        <li><strong>Validasi:</strong> Seluruh field wajib diisi, kecuali yang bertanda (Opsional). Sistem akan memvalidasi form, tabel aksesoris, dan tabel lokasi transit sebelum submit.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->

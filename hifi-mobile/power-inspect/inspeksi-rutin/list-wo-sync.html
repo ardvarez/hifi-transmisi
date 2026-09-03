@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daftar WO Sync - Power Inspect Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #cbd5e1; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px 0; }
+        .mobile-container { width: 100%; max-width: 440px; height: 100vh; background-color: var(--bg-color); position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(15,23,42,0.25); }
+        @media (min-width: 450px) { .mobile-container { height: 870px; max-height: 94vh; border-radius: 40px; border: 8px solid #1e293b; } }
+
+        .app-header { padding: 16px 20px 14px; display: flex; justify-content: space-between; align-items: center; background: #ffffff; border-bottom: 1px solid var(--border-color); z-index: 10; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { width: 36px; height: 36px; border-radius: 50%; background: #f8fafc; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-main); cursor: pointer; text-decoration: none; }
+        .header-title { font-size: 15px; font-weight: 800; color: var(--text-main); }
+        .header-sub { font-size: 11px; color: var(--primary-blue); font-weight: 700; }
+
+        .search-section { padding: 12px 18px 8px; background: white; border-bottom: 1px solid var(--border-color); }
+        .search-box { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; }
+        .search-box input { border: none; background: transparent; width: 100%; font-size: 13px; outline: none; }
+
+        .stats-banner { margin: 14px 18px 10px; background: linear-gradient(135deg, #1a65d6 0%, #0d47a1 100%); border-radius: 16px; padding: 16px; color: white; box-shadow: 0 6px 18px rgba(26,101,214,0.25); }
+        .stats-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .stats-desc { font-size: 11.5px; opacity: 0.9; }
+
+        .content-scroll { flex: 1; overflow-y: auto; padding: 0 18px 90px; }
+        .section-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 8px; }
+
+        .wo-card { background: white; border-radius: 18px; padding: 16px; border: 1px solid var(--border-color); margin-bottom: 12px; transition: transform 0.2s; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .wo-card:active { transform: scale(0.98); }
+        .wo-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .wo-num { font-size: 13px; font-weight: 800; color: var(--primary-blue); font-family: monospace; }
+        .wo-gi { font-size: 14px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+        .badge-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+        .badge-lokal { background: #dbeafe; color: #1e40af; }
+        .badge-gagal { background: #fee2e2; color: #991b1b; }
+
+        .wo-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 10px; font-size: 11px; }
+        .info-lbl { color: var(--text-muted); font-size: 10px; }
+        .info-val { font-weight: 700; color: var(--text-main); }
+
+        .wo-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); font-size: 12px; }
+        .asset-count { font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+        .arrow-link { color: var(--primary-blue); font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+
+        .bottom-action-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 18px; background: white; border-top: 1px solid var(--border-color); box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .btn-sync-all { width: 100%; padding: 14px; border-radius: 14px; background: #1a65d6; color: white; border: none; font-size: 13.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(26,101,214,0.3); }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="app-header">
+            <div class="header-left">
+                <button onclick="window.history.back()" class="back-btn"><i class="fa-solid fa-arrow-left"></i></button>
+                <div>
+                    <div class="header-title">Hasil Inspeksi Offline</div>
+                    <div class="header-sub">Daftar Work Order (WO)</div>
+                </div>
+            </div>
+            <div style="font-size: 18px; color: #1a65d6;"><i class="fa-solid fa-layer-group"></i></div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8;"></i>
+                <input type="text" placeholder="Cari No. WO atau Nama Gardu Induk...">
+            </div>
+        </div>
+
+        <div class="stats-banner">
+            <div class="stats-title"><i class="fa-solid fa-cloud-arrow-up"></i> 3 Work Order Siap Upload</div>
+            <div class="stats-desc">Total 6 hasil inspeksi aset tersimpan lokal. Pilih WO untuk melihat rincian per aset.</div>
+        </div>
+
+        <div class="content-scroll">
+            <div class="section-label">Daftar Work Order Sync</div>
+
+            <!-- WO Card 1 -->
+            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600131960'">
+                <div class="wo-header">
+                    <div>
+                        <div class="wo-num">INS202600131960</div>
+                        <div class="wo-gi">GI 150KV KALISARI</div>
+                    </div>
+                    <span class="badge-status badge-lokal">2 Asset Offline</span>
+                </div>
+                <div class="wo-info-grid">
+                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">TRF#4 150/20kV</span></div>
+                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Rutin 2 Tahunan</span></div>
+                </div>
+                <div class="wo-footer">
+                    <div class="asset-count"><i class="fa-solid fa-cube" style="color:#1a65d6;"></i> Over Current Relay & Trafo 4</div>
+                    <div class="arrow-link">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+
+            <!-- WO Card 2 -->
+            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600129841'">
+                <div class="wo-header">
+                    <div>
+                        <div class="wo-num">INS202600129841</div>
+                        <div class="wo-gi">GI 150KV RUNGKUT</div>
+                    </div>
+                    <span class="badge-status badge-gagal">1 Asset Gagal Sync</span>
+                </div>
+                <div class="wo-info-grid">
+                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">BAY KOPEL 150KV</span></div>
+                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Pengukuran LA</span></div>
+                </div>
+                <div class="wo-footer">
+                    <div class="asset-count"><i class="fa-solid fa-cube" style="color:#ef4444;"></i> Lightning Arrester (LA)</div>
+                    <div class="arrow-link">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+
+            <!-- WO Card 3 -->
+            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600142810'">
+                <div class="wo-header">
+                    <div>
+                        <div class="wo-num">INS202600142810</div>
+                        <div class="wo-gi">GIS 150KV WONOKROMO</div>
+                    </div>
+                    <span class="badge-status badge-lokal">3 Asset Offline</span>
+                </div>
+                <div class="wo-info-grid">
+                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">BAY FEET 1</span></div>
+                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Inspeksi Termovisi</span></div>
+                </div>
+                <div class="wo-footer">
+                    <div class="asset-count"><i class="fa-solid fa-cube" style="color:#1a65d6;"></i> Busbar, PMT, CT 150kV</div>
+                    <div class="arrow-link">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-action-bar">
+            <button class="btn-sync-all" onclick="window.location.href='sync-hasil-inspeksi.html'">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Semua WO (6 Asset)
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <!-- TODO: UPDATE NOTES HERE -->
+        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
+        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
+        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>

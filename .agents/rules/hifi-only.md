@@ -19,3 +19,4 @@ trigger: always_on
   - **Number**: Sesuaikan tipe data (Integer tanpa desimal atau Double/Float dengan desimal dan step).
   - **Text Input & Text Area**: Mengikuti styling input PLN yang seragam.
 - Pastikan pengecekan tag sebelum trigger selesai ke user, biar ga ada bug ataupun error dari FE
+- Gaperlu pakai dom karena itu ngabisin token bang
