@@ -1969,12 +1969,12 @@
         <!-- Activity Header -->
         <div class="activity-header">
             <div class="header-top-row">
-                <a href="./catalog-mobile.html" class="btn-back" title="Kembali ke Beranda">
+                <a href="./catalog-mobile.html" id="btnBackHeader" class="btn-back" title="Kembali">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div class="header-title-box">
-                    <h1>Pusat Notifikasi</h1>
-                    <p>PLN Transmisi Mobile • GI Mampang</p>
+                    <h1 id="headerMainTitle">Pusat Notifikasi</h1>
+                    <p id="headerSubTitle">PLN Transmisi Mobile • GI Mampang</p>
                 </div>
                 <div class="header-actions">
                     <button class="btn-header-action" onclick="markAllAsRead()" title="Tandai Semua Dibaca">
@@ -1995,35 +1995,35 @@
 
         <!-- App Category Filter Tabs (Scrollable Horizontal) -->
         <div class="app-tabs-bar" id="appTabsBar">
-            <div class="app-tab-pill active" onclick="switchAppTab('all', this)">
+            <div class="app-tab-pill active" data-app="all" onclick="switchAppTab('all', this)">
                 <i class="fa-solid fa-layer-group"></i>
                 <span>Semua</span>
-                <span class="app-tab-badge" id="badgeAll">6</span>
+                <span class="app-tab-badge" id="badgeAll">11</span>
             </div>
-            <div class="app-tab-pill" onclick="switchAppTab('inspeksi', this)">
+            <div class="app-tab-pill" data-app="newpst" onclick="switchAppTab('newpst', this)">
+                <i class="fa-solid fa-database" style="color: #d97706;"></i>
+                <span>NEW PST</span>
+                <span class="app-tab-badge" id="badgeNewPst">4</span>
+            </div>
+            <div class="app-tab-pill" data-app="inspeksi" onclick="switchAppTab('inspeksi', this)">
                 <i class="fa-solid fa-clipboard-check" style="color: #2563eb;"></i>
                 <span>Power Inspect</span>
-                <span class="app-tab-badge">2</span>
+                <span class="app-tab-badge" id="badgeInspeksi">2</span>
             </div>
-            <div class="app-tab-pill" onclick="switchAppTab('ers', this)">
+            <div class="app-tab-pill" data-app="ers" onclick="switchAppTab('ers', this)">
                 <i class="fa-solid fa-tower-observation" style="color: #9333ea;"></i>
                 <span>ERS Mobile</span>
-                <span class="app-tab-badge">2</span>
+                <span class="app-tab-badge" id="badgeErs">2</span>
             </div>
-            <div class="app-tab-pill" onclick="switchAppTab('ffe', this)">
+            <div class="app-tab-pill" data-app="ffe" onclick="switchAppTab('ffe', this)">
                 <i class="fa-solid fa-fire-extinguisher" style="color: #dc2626;"></i>
                 <span>FFE Transmisi</span>
-                <span class="app-tab-badge">1</span>
+                <span class="app-tab-badge" id="badgeFfe">1</span>
             </div>
-            <div class="app-tab-pill" onclick="switchAppTab('survey', this)">
+            <div class="app-tab-pill" data-app="survey" onclick="switchAppTab('survey', this)">
                 <i class="fa-solid fa-compass-drafting" style="color: #059669;"></i>
                 <span>SURVEY Mobile</span>
-                <span class="app-tab-badge">2</span>
-            </div>
-            <div class="app-tab-pill" onclick="switchAppTab('newpst', this)">
-                <i class="fa-solid fa-database" style="color: #d97706;"></i>
-                <span>NEWPST</span>
-                <span class="app-tab-badge">0</span>
+                <span class="app-tab-badge" id="badgeSurvey">2</span>
             </div>
         </div>
 
@@ -2108,6 +2108,85 @@
     <script>
         /* Comprehensive Notifications Dataset */
         let notificationsList = [
+            {
+                id: 'notif-pst-1',
+                app: 'newpst',
+                appName: 'NEW PST',
+                title: 'Persetujuan Registrasi Aset PMT 150kV #ASSET-PMT-042',
+                desc: 'Pengajuan registrasi aset baru Circuit Breaker Bay Trafo 1 GI Mampang telah diverifikasi oleh Spv Pemeliharaan dan statusnya disetujui (Approved).',
+                icon: 'fa-database',
+                priority: 'normal',
+                priorityLabel: 'Master Data',
+                time: '15 menit yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Peralatan', val: 'PMT 150kV Bay Trafo 1' },
+                    { label: 'Lokasi', val: 'GI Mampang' },
+                    { label: 'Status', val: 'Terdaftar Aktif' }
+                ],
+                actionText: 'Lihat Aset Register',
+                actionUrl: './new-pst/asset-register.html'
+            },
+            {
+                id: 'notif-pst-2',
+                app: 'newpst',
+                appName: 'NEW PST',
+                title: 'Alert MAX AHI: Trafo 2 GI Mampang Menjadi 3 (Fair)',
+                desc: 'Hasil sinkronisasi data uji diagnostik transmisi dan thermovisi memicu penurunan indeks ke AHI 3 (Fair). Rekomendasi evaluasi pemeliharaan diterbitkan.',
+                icon: 'fa-triangle-exclamation',
+                priority: 'warning',
+                priorityLabel: 'Kesehatan Aset',
+                time: '1 jam yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Aset', val: 'Trafo Tenaga 150/20kV #2' },
+                    { label: 'Indeks AHI', val: 'Skor 3 - Fair' },
+                    { label: 'Kualitas Data', val: '100% Lengkap' }
+                ],
+                actionText: 'Buka Detail AHI',
+                actionUrl: './new-pst/asset-detail.html'
+            },
+            {
+                id: 'notif-pst-3',
+                app: 'newpst',
+                appName: 'NEW PST',
+                title: 'Usulan Pelepasan Aset Disetujui (Disposal #DSP-2026-004)',
+                desc: 'Telaah teknis dan justifikasi kelayakan penarikan aset Disconnecting Switch (DS) Bay Line 1 telah disetujui oleh Tim Pengelola Aset UPT.',
+                icon: 'fa-file-signature',
+                priority: 'normal',
+                priorityLabel: 'Disposal',
+                time: 'Kemarin, 16:45',
+                dateGroup: 'Kemarin & Sebelumnya',
+                isUnread: false,
+                params: [
+                    { label: 'No. Disposal', val: '#DSP-2026-004' },
+                    { label: 'Item', val: 'DS 150kV Bus 1' },
+                    { label: 'Kondisi', val: 'Rusak Berat / Rekomendasi Ganti' }
+                ],
+                actionText: 'Buka Dokumen Disposal',
+                actionUrl: './new-pst/asset-register.html'
+            },
+            {
+                id: 'notif-pst-4',
+                app: 'newpst',
+                appName: 'NEW PST',
+                title: 'Perubahan Data Teknis Nameplate CT 150kV Ditolak',
+                desc: 'Pengajuan revisi rasio arus primer/sekunder Current Transformer Bay Koppel ditolak oleh Verifikator Data karena berkas hasil uji komisioning belum lengkap.',
+                icon: 'fa-circle-xmark',
+                priority: 'high',
+                priorityLabel: 'Revisi Ditolak',
+                time: 'Kemarin, 11:30',
+                dateGroup: 'Kemarin & Sebelumnya',
+                isUnread: true,
+                params: [
+                    { label: 'Peralatan', val: 'CT 150kV Bay Koppel' },
+                    { label: 'Catatan', val: 'Lampirkan Berita Acara Uji Lab' }
+                ],
+                actionText: 'Perbaiki Pengajuan',
+                actionUrl: './new-pst/asset-register.html'
+            },
             {
                 id: 'notif-1',
                 app: 'inspeksi',
@@ -2250,16 +2329,45 @@
 
         /* App Notification Settings */
         const appNotifSettings = {
+            newpst: { name: 'NEW PST (Asset Master & AHI)', desc: 'Pembaruan register aset, alert skor MAX AHI & mutasi/disposal', enabled: true, icon: 'fa-database', color: '#d97706', bg: '#fef3c7' },
             inspeksi: { name: 'Power Inspect (Inspeksi)', desc: 'Jadwal inspeksi harian, reminder sync & anomali CBM', enabled: true, icon: 'fa-clipboard-check', color: '#2563eb', bg: '#eff6ff' },
             ers: { name: 'ERS (Emergency System)', desc: 'Disposisi mutasi tower, permohonan material & stock opname', enabled: true, icon: 'fa-tower-observation', color: '#9333ea', bg: '#f3e8ff' },
             ffe: { name: 'FFE (Fire Fighting Equipment)', desc: 'Peringatan tabung APAR jatuh tempo & uji pompa hydrant', enabled: true, icon: 'fa-fire-extinguisher', color: '#dc2626', bg: '#fee2e2' },
-            survey: { name: 'SURVEY Mobile (Survei Lapangan)', desc: 'Permintaan survei baru, ketersediaan lahan/bay, & kajian riset transmisi', enabled: true, icon: 'fa-compass-drafting', color: '#059669', bg: '#d1fae5' },
-            newpst: { name: 'NEWPST Master Data', desc: 'Pembaruan katalog master asset sarana penyaluran', enabled: false, icon: 'fa-database', color: '#d97706', bg: '#fef3c7' }
+            survey: { name: 'SURVEY Mobile (Survei Lapangan)', desc: 'Permintaan survei baru, ketersediaan lahan/bay, & kajian riset transmisi', enabled: true, icon: 'fa-compass-drafting', color: '#059669', bg: '#d1fae5' }
         };
 
         let currentAppFilter = 'all';
         let currentQuickFilter = 'all';
         let currentSearchQuery = '';
+
+        function updateBadgeCounts() {
+            const counts = {
+                all: notificationsList.length,
+                inspeksi: notificationsList.filter(i => i.app === 'inspeksi').length,
+                ers: notificationsList.filter(i => i.app === 'ers').length,
+                ffe: notificationsList.filter(i => i.app === 'ffe').length,
+                survey: notificationsList.filter(i => i.app === 'survey').length,
+                newpst: notificationsList.filter(i => i.app === 'newpst').length
+            };
+
+            const badgeAll = document.getElementById('badgeAll');
+            if (badgeAll) badgeAll.textContent = counts.all;
+            
+            const badgeInspeksi = document.getElementById('badgeInspeksi');
+            if (badgeInspeksi) badgeInspeksi.textContent = counts.inspeksi;
+            
+            const badgeErs = document.getElementById('badgeErs');
+            if (badgeErs) badgeErs.textContent = counts.ers;
+            
+            const badgeFfe = document.getElementById('badgeFfe');
+            if (badgeFfe) badgeFfe.textContent = counts.ffe;
+            
+            const badgeSurvey = document.getElementById('badgeSurvey');
+            if (badgeSurvey) badgeSurvey.textContent = counts.survey;
+            
+            const badgeNewPst = document.getElementById('badgeNewPst');
+            if (badgeNewPst) badgeNewPst.textContent = counts.newpst;
+        }
 
         function renderNotifStream() {
             const container = document.getElementById('notifStream');
@@ -2365,7 +2473,35 @@
             currentAppFilter = appKey;
             const pills = document.querySelectorAll('#appTabsBar .app-tab-pill');
             pills.forEach(p => p.classList.remove('active'));
-            if (el) el.classList.add('active');
+            
+            let targetEl = el;
+            if (!targetEl) {
+                targetEl = document.querySelector(`#appTabsBar .app-tab-pill[data-app="${appKey}"]`);
+            }
+            if (targetEl) {
+                targetEl.classList.add('active');
+                try {
+                    targetEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } catch(e) {}
+            }
+
+            // Update Header Subtitle Contextually
+            const headerTitle = document.getElementById('headerMainTitle');
+            const headerSub = document.getElementById('headerSubTitle');
+            const appNames = {
+                all: { title: 'Pusat Notifikasi', sub: 'PLN Transmisi Mobile • Semua Modul' },
+                newpst: { title: 'Notifikasi NEW PST', sub: 'Katalog Master Data & Mutasi Aset' },
+                inspeksi: { title: 'Notifikasi Power Inspect', sub: 'Jadwal Rutin & Anomali CBM' },
+                ers: { title: 'Notifikasi ERS Mobile', sub: 'Disposisi & Stock Opname Tower' },
+                ffe: { title: 'Notifikasi FFE Transmisi', sub: 'Proteksi Kebakaran & APAR' },
+                survey: { title: 'Notifikasi SURVEY Mobile', sub: 'Ketersediaan Lahan & Riset Span' }
+            };
+
+            if (appNames[appKey]) {
+                if (headerTitle) headerTitle.textContent = appNames[appKey].title;
+                if (headerSub) headerSub.textContent = appNames[appKey].sub;
+            }
+
             renderNotifStream();
         }
 
@@ -2386,6 +2522,7 @@
             const item = notificationsList.find(i => i.id === id);
             if (item) {
                 item.isUnread = false;
+                updateBadgeCounts();
                 renderNotifStream();
             }
             if (url && url !== '#') {
@@ -2397,6 +2534,7 @@
 
         function markAllAsRead() {
             notificationsList.forEach(i => i.isUnread = false);
+            updateBadgeCounts();
             renderNotifStream();
             showToast('Semua notifikasi ditandai telah dibaca', 'fa-check-double', '#10b981');
         }
@@ -3033,19 +3171,51 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            renderNotifStream();
+        function initAppNotificationView() {
+            updateBadgeCounts();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const appParam = urlParams.get('app') || urlParams.get('source');
+            const backParam = urlParams.get('back') || urlParams.get('prev');
+
+            if (backParam) {
+                const backBtn = document.getElementById('btnBackHeader');
+                if (backBtn) {
+                    backBtn.href = backParam;
+                }
+            }
+
+            let initialApp = 'all';
+            if (appParam) {
+                const lower = appParam.toLowerCase().replace(/[-_]/g, '');
+                if (lower === 'newpst' || lower === 'pst') {
+                    initialApp = 'newpst';
+                } else if (lower === 'inspeksi' || lower === 'powerinspect') {
+                    initialApp = 'inspeksi';
+                } else if (lower === 'ers') {
+                    initialApp = 'ers';
+                } else if (lower === 'ffe') {
+                    initialApp = 'ffe';
+                } else if (lower === 'survey') {
+                    initialApp = 'survey';
+                }
+            }
+
+            switchAppTab(initialApp);
 
             // Check query params to auto-open bottom sheet (e.g. ?open=profile)
-            const urlParams = new URLSearchParams(window.location.search);
             const autoOpen = urlParams.get('open') || urlParams.get('modal') || urlParams.get('tab');
             if (autoOpen) {
                 openModal(autoOpen);
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initAppNotificationView();
         });
         initTheme();
-        renderNotifStream();
+        initAppNotificationView();
     </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
