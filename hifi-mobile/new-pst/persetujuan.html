@@ -12,15 +12,15 @@
 
     <style>
         :root {
-            --bg-canvas: #f0f4f8;
-            --header-blue: #0b4884;
-            --header-blue-dark: #083868;
+            --bg-canvas: #f4f6fb;
+            --header-blue: #1e3a8a;
+            --header-blue-dark: #1e40af;
             --card-bg: #ffffff;
-            --text-dark: #0f172a;
+            --text-dark: #1e293b;
             --text-muted: #64748b;
             --text-sub: #475569;
             --border-color: #e2e8f0;
-            --primary-blue: #0A58CA;
+            --primary-blue: #1a65d6;
             --primary-blue-light: #eff6ff;
             --emerald: #059669;
             --emerald-light: #d1fae5;
@@ -81,6 +81,10 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        h1, h2, h3, h4, h5, .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
         body {
             background-color: #cbd5e1;
             display: flex;
@@ -93,7 +97,7 @@
 
         .mobile-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 412px;
             height: 100vh;
             background-color: var(--bg-canvas);
             position: relative;
@@ -128,7 +132,7 @@
             color: #ffffff;
             font-size: 13px;
             font-weight: 700;
-            background-color: var(--header-blue);
+            background-color: #1e3a8a;
             z-index: 20;
         }
 
@@ -141,7 +145,7 @@
 
         /* Top Header */
         .header-bg {
-            background: linear-gradient(180deg, var(--header-blue) 0%, #0c4e8e 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%);
             padding: 10px 18px 46px;
             color: white;
             position: relative;
@@ -215,7 +219,7 @@
         .app-body {
             flex: 1;
             overflow-y: auto;
-            padding: 0 16px 85px;
+            padding: 0 16px 25px;
             margin-top: -34px;
             z-index: 15;
             scrollbar-width: none;
@@ -371,12 +375,12 @@
 
         /* Bottom Nav */
         .bottom-nav {
+            display: none !important;
             position: absolute;
             bottom: 0; left: 0; right: 0;
             height: 68px;
             background: #ffffff;
             border-top: 1px solid #e2e8f0;
-            display: flex;
             justify-content: space-around;
             align-items: center;
             padding: 0 16px 8px;
@@ -430,40 +434,85 @@
 
         .modal-drawer {
             width: 100%;
-            max-width: 420px;
-            height: 75vh;
+            max-width: 412px;
+            height: auto;
+            max-height: 88%;
             display: flex;
             flex-direction: column;
-            background: #ffffff;
-            border-top-left-radius: 26px;
-            border-top-right-radius: 26px;
-            padding: 16px 18px 20px;
-            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            background: var(--card-bg, #ffffff);
+            border-top: 1px solid var(--border-color, #e2e8f0);
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 12px 16px 18px;
+            box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.28);
             transform: translateY(100%);
-            transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
+            z-index: 1001;
         }
 
         .modal-overlay.active .modal-drawer { transform: translateY(0); }
 
         .drawer-handle {
-            width: 38px;
-            height: 4px;
+            width: 42px;
+            height: 5px;
             background: #cbd5e1;
-            border-radius: 2px;
+            border-radius: 3px;
             margin: 0 auto 12px;
             cursor: pointer;
             flex-shrink: 0;
+            transition: all 0.2s ease;
         }
 
         #drawerContent {
-            flex: 1;
-            overflow-y: auto;
-            scrollbar-width: none;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            max-height: 100%;
+            min-height: 0;
+            flex: 1;
         }
 
-        #drawerContent::-webkit-scrollbar { display: none; }
+        .drawer-scroll-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding-right: 3px;
+            padding-bottom: 6px;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 4px;
+        }
+
+        .drawer-footer-sticky {
+            flex-shrink: 0;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color, #e2e8f0);
+            background: var(--card-bg, #ffffff);
+            display: flex;
+            gap: 8px;
+        }
 
         .drawer-btn {
             width: 100%;
@@ -501,10 +550,108 @@
         }
 
         .mobile-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* OUTER FLOATING UNIT TOGGLE (TOP RIGHT) */
+        .outer-unit-toggle {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            padding: 8px 12px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .outer-unit-toggle {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(51, 65, 85, 0.9);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        .outer-unit-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        body.dark-mode .outer-unit-label {
+            color: #94a3b8;
+        }
+
+        .outer-toggle-pill {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 10px;
+            gap: 3px;
+        }
+
+        body.dark-mode .outer-toggle-pill {
+            background: #0f172a;
+        }
+
+        .outer-toggle-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body.dark-mode .outer-toggle-btn {
+            color: #94a3b8;
+        }
+
+        .outer-toggle-btn.active {
+            background: #1a65d6;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.3);
+        }
+
+        .outer-toggle-btn:hover:not(.active) {
+            color: #1a65d6;
+            background: rgba(26, 101, 214, 0.08);
+        }
     </style>
 </head>
 
 <body>
+    <!-- OUTER FLOATING UNIT TOGGLE (TOP RIGHT) -->
+    <div class="outer-unit-toggle" id="outerUnitToggle">
+        <div class="outer-unit-label">
+            <i class="fa-solid fa-location-dot"></i> Lokasi Dinas
+        </div>
+        <div class="outer-toggle-pill">
+            <button class="outer-toggle-btn" id="btnModeUltg" onclick="switchUnitMode('ultg')" title="Tampilan Unit ULTG">
+                <i class="fa-solid fa-building-shield"></i> Unit ULTG
+            </button>
+            <button class="outer-toggle-btn active" id="btnModeMultiGi" onclick="switchUnitMode('multigi')" title="Tampilan Multi 14 GI">
+                <i class="fa-solid fa-bolt"></i> Multi GI
+            </button>
+        </div>
+    </div>
+
     <div class="mobile-container">
         <!-- iOS Status Bar -->
         <div class="status-bar">
@@ -536,9 +683,10 @@
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div>
                     <div style="font-size: 12px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">Otorisasi Approval</div>
-                    <div class="header-info-tag">
-                        <i class="fa-solid fa-user-check" style="color: #facc15;"></i>
-                        <span>Daniandra Ersya (Supervisor PST)</span>
+                    <div class="header-info-tag" id="headerUnitTag" onclick="openGiDetailModal()" style="cursor: pointer;" title="Klik untuk lihat daftar Gardu Induk">
+                        <i class="fa-solid fa-bolt" id="headerUnitIcon" style="color: #facc15;"></i>
+                        <span id="headerUnitText">14 Gardu Induk (Daniandra - Spv PST)</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size: 7.5px; opacity: 0.8; margin-left: 3px;"></i>
                     </div>
                 </div>
                 <div style="text-align: right;">
@@ -701,7 +849,7 @@
         <ul>
             <li><strong>Fitur:</strong> Halaman Persetujuan terpisah untuk validasi approval pendaftaran aset baru & perubahan data.</li>
             <li><strong>Rules:</strong> Setiap aksi persetujuan mencatat log audit ke menu History.</li>
-            <li><strong>User Creator:</strong> Daniandra Ersya (Supervisor Master Data PST).</li>
+            <li><strong>User Creator (8 Peran Pengaju):</strong> Staff GI, TL/SPV GI, Staff ULTG, TL/SPV ULTG, Staff Asdig UPT, Asman UPT, TL Asdig UPT, Staff Manset UIT.</li>
         </ul>
     </div>
 
@@ -711,9 +859,10 @@
                 id: 'APP-01',
                 title: 'Registrasi Trafo Baru 150/20kV #3',
                 code: 'PST-TRF-MPG-03',
+                submissionType: 'Penambahan',
                 gi: 'GI Mampang 150kV',
                 bay: 'Bay Trafo #3 Baru',
-                applicant: 'Rian Pratama (Supervisor GI)',
+                applicant: 'Budi Santoso (Staff GI)',
                 date: 'Hari ini, 08:30 WIB',
                 level5: 'Power Transformer Unit (60 MVA)',
                 status: 'pending'
@@ -722,9 +871,10 @@
                 id: 'APP-02',
                 title: 'Penggantian Kontak PMT 150kV Bay Line 2',
                 code: 'PST-PMT-WRU-02',
+                submissionType: 'Perubahan',
                 gi: 'GI Waru 150kV',
                 bay: 'Bay Penghantar Krian 2',
-                applicant: 'Bagus Setiawan (Teknisi Pemeliharaan)',
+                applicant: 'Rian Pratama (Staff ULTG)',
                 date: 'Kemarin, 14:15 WIB',
                 level5: 'Switchgear & Interrupter Unit',
                 status: 'pending'
@@ -733,9 +883,10 @@
                 id: 'APP-03',
                 title: 'Koreksi Data Single Line Diagram Busbar 2',
                 code: 'PST-BUS-WRU-B2',
+                submissionType: 'Perubahan',
                 gi: 'GI Waru 150kV',
                 bay: 'Main Busbar 150kV',
-                applicant: 'Daniandra Ersya',
+                applicant: 'Daniandra Ersya (TL/SPV ULTG)',
                 date: '02 Sep 2026',
                 level5: 'Busbar Conductor & Bay Isolator',
                 status: 'pending'
@@ -744,9 +895,10 @@
                 id: 'APP-04',
                 title: 'Penggantian Current Transformer Bay Line 1',
                 code: 'PST-CT-MPG-01',
+                submissionType: 'Perubahan',
                 gi: 'GI Mampang 150kV',
                 bay: 'Bay Penghantar Kuningan',
-                applicant: 'Ahmad Fauzi (Teknisi Proteksi)',
+                applicant: 'Bagus Prasetyo (Staff Asdig UPT)',
                 date: '30 Agu 2026',
                 level5: 'Instrument Transformer System',
                 status: 'approved'
@@ -755,9 +907,10 @@
                 id: 'APP-05',
                 title: 'Registrasi Disconnector PMS Bay Trafo 1',
                 code: 'PST-PMS-MPG-01',
+                submissionType: 'Penambahan',
                 gi: 'GI Mampang 150kV',
                 bay: 'Bay Trafo #1',
-                applicant: 'Rian Pratama',
+                applicant: 'Ahmad Fadhil (TL/SPV GI)',
                 date: '28 Agu 2026',
                 level5: 'Busbar Disconnector & Earthing Switch',
                 status: 'rejected'
@@ -791,7 +944,10 @@
             container.innerHTML = filtered.map(item => `
                 <div class="approval-card" id="appCard-${item.id}">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
-                        <span class="asset-code-badge">${item.code}</span>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span class="asset-code-badge">${item.code}</span>
+                            <span style="font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:6px; ${item.submissionType === 'Penambahan' ? 'background:#dbeafe; color:#1d4ed8;' : 'background:#fef3c7; color:#b45309;'}">${item.submissionType || 'Penambahan'}</span>
+                        </div>
                         <span style="font-size:10px; color:var(--text-muted); font-weight:600;">${item.date}</span>
                     </div>
                     <div style="font-size:13px; font-weight:800; color:var(--text-dark); margin-top:2px;">${item.title}</div>
@@ -900,8 +1056,151 @@
             }
         }
 
+        // LOKASI DINAS / UNIT MODE MANAGEMENT (ULTG vs MULTI GI)
+        function applySavedUnitMode() {
+            const savedMode = localStorage.getItem('pln_new_pst_unit_mode') || 'multigi';
+            applyUnitMode(savedMode);
+        }
+
+        function switchUnitMode(mode) {
+            localStorage.setItem('pln_new_pst_unit_mode', mode);
+            applyUnitMode(mode);
+            showToast(mode === 'ultg' ? 'Tampilan: Unit ULTG Surabaya Utara' : 'Tampilan: Multi 14 Gardu Induk', 'fa-location-dot', '#38bdf8');
+        }
+
+        function applyUnitMode(mode) {
+            const btnUltg = document.getElementById('btnModeUltg');
+            const btnMultiGi = document.getElementById('btnModeMultiGi');
+            const headerUnitIcon = document.getElementById('headerUnitIcon');
+            const headerUnitText = document.getElementById('headerUnitText');
+
+            if (btnUltg && btnMultiGi) {
+                if (mode === 'ultg') {
+                    btnUltg.classList.add('active');
+                    btnMultiGi.classList.remove('active');
+                } else {
+                    btnMultiGi.classList.add('active');
+                    btnUltg.classList.remove('active');
+                }
+            }
+
+            if (mode === 'ultg') {
+                if (headerUnitIcon) headerUnitIcon.className = 'fa-solid fa-building-shield';
+                if (headerUnitText) headerUnitText.innerText = 'ULTG Surabaya Utara • Spv PST';
+            } else {
+                if (headerUnitIcon) headerUnitIcon.className = 'fa-solid fa-bolt';
+                if (headerUnitText) headerUnitText.innerText = '14 Gardu Induk (Daniandra - Spv PST)';
+            }
+        }
+
+        /* Gardu Induk Dataset & Modal Logic */
+        const giList = [
+            { name: 'GI Waru 150kV', total: 42, status: 'Normal Operasi', code: 'WARU150' },
+            { name: 'GI Krian 150kV', total: 58, status: 'Normal Operasi', code: 'KRIAN150' },
+            { name: 'GI Rungkut 150kV', total: 36, status: 'Normal Operasi', code: 'RNGKT150' },
+            { name: 'GI Sawahan 150kV', total: 29, status: 'Normal Operasi', code: 'SWAHN150' },
+            { name: 'GI Kenjeran 150kV', total: 31, status: 'Normal Operasi', code: 'KNJRN150' },
+            { name: 'GI Simpang 150kV', total: 27, status: 'Normal Operasi', code: 'SMPNG150' },
+            { name: 'GI Sukolilo 150kV', total: 34, status: 'Normal Operasi', code: 'SKLIL150' },
+            { name: 'GI Perak Barat 150kV', total: 22, status: 'Normal Operasi', code: 'PRKBR150' },
+            { name: 'GI Ujung 150kV', total: 19, status: 'Normal Operasi', code: 'UJUNG150' },
+            { name: 'GI Darmokali 150kV', total: 25, status: 'Normal Operasi', code: 'DRMKL150' },
+            { name: 'GI Karangpilang 150kV', total: 38, status: 'Normal Operasi', code: 'KRNGP150' },
+            { name: 'GI Dukuh Kupang 150kV', total: 30, status: 'Normal Operasi', code: 'DKHKP150' },
+            { name: 'GI Taman 150kV', total: 41, status: 'Normal Operasi', code: 'TAMAN150' },
+            { name: 'GI Buduran 150kV', total: 35, status: 'Normal Operasi', code: 'BUDRN150' }
+        ];
+
+        function openGiDetailModal() {
+            const content = document.getElementById('drawerContent');
+            const isUltg = localStorage.getItem('pln_new_pst_unit_mode') === 'ultg';
+            const title = isUltg ? 'Daftar GI di ULTG Surabaya Utara' : 'Daftar 14 Gardu Induk';
+            
+            content.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 15px; font-weight: 800; color: var(--text-dark, #0f172a); font-family: 'Outfit', sans-serif;">${title}</div>
+                            <div style="font-size: 11px; color: var(--text-muted, #64748b);">Wilayah ULTG Surabaya Utara • 14 Gardu Induk</div>
+                        </div>
+                    </div>
+                    <button onclick="closeDrawer()" style="background: var(--bg-canvas, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: var(--text-muted, #64748b); display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div style="position: relative; margin-bottom: 10px; flex-shrink: 0;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-muted, #64748b);"></i>
+                    <input type="text" id="giSearchDrawerInput" placeholder="Cari gardu induk atau kode..."
+                        oninput="filterGiDrawerList(this.value)"
+                        style="width: 100%; padding: 9px 12px 9px 34px; border-radius: 12px; border: 1px solid var(--border-color, #e2e8f0); background: var(--bg-canvas, #f8fafc); color: var(--text-dark, #0f172a); font-size: 12px; outline: none; box-sizing: border-box;">
+                </div>
+
+                <div id="giDrawerListContainer" class="drawer-scroll-body">
+                    <!-- populated dynamically -->
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button class="drawer-btn" onclick="closeDrawer()" style="flex: 1;">Tutup</button>
+                </div>
+            `;
+            renderGiDrawerList(giList);
+            openDrawer();
+        }
+
+        function renderGiDrawerList(items) {
+            const container = document.getElementById('giDrawerListContainer');
+            if (!container) return;
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 12px;">
+                        <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <div>Gardu Induk tidak ditemukan</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map((gi, idx) => `
+                <div style="background: var(--bg-canvas, #f8fafc); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; transition: all 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(26, 101, 214, 0.1); color: var(--primary-blue); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;">
+                            ${idx + 1}
+                        </div>
+                        <div>
+                            <div style="font-size: 12.5px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px;">
+                                <span>${gi.name}</span>
+                                <span style="font-size: 9px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 1px 6px; border-radius: 4px;">${gi.status || 'Normal'}</span>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                                <strong>${gi.total || 42}</strong> Total Aset &bull; Kode: ${gi.code || '-'}
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeDrawer(); showToast('Memfilter pengajuan ' + '${gi.name}', 'fa-bolt', '#0284c7');" style="font-size: 10px; background: var(--primary-light, #eff6ff); color: var(--primary-blue, #1a65d6); border: 1px solid #bfdbfe; padding: 4px 8px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                        Pilih
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterGiDrawerList(query) {
+            const q = query.toLowerCase().trim();
+            if (!q) {
+                renderGiDrawerList(giList);
+                return;
+            }
+            const filtered = giList.filter(g => g.name.toLowerCase().includes(q) || (g.code && g.code.toLowerCase().includes(q)));
+            renderGiDrawerList(filtered);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            applySavedUnitMode();
             renderApproval();
             updateCounts();
         });
