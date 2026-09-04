@@ -845,6 +845,124 @@
             color: var(--text-muted);
         }
 
+        /* ================= EMPTY STATE ================= */
+        .empty-state-card {
+            background: var(--card-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 36px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            margin: 10px 0 20px;
+        }
+
+        .empty-state-icon-box {
+            width: 68px;
+            height: 68px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(26, 101, 214, 0.1) 0%, rgba(2, 132, 199, 0.05) 100%);
+            border: 1px solid rgba(26, 101, 214, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--primary-blue, #1a65d6);
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+        body.dark-mode .empty-state-icon-box {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(56, 189, 248, 0.25);
+            color: #38bdf8;
+        }
+
+        .empty-state-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #f59e0b;
+            color: #ffffff;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-bg);
+        }
+
+        .empty-state-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .empty-state-desc {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            max-width: 280px;
+        }
+
+        .empty-state-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 260px;
+            margin-top: 6px;
+        }
+
+        .empty-state-btn-primary {
+            background: var(--header-blue, #1e3a8a);
+            color: #ffffff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 3px 10px rgba(30, 58, 138, 0.2);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .empty-state-btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .empty-state-btn-outline {
+            background: transparent;
+            color: var(--primary-blue, #1a65d6);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .empty-state-btn-outline:hover {
+            background: var(--bg-canvas);
+        }
+
         /* Status Pills Matching User Color Scheme Reference */
         .status-pill {
             font-size: 10.5px;
@@ -2714,11 +2832,27 @@
             });
 
             if (filtered.length === 0) {
+                const isPengajuan = currentSection === 'pengajuan';
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-regular fa-folder-open empty-icon"></i>
-                        <div style="font-weight:700; font-size:13px; color:var(--text-dark); margin-bottom:3px;">Tidak ada data aset ditemukan</div>
-                        <div style="font-size:11px;">Coba ubah kata kunci pencarian atau sesuaikan filter kategori / status / hirarki unit</div>
+                    <div class="empty-state-card">
+                        <div class="empty-state-icon-box">
+                            <i class="fa-solid ${searchQuery ? 'fa-magnifying-glass' : 'fa-box-open'}"></i>
+                            <div class="empty-state-badge"><i class="fa-solid fa-exclamation"></i></div>
+                        </div>
+                        <div class="empty-state-title">${searchQuery ? 'Hasil Pencarian Tidak Ditemukan' : 'Belum Ada Data Aset'}</div>
+                        <div class="empty-state-desc">
+                            ${searchQuery 
+                                ? `Tidak ditemukan aset yang cocok dengan kata kunci <strong>"${searchQuery}"</strong> atau filter terpilih.` 
+                                : `Tidak ada daftar aset yang sesuai pada kategori & hirarki unit saat ini.`}
+                        </div>
+                        <div class="empty-state-actions">
+                            <button class="empty-state-btn-primary" onclick="resetAllFiltersAndSearch()">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Filter & Pencarian
+                            </button>
+                            <button class="empty-state-btn-outline" onclick="openNewAssetModal()">
+                                <i class="fa-solid fa-plus-circle"></i> Tambah Pengajuan Baru
+                            </button>
+                        </div>
                     </div>
                 `;
                 return;
@@ -3692,6 +3826,14 @@
             renderAssetCards();
             closeDrawer();
             showToast('Filter dikembalikan ke pengaturan default', 'fa-rotate-left', '#64748b');
+        }
+
+        function resetAllFiltersAndSearch() {
+            searchQuery = '';
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            resetDrawerFilter();
+            showToast('Pencarian dan filter telah direset', 'fa-rotate-left', '#10b981');
         }
 
         /* Gardu Induk Dataset & Modal Logic */
