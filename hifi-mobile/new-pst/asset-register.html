@@ -2550,7 +2550,7 @@
             tipePengajuan: 'Semua', // 'Semua' | 'Penambahan' | 'Perubahan'
             creatorRole: 'Semua',
             selectedStatuses: [],
-            grupAset: 'Gardu Induk',
+            grupAset: 'Semua',
             jenisAset: 'Semua',
             merk: 'Semua',
             type: '',
@@ -2642,18 +2642,63 @@
 
             let filtered = pstAssetsData.filter(item => {
                 const matchSection = currentSection === 'all' || item.section === currentSection;
-                const matchCategory = currentCategory === 'all' || item.category === currentCategory || item.jenisAset.toLowerCase().includes(currentCategory.toLowerCase());
+                const matchCategory = currentCategory === 'all' || (item.category && item.category.toLowerCase().includes(currentCategory.toLowerCase())) || (item.jenisAset && item.jenisAset.toLowerCase().includes(currentCategory.toLowerCase()));
                 const matchTipe = filterState.tipePengajuan === 'Semua' || (item.pengajuanType && item.pengajuanType.toLowerCase() === filterState.tipePengajuan.toLowerCase());
-                const matchGi = filterState.garduInduk === 'Semua' || item.gi.toLowerCase().includes(filterState.garduInduk.toLowerCase());
-                const matchBay = filterState.bay === 'Semua' || item.penempatan.toLowerCase().includes(filterState.bay.toLowerCase());
-                const matchCreator = filterState.creatorRole === 'Semua' || (item.creatorRole && item.creatorRole.toLowerCase() === filterState.creatorRole.toLowerCase());
-                const matchGrup = filterState.grupAset === 'Semua' || (item.category && item.category.toLowerCase().includes(filterState.grupAset.toLowerCase()));
-                const matchStatus = filterState.status.length === 0 || filterState.status.includes(item.status);
-                const matchJenis = filterState.jenisAset === 'Semua' || item.jenisAset.toLowerCase().includes(filterState.jenisAset.toLowerCase());
-                const matchMerk = filterState.merk === 'Semua' || item.merk.toLowerCase().includes(filterState.merk.toLowerCase());
-                const matchType = filterState.type === '' || item.type.toLowerCase().includes(filterState.type.toLowerCase());
-                const matchSerial = filterState.serialId === '' || item.serialId.toLowerCase().includes(filterState.serialId.toLowerCase());
                 
+                let matchGi = true;
+                if (filterState.garduInduk && filterState.garduInduk !== 'Semua') {
+                    const cleanGi = filterState.garduInduk.toLowerCase().replace(/150kv|500kv|\s+/g, '');
+                    const itemGi = (item.gi || '').toLowerCase().replace(/150kv|500kv|\s+/g, '');
+                    const itemLoc = (item.penempatan || '').toLowerCase();
+                    matchGi = itemGi.includes(cleanGi) || itemLoc.includes(filterState.garduInduk.toLowerCase());
+                }
+
+                let matchBay = true;
+                if (filterState.bay && filterState.bay !== 'Semua' && filterState.bay !== 'Semua Bay' && filterState.bay !== '2 Bay Terpilih') {
+                    matchBay = (item.penempatan || '').toLowerCase().includes(filterState.bay.toLowerCase());
+                }
+
+                let matchCreator = true;
+                if (filterState.creatorRole && filterState.creatorRole !== 'Semua') {
+                    matchCreator = item.creatorRole === filterState.creatorRole || (item.creator && item.creator.includes(filterState.creatorRole));
+                }
+
+                let matchGrup = true;
+                if (filterState.grupAset && filterState.grupAset !== 'Semua') {
+                    if (filterState.grupAset === 'Gardu Induk') {
+                        matchGrup = true;
+                    } else if (filterState.grupAset === 'Transmisi') {
+                        matchGrup = item.category === 'Peralatan Primer' || (item.jenisAset && item.jenisAset.includes('Line')) || (item.category && item.category.includes('PMT'));
+                    } else if (filterState.grupAset === 'Proteksi & Kontrol') {
+                        matchGrup = (item.category && (item.category.includes('Relay') || item.category.includes('SCADA') || item.category.includes('Proteksi')));
+                    }
+                }
+
+                let matchStatus = true;
+                if (filterState.selectedStatuses && filterState.selectedStatuses.length > 0) {
+                    matchStatus = filterState.selectedStatuses.some(st => item.status.toLowerCase().includes(st.toLowerCase()) || st.toLowerCase().includes(item.status.toLowerCase()));
+                }
+
+                let matchJenis = true;
+                if (filterState.jenisAset && filterState.jenisAset !== 'Semua') {
+                    matchJenis = item.jenisAset.toLowerCase().includes(filterState.jenisAset.toLowerCase());
+                }
+
+                let matchMerk = true;
+                if (filterState.merk && filterState.merk !== 'Semua') {
+                    matchMerk = item.merk.toLowerCase().includes(filterState.merk.toLowerCase());
+                }
+
+                let matchType = true;
+                if (filterState.type) {
+                    matchType = item.type.toLowerCase().includes(filterState.type.toLowerCase());
+                }
+
+                let matchSerial = true;
+                if (filterState.serialId) {
+                    matchSerial = item.serialId.toLowerCase().includes(filterState.serialId.toLowerCase());
+                }
+
                 const matchSearch = searchQuery === '' ||
                     item.jenisAset.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     item.techidentno.toLowerCase().includes(searchQuery.toLowerCase()) ||
