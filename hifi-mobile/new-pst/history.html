@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>History & Mutasi - NEW PST Mobile</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-canvas: #f0f4f8;
+            --header-blue: #0b4884;
+            --header-blue-dark: #083868;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #475569;
+            --border-color: #e2e8f0;
+            --primary-blue: #0A58CA;
+            --primary-blue-light: #eff6ff;
+            --emerald: #059669;
+            --emerald-light: #d1fae5;
+            --purple: #7c3aed;
+            --purple-light: #f3e8ff;
+        }
+
+        body.dark-mode {
+            --bg-canvas: #0f172a;
+            --card-bg: #1e293b;
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+            --border-color: #334155;
+            --primary-blue-light: #172554;
+        }
+
+        body.dark-mode .mobile-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .history-card-wrap,
+        body.dark-mode .modal-drawer,
+        body.dark-mode .bottom-nav {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .search-box,
+        body.dark-mode .filter-btn,
+        body.dark-mode .filter-pill {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .filter-pill.active {
+            background-color: #7c3aed !important;
+            border-color: #7c3aed !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .timeline-item::before {
+            background: #334155 !important;
+        }
+
+        body.dark-mode input {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .drawer-handle { background-color: #475569 !important; }
+        body.dark-mode .ios-bar { background-color: #cbd5e1 !important; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.25s ease-out;
+            transition: background-color 0.3s ease;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0.95; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 22px 6px;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            background-color: var(--header-blue);
+            z-index: 20;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        /* Top Header */
+        .header-bg {
+            background: linear-gradient(180deg, var(--header-blue) 0%, #0c4e8e 100%);
+            padding: 10px 18px 46px;
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .back-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-nav-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-info-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.18);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 4px;
+        }
+
+        /* Scrollable App Body */
+        .app-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 85px;
+            margin-top: -34px;
+            z-index: 15;
+            scrollbar-width: none;
+        }
+
+        .app-body::-webkit-scrollbar { display: none; }
+
+        /* Filter Pills Row */
+        .filter-pills-scroll {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            margin-bottom: 12px;
+        }
+
+        .filter-pills-scroll::-webkit-scrollbar { display: none; }
+
+        .filter-pill {
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active {
+            background: var(--purple);
+            color: #ffffff;
+            border-color: var(--purple);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+        }
+
+        /* Search Box */
+        .search-box {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            margin-bottom: 12px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 12.5px;
+            color: var(--text-dark);
+            background: transparent;
+        }
+
+        /* History Card Wrap */
+        .history-card-wrap {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 14px;
+        }
+
+        .history-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Timeline Items */
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            padding-bottom: 18px;
+            cursor: pointer;
+        }
+
+        .timeline-item:last-child { padding-bottom: 0; }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 32px;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .timeline-item:last-child::before { display: none; }
+
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 16px 8px;
+            z-index: 50;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 3px;
+            text-decoration: none;
+        }
+
+        .nav-item.active { color: var(--header-blue); }
+        body.dark-mode .nav-item.active { color: #38bdf8 !important; }
+        .nav-item i { font-size: 19px; }
+
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #0f172a;
+            border-radius: 2px;
+            z-index: 51;
+        }
+
+        /* Modal Drawer */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-top-left-radius: 26px;
+            border-top-right-radius: 26px;
+            padding: 16px 18px 20px;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active .modal-drawer { transform: translateY(0); }
+
+        .drawer-handle {
+            width: 38px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        #drawerContent {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #drawerContent::-webkit-scrollbar { display: none; }
+
+        .drawer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--header-blue);
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mobile-toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 11.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+        }
+
+        .mobile-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Top Header -->
+        <div class="header-bg">
+            <div class="header-nav">
+                <a href="./catalog-mobile-new-pst.html" class="back-nav-btn" title="Kembali ke Catalog PST">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div style="text-align: center;">
+                    <div style="font-size: 14px; font-weight: 800; letter-spacing: -0.2px;">History & Mutasi</div>
+                    <div style="font-size: 10.5px; color: #bae6fd; font-weight: 600;">NEW PST Mobile</div>
+                </div>
+                <div class="header-actions">
+                    <div class="header-icon-btn" onclick="toggleNightModeAction()" title="Toggle Mode Gelap">
+                        <i class="fa-solid fa-moon" id="nightModeIcon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">Log Audit Penyaluran</div>
+                    <div class="header-info-tag">
+                        <i class="fa-solid fa-clock-rotate-left" style="color: #facc15;"></i>
+                        <span>GI Waru 150kV • ULTG Surabaya Utara</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 10px; color: #bae6fd;">Total Log</span>
+                    <div style="font-size: 13px; font-weight: 800; color: #ffffff;">142 Catatan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable App Body -->
+        <div class="app-body">
+            <!-- Filter Pills -->
+            <div class="filter-pills-scroll">
+                <button class="filter-pill active" onclick="filterHistory('all', this)">Semua Log (5)</button>
+                <button class="filter-pill" onclick="filterHistory('approval', this)">Persetujuan</button>
+                <button class="filter-pill" onclick="filterHistory('registrasi', this)">Registrasi</button>
+                <button class="filter-pill" onclick="filterHistory('mutasi', this)">Mutasi Aset</button>
+                <button class="filter-pill" onclick="filterHistory('sinkron', this)">Sinkronisasi</button>
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
+                <input type="text" id="searchInput" placeholder="Cari aksi, kode KKS, atau deskripsi log..." oninput="handleSearch(this.value)">
+            </div>
+
+            <!-- Timeline Wrap Card -->
+            <div class="history-card-wrap">
+                <div class="history-header-row">
+                    <div class="history-title">
+                        <i class="fa-solid fa-timeline" style="color: var(--purple);"></i>
+                        <span>Aktivitas & Mutasi Terakhir</span>
+                    </div>
+                    <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 600;" id="logCountLabel">5 Aktivitas</span>
+                </div>
+
+                <div id="timelineContainer">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+            <a href="./catalog-mobile-new-pst.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Katalog</span>
+            </a>
+            <a href="./asset-register.html" class="nav-item">
+                <i class="fa-solid fa-database"></i>
+                <span>Register</span>
+            </a>
+            <a href="./persetujuan.html" class="nav-item">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Approval</span>
+            </a>
+            <a href="./history.html" class="nav-item active">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+            <a href="../catalog-mobile.html?open=profile" class="nav-item">
+                <i class="fa-solid fa-user"></i>
+                <span>Profil</span>
+            </a>
+        </div>
+
+        <!-- iOS Bottom Bar Indicator -->
+        <div class="ios-bar"></div>
+
+        <!-- Modal Drawer -->
+        <div class="modal-overlay" id="modalDrawer" onclick="handleBackdropClick(event)">
+            <div class="modal-drawer">
+                <div class="drawer-handle" onclick="closeDrawer()"></div>
+                <div id="drawerContent"></div>
+            </div>
+        </div>
+
+        <!-- Toast Element -->
+        <div class="mobile-toast" id="mobileToast">
+            <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+            <span id="toastMsg">Aksi berhasil dilakukan</span>
+        </div>
+    </div>
+
+    <!-- NOTES FEATURE -->
+    <style>
+        .notes-fab {
+            position: fixed;
+            bottom: 24px; left: 24px;
+            width: 48px; height: 48px;
+            background: var(--header-blue, #0b4884);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; cursor: pointer;
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.4);
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+        .notes-fab:hover { transform: scale(1.08); }
+        .notes-panel {
+            position: fixed;
+            bottom: 80px; left: 24px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .notes-panel {
+            background: rgba(30, 41, 59, 0.95) !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        .notes-panel.active { transform: translateY(0); opacity: 1; visibility: visible; }
+        .notes-panel h3 {
+            margin: 0 0 12px 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--header-blue, #0b4884);
+            display: flex; align-items: center; gap: 8px; font-size: 15px;
+        }
+        body.dark-mode .notes-panel h3 { color: #38bdf8 !important; }
+        .notes-panel ul {
+            margin: 0; padding-left: 18px; font-size: 12px; color: #475569; line-height: 1.6;
+        }
+        body.dark-mode .notes-panel ul { color: #cbd5e1 !important; }
+        .notes-panel li { margin-bottom: 6px; }
+    </style>
+
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')" title="Notes & Validasi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+        <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Notes & Validasi History
+        </h3>
+        <ul>
+            <li><strong>Fitur:</strong> Halaman History terpisah untuk mencatat seluruh audit trail, mutasi aset antar gardu, dan sinkronisasi server.</li>
+            <li><strong>Integritas Data:</strong> Log audit tidak dapat diubah (immutable log).</li>
+            <li><strong>User Creator:</strong> Daniandra Ersya (Supervisor Master Data PST).</li>
+        </ul>
+    </div>
+
+    <script>
+        const historyData = [
+            {
+                id: 'H-01',
+                type: 'approval',
+                action: 'Approval Registrasi Aset',
+                desc: 'Aset <strong>PST-TRF-MPG-01</strong> disetujui & diverifikasi oleh Daniandra Ersya.',
+                user: 'Daniandra Ersya (Supervisor PST)',
+                time: 'Hari ini, 10:15 WIB',
+                icon: 'fa-check',
+                color: '#059669',
+                bg: '#dcfce7'
+            },
+            {
+                id: 'H-02',
+                type: 'registrasi',
+                action: 'Pembaruan Level 5',
+                desc: 'Klasifikasi Level 5 <strong>PST-PMT-MPG-02</strong> disesuaikan ke standar CIGRE/PLN.',
+                user: 'Rian Pratama (Teknisi GI)',
+                time: 'Kemarin, 16:40 WIB',
+                icon: 'fa-sitemap',
+                color: '#2563eb',
+                bg: '#eff6ff'
+            },
+            {
+                id: 'H-03',
+                type: 'mutasi',
+                action: 'Mutasi Fisik Aset Antar Unit',
+                desc: 'Pengiriman 1 unit Trafo Cadangan 30MVA dari Gudang Cawang ke GI Gandul.',
+                user: 'Logistik UPT Cawang',
+                time: '02 Sep 2026, 14:00 WIB',
+                icon: 'fa-truck-fast',
+                color: '#0284c7',
+                bg: '#e0f2fe'
+            },
+            {
+                id: 'H-04',
+                type: 'registrasi',
+                action: 'Registrasi Draft Baru',
+                desc: 'Menambahkan Surge Arrester <strong>PST-LA-MPG-03</strong> pada Bay Duren Tiga.',
+                user: 'Ahmad Fauzi (Teknisi Proteksi)',
+                time: '01 Sep 2026, 11:20 WIB',
+                icon: 'fa-plus',
+                color: '#d97706',
+                bg: '#fef3c7'
+            },
+            {
+                id: 'H-05',
+                type: 'sinkron',
+                action: 'Sinkronisasi Master Database',
+                desc: 'Sinkronisasi 1,248 data aset GI Mampang 150kV dengan Server Pusat UIP3B JBB.',
+                user: 'Sistem Otomatis PST',
+                time: '31 Agu 2026, 09:00 WIB',
+                icon: 'fa-rotate',
+                color: '#7c3aed',
+                bg: '#f3e8ff'
+            }
+        ];
+
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function renderHistory() {
+            const container = document.getElementById('timelineContainer');
+            const countLabel = document.getElementById('logCountLabel');
+
+            let filtered = historyData.filter(item => {
+                const matchType = currentFilter === 'all' || item.type === currentFilter;
+                const matchSearch = searchQuery === '' ||
+                    item.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.user.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchType && matchSearch;
+            });
+
+            countLabel.textContent = `${filtered.length} Aktivitas`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:32px; color:var(--text-muted);">
+                        <i class="fa-regular fa-folder-open" style="font-size:24px; margin-bottom:4px; display:block;"></i>
+                        Tidak ada catatan log sesuai filter
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="timeline-item" onclick="openLogDetail('${item.id}')">
+                    <div class="timeline-icon" style="background:${item.bg}; color:${item.color};">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:12px; font-weight:800; color:var(--text-dark);">${item.action}</span>
+                            <span style="font-size:9.5px; color:var(--text-muted); font-weight:600;">${item.time}</span>
+                        </div>
+                        <div style="font-size:11px; color:var(--text-sub); margin-top:2px; line-height:1.4;">${item.desc}</div>
+                        <div style="font-size:9.5px; color:var(--text-muted); margin-top:3px;"><i class="fa-regular fa-user"></i> ${item.user}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterHistory(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderHistory();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim();
+            renderHistory();
+        }
+
+        function openLogDetail(id) {
+            const item = historyData.find(h => h.id === id);
+            if (!item) return;
+
+            const content = document.getElementById('drawerContent');
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="font-size:14px; font-weight:800; color:var(--text-dark); display:flex; align-items:center; gap:8px;">
+                        <div style="width:28px; height:28px; border-radius:50%; background:${item.bg}; color:${item.color}; display:flex; align-items:center; justify-content:center; font-size:12px;">
+                            <i class="fa-solid ${item.icon}"></i>
+                        </div>
+                        <span>Detail Log Audit PST</span>
+                    </div>
+                    <button onclick="closeDrawer()" style="background:var(--bg-canvas); border:none; width:28px; height:28px; border-radius:50%; cursor:pointer; color:var(--text-muted);">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:14px; padding:14px; margin-bottom:12px; font-size:11.5px;">
+                    <div style="font-size:13px; font-weight:800; color:var(--text-dark); margin-bottom:6px;">${item.action}</div>
+                    <div style="color:var(--text-sub); line-height:1.5; margin-bottom:10px;">${item.desc}</div>
+                    
+                    <div style="border-top:1px dashed var(--border-color); padding-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <div>
+                            <span style="font-size:10px; color:var(--text-muted);">Pelaksana:</span>
+                            <div style="font-weight:700; color:var(--text-dark);">${item.user}</div>
+                        </div>
+                        <div>
+                            <span style="font-size:10px; color:var(--text-muted);">Waktu Eksekusi:</span>
+                            <div style="font-weight:700; color:var(--text-dark);">${item.time}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="drawer-btn" onclick="closeDrawer()" style="margin-top:auto;">Tutup</button>
+            `;
+            openDrawer();
+        }
+
+        function openDrawer() { document.getElementById('modalDrawer').classList.add('active'); }
+        function closeDrawer() { document.getElementById('modalDrawer').classList.remove('active'); }
+        function handleBackdropClick(e) { if (e.target.id === 'modalDrawer') closeDrawer(); }
+
+        function toggleNightModeAction() {
+            const isDark = document.body.classList.contains('dark-mode');
+            if (!isDark) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('pln_mobile_theme', 'dark');
+                document.getElementById('nightModeIcon').className = 'fa-solid fa-sun';
+                showToast('Mode Gelap diaktifkan', 'fa-moon', '#a855f7');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('pln_mobile_theme', 'light');
+                document.getElementById('nightModeIcon').className = 'fa-solid fa-moon';
+                showToast('Mode Terang diaktifkan', 'fa-sun', '#f59e0b');
+            }
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            const icon = document.getElementById('nightModeIcon');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-sun';
+            } else {
+                document.body.classList.remove('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function showToast(msg, icon = 'fa-circle-check', color = '#4ade80') {
+            const toast = document.getElementById('mobileToast');
+            const toastMsg = document.getElementById('toastMsg');
+            if (toast && toastMsg) {
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:15px;"></i> <span>${msg}</span>`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 2400);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderHistory();
+        });
+    </script>
+</body>
+
+</html>

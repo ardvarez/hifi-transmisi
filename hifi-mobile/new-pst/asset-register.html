@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asset Register - NEW PST Mobile</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-canvas: #f0f4f8;
+            --header-blue: #0b4884;
+            --header-blue-dark: #083868;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #475569;
+            --border-color: #e2e8f0;
+            --primary-blue: #0A58CA;
+            --primary-blue-light: #eff6ff;
+            --emerald: #059669;
+            --emerald-light: #d1fae5;
+        }
+
+        body.dark-mode {
+            --bg-canvas: #0f172a;
+            --card-bg: #1e293b;
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+            --border-color: #334155;
+            --primary-blue-light: #172554;
+        }
+
+        body.dark-mode .mobile-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .table-card,
+        body.dark-mode .chart-card,
+        body.dark-mode .modal-drawer,
+        body.dark-mode .bottom-nav {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .search-box,
+        body.dark-mode .filter-btn,
+        body.dark-mode .category-chip,
+        body.dark-mode .pst-table th {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .category-chip.active {
+            background-color: #0284c7 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .pst-table td {
+            border-bottom-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .pst-table tr:hover {
+            background-color: #172554 !important;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .drawer-handle {
+            background-color: #475569 !important;
+        }
+
+        body.dark-mode .ios-bar {
+            background-color: #cbd5e1 !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.25s ease-out;
+            transition: background-color 0.3s ease;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0.95; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 22px 6px;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            background-color: var(--header-blue);
+            z-index: 20;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        /* Top Header */
+        .header-bg {
+            background: linear-gradient(180deg, var(--header-blue) 0%, #0c4e8e 100%);
+            padding: 10px 18px 46px;
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .back-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-nav-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-info-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.18);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 4px;
+        }
+
+        /* Scrollable App Body */
+        .app-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 85px;
+            margin-top: -34px;
+            z-index: 15;
+            scrollbar-width: none;
+        }
+
+        .app-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Search & Filter Toolbar */
+        .toolbar-wrap {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 12.5px;
+            color: var(--text-dark);
+            background: transparent;
+        }
+
+        .filter-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--header-blue);
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+
+        .filter-btn:active {
+            transform: scale(0.94);
+            background: #f1f5f9;
+        }
+
+        /* Category Filter Chips */
+        .category-chips-scroll {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+            margin-bottom: 12px;
+        }
+
+        .category-chips-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .category-chip.active {
+            background: var(--header-blue);
+            color: #ffffff;
+            border-color: var(--header-blue);
+            box-shadow: 0 2px 8px rgba(11, 72, 132, 0.25);
+        }
+
+        /* Table Card */
+        .table-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 14px;
+        }
+
+        .table-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .table-count {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .pst-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 4px;
+        }
+
+        .pst-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .pst-table th {
+            text-align: left;
+            padding: 8px 6px;
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            border-bottom: 1.5px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .pst-table td {
+            padding: 10px 6px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .pst-table tr:hover {
+            background: #fafafa;
+        }
+
+        .asset-code-badge {
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 10px;
+            color: #0b4884;
+            background: #eff6ff;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+            display: inline-block;
+        }
+
+        body.dark-mode .asset-code-badge {
+            color: #93c5fd !important;
+            background: #1e3a8a !important;
+            border-color: #1d4ed8 !important;
+        }
+
+        .asset-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 8px;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .badge-verified { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-review { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-draft { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+        body.dark-mode .badge-verified { background: #064e3b; color: #6ee7b7; border-color: #047857; }
+        body.dark-mode .badge-review { background: #451a03; color: #fde68a; border-color: #78350f; }
+        body.dark-mode .badge-draft { background: #334155; color: #cbd5e1; border-color: #475569; }
+
+        /* Chart & Dashboard Summary */
+        .chart-section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 16px 0 10px;
+        }
+
+        .chart-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .chart-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .chart-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .chart-container-box {
+            position: relative;
+            height: 180px;
+            width: 100%;
+        }
+
+        .metrics-grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        body.dark-mode .metric-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        .metric-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .metric-icon-small {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .metric-number {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.1;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .metric-subdetail {
+            font-size: 9px;
+            color: #94a3b8;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* FAB Add */
+        .fab-add {
+            position: absolute;
+            bottom: 80px;
+            right: 18px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--header-blue) 0%, #0284c7 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 6px 18px rgba(11, 72, 132, 0.4);
+            text-decoration: none;
+            z-index: 40;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .fab-add:active { transform: scale(0.9); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 16px 8px;
+            z-index: 50;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 3px;
+            text-decoration: none;
+        }
+
+        .nav-item.active { color: var(--header-blue); }
+        body.dark-mode .nav-item.active { color: #38bdf8 !important; }
+        .nav-item i { font-size: 19px; }
+
+        /* iOS Indicator Bar */
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #0f172a;
+            border-radius: 2px;
+            z-index: 51;
+        }
+
+        /* Modal Drawer */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            height: 80vh;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-top-left-radius: 26px;
+            border-top-right-radius: 26px;
+            padding: 16px 18px 20px;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active .modal-drawer { transform: translateY(0); }
+
+        .drawer-handle {
+            width: 38px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        #drawerContent {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #drawerContent::-webkit-scrollbar { display: none; }
+
+        .drawer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--header-blue);
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .drawer-btn:active { transform: scale(0.98); }
+
+        .mobile-toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 11.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+        }
+
+        .mobile-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Top Header -->
+        <div class="header-bg">
+            <div class="header-nav">
+                <a href="./catalog-mobile-new-pst.html" class="back-nav-btn" title="Kembali ke Catalog PST">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div style="text-align: center;">
+                    <div style="font-size: 14px; font-weight: 800; letter-spacing: -0.2px;">Asset Register</div>
+                    <div style="font-size: 10.5px; color: #bae6fd; font-weight: 600;">NEW PST Mobile</div>
+                </div>
+                <div class="header-actions">
+                    <div class="header-icon-btn" onclick="toggleNightModeAction()" title="Toggle Mode Gelap">
+                        <i class="fa-solid fa-moon" id="nightModeIcon"></i>
+                    </div>
+                    <div class="header-icon-btn" onclick="openFilterDrawer()" title="Filter Data">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">Lokasi Penugasan</div>
+                    <div class="header-info-tag">
+                        <i class="fa-solid fa-location-dot" style="color: #facc15;"></i>
+                        <span>GI Waru 150kV • ULTG Surabaya Utara</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 10px; color: #bae6fd;">Total Terdaftar</span>
+                    <div style="font-size: 13px; font-weight: 800; color: #ffffff;">1.248 Aset</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable Body Content -->
+        <div class="app-body">
+            <!-- Search & Filter Toolbar -->
+            <div class="toolbar-wrap">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
+                    <input type="text" id="searchInput" placeholder="Cari nama aset, kode KKS, GI, atau bay..." oninput="handleSearch(this.value)">
+                </div>
+                <div class="filter-btn" onclick="openFilterDrawer()" title="Buka Filter Cepat">
+                    <i class="fa-solid fa-filter"></i>
+                </div>
+            </div>
+
+            <!-- Category Filter Chips -->
+            <div class="category-chips-scroll" id="categoryChips">
+                <button class="category-chip active" onclick="filterByCategory('all', this)">Semua (1,248)</button>
+                <button class="category-chip" onclick="filterByCategory('Trafo', this)">Power Trafo</button>
+                <button class="category-chip" onclick="filterByCategory('PMT', this)">PMT / Breaker</button>
+                <button class="category-chip" onclick="filterByCategory('PMS', this)">PMS / Disconnector</button>
+                <button class="category-chip" onclick="filterByCategory('CT/PT', this)">CT / PT Instrument</button>
+                <button class="category-chip" onclick="filterByCategory('Busbar', this)">Busbar & Bay</button>
+            </div>
+
+            <!-- Table Card -->
+            <div class="table-card">
+                <div class="table-card-header">
+                    <div class="table-title">
+                        <i class="fa-solid fa-table-list" style="color: var(--header-blue);"></i>
+                        <span>Daftar Aset Sarana Penyaluran</span>
+                    </div>
+                    <span class="table-count" id="tableCountLabel">6 Data Terpilih</span>
+                </div>
+
+                <div class="pst-table-wrapper">
+                    <table class="pst-table">
+                        <thead>
+                            <tr>
+                                <th>Kode PST / KKS</th>
+                                <th>Nama Peralatan</th>
+                                <th>Bay & Tegangan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableAssetBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= KONTEN CHART DI BAWAH TABLE ================= -->
+            <div class="chart-section-title">
+                <i class="fa-solid fa-chart-pie" style="color: var(--primary-blue);"></i>
+                <span>Dashboard Singkat Asset Register</span>
+            </div>
+
+            <!-- Mini KPI Cards -->
+            <div class="metrics-grid-2col" style="margin-bottom: 12px;">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-label">Total Populasi Aset</span>
+                        <div class="metric-icon-small" style="background:#eff6ff; color:#2563eb;">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                    </div>
+                    <div class="metric-number">1,248</div>
+                    <div class="metric-subdetail" style="color:#059669;">
+                        <i class="fa-solid fa-circle-check"></i> GI Mampang 150kV
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-label">Tingkat Kesesuaian Level 5</span>
+                        <div class="metric-icon-small" style="background:#dcfce7; color:#15803d;">
+                            <i class="fa-solid fa-sitemap"></i>
+                        </div>
+                    </div>
+                    <div class="metric-number" style="color:#15803d;">94.5%</div>
+                    <div class="metric-subdetail">
+                        <i class="fa-solid fa-arrow-trend-up"></i> Terstandarisasi CIGRE
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 1 & Chart 2 Cards -->
+            <div class="chart-grid">
+                <!-- Chart 1: Distribusi Kategori Aset -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Distribusi Kategori Peralatan</div>
+                            <div class="chart-sub">Komposisi aset gardu induk & bay transmisi</div>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 2px 6px; border-radius: 6px;">Total 1.248</span>
+                    </div>
+                    <div class="chart-container-box">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Status Validasi & Approval -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Status Validasi & Approval PST</div>
+                            <div class="chart-sub">Progress verifikasi master data Level 5</div>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; color: #059669; background: #d1fae5; padding: 2px 6px; border-radius: 6px;">Update Realtime</span>
+                    </div>
+                    <div class="chart-container-box">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Add Button -->
+        <div class="fab-add" onclick="openNewAssetModal()" title="Registrasi Aset Baru">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <a href="./catalog-mobile-new-pst.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Katalog</span>
+            </a>
+            <a href="./asset-register.html" class="nav-item active">
+                <i class="fa-solid fa-database"></i>
+                <span>Register</span>
+            </a>
+            <a href="./persetujuan.html" class="nav-item">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Approval</span>
+            </a>
+            <a href="./history.html" class="nav-item">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+            <a href="../catalog-mobile.html?open=profile" class="nav-item">
+                <i class="fa-solid fa-user"></i>
+                <span>Profil</span>
+            </a>
+        </div>
+
+        <!-- iOS Bottom Bar Indicator -->
+        <div class="ios-bar"></div>
+
+        <!-- Drawer Modal Overlay -->
+        <div class="modal-overlay" id="modalDrawer" onclick="handleBackdropClick(event)">
+            <div class="modal-drawer">
+                <div class="drawer-handle" onclick="closeDrawer()"></div>
+                <div id="drawerContent">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Element -->
+        <div class="mobile-toast" id="mobileToast">
+            <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+            <span id="toastMsg">Aksi berhasil dilakukan</span>
+        </div>
+    </div>
+
+    <!-- NOTES FEATURE -->
+    <style>
+        .notes-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            background: var(--header-blue, #0b4884);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.4);
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+        .notes-fab:hover { transform: scale(1.08); }
+        .notes-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 24px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .notes-panel {
+            background: rgba(30, 41, 59, 0.95) !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        .notes-panel.active { transform: translateY(0); opacity: 1; visibility: visible; }
+        .notes-panel h3 {
+            margin: 0 0 12px 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--header-blue, #0b4884);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        body.dark-mode .notes-panel h3 { color: #38bdf8 !important; }
+        .notes-panel ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.6;
+        }
+        body.dark-mode .notes-panel ul { color: #cbd5e1 !important; }
+        .notes-panel li { margin-bottom: 6px; }
+    </style>
+
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')" title="Notes & Validasi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+        <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Notes & Validasi Asset Register
+        </h3>
+        <ul>
+            <li><strong>Fitur:</strong> Halaman Asset Register terpisah dengan tabel lengkap & dashboard chart di bawah tabel.</li>
+            <li><strong>Validasi Field:</strong> Kode KKS, Klasifikasi Level 5, & Nomor Bay wajib terisi sebelum diajukan.</li>
+            <li><strong>User Creator:</strong> Daniandra Ersya (Supervisor Master Data PST).</li>
+        </ul>
+    </div>
+
+    <script>
+        const pstAssetsData = [
+            {
+                id: 'PST-001',
+                name: 'Power Transformer 150/20kV #1',
+                category: 'Trafo',
+                code: 'PST-TRF-WRU-01',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Trafo #1',
+                brand: 'UNINDO 60 MVA',
+                level5: 'Main Transformer & Bushing System',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'verified',
+                statusLabel: 'Terverifikasi',
+                voltage: '150/20 kV',
+                serialNumber: 'SN-UN-2018-9942',
+                year: '2018',
+                condition: 'Normal (AHI: 92.4)'
+            },
+            {
+                id: 'PST-002',
+                name: 'Circuit Breaker (PMT) 150kV Bay Line',
+                category: 'PMT',
+                code: 'PST-PMT-WRU-02',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Penghantar Krian 1',
+                brand: 'ABB LTB 170D1/B SF6',
+                level5: 'Switchgear & Interrupter Unit',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'verified',
+                statusLabel: 'Terverifikasi',
+                voltage: '150 kV',
+                serialNumber: 'PMT-ABB-170-4401',
+                year: '2020',
+                condition: 'Normal (Pres SF6: 6.2 bar)'
+            },
+            {
+                id: 'PST-003',
+                name: 'Disconnector (PMS) 150kV Busbar 1',
+                category: 'PMS',
+                code: 'PST-PMS-WRU-05',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Bus Coupler 150kV',
+                brand: 'Alstom S2DA 170 Horizontal',
+                level5: 'Busbar Disconnector & Earthing Switch',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'review',
+                statusLabel: 'Review PST',
+                voltage: '150 kV',
+                serialNumber: 'PMS-ALS-2019-3012',
+                year: '2019',
+                condition: 'Perlu Kalibrasi Mekanik'
+            },
+            {
+                id: 'PST-004',
+                name: 'Current Transformer (CT) 150kV R-Phase',
+                category: 'CT/PT',
+                code: 'PST-CT-WRU-08',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Trafo #2',
+                brand: 'Trench SAS 170kV',
+                level5: 'Instrument Transformer System',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'verified',
+                statusLabel: 'Terverifikasi',
+                voltage: '150 kV / 1200:5A',
+                serialNumber: 'CT-TR-2021-0081',
+                year: '2021',
+                condition: 'Normal'
+            },
+            {
+                id: 'PST-005',
+                name: 'Main Busbar 150kV Seksi A (Aluminum)',
+                category: 'Busbar',
+                code: 'PST-BUS-WRU-A1',
+                gi: 'GI WARU 150kV',
+                bay: 'Busbar Section 1',
+                brand: 'Twin Conductor 2x240mm',
+                level5: 'Busbar Conductor & Insulator String',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'verified',
+                statusLabel: 'Terverifikasi',
+                voltage: '150 kV',
+                serialNumber: 'BUS-WRU-A-01',
+                year: '2016',
+                condition: 'Normal'
+            },
+            {
+                id: 'PST-006',
+                name: 'Surge Arrester (LA) 150kV Phase T',
+                category: 'CT/PT',
+                code: 'PST-LA-WRU-03',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Penghantar Rungkut',
+                brand: 'Siemens 3EL2 144kV',
+                level5: 'Surge Arrester & Grounding System',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'draft',
+                statusLabel: 'Draft',
+                voltage: '144 kV MCOV',
+                serialNumber: 'LA-SIE-2023-1109',
+                year: '2023',
+                condition: 'Draft Registrasi Baru'
+            },
+            {
+                id: 'PST-007',
+                name: 'Capacitor Voltage Transformer (CVT) Bay 2',
+                category: 'CT/PT',
+                code: 'PST-CVT-WRU-02',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Line Krian 2',
+                brand: 'Arteche DDB 170kV',
+                level5: 'Instrument Transformer System',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'draft',
+                statusLabel: 'Draft',
+                voltage: '150 kV',
+                serialNumber: 'CVT-ART-2024-0019',
+                year: '2024',
+                condition: 'Draft Belum Diajukan'
+            },
+            {
+                id: 'PST-008',
+                name: 'Grounding Switch (PMS Tanah) Bay Trafo 3',
+                category: 'PMS',
+                code: 'PST-EARTH-WRU-01',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Trafo #3',
+                brand: 'ABB Earthing Switch 170kV',
+                level5: 'Earthing & Grounding Switch',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'draft',
+                statusLabel: 'Draft',
+                voltage: '150 kV',
+                serialNumber: 'EARTH-ABB-2024-8821',
+                year: '2024',
+                condition: 'Draft Peralatan Baru'
+            },
+            {
+                id: 'PST-009',
+                name: 'Neutral Grounding Resistor (NGR) 20kV',
+                category: 'Trafo',
+                code: 'PST-NGR-WRU-01',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Trafo #1',
+                brand: 'Cressall 40 Ohm',
+                level5: 'Auxiliary & Earthing Resistor System',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'draft',
+                statusLabel: 'Draft',
+                voltage: '20 kV / 40 Ohm',
+                serialNumber: 'NGR-CRE-2022-7714',
+                year: '2022',
+                condition: 'Draft Registrasi Tambahan'
+            },
+            {
+                id: 'PST-010',
+                name: 'Potential Transformer (PT) 150kV S-Phase',
+                category: 'CT/PT',
+                code: 'PST-PT-WRU-04',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Trafo #3',
+                brand: 'Trench SAS 170kV',
+                level5: 'Instrument Transformer System',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'rejected',
+                statusLabel: 'Ditolak (Perlu Revisi)',
+                voltage: '150 kV / 110V',
+                serialNumber: 'PT-TR-2023-4412',
+                year: '2023',
+                condition: 'Ditolak: Nomor Seri Tidak Sesuai Nameplate'
+            },
+            {
+                id: 'PST-011',
+                name: 'Disconnector (PMS) 150kV Line Krian 2',
+                category: 'PMS',
+                code: 'PST-PMS-WRU-09',
+                gi: 'GI WARU 150kV',
+                bay: 'Bay Penghantar Krian 2',
+                brand: 'Alstom S2DA 170',
+                level5: 'Busbar Disconnector & Earthing Switch',
+                subsistem: 'Subsistem Krian - Waru 150kV',
+                status: 'rejected',
+                statusLabel: 'Ditolak (Perlu Revisi)',
+                voltage: '150 kV',
+                serialNumber: 'PMS-ALS-2021-9981',
+                year: '2021',
+                condition: 'Ditolak: Klasifikasi Level 5 Harus Diperbaiki'
+            }
+        ];
+
+        let currentCategory = 'all';
+        let currentStatusFilter = 'all';
+        let searchQuery = '';
+        let catChartInstance = null;
+        let statChartInstance = null;
+
+        function renderAssetTable() {
+            const tableBody = document.getElementById('tableAssetBody');
+            const countLabel = document.getElementById('tableCountLabel');
+
+            let filtered = pstAssetsData.filter(item => {
+                const matchCategory = currentCategory === 'all' || item.category === currentCategory;
+                const matchStatus = currentStatusFilter === 'all' || item.status === currentStatusFilter;
+                const matchSearch = searchQuery === '' || 
+                    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.bay.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.brand.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCategory && matchStatus && matchSearch;
+            });
+
+            countLabel.textContent = `${filtered.length} Data Terpilih`;
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align:center; padding:24px; color:#94a3b8;">
+                            <i class="fa-regular fa-folder-open" style="font-size:22px; margin-bottom:4px; display:block;"></i>
+                            Tidak ada data aset sesuai filter
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = filtered.map(item => {
+                let badgeClass = 'badge-verified';
+                if (item.status === 'review') badgeClass = 'badge-review';
+                if (item.status === 'draft') badgeClass = 'badge-draft';
+
+                return `
+                    <tr onclick="openAssetDetail('${item.id}')" style="cursor:pointer;">
+                        <td><span class="asset-code-badge">${item.code}</span></td>
+                        <td>
+                            <div style="font-weight:700; color:var(--text-dark);">${item.name}</div>
+                            <div style="font-size:9.5px; color:var(--text-muted);">${item.brand}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight:600; color:var(--text-sub);">${item.bay}</div>
+                            <div style="font-size:9.5px; color:#0b4884; font-weight:700;">${item.voltage}</div>
+                        </td>
+                        <td><span class="asset-badge ${badgeClass}">${item.statusLabel}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderDashboardCharts() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const textClr = isDark ? '#94a3b8' : '#475569';
+            const gridClr = isDark ? '#334155' : '#f1f5f9';
+
+            const ctxCat = document.getElementById('categoryChart');
+            if (ctxCat) {
+                if (catChartInstance) catChartInstance.destroy();
+                catChartInstance = new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Trafo (18%)', 'PMT Breaker (32%)', 'PMS Disconnector (28%)', 'CT/PT (14%)', 'Busbar & LA (8%)'],
+                        datasets: [{
+                            data: [224, 398, 350, 175, 101],
+                            backgroundColor: ['#2563eb', '#38bdf8', '#fbbf24', '#34d399', '#a855f7'],
+                            borderWidth: 2,
+                            borderColor: isDark ? '#1e293b' : '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 10, font: { size: 9.5, family: 'Inter', weight: '600' }, color: textClr, padding: 8 }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const ctxStat = document.getElementById('statusChart');
+            if (ctxStat) {
+                if (statChartInstance) statChartInstance.destroy();
+                statChartInstance = new Chart(ctxStat, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Terverifikasi', 'Pending Review', 'Draft Baru', 'Koreksi SLD'],
+                        datasets: [{
+                            label: 'Jumlah Aset',
+                            data: [1180, 68, 24, 12],
+                            backgroundColor: ['#10b981', '#f59e0b', '#64748b', '#ef4444'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: gridClr }, ticks: { font: { size: 9.5 }, color: textClr } },
+                            y: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' }, color: isDark ? '#f8fafc' : '#1e293b' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim();
+            renderAssetTable();
+        }
+
+        function filterByCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('#categoryChips .category-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderAssetTable();
+        }
+
+        function openAssetDetail(assetId) {
+            const asset = pstAssetsData.find(a => a.id === assetId);
+            if (!asset) return;
+
+            let badgeColor = '#059669';
+            let badgeBg = '#d1fae5';
+            if (asset.status === 'review') { badgeColor = '#d97706'; badgeBg = '#fef3c7'; }
+            if (asset.status === 'draft') { badgeColor = '#475569'; badgeBg = '#f1f5f9'; }
+
+            const content = document.getElementById('drawerContent');
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                    <div>
+                        <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; background:${badgeBg}; color:${badgeColor}; text-transform:uppercase;">
+                            ${asset.statusLabel}
+                        </span>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-dark); margin-top:4px;">${asset.name}</div>
+                        <div style="font-size:11px; color:var(--text-muted);">${asset.code}</div>
+                    </div>
+                    <button onclick="closeDrawer()" style="background:var(--bg-canvas); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; color:var(--text-muted);">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+                    <div style="font-size:11px; font-weight:800; color:#0b4884; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-circle-info"></i> Parameter Teknis & Lokasi
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:11px;">
+                        <div>
+                            <span style="color:var(--text-muted); font-size:10px;">Gardu Induk:</span>
+                            <div style="font-weight:700; color:var(--text-dark);">${asset.gi}</div>
+                        </div>
+                        <div>
+                            <span style="color:var(--text-muted); font-size:10px;">Bay Penempatan:</span>
+                            <div style="font-weight:700; color:var(--text-dark);">${asset.bay}</div>
+                        </div>
+                        <div>
+                            <span style="color:var(--text-muted); font-size:10px;">Nomor Seri:</span>
+                            <div style="font-weight:700; color:var(--text-dark);">${asset.serialNumber}</div>
+                        </div>
+                        <div>
+                            <span style="color:var(--text-muted); font-size:10px;">Tahun Komisioning:</span>
+                            <div style="font-weight:700; color:var(--text-dark);">${asset.year}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px; margin-bottom:16px;">
+                    <div style="font-size:11px; font-weight:800; color:#059669; margin-bottom:6px;">
+                        <i class="fa-solid fa-sitemap"></i> Hirarki Master Level 5
+                    </div>
+                    <div style="font-size:12px; font-weight:700; color:var(--text-dark); margin-bottom:4px;">${asset.level5}</div>
+                    <div style="font-size:11px; color:var(--text-muted);">Sub-sistem: <strong>${asset.subsistem}</strong></div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Kondisi Aset: <span style="color:#059669; font-weight:700;">${asset.condition}</span></div>
+                </div>
+
+                <div style="display:flex; gap:8px; margin-top:auto; padding-top:10px;">
+                    <button class="drawer-btn" onclick="showToast('Data ${asset.code} disinkronkan ke server', 'fa-rotate', '#0b4884')" style="background:var(--bg-canvas); color:var(--text-dark); border:1px solid var(--border-color); flex:1;">
+                        <i class="fa-solid fa-rotate"></i> Sinkron
+                    </button>
+                    <button class="drawer-btn" onclick="showToast('Membuka form edit aset...', 'fa-pen-to-square', '#059669'); closeDrawer();" style="background:#0b4884; flex:2;">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Register Aset
+                    </button>
+                </div>
+            `;
+            openDrawer();
+        }
+
+        function openNewAssetModal() {
+            const content = document.getElementById('drawerContent');
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="font-size:15px; font-weight:800; color:var(--text-dark);">
+                        <i class="fa-solid fa-plus-circle" style="color:#0b4884;"></i> Registrasi Aset Baru
+                    </div>
+                    <button onclick="closeDrawer()" style="background:var(--bg-canvas); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; color:var(--text-muted);">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:10px; font-size:11.5px;">
+                    <div>
+                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:3px; display:block;">Nama Peralatan / Aset *</label>
+                        <input type="text" id="newAssetName" placeholder="cth: Power Transformer #3 150/20kV" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:3px; display:block;">Kategori Peralatan *</label>
+                        <select id="newAssetCategory" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none;">
+                            <option value="Trafo">Power Transformer (Trafo)</option>
+                            <option value="PMT">Circuit Breaker (PMT)</option>
+                            <option value="PMS">Disconnector (PMS)</option>
+                            <option value="CT/PT">Instrument CT / PT / LA</option>
+                            <option value="Busbar">Busbar & Switchyard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:3px; display:block;">Kode KKS / PST *</label>
+                        <input type="text" id="newAssetCode" placeholder="cth: PST-TRF-MPG-03" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none;">
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:3px; display:block;">Bay & Gardu Induk *</label>
+                        <input type="text" id="newAssetBay" value="Bay Trafo #3 • GI MAMPANG 150kV" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none;">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:8px; margin-top:auto; padding-top:14px;">
+                    <button class="drawer-btn" onclick="closeDrawer()" style="background:var(--bg-canvas); color:var(--text-sub); flex:1;">Batal</button>
+                    <button class="drawer-btn" onclick="submitNewAsset()" style="flex:2;">Simpan Aset</button>
+                </div>
+            `;
+            openDrawer();
+        }
+
+        function submitNewAsset() {
+            const nameEl = document.getElementById('newAssetName');
+            const codeEl = document.getElementById('newAssetCode');
+            const catEl = document.getElementById('newAssetCategory');
+            const bayEl = document.getElementById('newAssetBay');
+
+            if (!nameEl.value || !codeEl.value) {
+                showToast('Mohon lengkapi nama aset & kode KKS!', 'fa-triangle-exclamation', '#ef4444');
+                return;
+            }
+
+            const newObj = {
+                id: 'PST-' + Date.now().toString().slice(-4),
+                name: nameEl.value,
+                category: catEl.value,
+                code: codeEl.value.toUpperCase(),
+                gi: 'GI MAMPANG 150kV',
+                bay: bayEl.value,
+                brand: 'Standard PLN Spec',
+                level5: 'Main System & Primary Gear',
+                subsistem: 'Subsistem Gandul - Cawang 150kV',
+                status: 'draft',
+                statusLabel: 'Draft Data',
+                voltage: '150 kV',
+                serialNumber: 'SN-PST-NEW',
+                year: '2026',
+                condition: 'Registrasi Baru'
+            };
+
+            pstAssetsData.unshift(newObj);
+            renderAssetTable();
+            closeDrawer();
+            showToast(`Aset "${newObj.name}" berhasil didaftarkan!`, 'fa-circle-check', '#059669');
+        }
+
+        function openFilterDrawer() {
+            const content = document.getElementById('drawerContent');
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="font-size:15px; font-weight:800; color:var(--text-dark);">
+                        <i class="fa-solid fa-sliders" style="color:#0b4884;"></i> Filter Katalog PST
+                    </div>
+                    <button onclick="closeDrawer()" style="background:var(--bg-canvas); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; color:var(--text-muted);">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:12px;">
+                    <div>
+                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Status Validasi Aset</label>
+                        <select id="drawerStatusFilter" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px;">
+                            <option value="all" ${currentStatusFilter==='all'?'selected':''}>Semua Status</option>
+                            <option value="verified" ${currentStatusFilter==='verified'?'selected':''}>Terverifikasi (Verified)</option>
+                            <option value="review" ${currentStatusFilter==='review'?'selected':''}>Pending Review PST</option>
+                            <option value="draft" ${currentStatusFilter==='draft'?'selected':''}>Draft Data</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Tegangan Gardu Induk</label>
+                        <select style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px;">
+                            <option>150 kV (Standar Transmisi)</option>
+                            <option>500 kV (Extra High Voltage)</option>
+                            <option>70 kV / 20 kV (Sub-transmisi)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:auto; padding-top:14px;">
+                    <button class="drawer-btn" onclick="currentStatusFilter='all'; renderAssetTable(); closeDrawer();" style="background:var(--bg-canvas); color:var(--text-sub); flex:1;">Reset</button>
+                    <button class="drawer-btn" onclick="applyDrawerFilter()" style="flex:2;">Terapkan Filter</button>
+                </div>
+            `;
+            openDrawer();
+        }
+
+        function applyDrawerFilter() {
+            const el = document.getElementById('drawerStatusFilter');
+            if (el) currentStatusFilter = el.value;
+            renderAssetTable();
+            closeDrawer();
+            showToast('Filter berhasil diterapkan', 'fa-filter', '#0b4884');
+        }
+
+        function openDrawer() { document.getElementById('modalDrawer').classList.add('active'); }
+        function closeDrawer() { document.getElementById('modalDrawer').classList.remove('active'); }
+        function handleBackdropClick(e) { if (e.target.id === 'modalDrawer') closeDrawer(); }
+
+        function showToast(msg, icon = 'fa-circle-check', color = '#4ade80') {
+            const toast = document.getElementById('mobileToast');
+            const toastMsg = document.getElementById('toastMsg');
+            if (toast && toastMsg) {
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:15px;"></i> <span>${msg}</span>`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 2400);
+            }
+        }
+
+        function toggleNightModeAction() {
+            const isDark = document.body.classList.contains('dark-mode');
+            if (!isDark) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('pln_mobile_theme', 'dark');
+                document.getElementById('nightModeIcon').className = 'fa-solid fa-sun';
+                showToast('Mode Gelap diaktifkan', 'fa-moon', '#a855f7');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('pln_mobile_theme', 'light');
+                document.getElementById('nightModeIcon').className = 'fa-solid fa-moon';
+                showToast('Mode Terang diaktifkan', 'fa-sun', '#f59e0b');
+            }
+            renderDashboardCharts();
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            const icon = document.getElementById('nightModeIcon');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-sun';
+            } else {
+                document.body.classList.remove('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderAssetTable();
+            renderDashboardCharts();
+        });
+    </script>
+</body>
+
+</html>

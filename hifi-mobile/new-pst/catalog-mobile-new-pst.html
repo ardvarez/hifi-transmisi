@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Catalog Mobile - NEW PST</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --purple-color: #8b5cf6;
+            --cyan-color: #0284c7;
+        }
+
+        /* Dark Mode Variables (Matching Power Inspect Mobile) */
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --primary-light: #172554;
+        }
+
+        body.dark-mode .mobile-container {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .app-header,
+        body.dark-mode .welcome-card,
+        body.dark-mode .catalog-hub-card,
+        body.dark-mode .feature-nav-card,
+        body.dark-mode .kpi-card,
+        body.dark-mode .dual-metric-card,
+        body.dark-mode .chart-card,
+        body.dark-mode .modal-drawer,
+        body.dark-mode .bottom-nav,
+        body.dark-mode .ahi-legend-row {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .welcome-card {
+            background: linear-gradient(105deg, #172554 0%, #1e3a8a 50%, #1e293b 100%) !important;
+            border: 1px solid #1e40af !important;
+        }
+
+        body.dark-mode .welcome-title {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .welcome-desc,
+        body.dark-mode .welcome-badge {
+            color: #93c5fd !important;
+            background: rgba(30, 58, 138, 0.4) !important;
+        }
+
+        body.dark-mode .welcome-btn {
+            background: #1d4ed8 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .welcome-btn-outline {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: #334155 !important;
+            color: #93c5fd !important;
+        }
+
+        body.dark-mode .action-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .kpi-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .kpi-value,
+        body.dark-mode .section-title,
+        body.dark-mode .feature-nav-title {
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .dual-sub-pill {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .ahi-label-critical,
+        body.dark-mode .ahi-val-critical {
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .unit-pill-selector {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .modal-drawer {
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .gi-card-item {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .gi-search-box {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, h3, h4, h5, .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* App Header (Clean Power Inspect Style) */
+        .app-header {
+            padding: 16px 20px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-avatar-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1a65d6 0%, #0284c7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-name {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--text-main);
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-sub {
+            font-size: 11px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .notif-badge-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+        }
+        body.dark-mode .notif-badge-dot {
+            border-color: #1e293b;
+        }
+
+        /* Content Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            scrollbar-width: none;
+        }
+        .app-content::-webkit-scrollbar { display: none; }
+
+        /* Welcome Banner Card (Power Inspect Hero V2 Style - Clean PLN Enterprise) */
+        .welcome-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%);
+            border-radius: 22px;
+            padding: 18px 20px;
+            color: #ffffff;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(30, 64, 175, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .welcome-info {
+            max-width: 65%;
+            z-index: 2;
+            position: relative;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(4px);
+        }
+
+        .welcome-title {
+            font-size: 18.5px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 3px;
+            letter-spacing: -0.3px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .welcome-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 14px;
+            line-height: 1.35;
+        }
+
+        .welcome-action-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .welcome-btn {
+            background: #ffffff;
+            color: #1e3a8a;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background 0.2s;
+        }
+        .welcome-btn:hover { background: #f8fafc; transform: translateY(-1px); }
+
+        .welcome-btn-outline {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s;
+        }
+        .welcome-btn-outline:hover { background: rgba(255, 255, 255, 0.25); }
+
+        /* 3D Graphic Element for Welcome Banner */
+        .welcome-graphic-bg {
+            position: absolute;
+            right: -10px;
+            bottom: -15px;
+            width: 140px;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 76px;
+            color: rgba(255, 255, 255, 0.14);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            margin-top: 4px;
+        }
+
+        .section-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .section-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: var(--primary-light);
+            color: var(--primary-blue);
+        }
+
+        /* Top 3 Menu Modul (Feature Navigation Grid) */
+        .catalog-hub-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            margin-bottom: 16px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .feature-nav-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 6px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-nav-card:hover, .feature-nav-card:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(26, 101, 214, 0.12);
+            border-color: var(--primary-blue);
+        }
+
+        .feature-nav-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            margin-bottom: 8px;
+            transition: transform 0.2s;
+        }
+
+        .f-icon-blue {
+            background: #eff6ff;
+            color: #1a65d6;
+            border: 1px solid #bfdbfe;
+        }
+
+        .f-icon-amber {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .f-icon-emerald {
+            background: #ecfdf5;
+            color: #10b981;
+            border: 1px solid #a7f3d0;
+        }
+
+        .feature-nav-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.25;
+            margin-bottom: 2px;
+        }
+
+        .feature-nav-desc {
+            font-size: 9px;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        .feature-badge-corner {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 6px;
+            line-height: 1.1;
+        }
+
+        .badge-rose { background: #ffe4e6; color: #be123c; }
+        .badge-amber { background: #fef3c7; color: #92400e; }
+
+        /* Rangkuman Operasional (Power Inspect KPI Cards Grid) */
+        .summary-section-wrap {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            margin-bottom: 16px;
+        }
+
+        .dual-metric-card {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .dual-metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .dual-pill-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .dual-sub-pill {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .kpi-card:active { transform: scale(0.98); }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .kpi-icon-box {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .kpi-blue { background: #eff6ff; color: #1a65d6; }
+        .kpi-green { background: #ecfdf5; color: #10b981; }
+        .kpi-amber { background: #fffbeb; color: #f59e0b; }
+        .kpi-purple { background: #f5f3ff; color: #8b5cf6; }
+        .kpi-rose { background: #ffe4e6; color: #e11d48; }
+        .kpi-cyan { background: #e0f2fe; color: #0284c7; }
+
+        .kpi-value {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 1px;
+            line-height: 1.1;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            line-height: 1.25;
+        }
+
+        .kpi-subdetail {
+            font-size: 9.5px;
+            color: #94a3b8;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Chart Card: Asset Health Index (AHI) */
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            margin-bottom: 16px;
+        }
+
+        .chart-container-rel {
+            position: relative;
+            height: 175px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .ahi-legend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ahi-legend-row {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .ahi-grade-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+
+        .ahi-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Bottom Navigation Bar (Matching Power Inspect Mobile) */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px 8px;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 10.5px;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 3px;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+            font-weight: 800;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            z-index: 51;
+        }
+
+        /* Modal Drawer */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 16px 18px 24px;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 38px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Toast */
+        .mobile-toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 11.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+        }
+
+        .mobile-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* NOTES FEATURE (INJECTED STANDARD) */
+        .notes-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 88px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue, #1a65d6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(26, 101, 214, 0.4);
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+        .notes-fab:hover {
+            transform: scale(1.05);
+            background: var(--primary-blue-hover, #134db0);
+        }
+        .notes-panel {
+            position: fixed;
+            bottom: 85px;
+            left: 88px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .notes-panel.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        .notes-panel h3 {
+            margin: 0 0 10px 0;
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary-blue, #1a65d6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .notes-panel ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12.5px;
+            color: var(--text-muted, #64748b);
+            line-height: 1.6;
+        }
+        .notes-panel li {
+            margin-bottom: 6px;
+        }
+
+        body.dark-mode .notes-panel {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(51, 65, 85, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        body.dark-mode .notes-panel h3 {
+            color: #38bdf8;
+        }
+        body.dark-mode .notes-panel ul {
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- App Header (Back Button + Header Title + Notification Only) -->
+        <header class="app-header">
+            <div class="header-left-group">
+                <a href="../catalog-mobile.html" class="action-btn" title="Kembali ke Katalog Induk">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-group">
+                    <div class="header-name">
+                        <span>NEW PST Mobile</span>
+                        <i class="fa-solid fa-circle-check" style="font-size: 11px; color: #1a65d6;"></i>
+                    </div>
+                    <div class="header-sub">
+                        <i class="fa-solid fa-building-shield" style="font-size: 10px;"></i>
+                        <span id="activeUnitLabel">ULTG SURABAYA UTARA (14 - Gardu Induk)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="../notifikasi-catalog-mobile.html" class="action-btn" title="Notifikasi" style="position: relative;">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notif-badge-dot"></span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content -->
+        <div class="app-content">
+
+            <!-- Welcome Banner Card (Power Inspect Hero Style) -->
+            <div class="welcome-card">
+                <div class="welcome-info">
+                    <div class="welcome-badge" onclick="openGiDetailModal()" style="cursor: pointer;" title="Klik untuk lihat daftar 14 Gardu Induk">
+                        <i class="fa-solid fa-boxes-stacked"></i> Valuasi 14 - Gardu Induk <i class="fa-solid fa-circle-chevron-right" style="font-size: 9px; margin-left: 2px;"></i>
+                    </div>
+                    <div class="welcome-title">Rp 482.500.000.000</div>
+                    <div class="welcome-desc">1.248 Peralatan Terverifikasi di 14 Gardu Induk ULTG Surabaya Utara</div>
+                    <div class="welcome-action-row">
+                        <span class="welcome-btn-outline" onclick="openGiDetailModal()" style="cursor: pointer;" title="Buka Rincian Gardu Induk">
+                            <i class="fa-solid fa-list-check" style="color: #ffffff;"></i> Detail 14 GI
+                        </span>
+                        <a href="./asset-register.html" class="welcome-btn">
+                            Lihat Aset <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="welcome-graphic-bg">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+            </div>
+
+            <!-- 1. TOP 3 FITUR MODUL (Chip Counting Tanpa Satuan, History Tanpa Chip) -->
+            <div class="catalog-hub-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-layer-group" style="color: var(--primary-blue);"></i>
+                        <span>Menu Modul Utama</span>
+                    </div>
+                    <span class="section-tag">3 Fitur</span>
+                </div>
+
+                <div class="feature-grid">
+                    <!-- Fitur 1: Asset Register (Chip counting: 6 data ditolak & draft) -->
+                    <a href="./asset-register.html" class="feature-nav-card" title="6 Data Ditolak & Draft Perlu Disesuaikan">
+                        <div class="feature-badge-corner badge-rose">6</div>
+                        <div class="feature-nav-icon f-icon-blue">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <div class="feature-nav-title">Asset Register</div>
+                        <div class="feature-nav-desc">Inventaris & Data Peralatan</div>
+                    </a>
+
+                    <!-- Fitur 2: Persetujuan (Chip counting: 7) -->
+                    <a href="./persetujuan.html" class="feature-nav-card">
+                        <div class="feature-badge-corner badge-amber">7</div>
+                        <div class="feature-nav-icon f-icon-amber">
+                            <i class="fa-solid fa-signature"></i>
+                        </div>
+                        <div class="feature-nav-title">Persetujuan</div>
+                        <div class="feature-nav-desc">Approval & Verifikasi</div>
+                    </a>
+
+                    <!-- Fitur 3: History (Tanpa Chip Counting) -->
+                    <a href="./history.html" class="feature-nav-card">
+                        <div class="feature-nav-icon f-icon-emerald">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div class="feature-nav-title">History</div>
+                        <div class="feature-nav-desc">Riwayat & Log Mutasi</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. RANGKUMAN ANGKA OPERASIONAL (8 Operational Metrics in KPI Grid) -->
+            <div class="summary-section-wrap">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-chart-simple" style="color: var(--warning-color);"></i>
+                        <span>Rangkuman Operasional Aset</span>
+                    </div>
+                    <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 600;">Update: 09:30</span>
+                </div>
+
+                <!-- Metric 1: Diajukan Penambahan vs Perubahan (Dipisah) -->
+                <div class="dual-metric-card">
+                    <div class="dual-metric-header">
+                        <div style="font-size: 12px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-file-circle-plus" style="color: var(--primary-blue);"></i>
+                            <span>Asset Register Diajukan</span>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);" onclick="openGiDetailModal()" style="cursor: pointer;">14 - Gardu Induk</span>
+                    </div>
+                    <div class="dual-pill-grid">
+                        <div class="dual-sub-pill">
+                            <div class="kpi-icon-box kpi-blue">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <div>
+                                <div class="kpi-value" style="color: var(--primary-blue);">14</div>
+                                <div class="kpi-label">Penambahan</div>
+                            </div>
+                        </div>
+                        <div class="dual-sub-pill">
+                            <div class="kpi-icon-box kpi-amber">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </div>
+                            <div>
+                                <div class="kpi-value" style="color: var(--warning-color);">8</div>
+                                <div class="kpi-label">Perubahan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-Col KPI Cards Grid for Metrics 2 to 7 -->
+                <div class="kpi-grid">
+                    <!-- Metric 2: Laporan Asset Tidak Sesuai -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">Aset Tidak Sesuai</span>
+                            <div class="kpi-icon-box kpi-rose">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-value" style="color: var(--danger-color);">12</div>
+                        <div class="kpi-subdetail">
+                            <i class="fa-solid fa-clipboard-check"></i> Temuan Inspeksi
+                        </div>
+                    </div>
+
+                    <!-- Metric 3: Permintaan Pergantian Aset -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">Permintaan Ganti</span>
+                            <div class="kpi-icon-box kpi-amber">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-value" style="color: var(--warning-color);">5</div>
+                        <div class="kpi-subdetail">
+                            <i class="fa-solid fa-bolt"></i> TL Inspeksi GI
+                        </div>
+                    </div>
+
+                    <!-- Metric 4: Reminder Aset Anomali -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">Reminder Anomali</span>
+                            <div class="kpi-icon-box kpi-purple">
+                                <i class="fa-solid fa-bell"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-value" style="color: var(--purple-color);">9</div>
+                        <div class="kpi-subdetail">
+                            <i class="fa-solid fa-temperature-arrow-up"></i> Hotspot & DGA
+                        </div>
+                    </div>
+
+                    <!-- Metric 5: Data Perlu Approval Aset -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">Perlu Approval Aset</span>
+                            <div class="kpi-icon-box kpi-blue">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-value" style="color: var(--primary-blue);">7</div>
+                        <div class="kpi-subdetail">
+                            <i class="fa-solid fa-user-check"></i> Validasi Anda
+                        </div>
+                    </div>
+
+                    <!-- Metric 6: Approval Proses Mutasi Aset -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">Approval Mutasi</span>
+                            <div class="kpi-icon-box kpi-green">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-value" style="color: var(--success-color);">3</div>
+                        <div class="kpi-subdetail">
+                            <i class="fa-solid fa-truck-ramp-box"></i> SK Mutasi
+                        </div>
+                    </div>
+
+                    <!-- Metric 7: Aset Sedang Proses Mutasi -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">Proses Mutasi</span>
+                            <div class="kpi-icon-box kpi-cyan">
+                                <i class="fa-solid fa-dolly"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-value" style="color: var(--cyan-color);">4</div>
+                        <div class="kpi-subdetail">
+                            <i class="fa-solid fa-route"></i> Pengiriman Fisik
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. CHART KONDISI KESEHATAN ASET (AHI 1 s/d 5) -->
+            <div class="chart-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-heart-pulse" style="color: var(--success-color);"></i>
+                        <span>Kondisi Kesehatan Aset (AHI)</span>
+                    </div>
+                    <span class="section-tag" style="background: #d1fae5; color: #065f46;">Inspeksi Terkini</span>
+                </div>
+                <div class="chart-container-rel">
+                    <canvas id="ahiChart"></canvas>
+                </div>
+                <!-- Breakdown Legend AHI 1 s/d 5 -->
+                <div class="ahi-legend-list">
+                    <div class="ahi-legend-row">
+                        <div class="ahi-grade-badge">
+                            <div class="ahi-dot" style="background: #22c55e;"></div>
+                            <span style="font-weight: 700; color: #16a34a;">1 - Very Good</span>
+                        </div>
+                        <div><strong>68</strong> unit <span style="color: #94a3b8;">(47.9%)</span></div>
+                    </div>
+                    <div class="ahi-legend-row">
+                        <div class="ahi-grade-badge">
+                            <div class="ahi-dot" style="background: #15803d;"></div>
+                            <span style="font-weight: 700; color: #15803d;">2 - Good</span>
+                        </div>
+                        <div><strong>42</strong> unit <span style="color: #94a3b8;">(29.6%)</span></div>
+                    </div>
+                    <div class="ahi-legend-row">
+                        <div class="ahi-grade-badge">
+                            <div class="ahi-dot" style="background: #f97316;"></div>
+                            <span style="font-weight: 700; color: #ea580c;">3 - Fair</span>
+                        </div>
+                        <div><strong>18</strong> unit <span style="color: #94a3b8;">(12.7%)</span></div>
+                    </div>
+                    <div class="ahi-legend-row">
+                        <div class="ahi-grade-badge">
+                            <div class="ahi-dot" style="background: #ef4444;"></div>
+                            <span style="font-weight: 700; color: #dc2626;">4 - Poor</span>
+                        </div>
+                        <div><strong>10</strong> unit <span style="color: #94a3b8;">(7.0%)</span></div>
+                    </div>
+                    <div class="ahi-legend-row">
+                        <div class="ahi-grade-badge">
+                            <div class="ahi-dot" style="background: #0f172a; border: 1px solid #475569;"></div>
+                            <span style="font-weight: 800; color: #0f172a;" class="ahi-label-critical">5 - Critical</span>
+                        </div>
+                        <div><strong style="color: #0f172a;" class="ahi-val-critical">4</strong> unit <span style="color: #94a3b8;">(2.8%)</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- iOS Bottom Bar Indicator -->
+        <div class="ios-bar"></div>
+
+        <!-- Modal Drawer: Detail 14 Gardu Induk -->
+        <div class="modal-overlay" id="giDetailModalOverlay" onclick="closeGiDetailModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeGiDetailModal()"></div>
+                <div style="font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-boxes-stacked" style="color: var(--primary-blue);"></i>
+                        <span>Daftar 14 Gardu Induk</span>
+                    </div>
+                    <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 16px; color: var(--text-muted);" onclick="closeGiDetailModal()"></i>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                    Cakupan wilayah kerja <strong>ULTG Surabaya Utara</strong> &bull; Total 1.248 Aset
+                </div>
+
+                <!-- Mini Search Box for GI -->
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size: 12px; color: #94a3b8;"></i>
+                    <input type="text" id="giSearchInput" placeholder="Cari nama Gardu Induk..." oninput="filterGiList(this.value)" style="border: none; background: transparent; outline: none; font-size: 12px; width: 100%; color: var(--text-main);">
+                </div>
+
+                <!-- Scrollable GI List -->
+                <div id="giListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 52vh; overflow-y: auto; padding-right: 4px;">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div class="mobile-toast" id="mobileToast">
+            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+            <span id="toastMsg">Notifikasi</span>
+        </div>
+    </div>
+
+    <!-- NOTES FEATURE (INJECTED) SESUAI STANDAR inject_notes.py -->
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+        <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Notes & Validasi
+        </h3>
+        <ul>
+            <li><strong>Lokasi Dinas:</strong> Hirarki unit terstandarisasi dengan modul lain (UIT JBTB &gt; UPT Surabaya &gt; ULTG Surabaya Utara).</li>
+            <li><strong>Kondisi Kesehatan (AHI):</strong> Nilai Asset Health Index (1-Very Good s/d 5-Critical) tersinkron otomatis dari riwayat inspeksi Power Inspect.</li>
+            <li><strong>Validasi Approval:</strong> Penambahan aset baru atau permintaan pergantian memerlukan review digital Manager UPT / Spv Pemeliharaan.</li>
+            <li><strong>Mutasi Aset:</strong> Pemindahan aset antar unit wajib mencantumkan Berita Acara & SK Mutasi yang tervalidasi.</li>
+        </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+
+    <!-- Scripts -->
+    <script>
+        // Theme / Night Mode Management
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            const icon = document.getElementById('nightModeIcon');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            } else {
+                document.body.classList.remove('dark-mode');
+                if (icon) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+        }
+
+        function toggleNightModeAction() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('pln_mobile_theme', isDark ? 'dark' : 'light');
+            
+            const icon = document.getElementById('nightModeIcon');
+            if (icon) {
+                if (isDark) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+            showToast(isDark ? 'Mode Gelap diaktifkan' : 'Mode Terang diaktifkan');
+            renderAhiChart();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('mobileToast');
+            const text = document.getElementById('toastMsg');
+            if (!toast || !text) return;
+            text.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2200);
+        }
+
+        // Chart.js Setup: AHI Health Condition Distribution
+        let ahiChartInstance = null;
+
+        function renderAhiChart() {
+            const ctx = document.getElementById('ahiChart');
+            if (!ctx) return;
+
+            if (ahiChartInstance) {
+                ahiChartInstance.destroy();
+            }
+
+            const isDark = document.body.classList.contains('dark-mode');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+
+            ahiChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        '1 - Very Good (68)',
+                        '2 - Good (42)',
+                        '3 - Fair (18)',
+                        '4 - Poor (10)',
+                        '5 - Critical (4)'
+                    ],
+                    datasets: [{
+                        data: [68, 42, 18, 10, 4],
+                        backgroundColor: [
+                            '#22c55e', // 1 - Very Good (Hijau Muda)
+                            '#15803d', // 2 - Good (Hijau Agak Tua)
+                            '#f97316', // 3 - Fair (Oranye)
+                            '#ef4444', // 4 - Poor (Merah)
+                            isDark ? '#020617' : '#0f172a'  // 5 - Critical (Hitam)
+                        ],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#1e293b' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: textColor,
+                                font: { size: 10, family: 'Inter', weight: '600' },
+                                boxWidth: 10,
+                                padding: 6
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 142;
+                                    const val = context.raw;
+                                    const pct = ((val / total) * 100).toFixed(1);
+                                    return ` ${context.label.split('(')[0].trim()}: ${val} aset (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Data 14 Gardu Induk di ULTG Surabaya Utara
+        const garduIndukData = [
+            { name: "GI Waru", tegangan: "150 kV", aset: 142, kapasitas: "Trafo 3x60 MVA", valuasi: "Rp 64.2 M", status: "Normal" },
+            { name: "GI Krian", tegangan: "150/500 kV", aset: 210, kapasitas: "IBT 2x500 MVA", valuasi: "Rp 98.5 M", status: "Normal" },
+            { name: "GI Surabaya Barat", tegangan: "150 kV", aset: 98, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 41.0 M", status: "Normal" },
+            { name: "GI Rungkut", tegangan: "150 kV", aset: 86, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 36.8 M", status: "Normal" },
+            { name: "GI Kenjeran", tegangan: "150 kV", aset: 74, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 31.4 M", status: "Normal" },
+            { name: "GI Sawahan", tegangan: "150 kV", aset: 68, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 28.6 M", status: "Normal" },
+            { name: "GI Tandes", tegangan: "150 kV", aset: 112, kapasitas: "Trafo 3x60 MVA", valuasi: "Rp 49.0 M", status: "Normal" },
+            { name: "GI Simpang", tegangan: "150 kV", aset: 64, kapasitas: "Trafo 2x30 MVA", valuasi: "Rp 24.2 M", status: "Normal" },
+            { name: "GI Karangpilang", tegangan: "150 kV", aset: 92, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 38.5 M", status: "Normal" },
+            { name: "GI Sukolilo", tegangan: "150 kV", aset: 80, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 33.1 M", status: "Normal" },
+            { name: "GI Wonokromo", tegangan: "150 kV", aset: 58, kapasitas: "Trafo 2x30 MVA", valuasi: "Rp 22.8 M", status: "Normal" },
+            { name: "GI Babat Jerawat", tegangan: "150 kV", aset: 76, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 32.0 M", status: "Normal" },
+            { name: "GI Tambak Wedi", tegangan: "150 kV", aset: 54, kapasitas: "Trafo 2x60 MVA", valuasi: "Rp 21.6 M", status: "Normal" },
+            { name: "GI Dukuh Kupang", tegangan: "150 kV", aset: 34, kapasitas: "Trafo 1x30 MVA", valuasi: "Rp 14.8 M", status: "Normal" }
+        ];
+
+        function renderGiList(items) {
+            const container = document.getElementById('giListContainer');
+            if (!container) return;
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 12px;">
+                        <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <div>Gardu Induk tidak ditemukan</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map((gi, idx) => `
+                <div class="gi-card-item" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(26, 101, 214, 0.1); color: var(--primary-blue); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">
+                            ${idx + 1}
+                        </div>
+                        <div>
+                            <div style="font-size: 12.5px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                                <span>${gi.name}</span>
+                                <span style="font-size: 9px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 1px 6px; border-radius: 4px;">${gi.tegangan}</span>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                                ${gi.kapasitas} &bull; <strong>${gi.aset}</strong> Aset
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11.5px; font-weight: 800; color: var(--text-main);">${gi.valuasi}</div>
+                        <a href="./asset-register.html" style="font-size: 9.5px; color: var(--primary-blue); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 2px; margin-top: 2px;">
+                            Aset <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterGiList(query) {
+            const q = query.toLowerCase().trim();
+            if (!q) {
+                renderGiList(garduIndukData);
+                return;
+            }
+            const filtered = garduIndukData.filter(g => 
+                g.name.toLowerCase().includes(q) || 
+                g.tegangan.toLowerCase().includes(q) ||
+                g.kapasitas.toLowerCase().includes(q)
+            );
+            renderGiList(filtered);
+        }
+
+        function openGiDetailModal() {
+            const overlay = document.getElementById('giDetailModalOverlay');
+            if (overlay) {
+                overlay.classList.add('active');
+                const searchInput = document.getElementById('giSearchInput');
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                renderGiList(garduIndukData);
+            }
+        }
+
+        function closeGiDetailModal(e) {
+            if (e && e.target && e.target.closest('.modal-drawer') && !e.target.classList.contains('drawer-handle') && !e.target.classList.contains('fa-xmark')) {
+                return;
+            }
+            const overlay = document.getElementById('giDetailModalOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            applySavedTheme();
+            renderAhiChart();
+            renderGiList(garduIndukData);
+        });
+    </script>
+</body>
+
+</html>
