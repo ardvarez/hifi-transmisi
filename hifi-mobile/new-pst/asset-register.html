@@ -257,12 +257,24 @@
         .app-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 16px 18px 24px;
-            scrollbar-width: none;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            -webkit-overflow-scrolling: touch;
         }
 
         .app-content::-webkit-scrollbar {
-            display: none;
+            width: 4px;
+        }
+
+        .app-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .app-content::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 4px;
         }
 
         /* Welcome / Summary Hero Banner Card */
@@ -388,6 +400,46 @@
             mask-image: radial-gradient(circle at 56% 54%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0.75) 42%, rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.08) 72%, transparent 82%);
             -webkit-mask-image: radial-gradient(circle at 56% 54%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0.75) 42%, rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.08) 72%, transparent 82%);
             filter: saturate(1.05);
+        }
+
+        /* Sticky Search & Section Switch Bar (Freezes on Scroll) */
+        .sticky-controls-bar {
+            position: sticky;
+            top: -16px;
+            z-index: 30;
+            background: var(--bg-canvas);
+            margin: -6px -18px 12px;
+            padding: 10px 18px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sticky-controls-bar.is-stuck {
+            border-bottom-color: var(--border-color);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        body.dark-mode .sticky-controls-bar {
+            background: var(--bg-canvas) !important;
+        }
+
+        body.dark-mode .sticky-controls-bar.is-stuck {
+            border-bottom-color: #334155 !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .sticky-controls-bar .toolbar-wrap,
+        .sticky-controls-bar .section-switch-row {
+            margin-bottom: 0;
+        }
+
+        .sticky-controls-bar .category-chips-scroll {
+            margin-bottom: 2px;
         }
 
         /* Search & Filter Toolbar */
@@ -1246,7 +1298,7 @@
         .modal-drawer {
             width: 100%;
             max-width: 412px;
-            height: auto;
+            height: 85%;
             max-height: 88%;
             display: flex;
             flex-direction: column;
@@ -1264,6 +1316,7 @@
             right: 0;
             box-sizing: border-box;
             z-index: 1001;
+            overflow: hidden;
         }
 
         .modal-overlay.active .modal-drawer {
@@ -1294,14 +1347,16 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 100%;
             max-height: 100%;
             min-height: 0;
-            flex: 1;
+            flex: 1 1 auto;
         }
 
         .drawer-scroll-body {
-            flex: 1 1 auto;
-            overflow-y: auto;
+            flex: 1 1 0;
+            overflow-y: auto !important;
+            overflow-x: hidden;
             overscroll-behavior: contain;
             scrollbar-width: thin;
             scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
@@ -1309,12 +1364,13 @@
             display: flex;
             flex-direction: column;
             gap: 7px;
-            padding-right: 3px;
-            padding-bottom: 6px;
+            padding-right: 4px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .drawer-scroll-body::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
 
         .drawer-scroll-body::-webkit-scrollbar-track {
@@ -1322,7 +1378,7 @@
         }
 
         .drawer-scroll-body::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.4);
+            background: rgba(148, 163, 184, 0.5);
             border-radius: 4px;
         }
 
@@ -1780,40 +1836,43 @@
                 </div>
             </div>
 
-            <!-- Search & Filter Toolbar -->
-            <div class="toolbar-wrap">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
-                    <input type="text" id="searchInput" placeholder="Cari Jenis Asset ..."
-                        oninput="handleSearch(this.value)">
+            <!-- Sticky Controls Group (Freezes on Scroll) -->
+            <div class="sticky-controls-bar" id="stickyControlsBar">
+                <!-- Search & Filter Toolbar -->
+                <div class="toolbar-wrap">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
+                        <input type="text" id="searchInput" placeholder="Cari Jenis Asset ..."
+                            oninput="handleSearch(this.value)">
+                    </div>
+                    <div class="filter-btn" onclick="openFilterDrawer()" title="Buka Filter Cepat">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
                 </div>
-                <div class="filter-btn" onclick="openFilterDrawer()" title="Buka Filter Cepat">
-                    <i class="fa-solid fa-sliders"></i>
-                </div>
-            </div>
 
-            <!-- Section Switch: [Data Aset] vs [Pengajuan] (Button text-only, no icon) -->
-            <div class="section-switch-row">
-                <div class="segmented-control">
-                    <button class="seg-btn active" id="btnDataAset" onclick="switchSection('data_aset', this)">Data
-                        Aset</button>
-                    <button class="seg-btn" id="btnPengajuan"
-                        onclick="switchSection('pengajuan', this)">Pengajuan</button>
+                <!-- Section Switch: [Data Aset] vs [Pengajuan] (Button text-only, no icon) -->
+                <div class="section-switch-row">
+                    <div class="segmented-control">
+                        <button class="seg-btn active" id="btnDataAset" onclick="switchSection('data_aset', this)">Data
+                            Aset</button>
+                        <button class="seg-btn" id="btnPengajuan"
+                            onclick="switchSection('pengajuan', this)">Pengajuan</button>
+                    </div>
+                    <div class="counter-label">
+                        Total <strong id="totalCountDisplay">1.000</strong> <span id="sectionTypeLabel">Data Aset</span>
+                    </div>
                 </div>
-                <div class="counter-label">
-                    Total <strong id="totalCountDisplay">1.000</strong> <span id="sectionTypeLabel">Data Aset</span>
-                </div>
-            </div>
 
-            <!-- Category Filter Chips -->
-            <div class="category-chips-scroll" id="categoryChips">
-                <button class="category-chip active" onclick="filterByCategory('all', this)">Semua</button>
-                <button class="category-chip" onclick="filterByCategory('Lightning Arrester', this)">Lightning Arrester</button>
-                <button class="category-chip" onclick="filterByCategory('Power Trafo', this)">Power Trafo</button>
-                <button class="category-chip" onclick="filterByCategory('PMT', this)">PMT / Breaker</button>
-                <button class="category-chip" onclick="filterByCategory('PMS', this)">PMS / Disconnector</button>
-                <button class="category-chip" onclick="filterByCategory('CT/PT', this)">CT / PT</button>
-                <button class="category-chip" onclick="filterByCategory('Busbar', this)">Busbar</button>
+                <!-- Category Filter Chips -->
+                <div class="category-chips-scroll" id="categoryChips">
+                    <button class="category-chip active" onclick="filterByCategory('all', this)">Semua</button>
+                    <button class="category-chip" onclick="filterByCategory('Lightning Arrester', this)">Lightning Arrester</button>
+                    <button class="category-chip" onclick="filterByCategory('Power Trafo', this)">Power Trafo</button>
+                    <button class="category-chip" onclick="filterByCategory('PMT', this)">PMT / Breaker</button>
+                    <button class="category-chip" onclick="filterByCategory('PMS', this)">PMS / Disconnector</button>
+                    <button class="category-chip" onclick="filterByCategory('CT/PT', this)">CT / PT</button>
+                    <button class="category-chip" onclick="filterByCategory('Busbar', this)">Busbar</button>
+                </div>
             </div>
 
             <!-- Dynamic Asset List Container -->
@@ -2641,89 +2700,7 @@
         }
 
         function openAssetDetailModal(assetId) {
-            const asset = pstAssetsData.find(a => a.id === assetId);
-            if (!asset) return;
-
-            const statusCls = asset.statusClass || getStatusClass(asset.status);
-            const content = document.getElementById('drawerContent');
-            content.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:#0b4884; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
-                            <i class="fa-solid fa-cube"></i>
-                        </div>
-                        <div>
-                            <div style="font-size:15px; font-weight:800; color:var(--text-dark); font-family:'Outfit', sans-serif; line-height:1.2;">${asset.jenisAset}</div>
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${asset.penempatan}</div>
-                        </div>
-                    </div>
-                    <button onclick="closeDrawer()" style="background:var(--bg-canvas); border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <div class="drawer-scroll-body">
-                    <div style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px;">
-                        <div style="font-size:11px; font-weight:800; color:#0b4884; margin-bottom:10px; display:flex; align-items:flex-start; justify-content:space-between;">
-                            <span style="display:flex; align-items:center; gap:6px; margin-top:2px;"><i class="fa-solid fa-circle-info"></i> Identitas & Spesifikasi</span>
-                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-                                <span class="status-pill ${statusCls}" style="padding:2px 8px; font-size:9.5px;">${asset.status}</span>
-                                ${asset.pengajuanType ? `<span style="font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; background:${asset.pengajuanType === 'Perubahan' ? '#fef3c7' : '#e0f2fe'}; color:${asset.pengajuanType === 'Perubahan' ? '#b45309' : '#0369a1'}; border:1px solid ${asset.pengajuanType === 'Perubahan' ? '#fde68a' : '#bae6fd'};">${asset.pengajuanType}</span>` : ''}
-                            </div>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:8px; font-size:11.5px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="color:var(--text-muted);">Techidentno</span>
-                                <span style="font-family:monospace; font-weight:700; color:var(--primary-blue);">${asset.techidentno}</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="color:var(--text-muted);">Merk / Brand</span>
-                                <span style="font-weight:700; color:var(--text-dark);">${asset.merk}</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="color:var(--text-muted);">Tipe Peralatan</span>
-                                <span style="font-weight:700; color:var(--text-dark);">${asset.type}</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="color:var(--text-muted);">Serial ID</span>
-                                <span style="font-family:monospace; font-weight:700; color:var(--text-dark);">${asset.serialId}</span>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="color:var(--text-muted);">Phasa</span>
-                                <span style="font-weight:700; color:var(--text-dark);">${asset.phasa}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px;">
-                        <div style="font-size:11px; font-weight:800; color:#059669; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-                            <i class="fa-solid fa-sitemap"></i> Hirarki & Penempatan Lokasi
-                        </div>
-                        <div style="font-size:12px; font-weight:700; color:var(--text-dark); margin-bottom:4px;">${asset.level5}</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Gardu Induk: <strong style="color:var(--text-dark);">${asset.gi}</strong></div>
-                        ${asset.creator ? `<div style="font-size:11px; color:var(--text-muted); margin-top:3px;">Pembuat Pengajuan: <strong style="color:var(--text-dark);">${asset.creator}</strong></div>` : ''}
-                    </div>
-
-                    ${asset.catatanPenolakan ? `
-                        <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:14px; padding:12px 14px; font-size:11.5px; color:#be123c;">
-                            <div style="font-weight:800; margin-bottom:3px; display:flex; align-items:center; gap:6px;">
-                                <i class="fa-solid fa-circle-exclamation"></i> Catatan Evaluasi Penolakan:
-                            </div>
-                            <div style="line-height:1.4;">${asset.catatanPenolakan}</div>
-                        </div>
-                    ` : ''}
-                </div>
-
-                <div class="drawer-footer-sticky">
-                    <button class="drawer-btn drawer-btn-secondary" onclick="showToast('Data ${asset.techidentno} disinkronkan', 'fa-rotate', '#0b4884')" style="flex:1;">
-                        <i class="fa-solid fa-rotate"></i> Sinkron
-                    </button>
-                    <button class="drawer-btn" onclick="showToast('Membuka form edit data aset...', 'fa-pen-to-square', '#059669'); closeDrawer();" style="flex:2;">
-                        <i class="fa-solid fa-pen-to-square"></i> Edit Data Aset
-                    </button>
-                </div>
-            `;
-            openDrawer();
+            window.location.href = `asset-detail.html?id=${assetId}`;
         }
 
         let currentNewAssetType = 'Penambahan';
@@ -3801,6 +3778,19 @@
             initTheme();
             applySavedUnitMode();
             renderAssetCards();
+
+            // Sticky Controls Shadow on Scroll
+            const appContent = document.querySelector('.app-content');
+            const stickyControls = document.getElementById('stickyControlsBar');
+            if (appContent && stickyControls) {
+                appContent.addEventListener('scroll', () => {
+                    if (appContent.scrollTop > 100) {
+                        stickyControls.classList.add('is-stuck');
+                    } else {
+                        stickyControls.classList.remove('is-stuck');
+                    }
+                });
+            }
         });
     </script>
 </body>

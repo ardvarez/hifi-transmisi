@@ -1,0 +1,3697 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detail Aset - New PST Mobile | PLN Nusantara</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        :root {
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #1451b0;
+            --primary-light: #eff6ff;
+            --primary-border: #bfdbfe;
+            --secondary-cyan: #0284c7;
+            --accent-green: #10b981;
+            --accent-green-bg: #ecfdf5;
+            --accent-amber: #f59e0b;
+            --accent-amber-bg: #fffbeb;
+            --accent-rose: #f43f5e;
+            --accent-rose-bg: #fff1f2;
+
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --pill-inactive-bg: #f1f5f9;
+            --pill-inactive-text: #64748b;
+            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            --shadow-float: 0 12px 30px -4px rgba(15, 23, 42, 0.12);
+        }
+
+        body.dark-mode {
+            --bg-canvas: #090d16;
+            --card-bg: #111827;
+            --border-color: #1f293d;
+            --text-dark: #f8fafc;
+            --text-sub: #cbd5e1;
+            --text-muted: #94a3b8;
+            --pill-inactive-bg: #1e293b;
+            --pill-inactive-text: #94a3b8;
+            --primary-light: rgba(26, 101, 214, 0.18);
+            --primary-border: rgba(26, 101, 214, 0.35);
+            --accent-green-bg: rgba(16, 185, 129, 0.15);
+            --accent-amber-bg: rgba(245, 158, 11, 0.15);
+            --accent-rose-bg: rgba(244, 63, 94, 0.15);
+            --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+            --shadow-float: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+            color: var(--text-dark);
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 412px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.25s ease-out;
+            transition: background-color 0.3s ease;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.95;
+                transform: scale(0.99);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Top App Bar */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .btn-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-canvas);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-header-icon:active {
+            transform: scale(0.92);
+            background: var(--primary-light);
+            color: var(--primary-blue);
+        }
+
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .header-title-box .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .header-title-box .page-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Content Container */
+        .main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-bottom: 90px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .main-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .main-scroll::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 4px;
+        }
+
+        /* Profile Header Hero Card */
+        .profile-hero-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .profile-hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .profile-hero-left {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .asset-brand {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .profile-hero-right {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .hero-code-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .hero-code-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 600;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            padding: 4px 9px;
+            border-radius: 8px;
+            color: var(--text-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hero-code-pill i {
+            color: var(--primary-blue);
+            font-size: 9.5px;
+        }
+
+        .hero-code-pill.location-pill {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            background: var(--primary-light, #eff6ff);
+            border-color: rgba(26, 101, 214, 0.2);
+            color: var(--primary-blue, #1a65d6);
+        }
+
+        body.dark-mode .hero-code-pill.location-pill {
+            background: rgba(30, 58, 138, 0.35);
+            border-color: rgba(96, 165, 250, 0.25);
+            color: #93c5fd;
+        }
+
+        .btn-edit-navbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(26, 101, 214, 0.3);
+            background: var(--primary-light, #eff6ff);
+            color: var(--primary-blue, #1a65d6);
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .btn-edit-navbar:hover {
+            background: var(--primary-blue, #1a65d6);
+            color: #ffffff;
+            border-color: var(--primary-blue, #1a65d6);
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.3);
+        }
+
+        .btn-edit-navbar:active {
+            transform: scale(0.95);
+        }
+
+        body.dark-mode .btn-edit-navbar {
+            background: #1e3a8a;
+            color: #93c5fd;
+            border-color: #3b82f6;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 800;
+            width: fit-content;
+        }
+
+        .status-badge.status-operasi {
+            background: var(--accent-green-bg);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.status-approval {
+            background: var(--accent-amber-bg);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .profile-hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .profile-hero-meta .tech-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            letter-spacing: 0.3px;
+        }
+
+        .profile-hero-meta .asset-brand {
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        .profile-hero-meta .serial-num {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+        }
+
+        /* Top KPI Score Summary Cards (AHI, Kualitas Data, Valuasi) */
+        .kpi-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .kpi-score-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 14px 14px;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .kpi-score-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 19px;
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.1;
+        }
+
+        .kpi-score-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .kpi-score-sub {
+            font-size: 10px;
+            color: var(--secondary-cyan);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Sticky Tabs Header Wrapper (Freezes on Scroll) */
+        .sticky-tabs-wrapper {
+            position: sticky;
+            top: -16px;
+            z-index: 25;
+            background: var(--bg-canvas);
+            margin: -6px -16px 0;
+            padding: 10px 16px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sticky-tabs-wrapper.is-stuck {
+            border-bottom-color: var(--border-color);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        body.dark-mode .sticky-tabs-wrapper.is-stuck {
+            border-bottom-color: var(--border-color);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Main Tabs Bar (Data Aset, Organisasi & Lokasi, AHI & Inspeksi, Riwayat Perubahan) */
+        .main-category-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 2px 2px 4px;
+            -webkit-overflow-scrolling: touch;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .main-category-scroll::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        .cat-tab-btn {
+            padding: 9px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .cat-tab-btn i {
+            font-size: 12px;
+        }
+
+        .cat-tab-btn:hover {
+            color: var(--primary-blue);
+            background: var(--primary-light);
+            border-color: var(--primary-border);
+        }
+
+        .cat-tab-btn.active {
+            background: var(--primary-blue, #1a65d6);
+            color: #ffffff;
+            border-color: var(--primary-blue, #1a65d6);
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.3);
+            font-weight: 800;
+        }
+
+        body.dark-mode .cat-tab-btn {
+            background: #111827;
+            border-color: #1f293d;
+            color: #94a3b8;
+        }
+
+        body.dark-mode .cat-tab-btn.active {
+            background: #1a65d6;
+            color: #ffffff;
+            border-color: #1a65d6;
+        }
+
+        /* Sub Navigation Pills (Umum, Spesifikasi, Lampiran) */
+        .sub-pills-row {
+            display: flex;
+            gap: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 4px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .sub-pill-btn {
+            flex: 1;
+            padding: 7px 0;
+            text-align: center;
+            border-radius: 9px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .sub-pill-btn.active {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: rgba(26, 101, 214, 0.25);
+            font-weight: 800;
+        }
+
+        /* Section Cards */
+        .detail-section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+            font-size: 13px;
+        }
+
+        /* Key-Value Pair Rows */
+        .kv-table {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            font-size: 12px;
+        }
+
+        .kv-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .kv-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .kv-value {
+            color: var(--text-dark);
+            font-weight: 700;
+            text-align: right;
+            flex: 1.3;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .kv-value.highlight-blue {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary-blue);
+        }
+
+        .kv-value.currency-val {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: #059669;
+        }
+
+        /* Photo Gallery Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .photo-thumb {
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #e2e8f0;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-thumb:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            z-index: 2;
+        }
+
+        .photo-thumb .thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .photo-thumb:hover .thumb-overlay {
+            opacity: 1;
+        }
+
+        /* Document Attachment Item */
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .doc-item:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .doc-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .doc-item-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .doc-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #fee2e2;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .doc-icon-box {
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+        }
+
+        .doc-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            line-height: 1.35;
+        }
+
+        .doc-meta {
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        .doc-item .btn-action-secondary {
+            flex-shrink: 0;
+        }
+
+        /* Asset Location Map Card */
+        .asset-map-wrapper {
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            position: relative;
+            margin-top: 12px;
+            background: #e2e8f0;
+        }
+
+        #assetLocationMap {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .map-badge-overlay {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(4px);
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+            z-index: 400;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        body.dark-mode .map-badge-overlay {
+            background: rgba(15, 23, 42, 0.92);
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        .map-btn-open {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ffffff;
+            color: var(--primary-blue);
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+            z-index: 400;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: transform 0.15s, background-color 0.15s;
+        }
+
+        .map-btn-open:active {
+            transform: scale(0.96);
+        }
+
+        body.dark-mode .map-btn-open {
+            background: #1e293b;
+            color: #60a5fa;
+            border-color: #334155;
+        }
+
+        /* Timeline & Audit Log Module */
+        .audit-filter-chips {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .audit-filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .audit-chip {
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .audit-chip.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+        }
+
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            padding-left: 14px;
+            border-left: 2px solid var(--border-color);
+            margin-left: 6px;
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+
+        .timeline-item:hover {
+            border-color: var(--primary-border);
+            transform: translateY(-1px);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -20px;
+            top: 14px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--card-bg);
+        }
+
+        .timeline-dot.dot-valuasi { background: #10b981; }
+        .timeline-dot.dot-roa { background: #06b6d4; }
+        .timeline-dot.dot-mutasi { background: #8b5cf6; }
+        .timeline-dot.dot-lokasi { background: #f59e0b; }
+        .timeline-dot.dot-pelepasan { background: #ef4444; }
+        .timeline-dot.dot-informasi { background: #0284c7; }
+
+        .audit-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            letter-spacing: 0.2px;
+        }
+
+        .audit-badge.badge-valuasi { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .audit-badge.badge-roa { background: #ecfeff; color: #0891b2; border: 1px solid #a5f3fc; }
+        .audit-badge.badge-mutasi { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        .audit-badge.badge-lokasi { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .audit-badge.badge-pelepasan { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .audit-badge.badge-informasi { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+        body.dark-mode .audit-badge.badge-valuasi { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+        body.dark-mode .audit-badge.badge-roa { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border-color: rgba(6, 182, 212, 0.3); }
+        body.dark-mode .audit-badge.badge-mutasi { background: rgba(139, 92, 246, 0.15); color: #c084fc; border-color: rgba(139, 92, 246, 0.3); }
+        body.dark-mode .audit-badge.badge-lokasi { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+        body.dark-mode .audit-badge.badge-pelepasan { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+        body.dark-mode .audit-badge.badge-informasi { background: rgba(2, 132, 199, 0.15); color: #60a5fa; border-color: rgba(2, 132, 199, 0.3); }
+
+        .timeline-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .timeline-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.35;
+        }
+
+        .timeline-time {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .audit-diff-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 7px 9px;
+            margin: 4px 0 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .audit-diff-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+        }
+
+        .audit-diff-label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .audit-diff-val {
+            color: var(--text-dark);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+        }
+
+        .timeline-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        .audit-footer-ref {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 5px;
+            margin-top: 3px;
+        }
+
+        /* ================= AHI & PARAMETER INSPEKSI UI ================= */
+        .ahi-tab-nav {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 12px;
+            gap: 16px;
+            padding: 0 4px;
+        }
+
+        .ahi-tab-item {
+            padding: 8px 4px 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            background: none;
+            border: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ahi-tab-item.active {
+            color: var(--primary-blue);
+        }
+
+        .ahi-tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-blue);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .ahi-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .ahi-search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 7px 11px;
+        }
+
+        .ahi-search-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            color: var(--text-dark);
+            outline: none;
+            font-family: inherit;
+        }
+
+        .ahi-filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-border);
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.15s, background 0.15s;
+        }
+
+        body.dark-mode .ahi-filter-btn {
+            background: rgba(26, 101, 214, 0.2);
+            border-color: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .ahi-filter-chips {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+        }
+
+        .ahi-filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ahi-chip {
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .ahi-chip.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+        }
+
+        /* Section divider header for AHI & Non-AHI */
+        .ahi-section-tag {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .ahi-section-tag.tag-ahi {
+            background: #eff6ff;
+            color: #1a65d6;
+            border: 1px solid #bfdbfe;
+        }
+
+        body.dark-mode .ahi-section-tag.tag-ahi {
+            background: rgba(26, 101, 214, 0.18);
+            border-color: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .ahi-section-tag.tag-non-ahi {
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        body.dark-mode .ahi-section-tag.tag-non-ahi {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        /* Parameter Table (Desktop / Horizontal Swipe) */
+        .ahi-table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--card-bg);
+            margin-bottom: 14px;
+        }
+
+        .ahi-table {
+            width: 100%;
+            min-width: 680px;
+            border-collapse: collapse;
+            font-size: 11.5px;
+        }
+
+        .ahi-table th {
+            background: var(--bg-canvas);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .ahi-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .ahi-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ahi-badge-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 800;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .ahi-badge-score.good {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .ahi-badge-score.fair {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        body.dark-mode .ahi-badge-score.good {
+            background: rgba(5, 150, 105, 0.2);
+            color: #34d399;
+        }
+
+        body.dark-mode .ahi-badge-score.fair {
+            background: rgba(217, 119, 6, 0.2);
+            color: #fbbf24;
+        }
+
+        /* View Switcher: Card vs Table */
+        .ahi-view-toggle {
+            display: inline-flex;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2px;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .ahi-view-btn {
+            border: none;
+            background: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .ahi-view-btn.active {
+            background: var(--card-bg);
+            color: var(--primary-blue);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode .ahi-view-btn.active {
+            background: #1e293b;
+            color: #60a5fa;
+        }
+
+        /* Mobile Parameter Cards List */
+        .ahi-cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .ahi-item-card {
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .ahi-item-card:hover {
+            border-color: var(--primary-border);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .ahi-card-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .ahi-card-subsys {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            background: var(--primary-light);
+            border: 1px solid var(--primary-border);
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        body.dark-mode .ahi-card-subsys {
+            background: rgba(26, 101, 214, 0.2);
+            color: #93c5fd;
+            border-color: #1e3a8a;
+        }
+
+        .ahi-card-title {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+
+        .ahi-card-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .ahi-card-ins-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        /* 3-Pill Data Quality Row */
+        .ahi-card-quality-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .ahi-quality-pill {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 6px;
+            text-align: center;
+        }
+
+        .ahi-quality-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 1px;
+        }
+
+        .ahi-quality-val {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #059669;
+        }
+
+        /* Expandable Details Accordion */
+        .ahi-card-expandable {
+            display: none;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .ahi-item-card.expanded .ahi-card-expandable {
+            display: block;
+        }
+
+        /* Detail Parameter Uraian Isian Measurements */
+        .ahi-param-metrics-table {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: var(--bg-canvas);
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 6px;
+        }
+
+        .ahi-metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            padding: 2px 0;
+        }
+
+        .ahi-metric-row:not(:last-child) {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .ahi-metric-label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .ahi-metric-val {
+            color: var(--text-dark);
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .ahi-metric-val.highlight-amber {
+            color: #d97706;
+            background: rgba(217, 119, 6, 0.1);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        body.dark-mode .ahi-badge-score.good {
+            background: rgba(5, 150, 105, 0.2);
+            color: #34d399;
+        }
+
+        body.dark-mode .ahi-badge-score.fair {
+            background: rgba(217, 119, 6, 0.2);
+            color: #fbbf24;
+        }
+
+        .ahi-link-ins {
+            color: var(--primary-blue);
+            font-weight: 800;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .btn-ahi-chart {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            border: 1px solid var(--primary-border);
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 11px;
+        }
+
+        .btn-ahi-chart:hover {
+            background: var(--primary-blue);
+            color: #ffffff;
+        }
+
+        /* MAX AHI Banner */
+        .ahi-max-banner-card {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 11px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: -6px;
+            margin-bottom: 14px;
+        }
+
+        body.dark-mode .ahi-max-banner-card {
+            background: rgba(217, 119, 6, 0.15);
+            border-color: rgba(217, 119, 6, 0.35);
+        }
+
+        /* Shimmer Skeleton & Loader State */
+        @keyframes shimmerPulse {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-block {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmerPulse 1.4s infinite ease-in-out;
+            border-radius: 6px;
+        }
+
+        body.dark-mode .skeleton-block {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+        }
+
+        .ahi-skeleton-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ahi-loader-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: var(--primary-light);
+            border: 1px solid var(--primary-border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .ahi-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(2, 132, 199, 0.25);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .ahi-load-more-container {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-load-more {
+            width: 100%;
+            padding: 11px;
+            background: var(--card-bg);
+            border: 1px dashed var(--primary-border);
+            border-radius: 12px;
+            color: var(--primary-blue);
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-load-more:active {
+            transform: scale(0.98);
+            background: var(--primary-light);
+        }
+
+        /* Trend Graph Modal */
+        .trend-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .trend-modal.active {
+            display: flex;
+        }
+
+        .trend-modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: zoomIn 0.2s ease-out;
+        }
+
+        /* Bottom Action Bar */
+        .bottom-action-bar {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            z-index: 30;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 11px 0;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.2s;
+        }
+
+        .btn-action-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.3);
+        }
+
+        .btn-action-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-action-secondary {
+            background: var(--bg-canvas);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-action-secondary:active {
+            transform: scale(0.97);
+            background: var(--primary-light);
+        }
+
+        /* Modal Lightbox Preview */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox-modal.active {
+            display: flex;
+        }
+
+        .lightbox-box {
+            background: var(--card-bg);
+            border-radius: 20px;
+            max-width: 380px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: var(--shadow-float);
+            animation: zoomIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .lightbox-img-wrapper {
+            width: 100%;
+            max-height: 280px;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .lightbox-img-wrapper img {
+            width: 100%;
+            height: auto;
+            max-height: 280px;
+            object-fit: contain;
+        }
+
+        .lightbox-info {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .lightbox-info-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .lightbox-info-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .lightbox-close-btn {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            padding: 9px 0;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        /* Toast Feedback */
+        .toast-msg {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- Top App Bar -->
+        <header class="app-header">
+            <a href="asset-register.html" class="btn-header-icon" title="Kembali ke Daftar Aset">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="header-title-box">
+                <div class="page-title" id="topHeaderTitle">Detail Aset</div>
+                <div class="page-sub" id="topHeaderSub">Peralatan Transmisi</div>
+            </div>
+            <button class="btn-header-icon" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-scroll">
+            <!-- Profile Hero Card -->
+            <section class="profile-hero-card">
+                <div class="profile-hero-top">
+                    <div class="profile-hero-left">
+                        <h1 class="profile-hero-title" id="assetName">Lightning Arrester</h1>
+                        <div class="asset-brand" id="assetMerkType">Techfill - Techfill 70S</div>
+                    </div>
+                    <div class="profile-hero-right">
+                        <span class="status-badge status-operasi" id="assetStatusPill">
+                            <i class="fa-solid fa-circle-check"></i> <span id="assetStatusText">Operasi</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="hero-code-row">
+                    <span class="hero-code-pill"><i class="fa-solid fa-barcode"></i> <span
+                            id="assetTechidentno">16140265120000000001</span></span>
+                    <span class="hero-code-pill"><i class="fa-solid fa-hashtag"></i> <span
+                            id="assetSerialId">048826-12S</span></span>
+                    <span class="hero-code-pill location-pill"><i class="fa-solid fa-location-dot"></i> <span
+                            id="assetHeroLocation">GI Waru 150kV • Bay Line 1</span></span>
+                </div>
+            </section>
+
+            <!-- Top KPI Score & Quality Summary Cards -->
+            <section class="kpi-summary-grid">
+                <!-- AHI Card -->
+                <div class="kpi-score-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="kpi-card-dot" id="ahiDot" style="background:#d97706; box-shadow:0 0 0 3px rgba(217,119,6,0.2);"></div>
+                        <span id="ahiConditionBadge"
+                            style="font-size:9px; font-weight:800; color:#d97706; background:rgba(217,119,6,0.1); padding:2px 6px; border-radius:6px; border:1px solid rgba(217,119,6,0.25);">Perlu Perhatian</span>
+                    </div>
+                    <div>
+                        <div class="kpi-score-val" id="ahiScore">3 - Fair</div>
+                        <div class="kpi-score-label">Aset Health Index</div>
+                    </div>
+                    <div class="kpi-score-sub" id="ahiScoreSub">
+                        <i class="fa-solid fa-chart-line"></i> Skor Indeks 88.5
+                    </div>
+                </div>
+
+                <!-- Kualitas Data Card -->
+                <div class="kpi-score-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="kpi-card-dot" id="kualitasDataDot"
+                            style="background:#059669; box-shadow:0 0 0 3px rgba(5, 150, 105, 0.2);"></div>
+                        <span id="kualitasDataBadge"
+                            style="font-size:9px; font-weight:800; color:#059669; background:rgba(5, 150, 105, 0.1); padding:2px 6px; border-radius:6px; border:1px solid rgba(5, 150, 105, 0.25);">100% Valid</span>
+                    </div>
+                    <div>
+                        <div class="kpi-score-val" id="kualitasDataScore">100.0%</div>
+                        <div class="kpi-score-label">Kualitas Data</div>
+                    </div>
+                    <div class="kpi-score-sub" id="kualitasDataSub" style="color:var(--text-muted); font-size:9.5px;">
+                        Inspeksi: 100% • Isian: 100%
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sticky Tabs Header Group (Freezes on Scroll) -->
+            <div class="sticky-tabs-wrapper">
+                <!-- Main Categories Bar (Data Asset, Organisasi & Lokasi, AHI & Inspeksi, Riwayat Perubahan) -->
+                <section class="main-category-scroll">
+                    <button class="cat-tab-btn active" id="tabBtnDataAset" onclick="switchMainTab('data_aset', this)">
+                        <i class="fa-solid fa-cubes"></i> Data Asset
+                    </button>
+                    <button class="cat-tab-btn" id="tabBtnOrgLokasi" onclick="switchMainTab('org_lokasi', this)">
+                        <i class="fa-solid fa-sitemap"></i> Organisasi & Lokasi
+                    </button>
+                    <button class="cat-tab-btn" id="tabBtnAhiInspeksi" onclick="switchMainTab('ahi_inspeksi', this)">
+                        <i class="fa-solid fa-heart-pulse"></i> AHI & Inspeksi
+                    </button>
+                    <button class="cat-tab-btn" id="tabBtnRiwayat" onclick="switchMainTab('riwayat', this)">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Perubahan
+                    </button>
+                </section>
+
+                <!-- Sub Navigation Pills (Umum, Spesifikasi, Lampiran) -->
+                <section class="sub-pills-row" id="subPillsWrap">
+                    <button class="sub-pill-btn active" id="subPillUmum" onclick="switchSubPill('umum', this)">
+                        <i class="fa-solid fa-circle-info"></i> Umum
+                    </button>
+                    <button class="sub-pill-btn" id="subPillSpesifikasi" onclick="switchSubPill('spesifikasi', this)">
+                        <i class="fa-solid fa-sliders"></i> Spesifikasi
+                    </button>
+                    <button class="sub-pill-btn" id="subPillLampiran" onclick="switchSubPill('lampiran', this)">
+                        <i class="fa-regular fa-file-lines"></i> Lampiran
+                    </button>
+                </section>
+            </div>
+
+            <!-- ================= TAB CONTENT: DATA ASSET - UMUM ================= -->
+            <div id="tabContentUmum" style="display:flex; flex-direction:column; gap:16px;">
+                <!-- 1. Identitas Aset -->
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-fingerprint"></i> Identitas Aset
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Eqnumber</span>
+                            <span class="kv-value" id="valEqnumber">-</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Phasa</span>
+                            <span class="kv-value" id="valPhasa">R</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Cons Type</span>
+                            <span class="kv-value" id="valConsType">-</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Buatan / Pabrikan</span>
+                            <span class="kv-value" id="valBuatan">Swedia</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Standar Desain</span>
+                            <span class="kv-value">IEC 60099-4 / SPLN D3</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Tipe Konstruksi</span>
+                            <span class="kv-value">Outdoor Base Mounted</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Lokasi Aset -->
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> Lokasi Aset
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Kantor Induk</span>
+                            <span class="kv-value" id="valKantorInduk">UP3B SUL</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">UPT / UPK</span>
+                            <span class="kv-value" id="valUpt">UPT Makassar</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">ULTG</span>
+                            <span class="kv-value" id="valUltg">Maros</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Gardu Induk</span>
+                            <span class="kv-value" id="valGardu">GI Maros 150kV</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Bay / Koridor</span>
+                            <span class="kv-value" id="valBay">GITET MENUM 275kV BAY 6AB5 Diameter #5</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Titik Koordinat</span>
+                            <span class="kv-value highlight-blue">-5.018921, 119.574102</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Usia Aset -->
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-hourglass-half" style="color:#d97706;"></i> Usia & Siklus Operasi
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Tgl Awal Ops</span>
+                            <span class="kv-value" id="valTglAwal">10 Nov 2023</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Tgl Akhir Ops</span>
+                            <span class="kv-value" id="valTglAkhir">-</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Usia Operasi</span>
+                            <span class="kv-value" id="valUsiaOperasi">2 Tahun</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Tahun Dibuat</span>
+                            <span class="kv-value" id="valTahunDibuat">2010</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Usia Aset</span>
+                            <span class="kv-value" id="valUsiaAset">13 Tahun</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Estimasi Sisa Umur</span>
+                            <span class="kv-value" style="color:#059669; font-weight:800;">12 Tahun (Target 25
+                                Thn)</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Valuasi & Finansial Aset (Fitur Tambahan Baru) -->
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-coins" style="color:#10b981;"></i> Valuasi & Finansial Aset
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Nilai Perolehan (CAPEX)</span>
+                            <span class="kv-value currency-val" id="valCapex">Rp 2.450.000.000</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Nilai Buku Saat Ini (NBV)</span>
+                            <span class="kv-value currency-val" style="color:#0284c7;" id="valNbv">Rp
+                                1.470.000.000</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Akumulasi Depresiasi</span>
+                            <span class="kv-value" id="valDepresiasi">Rp 980.000.000 (40.0%)</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Akumulasi OPEX (Pemeliharaan)</span>
+                            <span class="kv-value" id="valOpex">Rp 185.200.000</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Status Asuransi</span>
+                            <span class="kv-value" style="color:#059669; font-weight:800;">Covered (All Risk)</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Foto Galeri Aset -->
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-images" style="color:#8b5cf6;"></i> Galeri Foto Dokumentasi
+                        </div>
+                    </div>
+
+                    <!-- Foto Fisik Aset -->
+                    <div style="margin-top:2px;">
+                        <div
+                            style="font-size:12px; font-weight:800; color:var(--text-dark); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Foto Fisik Aset</span>
+                            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">10 Foto</span>
+                        </div>
+                        <div class="photo-grid" id="gridFotoFisik">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Foto Nameplate Aset -->
+                    <div style="margin-top:10px;">
+                        <div
+                            style="font-size:12px; font-weight:800; color:var(--text-dark); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Foto Nameplate Aset</span>
+                            <span style="font-size:10px; color:var(--text-muted); font-weight:600;">10 Foto</span>
+                        </div>
+                        <div class="photo-grid" id="gridFotoNameplate">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= TAB CONTENT: DATA ASSET - SPESIFIKASI ================= -->
+            <div id="tabContentSpesifikasi" style="display:none; flex-direction:column; gap:16px;">
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-sliders" style="color:var(--primary-blue);"></i> Spesifikasi Teknis
+                            Aset
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Tegangan Sistem</span>
+                            <span class="kv-value highlight-blue">150 kV</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Tegangan Maks (Ur)</span>
+                            <span class="kv-value">170 kV rms</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Arus Nominal (In)</span>
+                            <span class="kv-value">10 kA (8/20 μs)</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Frekuensi Nominal</span>
+                            <span class="kv-value">50 Hz</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Lightning Impulse (BIL)</span>
+                            <span class="kv-value">650 kV Peak</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Continuous Voltage (Uc)</span>
+                            <span class="kv-value">120 kV</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">High Current Impulse</span>
+                            <span class="kv-value">100 kA (4/10 μs)</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Bahan Housing</span>
+                            <span class="kv-value">Polymer Silicone Rubber</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Creepage Distance</span>
+                            <span class="kv-value">4.350 mm</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Cantilever Strength</span>
+                            <span class="kv-value">1.200 Nm</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Tinggi Keseluruhan</span>
+                            <span class="kv-value">1.450 mm</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Berat Total</span>
+                            <span class="kv-value">48.5 kg</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Line Discharge Class</span>
+                            <span class="kv-value">Class 2</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Derajat Proteksi</span>
+                            <span class="kv-value">IP67 Enclosure</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Standar Manufaktur</span>
+                            <span class="kv-value">IEC 60099-4 / SPLN D3.023</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= TAB CONTENT: DATA ASSET - LAMPIRAN ================= -->
+            <div id="tabContentLampiran" style="display:none; flex-direction:column; gap:16px;">
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-folder-open" style="color:#d97706;"></i> Berkas & Dokumen Terlampir
+                        </div>
+                        <span style="font-size:10.5px; font-weight:700; color:var(--text-muted);">5 Berkas PDF</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
+                        <div class="doc-item" onclick="showToast('Mengunduh Manual Book Pabrikan...', 'fa-file-pdf')">
+                            <div class="doc-item-left">
+                                <div class="doc-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                                <div class="doc-item-info">
+                                    <div class="doc-title">Manual Book & Tech Specs.pdf</div>
+                                    <div class="doc-meta">4.2 MB • Diunggah 10 Nov 2023</div>
+                                </div>
+                            </div>
+                            <button class="btn-action-secondary"
+                                style="padding:6px 12px; font-size:11px; border-radius:8px; border:none; cursor:pointer;"><i
+                                    class="fa-solid fa-download"></i> Unduh</button>
+                        </div>
+
+                        <div class="doc-item" onclick="showToast('Mengunduh Sertifikat FAT...', 'fa-file-pdf')">
+                            <div class="doc-item-left">
+                                <div class="doc-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                                <div class="doc-item-info">
+                                    <div class="doc-title">Sertifikat Factory Acceptance Test (FAT).pdf</div>
+                                    <div class="doc-meta">1.8 MB • Diunggah 12 Nov 2023</div>
+                                </div>
+                            </div>
+                            <button class="btn-action-secondary"
+                                style="padding:6px 12px; font-size:11px; border-radius:8px; border:none; cursor:pointer;"><i
+                                    class="fa-solid fa-download"></i> Unduh</button>
+                        </div>
+
+                        <div class="doc-item" onclick="showToast('Mengunduh BA Komisioning...', 'fa-file-pdf')">
+                            <div class="doc-item-left">
+                                <div class="doc-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                                <div class="doc-item-info">
+                                    <div class="doc-title">Berita Acara Komisioning & Energize.pdf</div>
+                                    <div class="doc-meta">2.5 MB • Diunggah 15 Nov 2023</div>
+                                </div>
+                            </div>
+                            <button class="btn-action-secondary"
+                                style="padding:6px 12px; font-size:11px; border-radius:8px; border:none; cursor:pointer;"><i
+                                    class="fa-solid fa-download"></i> Unduh</button>
+                        </div>
+
+                        <div class="doc-item" onclick="showToast('Mengunduh Single Line Diagram...', 'fa-file-pdf')">
+                            <div class="doc-item-left">
+                                <div class="doc-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                                <div class="doc-item-info">
+                                    <div class="doc-title">Single Line Diagram (SLD) Bay 6AB5.pdf</div>
+                                    <div class="doc-meta">3.1 MB • Diunggah 18 Mei 2024</div>
+                                </div>
+                            </div>
+                            <button class="btn-action-secondary"
+                                style="padding:6px 12px; font-size:11px; border-radius:8px; border:none; cursor:pointer;"><i
+                                    class="fa-solid fa-download"></i> Unduh</button>
+                        </div>
+
+                        <div class="doc-item" onclick="showToast('Mengunduh SOP Pemeliharaan...', 'fa-file-pdf')">
+                            <div class="doc-item-left">
+                                <div class="doc-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                                <div class="doc-item-info">
+                                    <div class="doc-title">SOP Pemeliharaan & K3 Gardu Induk.pdf</div>
+                                    <div class="doc-meta">890 KB • Diunggah 01 Jan 2025</div>
+                                </div>
+                            </div>
+                            <button class="btn-action-secondary"
+                                style="padding:6px 12px; font-size:11px; border-radius:8px; border:none; cursor:pointer;"><i
+                                    class="fa-solid fa-download"></i> Unduh</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= TAB CONTENT: ORGANISASI & LOKASI ================= -->
+            <div id="tabContentOrgLokasi" style="display:none; flex-direction:column; gap:16px;">
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-sitemap" style="color:var(--primary-blue);"></i> Hirarki Organisasi
+                            Pengelola
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Kantor Induk (UIP / UIT)</span>
+                            <span class="kv-value" id="orgValKantorInduk">UP3B SUL</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">UPT / UPK</span>
+                            <span class="kv-value" id="orgValUpt">UPT Makassar</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">ULTG</span>
+                            <span class="kv-value" id="orgValUltg">Maros</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="detail-section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-location-crosshairs" style="color:#0284c7;"></i> Titik Gardu &
+                            Penempatan
+                        </div>
+                    </div>
+                    <div class="kv-table">
+                        <div class="kv-row">
+                            <span class="kv-label">Gardu Induk</span>
+                            <span class="kv-value" id="orgValGardu">GI Maros 150kV</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Bay / Koridor</span>
+                            <span class="kv-value" id="orgValBay">GITET MENUM 275kV BAY 6AB5 Diameter #5</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Status Kawasan</span>
+                            <span class="kv-value" style="color:#059669; font-weight:800;">Switchyard Terproteksi</span>
+                        </div>
+                    </div>
+
+                    <!-- Map Display for Substation Location -->
+                    <div class="asset-map-wrapper">
+                        <div id="assetLocationMap"></div>
+                        <div class="map-badge-overlay">
+                            <i class="fa-solid fa-location-dot" style="color: #ef4444;"></i>
+                            <span id="mapBadgeText">GI Maros 150kV</span>
+                        </div>
+                        <a href="https://maps.google.com/?q=-5.018921,119.574102" target="_blank" id="mapExternalLink"
+                            class="map-btn-open">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Maps
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= TAB CONTENT: AHI & INSPEKSI ================= -->
+            <div id="tabContentAhi" style="display:none; flex-direction:column; gap:14px;">
+                <!-- Inner Sub Navigation: [AHI] | [Detail Parameter Inspeksi] -->
+                <div class="ahi-tab-nav">
+                    <button class="ahi-tab-item active" id="ahiNavOverview" onclick="switchAhiSubTab('overview')">
+                        <i class="fa-solid fa-heart-pulse"></i> AHI
+                    </button>
+                    <button class="ahi-tab-item" id="ahiNavDetailParam" onclick="switchAhiSubTab('detail')">
+                        <i class="fa-solid fa-list-check"></i> Detail Parameter Inspeksi
+                    </button>
+                </div>
+
+                <!-- VIEW 1: AHI Overview & Health Summary -->
+                <div id="ahiViewOverview" style="display:flex; flex-direction:column; gap:14px;">
+                    <section class="detail-section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fa-solid fa-heart-pulse" style="color:#e11d48;"></i> Status Kesehatan Aset
+                                Terkini
+                            </div>
+                            <span class="ahi-badge-score fair" style="font-size:11px;" id="ahiOverviewMaxBadge">MAX AHI: 3 - Fair</span>
+                        </div>
+                        <div class="kv-table">
+                            <div class="kv-row">
+                                <span class="kv-label">Indeks AHI Utama</span>
+                                <span class="kv-value" style="color:#d97706; font-weight:800;" id="ahiValScore">3 - Fair
+                                    (Perlu Perhatian)</span>
+                            </div>
+                            <div class="kv-row">
+                                <span class="kv-label">Skor Indeks Kumulatif</span>
+                                <span class="kv-value highlight-blue" id="ahiValIndexScore">88.5 / 100</span>
+                            </div>
+                            <div class="kv-row">
+                                <span class="kv-label">Kualitas Data Pengujian</span>
+                                <span class="kv-value" style="color:#059669; font-weight:700;" id="ahiValQuality">100.0% (Valid)</span>
+                            </div>
+                            <div class="kv-row">
+                                <span class="kv-label">Tingkat Anomali</span>
+                                <span class="kv-value" style="color:#0284c7;" id="ahiValAnomaly">Sedang (In-Service Terpantau)</span>
+                            </div>
+                            <div class="kv-row">
+                                <span class="kv-label">Rekomendasi Pemeliharaan</span>
+                                <span class="kv-value" id="ahiValRec">Cleaning isolator & pengujian berkala tahanan isolasi</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick banner to view detail parameter inspections -->
+                        <div
+                            style="margin-top:14px; padding:12px; background:var(--primary-light); border:1px solid var(--primary-border); border-radius:12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                            <div>
+                                <div style="font-size:12px; font-weight:800; color:var(--primary-blue);">Detail 8
+                                    Parameter Terdaftar</div>
+                                <div style="font-size:10.5px; color:var(--text-muted);">4 Parameter AHI & 4 Parameter
+                                    Non AHI</div>
+                            </div>
+                            <button onclick="switchAhiSubTab('detail')"
+                                style="padding:7px 12px; background:var(--primary-blue); color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+                                Buka Parameter <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- VIEW 2: Detail Parameter Inspeksi (Separated into AHI & Non-AHI) -->
+                <div id="ahiViewDetailParam" style="display:none; flex-direction:column; gap:12px;">
+                    <!-- Search Bar -->
+                    <div class="ahi-toolbar">
+                        <div class="ahi-search-box">
+                            <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 12px;"></i>
+                            <input type="text" id="ahiSearchInput" class="ahi-search-input"
+                                placeholder="Cari Parameter ..." oninput="filterAhiParams(this.value)">
+                        </div>
+                    </div>
+
+                    <!-- Category Filter Chips -->
+                    <div class="ahi-filter-chips" id="ahiFilterChips">
+                        <button class="ahi-chip active" onclick="setAhiFilter('all', this)">Semua (8)</button>
+                        <button class="ahi-chip" onclick="setAhiFilter('ahi', this)">Parameter AHI (4)</button>
+                        <button class="ahi-chip" onclick="setAhiFilter('non_ahi', this)">Parameter Non AHI (4)</button>
+                        <button class="ahi-chip" onclick="setAhiFilter('fair', this)">Skor 3 - Fair (1)</button>
+                    </div>
+
+                    <!-- Loader / Skeleton State -->
+                    <div id="ahiLoadingState" style="display:none; flex-direction:column; gap:10px;">
+                        <div class="ahi-loader-status">
+                            <div class="ahi-spinner"></div>
+                            <span>Memuat data parameter inspeksi...</span>
+                        </div>
+                        <div class="ahi-skeleton-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div class="skeleton-block" style="width:85px; height:18px;"></div>
+                                <div class="skeleton-block" style="width:65px; height:20px; border-radius:12px;"></div>
+                            </div>
+                            <div class="skeleton-block" style="width:70%; height:15px; margin-top:2px;"></div>
+                            <div class="skeleton-block" style="width:50%; height:12px;"></div>
+                            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-top:4px;">
+                                <div class="skeleton-block" style="height:34px; border-radius:8px;"></div>
+                                <div class="skeleton-block" style="height:34px; border-radius:8px;"></div>
+                                <div class="skeleton-block" style="height:34px; border-radius:8px;"></div>
+                            </div>
+                        </div>
+                        <div class="ahi-skeleton-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div class="skeleton-block" style="width:100px; height:18px;"></div>
+                                <div class="skeleton-block" style="width:65px; height:20px; border-radius:12px;"></div>
+                            </div>
+                            <div class="skeleton-block" style="width:60%; height:15px; margin-top:2px;"></div>
+                            <div class="skeleton-block" style="width:45%; height:12px;"></div>
+                            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-top:4px;">
+                                <div class="skeleton-block" style="height:34px; border-radius:8px;"></div>
+                                <div class="skeleton-block" style="height:34px; border-radius:8px;"></div>
+                                <div class="skeleton-block" style="height:34px; border-radius:8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wrapper for Sections to easily toggle with Loader -->
+                    <div id="ahiParamsContainer" style="display:flex; flex-direction:column; gap:12px;">
+                        <!-- SECTION 1: PARAMETER AHI -->
+                        <section class="detail-section-card" id="sectionParamAhi" style="padding:14px;">
+                            <div class="ahi-section-tag tag-ahi">
+                                <span><i class="fa-solid fa-heart-pulse"></i> Parameter AHI</span>
+                                <span style="font-size:10px; font-weight:600;">Bobot Penentu Indeks</span>
+                            </div>
+
+                            <!-- Mobile Cards View -->
+                            <div class="ahi-cards-list" id="cardsParamAhi">
+                                <!-- Dynamic Cards Generated by JS -->
+                            </div>
+
+                            <!-- MAX AHI Banner -->
+                            <div class="ahi-max-banner-card" style="margin-bottom:0;">
+                                <div
+                                    style="font-size:12px; font-weight:800; color:#b45309; display:flex; align-items:center; gap:6px;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> MAX AHI
+                                </div>
+                                <div class="ahi-badge-score fair" style="font-size:12px; padding:4px 10px;">
+                                    3 - Fair <i class="fa-solid fa-circle-info"></i>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- SECTION 2: PARAMETER NON AHI -->
+                        <section class="detail-section-card" id="sectionParamNonAhi" style="padding:14px;">
+                            <div class="ahi-section-tag tag-non-ahi">
+                                <span><i class="fa-solid fa-clipboard-check"></i> Parameter Non AHI</span>
+                                <span style="font-size:10px; font-weight:600;">Inspeksi Visual & Rutin</span>
+                            </div>
+
+                            <!-- Mobile Cards View -->
+                            <div class="ahi-cards-list" id="cardsParamNonAhi">
+                                <!-- Dynamic Cards Generated by JS -->
+                            </div>
+                        </section>
+
+                        <!-- Load More Button with Loader State -->
+                        <div class="ahi-load-more-container" id="ahiLoadMoreBox">
+                            <button class="btn-load-more" id="btnLoadMoreParams" onclick="loadMoreAhiParams()">
+                                <i class="fa-solid fa-cloud-arrow-down"></i> Muat Data Riwayat Lainnya (+4)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB CONTENT: RIWAYAT PERUBAHAN ================= -->
+            <div id="tabContentRiwayat" style="display:none; flex-direction:column; gap:14px;">
+                <section class="detail-section-card" style="padding:14px;">
+                    <div class="section-header" style="margin-bottom:12px;">
+                        <div class="section-title">
+                            <i class="fa-solid fa-clock-rotate-left" style="color:#6366f1;"></i> Log Audit & Siklus Hidup Aset
+                        </div>
+                        <span style="font-size:10.5px; font-weight:700; color:var(--primary-blue); background:var(--primary-light); padding:2px 8px; border-radius:6px; border:1px solid var(--primary-border);" id="auditTotalBadge">7 Peristiwa</span>
+                    </div>
+
+                    <!-- Category Filter Chips for Audit Log -->
+                    <div class="audit-filter-chips" id="auditFilterChips">
+                        <button class="audit-chip active" onclick="filterAuditLogs('all', this)">Semua (8)</button>
+                        <button class="audit-chip" onclick="filterAuditLogs('info_file', this)">Info, Foto & File</button>
+                        <button class="audit-chip" onclick="filterAuditLogs('alert_ahi', this)">Alert MAX AHI</button>
+                        <button class="audit-chip" onclick="filterAuditLogs('mutasi_lokasi', this)">Mutasi & Lokasi</button>
+                        <button class="audit-chip" onclick="filterAuditLogs('valuasi_roa', this)">Valuasi & RoA</button>
+                        <button class="audit-chip" onclick="filterAuditLogs('pelepasan', this)">Pelepasan & Disposal</button>
+                    </div>
+
+                    <!-- Timeline Audit List Container (Injected by JS) -->
+                    <div class="timeline-container" id="auditTimelineList">
+                        <!-- Dynamic Audit Timeline Items -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Bottom Action Bar -->
+        <div class="bottom-action-bar">
+            <button class="btn-action btn-action-primary"
+                onclick="showToast('Membuka formulir perubahan data aset...', 'fa-pen-to-square')">
+                <i class="fa-solid fa-pen-to-square"></i> Ubah Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+        <div class="lightbox-box" onclick="event.stopPropagation()">
+            <div class="lightbox-img-wrapper">
+                <img id="lightboxImg" src="" alt="Foto Aset Preview">
+            </div>
+            <div class="lightbox-info">
+                <div class="lightbox-info-title" id="lightboxTitle">Foto Aset</div>
+                <div class="lightbox-info-desc" id="lightboxDesc">Dokumentasi fisik lapangan peralatan transmisi.</div>
+                <button class="lightbox-close-btn" onclick="closeLightbox()">Tutup Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AHI Trend & Parameter Detail Modal -->
+    <div class="trend-modal" id="ahiTrendModal" onclick="closeAhiTrendModal(event)">
+        <div class="trend-modal-content" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div>
+                    <span id="trendModalSubsystem"
+                        style="font-size:10px; font-weight:800; color:var(--primary-blue); background:var(--primary-light); padding:2px 7px; border-radius:6px; border:1px solid var(--primary-border);">Primary
+                        Unit</span>
+                    <h3 id="trendModalTitle"
+                        style="font-size:14px; font-weight:800; color:var(--text-dark); margin:6px 0 2px;">Thermovisi
+                        Body Aset</h3>
+                    <div id="trendModalInsNo"
+                        style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--primary-blue); font-weight:700;">
+                        INS202601650195</div>
+                </div>
+                <button onclick="closeAhiTrendModal()"
+                    style="width:28px; height:28px; border-radius:8px; border:none; background:var(--bg-canvas); color:var(--text-muted); cursor:pointer; font-size:14px;"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Score badge and metadata -->
+            <div
+                style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:12px; padding:12px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Skor Kondisi Terkini</span>
+                    <span id="trendModalScore" class="ahi-badge-score good">2 - Good <i
+                            class="fa-solid fa-circle-info"></i></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Tanggal Uji Terakhir</span>
+                    <span id="trendModalDate" style="font-size:11.5px; font-weight:700; color:var(--text-dark);">04
+                        September 2026 13:39:29</span>
+                </div>
+                <div style="font-size:11px; color:var(--text-muted); border-top:1px dashed var(--border-color); padding-top:8px;"
+                    id="trendModalDesc">
+                    Hasil pengujian thermovisi menunjukkan perbedaan suhu ΔT sebesar 1.1°C (Kondisi Normal).
+                </div>
+            </div>
+
+            <!-- Quality scores pills -->
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px;">
+                <div
+                    style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:10px; padding:8px; text-align:center;">
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">Accuracy</div>
+                    <div style="font-size:12px; font-weight:800; color:#059669;" id="trendModalAcc">100%</div>
+                </div>
+                <div
+                    style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:10px; padding:8px; text-align:center;">
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">Timeliness</div>
+                    <div style="font-size:12px; font-weight:800; color:#059669;" id="trendModalTime">100.0%</div>
+                </div>
+                <div
+                    style="background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:10px; padding:8px; text-align:center;">
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">Completeness</div>
+                    <div style="font-size:12px; font-weight:800; color:#059669;" id="trendModalComp">100%</div>
+                </div>
+            </div>
+
+            <button onclick="closeAhiTrendModal()"
+                style="width:100%; padding:10px 0; background:var(--primary-blue); color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
+                Tutup Informasi
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast-msg" id="toastMsg">
+        <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+        <span id="toastText">Aksi berhasil dilakukan</span>
+    </div>
+
+    <!-- Leaflet Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Sample dataset representing AHI & Non-AHI Inspection Parameters
+        const ahiParamsData = [
+            // Parameter AHI (Score & Index Calculation)
+            {
+                no: 1,
+                type: 'ahi',
+                subSistem: 'Primary Unit',
+                paramAnomali: 'Thermovisi Body Aset',
+                skor: '2 - Good',
+                skorClass: 'good',
+                noInspeksi: 'INS202601650195',
+                lastUpdate: '04 September 2026 13:39:29',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Suhu Titik Aset (T1)', value: '31.4 °C' },
+                    { label: 'Suhu Lingkungan / Pembanding (T2)', value: '30.3 °C' },
+                    { label: 'Perbedaan Suhu (ΔT)', value: '1.1 °C', highlight: true },
+                    { label: 'Kategori Kriteria Termal', value: 'Normal (ΔT < 5°C)' }
+                ],
+                keterangan: 'Hasil pengujian thermovisi menunjukkan perbedaan suhu ΔT sebesar 1.1°C (Kondisi Normal).'
+            },
+            {
+                no: 2,
+                type: 'ahi',
+                subSistem: 'Primary Unit',
+                paramAnomali: 'Kondisi Fisik LA - 8331114 - S',
+                skor: '2 - Good',
+                skorClass: 'good',
+                noInspeksi: 'INS202601662307',
+                lastUpdate: '02 September 2026 13:49:56',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Kondisi Housing Isolator', value: 'Bersih & Utuh' },
+                    { label: 'Baut Terminal & Klem', value: 'Kencang (85 Nm)' },
+                    { label: 'Disconnector / Spark Gap', value: 'Normal' },
+                    { label: 'Level Kontaminasi Polutan', value: 'Ringan (Level 1)' }
+                ],
+                keterangan: 'Fisik isolator keramik bersih, tidak ada retak, porcelain utuh, grounding kencang.'
+            },
+            {
+                no: 3,
+                type: 'ahi',
+                subSistem: 'Primary Unit',
+                paramAnomali: 'Pengukuran Arus Bocor (LCM) - S',
+                skor: '2 - Good',
+                skorClass: 'good',
+                noInspeksi: 'INS202600324818',
+                lastUpdate: '17 Maret 2026 09:02:30',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Arus Bocor Total (Itotal)', value: '0.14 mA', highlight: true },
+                    { label: 'Arus Resistif (Ir)', value: '18.2 µA' },
+                    { label: 'Harmonik ke-3 (I3rd)', value: '4.1 µA' },
+                    { label: 'Batas Standar CBM', value: '< 0.50 mA' }
+                ],
+                keterangan: 'Arus bocor total terukur 0.14 mA (Batas normal CBM < 0.5 mA).'
+            },
+            {
+                no: 4,
+                type: 'ahi',
+                subSistem: 'Dielectric',
+                paramAnomali: 'Tahanan Isolasi Primary Unit - S',
+                skor: '3 - Fair',
+                skorClass: 'fair',
+                noInspeksi: 'INS202500057113',
+                lastUpdate: '22 Februari 2025 00:10:25',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Tegangan Uji Megger', value: '5.000 V DC' },
+                    { label: 'Tahanan 1 Menit (R60s)', value: '8.50 GΩ', highlight: true },
+                    { label: 'Indeks Polarisasi (IP)', value: '1.42 (Fair)' },
+                    { label: 'Suhu / Kelembaban RH', value: '28°C / 68%' }
+                ],
+                keterangan: 'Tahanan isolasi 5kV mengalami sedikit penurunan ke 8.5 GΩ (Direkomendasikan cleaning isolator berkala).'
+            },
+            // Parameter Non AHI (Visual & Maintenance Inspection)
+            {
+                no: 1,
+                type: 'non_ahi',
+                subSistem: 'Mechanical & Support',
+                paramAnomali: 'Kondisi Struktur & Dudukan Pondasi',
+                skor: '1 - Normal',
+                skorClass: 'good',
+                noInspeksi: 'INS202601662308',
+                lastUpdate: '02 September 2026 13:50:12',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Leveling & Kemiringan', value: '0.0° (Tegak)' },
+                    { label: 'Torsi Baut Angkur Base', value: '120 Nm (Kencang)' },
+                    { label: 'Permukaan Beton Pondasi', value: 'Bebas Retak' }
+                ],
+                keterangan: 'Pondasi beton kokoh, baut pengikat tidak kendor atau berkarat.'
+            },
+            {
+                no: 2,
+                type: 'non_ahi',
+                subSistem: 'Grounding System',
+                paramAnomali: 'Kerapian & Baut Jalur Grounding',
+                skor: '1 - Normal',
+                skorClass: 'good',
+                noInspeksi: 'INS202601662309',
+                lastUpdate: '02 September 2026 13:51:00',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Tahanan Pentanahan', value: '0.32 Ω (< 1.0 Ω)', highlight: true },
+                    { label: 'Penampang Kawat BC', value: 'BC 50 mm²' },
+                    { label: 'Klem & Sepatu Kabel', value: 'Kencang & Bebas Korosi' }
+                ],
+                keterangan: 'Kawat grounding tembaga terpasang sempurna tanpa korosi.'
+            },
+            {
+                no: 3,
+                type: 'non_ahi',
+                subSistem: 'Safety & Environment',
+                paramAnomali: 'Papan Tanda Bahaya & K3 Bay',
+                skor: '1 - Normal',
+                skorClass: 'good',
+                noInspeksi: 'INS202601662310',
+                lastUpdate: '02 September 2026 13:52:15',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Rambu Bahaya Tegangan', value: 'Terpasang & Jelas' },
+                    { label: 'Plat Identifikasi Fasa', value: 'Fasa S (Kuning)' },
+                    { label: 'Batas Clearance Bay', value: 'Sesuai SPLN' }
+                ],
+                keterangan: 'Rambu K3 dan label identifikasi fasa jelas terbaca.'
+            },
+            {
+                no: 4,
+                type: 'non_ahi',
+                subSistem: 'Area Bay',
+                paramAnomali: 'Kebersihan Lingkungan Switchyard',
+                skor: '1 - Normal',
+                skorClass: 'good',
+                noInspeksi: 'INS202601662311',
+                lastUpdate: '02 September 2026 13:53:30',
+                accuracy: '100%',
+                timeliness: '100.0%',
+                completeness: '100%',
+                uraianIsian: [
+                    { label: 'Tinggi Vegetasi / Rumput', value: '0 cm (Bersih)' },
+                    { label: 'Saluran Drainase Sekitar', value: 'Lancar & Kering' },
+                    { label: 'Benda Asing / Sarang Hewan', value: 'Nihil' }
+                ],
+                keterangan: 'Bebas dari semak, air menggenang, dan benda asing di sekitar bay LA.'
+            }
+        ];
+        const pstAssetsData = [
+            {
+                id: 'PST-006',
+                jenisAset: 'Lightning Arrester (LA)',
+                category: 'Lightning Arrester',
+                techidentno: '16140265120000000001',
+                merk: 'Techfill',
+                type: 'Techfill - 70S',
+                serialId: '048826-12S',
+                status: 'Operasi',
+                statusClass: 'status-operasi',
+                ahiScore: '3 - Fair',
+                skorIndeks: '88.5',
+                kualitasData: '100.0%',
+                anomali: 'Sedang (In-Service Terpantau)',
+                rekomendasi: 'Cleaning isolator & pengujian berkala tahanan isolasi',
+                eqnumber: '-',
+                phasa: 'R',
+                consType: '-',
+                buatan: 'Swedia (ABB Group)',
+                kantorInduk: 'UP3B SUL',
+                upt: 'UPT Makassar',
+                ultg: 'Maros',
+                gardu: 'GI Maros 150kV',
+                bay: 'GITET MENUM 275kV BAY 6AB5 Diameter #5',
+                lat: -5.018921,
+                lng: 119.574102,
+                tglAwal: '10 Nov 2023',
+                tglAkhir: '-',
+                usiaOperasi: '2 Tahun 10 Bulan',
+                tahunDibuat: '2010',
+                usiaAset: '13 Tahun',
+                capex: 'Rp 2.450.000.000',
+                nbv: 'Rp 1.470.000.000',
+                depresiasi: 'Rp 980.000.000 (40.0%)',
+                opex: 'Rp 185.200.000'
+            },
+            {
+                id: 'PST-001',
+                jenisAset: 'Power Transformer (Trafo Tenaga)',
+                category: 'Trafo Tenaga',
+                techidentno: '161402651200000001',
+                merk: 'Unindo',
+                type: '60 MVA 150/20kV',
+                serialId: 'TR-UN-2018-9941',
+                status: 'Operasi',
+                statusClass: 'status-operasi',
+                ahiScore: '2 - Good',
+                kualitasData: '99.2%',
+                eqnumber: '10048190',
+                phasa: '3 Phasa',
+                consType: 'ONAN / ONAF',
+                buatan: 'Indonesia (Unindo France Tech)',
+                kantorInduk: 'UIT JBTB',
+                upt: 'UPT Surabaya',
+                ultg: 'ULTG Surabaya Utara',
+                gardu: 'GI WARU 150kV',
+                bay: 'Bay Trafo #1 150kV',
+                lat: -7.351210,
+                lng: 112.748315,
+                tglAwal: '15 Jan 2019',
+                tglAkhir: '-',
+                usiaOperasi: '7 Tahun 2 Bulan',
+                tahunDibuat: '2018',
+                usiaAset: '8 Tahun',
+                capex: 'Rp 18.500.000.000',
+                nbv: 'Rp 12.600.000.000',
+                depresiasi: 'Rp 5.900.000.000 (31.8%)',
+                opex: 'Rp 840.000.000'
+            },
+            {
+                id: 'PST-002',
+                jenisAset: 'Circuit Breaker (PMT)',
+                category: 'PMT',
+                techidentno: '161402651200000002',
+                merk: 'ABB',
+                type: 'LTB 170D1/B SF6',
+                serialId: 'CB-ABB-2020-0082',
+                status: 'Operasi',
+                statusClass: 'status-operasi',
+                ahiScore: '1 - Very Good',
+                kualitasData: '97.5%',
+                eqnumber: '10052301',
+                phasa: '3 Phasa',
+                consType: 'SF6 Gas Insulated',
+                buatan: 'Swedia',
+                kantorInduk: 'UIT JBTB',
+                upt: 'UPT Surabaya',
+                ultg: 'ULTG Surabaya Utara',
+                gardu: 'GI WARU 150kV',
+                bay: 'Bay Trafo #1 150kV',
+                lat: -7.351210,
+                lng: 112.748315,
+                tglAwal: '20 Mar 2020',
+                tglAkhir: '-',
+                usiaOperasi: '6 Tahun',
+                tahunDibuat: '2020',
+                usiaAset: '6 Tahun',
+                capex: 'Rp 1.850.000.000',
+                nbv: 'Rp 1.400.000.000',
+                depresiasi: 'Rp 450.000.000 (24.3%)',
+                opex: 'Rp 120.000.000'
+            }
+        ];
+
+        // Sample photos collection using reliable electrical substation image sources
+        const photoSources = [
+            'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&q=80',
+            'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300&q=80',
+            'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=300&q=80',
+            'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=300&q=80',
+            'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=300&q=80'
+        ];
+
+        let locationMap = null;
+        let locationMarker = null;
+
+        function initLocationMap() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const assetId = urlParams.get('id') || 'PST-006';
+            const asset = pstAssetsData.find(a => a.id.toLowerCase() === assetId.toLowerCase()) || pstAssetsData[0];
+
+            const lat = asset.lat || -5.018921;
+            const lng = asset.lng || 119.574102;
+            const garduName = asset.gardu || 'GI Maros 150kV';
+            const bayName = asset.bay || 'Bay Koridor Transmisi';
+
+            const mapEl = document.getElementById('assetLocationMap');
+            if (!mapEl || typeof L === 'undefined') return;
+
+            if (!locationMap) {
+                locationMap = L.map('assetLocationMap', {
+                    zoomControl: false,
+                    attributionControl: false
+                }).setView([lat, lng], 15);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19
+                }).addTo(locationMap);
+
+                // Add zoom control at bottom-right
+                L.control.zoom({ position: 'bottomright' }).addTo(locationMap);
+
+                // Custom pin icon with pulse effect
+                const pinIcon = L.divIcon({
+                    className: 'custom-substation-pin',
+                    html: `<div style="background: linear-gradient(135deg, #0284c7, #1a65d6); color: #ffffff; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(26,101,214,0.45); border: 2.5px solid #ffffff; font-size: 15px;"><i class="fa-solid fa-bolt"></i></div>`,
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17],
+                    popupAnchor: [0, -18]
+                });
+
+                locationMarker = L.marker([lat, lng], { icon: pinIcon }).addTo(locationMap);
+                locationMarker.bindPopup(`<div style="font-size:12px; font-weight:700; color:#0f172a; margin-bottom:2px;"><i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> ${garduName}</div><div style="font-size:10.5px; color:#64748b;">${bayName}</div>`).openPopup();
+            } else {
+                locationMap.setView([lat, lng], 15);
+                if (locationMarker) {
+                    locationMarker.setLatLng([lat, lng]);
+                    locationMarker.setPopupContent(`<div style="font-size:12px; font-weight:700; color:#0f172a; margin-bottom:2px;"><i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> ${garduName}</div><div style="font-size:10.5px; color:#64748b;">${bayName}</div>`);
+                }
+            }
+
+            setTimeout(() => {
+                if (locationMap) locationMap.invalidateSize();
+            }, 100);
+
+            if (document.getElementById('mapBadgeText')) {
+                document.getElementById('mapBadgeText').textContent = garduName;
+            }
+            if (document.getElementById('mapExternalLink')) {
+                document.getElementById('mapExternalLink').href = `https://maps.google.com/?q=${lat},${lng}`;
+            }
+        }
+
+        function initPage() {
+            // Read query param ?id=...
+            const urlParams = new URLSearchParams(window.location.search);
+            const assetId = urlParams.get('id') || 'PST-006';
+
+            // Find matching asset
+            const asset = pstAssetsData.find(a => a.id.toLowerCase() === assetId.toLowerCase()) || pstAssetsData[0];
+
+            // Render asset details
+            document.getElementById('assetName').textContent = asset.jenisAset;
+            if (document.getElementById('topHeaderTitle')) document.getElementById('topHeaderTitle').textContent = 'Detail Aset';
+            document.getElementById('assetTechidentno').textContent = asset.techidentno;
+            document.getElementById('assetMerkType').textContent = `${asset.merk} - ${asset.type}`;
+            document.getElementById('assetSerialId').textContent = `SN: ${asset.serialId}`;
+            document.getElementById('assetStatusText').textContent = asset.status;
+
+            const gi = asset.gardu || 'GI Waru 150kV';
+            const bay = asset.bay || 'Bay Line 1';
+            const shortBay = bay.length > 24 ? bay.substring(0, 24) + '...' : bay;
+            if (document.getElementById('assetHeroLocation')) {
+                document.getElementById('assetHeroLocation').textContent = `${gi} • ${shortBay}`;
+            }
+
+            // Bind Top & Bottom AHI and Data Quality Indicators (Synchronized)
+            const ahiScore = asset.ahiScore || '3 - Fair';
+            const kualitasData = asset.kualitasData || '100.0%';
+            const skorIndeks = asset.skorIndeks || '88.5';
+            const isFair = ahiScore.toLowerCase().includes('fair') || ahiScore.includes('3');
+
+            // 1. Top KPI Summary Cards
+            if (document.getElementById('ahiScore')) document.getElementById('ahiScore').textContent = ahiScore;
+            if (document.getElementById('ahiScoreSub')) {
+                document.getElementById('ahiScoreSub').innerHTML = `<i class="fa-solid fa-chart-line"></i> Skor Indeks ${skorIndeks}`;
+            }
+            if (document.getElementById('ahiConditionBadge')) {
+                document.getElementById('ahiConditionBadge').textContent = isFair ? 'Perlu Perhatian' : 'Kondisi Prima';
+                document.getElementById('ahiConditionBadge').style.color = isFair ? '#d97706' : '#059669';
+                document.getElementById('ahiConditionBadge').style.background = isFair ? 'rgba(217, 119, 6, 0.1)' : 'rgba(5, 150, 105, 0.1)';
+                document.getElementById('ahiConditionBadge').style.borderColor = isFair ? 'rgba(217, 119, 6, 0.25)' : 'rgba(5, 150, 105, 0.25)';
+            }
+            if (document.getElementById('ahiDot')) {
+                document.getElementById('ahiDot').style.background = isFair ? '#d97706' : '#059669';
+                document.getElementById('ahiDot').style.boxShadow = isFair ? '0 0 0 3px rgba(217, 119, 6, 0.2)' : '0 0 0 3px rgba(5, 150, 105, 0.2)';
+            }
+            if (document.getElementById('kualitasDataScore')) document.getElementById('kualitasDataScore').textContent = kualitasData;
+
+            // Details
+            document.getElementById('valEqnumber').textContent = asset.eqnumber || '-';
+            document.getElementById('valPhasa').textContent = asset.phasa || '-';
+            document.getElementById('valConsType').textContent = asset.consType || '-';
+            document.getElementById('valBuatan').textContent = asset.buatan || '-';
+            document.getElementById('valKantorInduk').textContent = asset.kantorInduk || 'UP3B SUL';
+            document.getElementById('valUpt').textContent = asset.upt || 'UPT Makassar';
+            document.getElementById('valUltg').textContent = asset.ultg || 'Maros';
+            document.getElementById('valGardu').textContent = asset.gardu || 'GI Maros 150kV';
+            document.getElementById('valBay').textContent = asset.bay || 'GITET MENUM 275kV BAY 6AB5 Diameter #5';
+            if (document.getElementById('topHeaderSub')) document.getElementById('topHeaderSub').textContent = asset.gardu || 'Peralatan Transmisi';
+
+            // Bind Organisasi & Lokasi Tab
+            if (document.getElementById('orgValKantorInduk')) document.getElementById('orgValKantorInduk').textContent = asset.kantorInduk || 'UP3B SUL';
+            if (document.getElementById('orgValUpt')) document.getElementById('orgValUpt').textContent = asset.upt || 'UPT Makassar';
+            if (document.getElementById('orgValUltg')) document.getElementById('orgValUltg').textContent = asset.ultg || 'Maros';
+            if (document.getElementById('orgValGardu')) document.getElementById('orgValGardu').textContent = asset.gardu || 'GI Maros 150kV';
+            if (document.getElementById('orgValBay')) document.getElementById('orgValBay').textContent = asset.bay || 'GITET MENUM 275kV BAY 6AB5 Diameter #5';
+
+            // Bind Bottom AHI Tab Overview
+            if (document.getElementById('ahiOverviewMaxBadge')) {
+                document.getElementById('ahiOverviewMaxBadge').className = `ahi-badge-score ${isFair ? 'fair' : 'good'}`;
+                document.getElementById('ahiOverviewMaxBadge').textContent = `MAX AHI: ${ahiScore}`;
+            }
+            if (document.getElementById('ahiValScore')) {
+                document.getElementById('ahiValScore').style.color = isFair ? '#d97706' : '#059669';
+                document.getElementById('ahiValScore').textContent = `${ahiScore} (${isFair ? 'Perlu Perhatian' : 'Prima'})`;
+            }
+            if (document.getElementById('ahiValIndexScore')) {
+                document.getElementById('ahiValIndexScore').textContent = `${skorIndeks} / 100`;
+            }
+            if (document.getElementById('ahiValQuality')) {
+                document.getElementById('ahiValQuality').textContent = `${kualitasData} (Valid)`;
+            }
+            if (document.getElementById('ahiValAnomaly') && asset.anomali) {
+                document.getElementById('ahiValAnomaly').textContent = asset.anomali;
+            }
+            if (document.getElementById('ahiValRec') && asset.rekomendasi) {
+                document.getElementById('ahiValRec').textContent = asset.rekomendasi;
+            }
+
+            document.getElementById('valTglAwal').textContent = asset.tglAwal || '10 Nov 2023';
+            document.getElementById('valTglAkhir').textContent = asset.tglAkhir || '-';
+            document.getElementById('valUsiaOperasi').textContent = asset.usiaOperasi || '2 Tahun';
+            document.getElementById('valTahunDibuat').textContent = asset.tahunDibuat || '2010';
+            document.getElementById('valUsiaAset').textContent = asset.usiaAset || '13 Tahun';
+
+            if (asset.capex) document.getElementById('valCapex').textContent = asset.capex;
+            if (asset.nbv) document.getElementById('valNbv').textContent = asset.nbv;
+            if (asset.depresiasi) document.getElementById('valDepresiasi').textContent = asset.depresiasi;
+            if (asset.opex) document.getElementById('valOpex').textContent = asset.opex;
+
+            // Render photo grids
+            renderPhotoGrids();
+
+            // Init location map
+            initLocationMap();
+
+            // Render AHI & Non-AHI Inspection Tables
+            renderAhiTables();
+
+            // Render Lifecycle Audit Logs
+            renderAuditLogs();
+
+            // Init dark mode
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            }
+        }
+
+        /* ================= AHI LOGIC & INTERACTIVITY ================= */
+        let activeAhiFilter = 'all';
+        let activeAhiSearchQuery = '';
+        let ahiLoadingTimer = null;
+
+        function showAhiLoader(duration = 280, onComplete) {
+            const loader = document.getElementById('ahiLoadingState');
+            const container = document.getElementById('ahiParamsContainer');
+            if (loader && container) {
+                loader.style.display = 'flex';
+                container.style.display = 'none';
+            }
+            if (ahiLoadingTimer) clearTimeout(ahiLoadingTimer);
+            ahiLoadingTimer = setTimeout(() => {
+                if (loader && container) {
+                    loader.style.display = 'none';
+                    container.style.display = 'flex';
+                }
+                if (onComplete) onComplete();
+            }, duration);
+        }
+
+        function switchAhiSubTab(viewKey) {
+            const btnOverview = document.getElementById('ahiNavOverview');
+            const btnDetail = document.getElementById('ahiNavDetailParam');
+            const viewOverview = document.getElementById('ahiViewOverview');
+            const viewDetail = document.getElementById('ahiViewDetailParam');
+
+            if (viewKey === 'overview') {
+                btnOverview.classList.add('active');
+                btnDetail.classList.remove('active');
+                viewOverview.style.display = 'flex';
+                viewDetail.style.display = 'none';
+                showToast('Menampilkan ringkasan status AHI aset', 'fa-heart-pulse');
+            } else {
+                btnOverview.classList.remove('active');
+                btnDetail.classList.add('active');
+                viewOverview.style.display = 'none';
+                viewDetail.style.display = 'flex';
+                showAhiLoader(300, () => {
+                    renderAhiTables();
+                });
+                showToast('Menampilkan detail parameter AHI & Non AHI', 'fa-list-check');
+            }
+        }
+
+        function setAhiFilter(filterType, btn) {
+            activeAhiFilter = filterType;
+            document.querySelectorAll('.ahi-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            showAhiLoader(220, () => {
+                renderAhiTables();
+            });
+        }
+
+        function filterAhiParams(query) {
+            activeAhiSearchQuery = (query || '').toLowerCase().trim();
+            renderAhiTables();
+        }
+
+        function loadMoreAhiParams() {
+            const btn = document.getElementById('btnLoadMoreParams');
+            if (!btn) return;
+
+            btn.innerHTML = `<div class="ahi-spinner" style="width:14px; height:14px; border-width:2px;"></div> Memuat riwayat parameter...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                ahiParamsData.push(
+                    {
+                        no: 5,
+                        type: 'ahi',
+                        subSistem: 'Dielectric',
+                        paramAnomali: 'Uji Tangen Delta Isolator LA (Tan δ)',
+                        skor: '1 - Very Good',
+                        skorClass: 'good',
+                        noInspeksi: 'INS202400812930',
+                        lastUpdate: '10 Oktober 2024 10:15:00',
+                        accuracy: '100%',
+                        timeliness: '100.0%',
+                        completeness: '100%',
+                        keterangan: 'Nilai dielectric dissipation factor 0.35% memenuhi batas normal IEEE Std.'
+                    },
+                    {
+                        no: 5,
+                        type: 'non_ahi',
+                        subSistem: 'Mechanical & Support',
+                        paramAnomali: 'Pengecekan Counter Surge Arrester',
+                        skor: '1 - Normal',
+                        skorClass: 'good',
+                        noInspeksi: 'INS202400812931',
+                        lastUpdate: '10 Oktober 2024 10:20:00',
+                        accuracy: '100%',
+                        timeliness: '100.0%',
+                        completeness: '100%',
+                        keterangan: 'Counter bekerja normal, tercatat 12 kali pelepasan arus impuls petir.'
+                    }
+                );
+
+                renderAhiTables();
+                btn.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#059669;"></i> Semua Riwayat Inspeksi Terkini Dimuat`;
+                btn.style.color = '#059669';
+                btn.style.borderColor = '#059669';
+                showToast('Berhasil memuat data riwayat parameter inspeksi', 'fa-circle-check');
+            }, 600);
+        }
+
+        function toggleAhiFilterChips() {
+            const chips = document.getElementById('ahiFilterChips');
+            if (chips) {
+                chips.style.display = (chips.style.display === 'none') ? 'flex' : 'none';
+            }
+        }
+
+        function toggleAhiCardExpand(el) {
+            el.classList.toggle('expanded');
+        }
+
+        function renderAhiTables() {
+            const cardsAhi = document.getElementById('cardsParamAhi');
+            const cardsNonAhi = document.getElementById('cardsParamNonAhi');
+            const sectionAhi = document.getElementById('sectionParamAhi');
+            const sectionNonAhi = document.getElementById('sectionParamNonAhi');
+
+            if (!cardsAhi || !cardsNonAhi) return;
+
+            // Filter data
+            const filteredAhi = ahiParamsData.filter(item => {
+                if (item.type !== 'ahi') return false;
+                if (activeAhiFilter === 'non_ahi') return false;
+                if (activeAhiFilter === 'fair' && !item.skor.includes('Fair')) return false;
+                if (activeAhiSearchQuery) {
+                    const matchName = item.paramAnomali.toLowerCase().includes(activeAhiSearchQuery);
+                    const matchSub = item.subSistem.toLowerCase().includes(activeAhiSearchQuery);
+                    const matchIns = item.noInspeksi.toLowerCase().includes(activeAhiSearchQuery);
+                    return matchName || matchSub || matchIns;
+                }
+                return true;
+            });
+
+            const filteredNonAhi = ahiParamsData.filter(item => {
+                if (item.type !== 'non_ahi') return false;
+                if (activeAhiFilter === 'ahi' || activeAhiFilter === 'fair') return false;
+                if (activeAhiSearchQuery) {
+                    const matchName = item.paramAnomali.toLowerCase().includes(activeAhiSearchQuery);
+                    const matchSub = item.subSistem.toLowerCase().includes(activeAhiSearchQuery);
+                    const matchIns = item.noInspeksi.toLowerCase().includes(activeAhiSearchQuery);
+                    return matchName || matchSub || matchIns;
+                }
+                return true;
+            });
+
+            // Toggle sections display
+            if (sectionAhi) sectionAhi.style.display = (filteredAhi.length === 0 && activeAhiFilter === 'non_ahi') ? 'none' : 'block';
+            if (sectionNonAhi) sectionNonAhi.style.display = (filteredNonAhi.length === 0 && (activeAhiFilter === 'ahi' || activeAhiFilter === 'fair')) ? 'none' : 'block';
+
+            // 1. RENDER AHI CARDS
+            if (filteredAhi.length === 0) {
+                cardsAhi.innerHTML = `<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:11.5px;">Tidak ada parameter AHI yang cocok.</div>`;
+            } else {
+                cardsAhi.innerHTML = filteredAhi.map(p => {
+                    const metricsHtml = p.uraianIsian ? `
+                        <div class="ahi-param-metrics-table">
+                            ${p.uraianIsian.map(m => `
+                                <div class="ahi-metric-row">
+                                    <span class="ahi-metric-label">${m.label}</span>
+                                    <span class="ahi-metric-val ${m.highlight ? 'highlight-amber' : ''}">${m.value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="ahi-item-card" onclick="toggleAhiCardExpand(this)">
+                            <div class="ahi-card-top-row">
+                                <span class="ahi-card-subsys">${p.subSistem}</span>
+                                <span class="ahi-badge-score ${p.skorClass}">
+                                    ${p.skor} <i class="fa-solid fa-circle-info" style="font-size:10px;"></i>
+                                </span>
+                            </div>
+                            <div class="ahi-card-title">${p.paramAnomali}</div>
+                            <div class="ahi-card-meta-row">
+                                <span><i class="fa-solid fa-file-lines" style="color:var(--primary-blue);"></i> <strong class="ahi-card-ins-badge">${p.noInspeksi}</strong></span>
+                                <span><i class="fa-regular fa-clock"></i> ${p.lastUpdate}</span>
+                            </div>
+                            <div class="ahi-card-quality-grid">
+                                <div class="ahi-quality-pill">
+                                    <div class="ahi-quality-label">Accuracy</div>
+                                    <div class="ahi-quality-val">${p.accuracy}</div>
+                                </div>
+                                <div class="ahi-quality-pill">
+                                    <div class="ahi-quality-label">Timeliness</div>
+                                    <div class="ahi-quality-val">${p.timeliness}</div>
+                                </div>
+                                <div class="ahi-quality-pill">
+                                    <div class="ahi-quality-label">Completeness</div>
+                                    <div class="ahi-quality-val">${p.completeness}</div>
+                                </div>
+                            </div>
+                            <div class="ahi-card-expandable">
+                                <div style="font-weight:800; color:var(--text-dark); margin-bottom:6px; font-size:11px; display:flex; align-items:center; gap:5px;">
+                                    <i class="fa-solid fa-clipboard-list" style="color:var(--primary-blue);"></i> Detail Uraian Isian Parameter:
+                                </div>
+                                ${metricsHtml}
+                                <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border-color);">
+                                    <div style="font-weight:700; color:var(--text-dark); margin-bottom:2px; font-size:10.5px;">Catatan Hasil Pengujian:</div>
+                                    <div style="font-size:10.5px; color:var(--text-muted);">${p.keterangan}</div>
+                                </div>
+                                <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:9.5px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">No: ${p.noInspeksi}</span>
+                                    <span style="font-size:10px; color:var(--primary-blue); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Terverifikasi Sistem</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 2. RENDER NON-AHI CARDS
+            if (filteredNonAhi.length === 0) {
+                cardsNonAhi.innerHTML = `<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:11.5px;">Tidak ada parameter Non AHI yang cocok.</div>`;
+            } else {
+                cardsNonAhi.innerHTML = filteredNonAhi.map(p => {
+                    const metricsHtml = p.uraianIsian ? `
+                        <div class="ahi-param-metrics-table">
+                            ${p.uraianIsian.map(m => `
+                                <div class="ahi-metric-row">
+                                    <span class="ahi-metric-label">${m.label}</span>
+                                    <span class="ahi-metric-val ${m.highlight ? 'highlight-amber' : ''}">${m.value}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="ahi-item-card" onclick="toggleAhiCardExpand(this)">
+                            <div class="ahi-card-top-row">
+                                <span class="ahi-card-subsys" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1;">${p.subSistem}</span>
+                                <span class="ahi-badge-score ${p.skorClass}">
+                                    ${p.skor} <i class="fa-solid fa-circle-info" style="font-size:10px;"></i>
+                                </span>
+                            </div>
+                            <div class="ahi-card-title">${p.paramAnomali}</div>
+                            <div class="ahi-card-meta-row">
+                                <span><i class="fa-solid fa-file-lines" style="color:var(--primary-blue);"></i> <strong class="ahi-card-ins-badge">${p.noInspeksi}</strong></span>
+                                <span><i class="fa-regular fa-clock"></i> ${p.lastUpdate}</span>
+                            </div>
+                            <div class="ahi-card-quality-grid">
+                                <div class="ahi-quality-pill">
+                                    <div class="ahi-quality-label">Accuracy</div>
+                                    <div class="ahi-quality-val">${p.accuracy}</div>
+                                </div>
+                                <div class="ahi-quality-pill">
+                                    <div class="ahi-quality-label">Timeliness</div>
+                                    <div class="ahi-quality-val">${p.timeliness}</div>
+                                </div>
+                                <div class="ahi-quality-pill">
+                                    <div class="ahi-quality-label">Completeness</div>
+                                    <div class="ahi-quality-val">${p.completeness}</div>
+                                </div>
+                            </div>
+                            <div class="ahi-card-expandable">
+                                <div style="font-weight:800; color:var(--text-dark); margin-bottom:6px; font-size:11px; display:flex; align-items:center; gap:5px;">
+                                    <i class="fa-solid fa-clipboard-list" style="color:var(--accent-green);"></i> Detail Uraian Isian Inspeksi:
+                                </div>
+                                ${metricsHtml}
+                                <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border-color);">
+                                    <div style="font-weight:700; color:var(--text-dark); margin-bottom:2px; font-size:10.5px;">Catatan Hasil Inspeksi:</div>
+                                    <div style="font-size:10.5px; color:var(--text-muted);">${p.keterangan}</div>
+                                </div>
+                                <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:9.5px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">No: ${p.noInspeksi}</span>
+                                    <span style="font-size:10px; color:var(--accent-green); font-weight:700;"><i class="fa-solid fa-circle-check"></i> Kondisi Memenuhi Standar</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function openAhiTrendModal(noInspeksi) {
+            const param = ahiParamsData.find(p => p.noInspeksi === noInspeksi) || ahiParamsData[0];
+            document.getElementById('trendModalSubsystem').textContent = param.subSistem;
+            document.getElementById('trendModalTitle').textContent = param.paramAnomali;
+            document.getElementById('trendModalInsNo').textContent = param.noInspeksi;
+
+            const scoreEl = document.getElementById('trendModalScore');
+            scoreEl.className = `ahi-badge-score ${param.skorClass}`;
+            scoreEl.innerHTML = `${param.skor} <i class="fa-solid fa-circle-info"></i>`;
+
+            document.getElementById('trendModalDate').textContent = param.lastUpdate;
+            document.getElementById('trendModalDesc').textContent = param.keterangan;
+            document.getElementById('trendModalAcc').textContent = param.accuracy;
+            document.getElementById('trendModalTime').textContent = param.timeliness;
+            document.getElementById('trendModalComp').textContent = param.completeness;
+
+            document.getElementById('ahiTrendModal').classList.add('active');
+        }
+
+        function closeAhiTrendModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('ahiTrendModal').classList.remove('active');
+        }
+
+        /* ================= AUDIT LOG & LIFECYCLE DATA ================= */
+        const auditLogsData = [
+            {
+                id: 'AUD-2026-08',
+                category: 'alert_ahi',
+                badgeClass: 'badge-lokasi',
+                badgeText: 'Alert MAX AHI',
+                dotClass: 'dot-lokasi',
+                icon: 'fa-triangle-exclamation',
+                title: 'Alert Pembaruan MAX AHI: Indeks Disesuaikan ke 3 - Fair',
+                time: '24 Feb 2026, 14:00',
+                user: 'Sistem Integrasi CBM & Pemeliharaan Terpadu',
+                diff: [
+                    { label: 'Indeks AHI Sebelumnya', value: '1 - Very Good' },
+                    { label: 'Indeks AHI Baru (MAX)', value: '3 - Fair (Perlu Perhatian)' },
+                    { label: 'Pemicu Penyesuaian', value: 'Tahanan Isolasi Mengalami Penurunan' }
+                ],
+                desc: 'Notifikasi otomatis perubahan batas skor kesehatan aset (MAX AHI) hasil sinkronisasi data sistem uji diagnostik transmisi.',
+                docRef: 'INTEG-AHI/2026/02/ALRT-89'
+            },
+            {
+                id: 'AUD-2026-07',
+                category: 'valuasi_roa',
+                badgeClass: 'badge-roa',
+                badgeText: 'Pencatatan RoA',
+                dotClass: 'dot-roa',
+                icon: 'fa-chart-line',
+                title: 'Pencatatan Indeks Return on Assets (RoA) Q4-2025',
+                time: '20 Feb 2026, 10:15',
+                user: 'Rendy Pratama (Analis Keuangan Aset)',
+                diff: [
+                    { label: 'Rasio RoA Terkini', value: '14.8% (Target > 12.0%)' },
+                    { label: 'Kontribusi Penyaluran', value: 'Rp 362.500.000 / Thn' },
+                    { label: 'Tingkat Utilisasi Aset', value: '99.8% (EAF Sangat Tinggi)' }
+                ],
+                desc: 'Pencatatan evaluasi rasio keuangan dan produktivitas aset transmisi periode akhir tahun 2025.',
+                docRef: 'LAP-ROA/2026/Q4-SUL-092'
+            },
+            {
+                id: 'AUD-2026-06',
+                category: 'valuasi_roa',
+                badgeClass: 'badge-valuasi',
+                badgeText: 'Pencatatan Valuasi',
+                dotClass: 'dot-valuasi',
+                icon: 'fa-coins',
+                title: 'Penyesuaian Nilai Buku (NBV) & Depresiasi Tahunan',
+                time: '14 Jan 2026, 09:30',
+                user: 'Siti Rahma (Tim Akuntansi Aset Transmisi)',
+                diff: [
+                    { label: 'Nilai Buku Sebelum', value: 'Rp 1.715.000.000' },
+                    { label: 'Nilai Buku Sesudah (NBV)', value: 'Rp 1.470.000.000' },
+                    { label: 'Akumulasi Depresiasi', value: 'Rp 980.000.000 (40.0%)' }
+                ],
+                desc: 'Penyesuaian nilai buku bersih (NBV) aset dan pembebanan amortisasi depresiasi aktiva tetap tahun 2025.',
+                docRef: 'BA-VAL/2026/01-TRM/042'
+            },
+            {
+                id: 'AUD-2025-05',
+                category: 'info_file',
+                badgeClass: 'badge-informasi',
+                badgeText: 'Pembaruan Foto & File',
+                dotClass: 'dot-informasi',
+                icon: 'fa-file-arrow-up',
+                title: 'Unggah Foto Nameplate HD & Dokumen Manual Book Pabrikan',
+                time: '12 Des 2025, 11:30',
+                user: 'Bayu Wicaksono (Admin Logistik & Fasilitas)',
+                diff: [
+                    { label: 'Dokumen Diunggah', value: 'Manual-ABB-Techfill-70S.pdf (2.4 MB)' },
+                    { label: 'Foto Nameplate Baru', value: '10 Foto Resolusi Tinggi (Tervalidasi)' },
+                    { label: 'Status Kelengkapan', value: '100% Sesuai Standar PST' }
+                ],
+                desc: 'Pembaruan berkas dokumentasi fisik nameplate digital dan penambahan lampiran petunjuk pemeliharaan pabrikan.',
+                docRef: 'DOK-LAMP/2025/12-PST'
+            },
+            {
+                id: 'AUD-2025-04',
+                category: 'info_file',
+                badgeClass: 'badge-informasi',
+                badgeText: 'Perubahan Info Aset',
+                dotClass: 'dot-informasi',
+                icon: 'fa-pen-to-square',
+                title: 'Pembaruan Spesifikasi & Nomor Seri Peralatan',
+                time: '15 Okt 2025, 09:45',
+                user: 'Ilham Wahyudi (Spesialis Pemeliharaan UPT Makassar)',
+                diff: [
+                    { label: 'Nomor Seri (Serial ID)', value: '048826-12S (Tervalidasi)' },
+                    { label: 'Tegangan Nominal (Ur)', value: '170 kV rms' },
+                    { label: 'Continuous Voltage (Uc)', value: '120 kV' }
+                ],
+                desc: 'Pemutakhiran atribut spesifikasi kelistrikan dan sinkronisasi nomor seri fisik pada master catalog aset.',
+                docRef: 'REV-INFO/2025/10-UPT'
+            },
+            {
+                id: 'AUD-2024-03',
+                category: 'mutasi_lokasi',
+                badgeClass: 'badge-mutasi',
+                badgeText: 'Mutasi Aset',
+                dotClass: 'dot-mutasi',
+                icon: 'fa-truck-ramp-box',
+                title: 'Mutasi Tanggung Jawab Operasional ke ULTG Maros',
+                time: '18 Agu 2024, 11:00',
+                user: 'Bagus Sudrajat (Manager Rendal Har Transmisi)',
+                diff: [
+                    { label: 'Unit Asal', value: 'ULTG Panakkukang' },
+                    { label: 'Unit Pengelola Baru', value: 'ULTG Maros' },
+                    { label: 'Cost Center Baru', value: 'CC-UPT-MKS-MAROS-01' }
+                ],
+                desc: 'Pengalihan wewenang pemeliharaan dan pengoperasian aset bay arrester sesuai restrukturisasi wilayah kerja.',
+                docRef: 'SK-DIR/MUT-TRM/2024/08/910'
+            },
+            {
+                id: 'AUD-2024-02',
+                category: 'mutasi_lokasi',
+                badgeClass: 'badge-lokasi',
+                badgeText: 'Pergantian Lokasi',
+                dotClass: 'dot-lokasi',
+                icon: 'fa-location-crosshairs',
+                title: 'Pergantian Lokasi Bay & Pemutakhiran Geotagging GIS',
+                time: '19 Mei 2024, 11:20',
+                user: 'Dimas Arya (Surveyor GIS Transmisi)',
+                diff: [
+                    { label: 'Penempatan Lama', value: 'Bay 6AB4 (Temporary)' },
+                    { label: 'Penempatan Baru', value: 'Bay 6AB5 Diameter #5' },
+                    { label: 'Koordinat GPS', value: '-5.018921, 119.574102' }
+                ],
+                desc: 'Relokasi penempatan fisik dari bay temporer ke bay permanen diameter #5 dan sinkronisasi titik peta GIS.',
+                docRef: 'BAST-GIS-2024-0519'
+            },
+            {
+                id: 'AUD-2024-01',
+                category: 'pelepasan',
+                badgeClass: 'badge-pelepasan',
+                badgeText: 'Kajian Pelepasan / Disposal',
+                dotClass: 'dot-pelepasan',
+                icon: 'fa-triangle-exclamation',
+                title: 'Kajian Teknis Siklus Hidup & Status Kelayakan Operasi',
+                time: '05 Jan 2024, 16:45',
+                user: 'Tim Manajemen Aset Divisi Transmisi Pusat',
+                diff: [
+                    { label: 'Status Usulan', value: 'Laik Operasi (Tidak Dilepas)' },
+                    { label: 'Estimasi Sisa Umur', value: '12 Tahun (Target 25 Tahun)' },
+                    { label: 'Jadwal Disposal / Scrap', value: 'Belum Dijadwalkan' }
+                ],
+                desc: 'Evaluasi berkala kelayakan operasi aset transmisi untuk memastikan keandalan switchyard sebelum batas depresiasi habis.',
+                docRef: 'KAJIAN-DISP/2024/01-MGR'
+            }
+        ];
+
+        let activeAuditFilter = 'all';
+
+        function filterAuditLogs(category, btn) {
+            activeAuditFilter = category;
+            document.querySelectorAll('.audit-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderAuditLogs();
+        }
+
+        function renderAuditLogs() {
+            const listEl = document.getElementById('auditTimelineList');
+            if (!listEl) return;
+
+            const filtered = auditLogsData.filter(item => {
+                if (activeAuditFilter === 'all') return true;
+                if (activeAuditFilter === 'info_file' && item.category === 'info_file') return true;
+                if (activeAuditFilter === 'alert_ahi' && item.category === 'alert_ahi') return true;
+                if (activeAuditFilter === 'mutasi_lokasi' && item.category === 'mutasi_lokasi') return true;
+                if (activeAuditFilter === 'valuasi_roa' && item.category === 'valuasi_roa') return true;
+                if (activeAuditFilter === 'pelepasan' && item.category === 'pelepasan') return true;
+                return false;
+            });
+
+            const badgeTotal = document.getElementById('auditTotalBadge');
+            if (badgeTotal) badgeTotal.textContent = `${filtered.length} Peristiwa`;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div style="padding:16px; text-align:center; color:var(--text-muted); font-size:11.5px;">Tidak ada riwayat audit pada kategori ini.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(item => `
+                <div class="timeline-item">
+                    <div class="timeline-dot ${item.dotClass}"></div>
+                    <div class="timeline-header-row">
+                        <span class="audit-badge ${item.badgeClass}">
+                            <i class="fa-solid ${item.icon}"></i> ${item.badgeText}
+                        </span>
+                        <span class="timeline-time"><i class="fa-regular fa-clock"></i> ${item.time}</span>
+                    </div>
+                    <div class="timeline-title">${item.title}</div>
+                    <div style="font-size:10.5px; color:var(--text-muted); font-weight:600;">
+                        <i class="fa-solid fa-user-pen" style="color:var(--primary-blue);"></i> Oleh: ${item.user}
+                    </div>
+
+                    <!-- Diff Table -->
+                    <div class="audit-diff-box">
+                        ${item.diff.map(d => `
+                            <div class="audit-diff-row">
+                                <span class="audit-diff-label">${d.label}</span>
+                                <span class="audit-diff-val">${d.value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="timeline-desc">${item.desc}</div>
+
+                    <div class="audit-footer-ref">
+                        <span><i class="fa-solid fa-file-contract"></i> Ref: <strong style="font-family:'JetBrains Mono',monospace;">${item.docRef}</strong></span>
+                        <span style="color:#059669; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Audit Terverifikasi</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPhotoGrids() {
+            // Render 10 Foto Fisik
+            const gridFisik = document.getElementById('gridFotoFisik');
+            gridFisik.innerHTML = Array.from({ length: 10 }).map((_, i) => {
+                const src = photoSources[i % photoSources.length];
+                return `
+                    <div class="photo-thumb" onclick="openLightbox('${src}', 'Foto Fisik Aset #${i + 1}', 'Dokumentasi fisik Lightning Arrester gardu induk.')">
+                        <img src="${src}" alt="Foto Fisik ${i + 1}" loading="lazy">
+                        <div class="thumb-overlay"><i class="fa-solid fa-expand"></i></div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render 10 Foto Nameplate
+            const gridNameplate = document.getElementById('gridFotoNameplate');
+            gridNameplate.innerHTML = Array.from({ length: 10 }).map((_, i) => {
+                const src = photoSources[(i + 2) % photoSources.length];
+                return `
+                    <div class="photo-thumb" onclick="openLightbox('${src}', 'Foto Nameplate Spesifikasi #${i + 1}', 'Nameplate serial, rating tegangan, dan pabrikan manufaktur.')">
+                        <img src="${src}" alt="Foto Nameplate ${i + 1}" loading="lazy">
+                        <div class="thumb-overlay"><i class="fa-solid fa-expand"></i></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        let currentSubPill = 'umum';
+
+        function switchMainTab(tabKey, btn) {
+            document.querySelectorAll('.cat-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const subPills = document.getElementById('subPillsWrap');
+            const tabUmum = document.getElementById('tabContentUmum');
+            const tabSpesifikasi = document.getElementById('tabContentSpesifikasi');
+            const tabLampiran = document.getElementById('tabContentLampiran');
+            const tabOrgLokasi = document.getElementById('tabContentOrgLokasi');
+            const tabAhi = document.getElementById('tabContentAhi');
+            const tabRiwayat = document.getElementById('tabContentRiwayat');
+
+            // Hide all tab contents
+            [tabUmum, tabSpesifikasi, tabLampiran, tabOrgLokasi, tabAhi, tabRiwayat].forEach(el => {
+                if (el) el.style.display = 'none';
+            });
+
+            if (tabKey === 'data_aset') {
+                subPills.style.display = 'flex';
+                if (currentSubPill === 'umum') tabUmum.style.display = 'flex';
+                else if (currentSubPill === 'spesifikasi') tabSpesifikasi.style.display = 'flex';
+                else if (currentSubPill === 'lampiran') tabLampiran.style.display = 'flex';
+            } else {
+                subPills.style.display = 'none';
+                if (tabKey === 'org_lokasi') {
+                    tabOrgLokasi.style.display = 'flex';
+                    setTimeout(() => initLocationMap(), 60);
+                }
+                else if (tabKey === 'ahi_inspeksi') {
+                    tabAhi.style.display = 'flex';
+                    renderAhiTables();
+                }
+                else if (tabKey === 'riwayat') {
+                    tabRiwayat.style.display = 'flex';
+                    renderAuditLogs();
+                    showToast('Log audit & riwayat siklus hidup aset', 'fa-clock-rotate-left');
+                }
+            }
+        }
+
+        function switchSubPill(pillKey, btn) {
+            currentSubPill = pillKey;
+            document.querySelectorAll('.sub-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const tabUmum = document.getElementById('tabContentUmum');
+            const tabSpesifikasi = document.getElementById('tabContentSpesifikasi');
+            const tabLampiran = document.getElementById('tabContentLampiran');
+
+            tabUmum.style.display = (pillKey === 'umum') ? 'flex' : 'none';
+            tabSpesifikasi.style.display = (pillKey === 'spesifikasi') ? 'flex' : 'none';
+            tabLampiran.style.display = (pillKey === 'lampiran') ? 'flex' : 'none';
+
+            if (pillKey === 'umum') {
+                showToast('Menampilkan data umum aset', 'fa-circle-info');
+            } else if (pillKey === 'spesifikasi') {
+                showToast('Spesifikasi teknis & parameter kelistrikan', 'fa-sliders');
+            } else if (pillKey === 'lampiran') {
+                showToast('Dokumen manual book, sertifikat, & SOP', 'fa-file-lines');
+            }
+        }
+
+        function openLightbox(src, title, desc) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxTitle').textContent = title || 'Foto Aset';
+            document.getElementById('lightboxDesc').textContent = desc || 'Dokumentasi visual peralatan gardu induk.';
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+
+        function closeLightbox(event) {
+            if (event && event.target !== event.currentTarget && !event.target.classList.contains('lightbox-close-btn')) {
+                return;
+            }
+            document.getElementById('lightboxModal').classList.remove('active');
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun';
+                localStorage.setItem('theme', 'dark');
+                showToast('Mode Gelap diaktifkan', 'fa-moon');
+            } else {
+                icon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'light');
+                showToast('Mode Terang diaktifkan', 'fa-sun');
+            }
+        }
+
+        let toastTimer = null;
+        function showToast(text, iconClass = 'fa-circle-check') {
+            const toast = document.getElementById('toastMsg');
+            const toastText = document.getElementById('toastText');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastText.textContent = text;
+            toastIcon.className = 'fa-solid ' + iconClass;
+            toast.classList.add('show');
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Initialize when DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+
+            // Sticky Tabs Shadow on Scroll
+            const mainScroll = document.querySelector('.main-scroll');
+            const stickyTabs = document.querySelector('.sticky-tabs-wrapper');
+            if (mainScroll && stickyTabs) {
+                mainScroll.addEventListener('scroll', () => {
+                    if (mainScroll.scrollTop > 180) {
+                        stickyTabs.classList.add('is-stuck');
+                    } else {
+                        stickyTabs.classList.remove('is-stuck');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
