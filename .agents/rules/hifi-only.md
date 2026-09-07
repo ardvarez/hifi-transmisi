@@ -20,3 +20,4 @@ trigger: always_on
   - **Text Input & Text Area**: Mengikuti styling input PLN yang seragam.
 - Pastikan pengecekan tag sebelum trigger selesai ke user, biar ga ada bug ataupun error dari FE
 - Gaperlu pakai dom karena itu ngabisin token bang
+- Kurangi penggunaan Emoji, icon atau emoji digunakan untuk bagian yang memang perlu saja
