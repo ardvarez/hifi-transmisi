@@ -990,30 +990,44 @@
         function closeDrawer() { document.getElementById('modalDrawer').classList.remove('active'); }
         function handleBackdropClick(e) { if (e.target.id === 'modalDrawer') closeDrawer(); }
 
-        function toggleNightModeAction() {
-            const isDark = document.body.classList.contains('dark-mode');
-            if (!isDark) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('pln_mobile_theme', 'dark');
-                document.getElementById('nightModeIcon').className = 'fa-solid fa-sun';
-                showToast('Mode Gelap diaktifkan', 'fa-moon', '#a855f7');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('pln_mobile_theme', 'light');
-                document.getElementById('nightModeIcon').className = 'fa-solid fa-moon';
-                showToast('Mode Terang diaktifkan', 'fa-sun', '#f59e0b');
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            if (savedTheme) return savedTheme;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                return 'light';
             }
+            return 'dark';
         }
 
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pln_mobile_theme');
+        function applyTheme(theme) {
             const icon = document.getElementById('nightModeIcon');
-            if (savedTheme === 'dark') {
+            if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
                 if (icon) icon.className = 'fa-solid fa-sun';
             } else {
                 document.body.classList.remove('dark-mode');
                 if (icon) icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function toggleNightModeAction() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('pln_mobile_theme', newTheme);
+            applyTheme(newTheme);
+            showToast(newTheme === 'dark' ? 'Mode Gelap diaktifkan' : 'Mode Terang diaktifkan', newTheme === 'dark' ? 'fa-moon' : 'fa-sun', newTheme === 'dark' ? '#a855f7' : '#f59e0b');
+        }
+
+        function initTheme() {
+            const theme = getPreferredTheme();
+            applyTheme(theme);
+
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.getItem('pln_mobile_theme')) {
+                        applyTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
             }
         }
 

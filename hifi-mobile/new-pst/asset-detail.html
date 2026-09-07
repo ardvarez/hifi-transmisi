@@ -2578,8 +2578,7 @@
 
         <!-- Bottom Action Bar -->
         <div class="bottom-action-bar">
-            <button class="btn-action btn-action-primary"
-                onclick="showToast('Membuka formulir perubahan data aset...', 'fa-pen-to-square')">
+            <button class="btn-action btn-action-primary" id="btnUbahData" onclick="goToUbahData()">
                 <i class="fa-solid fa-pen-to-square"></i> Ubah Data
             </button>
         </div>
@@ -3748,17 +3747,44 @@
             document.getElementById('lightboxModal').classList.remove('active');
         }
 
-        function toggleDarkMode() {
-            const isDark = document.body.classList.toggle('dark-mode');
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            if (savedTheme) return savedTheme;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                return 'light';
+            }
+            return 'dark';
+        }
+
+        function applyTheme(theme) {
             const icon = document.getElementById('themeIcon');
-            if (isDark) {
-                icon.className = 'fa-solid fa-sun';
-                localStorage.setItem('theme', 'dark');
-                showToast('Mode Gelap diaktifkan', 'fa-moon');
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-sun';
             } else {
-                icon.className = 'fa-solid fa-moon';
-                localStorage.setItem('theme', 'light');
-                showToast('Mode Terang diaktifkan', 'fa-sun');
+                document.body.classList.remove('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('pln_mobile_theme', newTheme);
+            applyTheme(newTheme);
+            showToast(newTheme === 'dark' ? 'Mode Gelap diaktifkan' : 'Mode Terang diaktifkan', newTheme === 'dark' ? 'fa-moon' : 'fa-sun');
+        }
+
+        function initTheme() {
+            const theme = getPreferredTheme();
+            applyTheme(theme);
+
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.getItem('pln_mobile_theme')) {
+                        applyTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
             }
         }
 
@@ -3778,8 +3804,15 @@
             }, 2500);
         }
 
+        function goToUbahData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const assetId = urlParams.get('id') || 'PST-006';
+            window.location.href = `./tambah-asset-register.html?mode=perubahan&id=${encodeURIComponent(assetId)}`;
+        }
+
         // Initialize when DOM loaded
         document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             initPage();
 
             // Sticky Tabs Shadow on Scroll

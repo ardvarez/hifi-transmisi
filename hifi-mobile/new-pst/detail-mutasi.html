@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detail Persetujuan Mutasi Aset - PLN Mobile New PST</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary-blue: #0b4884;
+            --primary-blue-light: #e8f1fb;
+            --header-blue: #0b4884;
+            --accent-cyan: #00bcd4;
+            --accent-green: #10b981;
+            --accent-orange: #d97706;
+            --accent-red: #ef4444;
+            --accent-red-light: #fef2f2;
+            --btn-reject-red: #f43f5e;
+            --btn-approve-blue: #2563eb;
+        }
+
+        body.dark-mode {
+            background-color: #020617 !important;
+            --bg-canvas: #0f172a;
+            --card-bg: #1e293b;
+            --text-dark: #f8fafc;
+            --text-sub: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --primary-blue: #38bdf8;
+            --primary-blue-light: rgba(56, 189, 248, 0.12);
+            --header-blue: #0f172a;
+            --btn-reject-red: #e11d48;
+            --btn-approve-blue: #1d4ed8;
+        }
+
+        body.dark-mode .mobile-container {
+            background-color: var(--bg-canvas) !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .app-header,
+        body.dark-mode .sticky-action-footer,
+        body.dark-mode .preview-modal-box {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .reg-section-card,
+        body.dark-mode .asset-mutasi-item,
+        body.dark-mode .select-all-row,
+        body.dark-mode .file-chip-item,
+        body.dark-mode .meta-hero-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .reg-section-title {
+            background: rgba(11, 72, 132, 0.3) !important;
+            color: #93c5fd !important;
+            border-color: rgba(11, 72, 132, 0.4) !important;
+        }
+
+        body.dark-mode .info-static-row {
+            border-bottom-color: #334155 !important;
+        }
+
+        body.dark-mode .info-label {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .info-val {
+            color: #f8fafc !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, h3, h4, h5, .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: #0b1329;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 900px;
+            background-color: var(--bg-canvas);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: pageFadeIn 0.25s ease;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0.95; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 94vh;
+                border-radius: 36px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* App Header */
+        .app-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: var(--primary-blue-light);
+            border: 1px solid rgba(11, 72, 132, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .back-btn:active { transform: scale(0.92); }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-main-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.2;
+        }
+
+        .header-sub-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Content Scroll Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px 95px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Hero Meta Banner (Matching User's Mockup) */
+        .meta-hero-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .meta-hero-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-badge-waiting {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.1px;
+        }
+
+        .status-badge-approved {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .status-badge-rejected {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body.dark-mode .status-badge-waiting {
+            background: rgba(217, 119, 6, 0.2);
+            color: #fbbf24;
+            border-color: rgba(217, 119, 6, 0.4);
+        }
+
+        body.dark-mode .status-badge-approved {
+            background: rgba(5, 150, 105, 0.2);
+            color: #34d399;
+            border-color: rgba(5, 150, 105, 0.4);
+        }
+
+        body.dark-mode .status-badge-rejected {
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+            border-color: rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-link-lampiran {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #0284c7;
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-link-lampiran:hover {
+            background: #bae6fd;
+        }
+
+        body.dark-mode .btn-link-lampiran {
+            background: rgba(2, 132, 199, 0.2);
+            color: #38bdf8;
+            border-color: rgba(2, 132, 199, 0.4);
+        }
+
+        .meta-hero-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.25;
+            margin-top: 2px;
+        }
+
+        .meta-hero-subtitle {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-hero-author {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 2px;
+        }
+
+        /* Tab Switcher: [Informasi Aset] vs [Daftar Aset 🔴4] */
+        .form-tabs-container {
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 4px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .form-tab-btn {
+            flex: 1;
+            padding: 9px 8px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .form-tab-btn.active {
+            background: #ffffff;
+            color: var(--primary-blue, #0b4884);
+            border-color: var(--primary-blue, #0b4884);
+            box-shadow: 0 3px 10px rgba(11, 72, 132, 0.12);
+            font-weight: 800;
+        }
+
+        body.dark-mode .form-tab-btn.active {
+            background: #172554;
+            color: #93c5fd;
+            border-color: #3b82f6;
+        }
+
+        .form-tab-btn:not(.active) {
+            background: transparent;
+            color: var(--text-muted, #64748b);
+        }
+
+        .count-chip-badge {
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 2px;
+        }
+
+        /* Section Cards */
+        .reg-section-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 18px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.03);
+        }
+
+        .reg-section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-blue, #0b4884);
+            background: var(--primary-blue-light, #e8f1fb);
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Outfit', sans-serif;
+            border: 1px solid rgba(11, 72, 132, 0.12);
+        }
+
+        .section-title-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Static Key-Value Display Rows */
+        .info-static-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 5px 2px;
+            border-bottom: 1px dashed var(--border-color, #f1f5f9);
+            font-size: 11.5px;
+            gap: 12px;
+        }
+
+        .info-static-row:last-child {
+            border-bottom: none;
+            padding-bottom: 2px;
+        }
+
+        .info-label {
+            color: var(--text-muted, #64748b);
+            font-weight: 600;
+            flex-shrink: 0;
+            width: 35%;
+        }
+
+        .info-val {
+            color: var(--text-dark, #0f172a);
+            font-weight: 700;
+            text-align: right;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        .val-code {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.2px;
+        }
+
+        /* Tab 2: Daftar Aset Grouping & Rich Asset Cards (Matching Asset Register Habits) */
+        .mutasi-group-header {
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding: 2px 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mutasi-group-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .mutasi-group-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .select-all-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+
+        .select-all-row:hover {
+            border-color: rgba(11, 72, 132, 0.35);
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 7px;
+            border: 2px solid #cbd5e1;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: transparent;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .custom-checkbox {
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        .custom-checkbox.checked {
+            background: var(--primary-blue, #0b4884);
+            border-color: var(--primary-blue, #0b4884);
+            color: #ffffff;
+        }
+
+        /* Asset List Cards (Identical to Asset Register Design) */
+        .asset-list-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px 15px;
+            border: 1.5px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            word-break: break-word;
+            position: relative;
+        }
+
+        .asset-list-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(11, 72, 132, 0.08);
+            border-color: rgba(11, 72, 132, 0.35);
+        }
+
+        .asset-list-card.selected {
+            border-color: var(--primary-blue, #0b4884);
+            background: var(--card-bg);
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.12);
+        }
+
+        body.dark-mode .asset-list-card.selected {
+            border-color: #38bdf8 !important;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.15) !important;
+        }
+
+        .asset-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .asset-code-badge {
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--primary-blue-light, #e8f1fb);
+            color: var(--primary-blue, #0b4884);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        body.dark-mode .asset-code-badge {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #38bdf8 !important;
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-operasi {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        body.dark-mode .status-operasi {
+            background: #064e3b;
+            color: #6ee7b7;
+            border-color: #047857;
+        }
+
+        .asset-card-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.35;
+            font-family: 'Outfit', sans-serif;
+            word-break: break-word;
+        }
+
+        .asset-card-grid-box {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px 12px;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 9px 11px;
+            font-size: 11px;
+            min-width: 0;
+        }
+
+        .asset-grid-col {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .asset-grid-label {
+            color: var(--text-muted);
+            font-size: 9.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+
+        .asset-grid-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .asset-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            color: var(--text-muted);
+            padding-top: 6px;
+            border-top: 1px dashed var(--border-color);
+            min-width: 0;
+            gap: 8px;
+        }
+
+        /* Lampiran File Chips List */
+        .file-chip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .file-chip-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-canvas, #f8fafc);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            gap: 10px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .file-chip-item:hover {
+            border-color: var(--primary-blue);
+            background: var(--card-bg);
+        }
+
+        .file-chip-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .file-chip-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .icon-foto { background: #e0f2fe; color: #0284c7; }
+        .icon-nameplate { background: #fef3c7; color: #d97706; }
+        .icon-doc { background: #fef2f2; color: #dc2626; }
+
+        .file-chip-details {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-chip-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-chip-size {
+            font-size: 9.5px;
+            color: var(--text-muted);
+        }
+
+        /* Sticky Footer Action Bar (Tolak & Setujui) */
+        .sticky-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px 20px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-btn {
+            flex: 1;
+            padding: 13px 16px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reject {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-reject:active {
+            transform: scale(0.97);
+        }
+
+        .btn-approve {
+            background: var(--header-blue, #0b4884);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(11, 72, 132, 0.25);
+            flex: 1.3;
+        }
+
+        .btn-approve:active {
+            transform: scale(0.97);
+        }
+
+        body.dark-mode .sticky-footer {
+            background: var(--card-bg);
+        }
+
+        body.dark-mode .btn-reject {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Modals & Dialogs */
+        .preview-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .preview-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .preview-modal-box {
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 370px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(24px) scale(0.94); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .preview-header {
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .preview-body {
+            padding: 20px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .preview-img-frame {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-canvas);
+            overflow: hidden;
+            max-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Toast Component */
+        .mobile-toast {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 11.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+        }
+
+        .mobile-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Result Flags */
+        .alert-flag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .alert-flag-success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .alert-flag-minor { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .alert-flag-mayor { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        body.dark-mode .alert-flag-success { background: rgba(5, 150, 105, 0.2); color: #34d399; border-color: rgba(5, 150, 105, 0.4); }
+        body.dark-mode .alert-flag-minor { background: rgba(217, 119, 6, 0.2); color: #fbbf24; border-color: rgba(217, 119, 6, 0.4); }
+        body.dark-mode .alert-flag-mayor { background: rgba(220, 38, 38, 0.2); color: #f87171; border-color: rgba(220, 38, 38, 0.4); }
+
+        /* iOS Indicator Bar */
+        .ios-bar {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 4px;
+            background-color: #0f172a;
+            border-radius: 3px;
+            z-index: 60;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <a href="./persetujuan.html" class="back-btn" title="Kembali ke Daftar Persetujuan">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-titles">
+                    <div class="header-main-title">Persetujuan Mutasi Aset</div>
+                    <div class="header-sub-title" id="headerSub">Verifikasi & Approval Pengalihan Aset</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="back-btn" onclick="toggleNightModeAction()" title="Mode Gelap/Terang">
+                    <i class="fa-solid fa-moon" id="nightModeIcon"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content -->
+        <div class="app-content">
+
+            <!-- Hero Meta Card (Exact Matching Screenshot) -->
+            <div class="meta-hero-card">
+                <div class="meta-hero-top">
+                    <div class="status-badge-waiting" id="badgeStatusWorkflow">
+                        <i class="fa-solid fa-clock"></i> <span id="textStatusWorkflow">Menunggu ASMAN Unit Induk</span>
+                    </div>
+                    <button class="btn-link-lampiran" onclick="openFilePreviewList()" title="Lihat Berkas Lampiran">
+                        <i class="fa-regular fa-file-lines"></i>
+                        <span>Lampiran</span>
+                    </button>
+                </div>
+
+                <h1 class="meta-hero-title" id="displayMutasiTitle">Lightning Arrester</h1>
+
+                <div class="meta-hero-subtitle" id="displayLocationSub">
+                    <i class="fa-solid fa-location-dot" style="color: var(--primary-blue);"></i>
+                    <span id="textLocationSub">GI Maros 150kV - Mutasi Aset</span>
+                </div>
+
+                <div class="meta-hero-author" id="displayAuthorRow">
+                    <i class="fa-regular fa-clock" style="font-size: 10px;"></i>
+                    <span id="textAuthorRow">16 Nov 2023 , 10:54:47 - Create by Miami</span>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs: [Informasi Aset] vs [Daftar Aset 🔴4] -->
+            <div class="form-tabs-container">
+                <button type="button" class="form-tab-btn active" id="tabBtnInfo" onclick="switchMutasiTab('info')">
+                    Informasi Aset
+                </button>
+                <button type="button" class="form-tab-btn" id="tabBtnDaftar" onclick="switchMutasiTab('daftar')">
+                    Daftar Aset <span class="count-chip-badge" id="badgeTotalAsetCount">4</span>
+                </button>
+            </div>
+
+            <!-- ================= TAB 1: INFORMASI MUTASI ================= -->
+            <div id="tabInfoContent" style="display: flex; flex-direction: column;">
+                <!-- Section 1: Informasi Mutasi -->
+                <div class="reg-section-card">
+                    <div class="reg-section-title">
+                        <div class="section-title-left">
+                            <i class="fa-solid fa-right-left"></i> Informasi Mutasi
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; color: var(--primary-blue);" id="valDocNo">044/SK-MUT/2023</span>
+                    </div>
+
+                    <div class="info-static-row">
+                        <span class="info-label">Jenis Mutasi</span>
+                        <span class="info-val" id="valJenisMutasi" style="color: var(--primary-blue);">Pindah Lokasi</span>
+                    </div>
+                    <div class="info-static-row">
+                        <span class="info-label">Unit Asal</span>
+                        <span class="info-val" id="valUnitAsal">GI Maros 150kV</span>
+                    </div>
+                    <div class="info-static-row">
+                        <span class="info-label">Unit Tujuan</span>
+                        <span class="info-val" id="valUnitTujuan">GI Mampang 150kV</span>
+                    </div>
+                    <div class="info-static-row">
+                        <span class="info-label">Alasan</span>
+                        <span class="info-val" id="valAlasan">Pemberhentian GI Maros 150kV</span>
+                    </div>
+                    <div class="info-static-row">
+                        <span class="info-label">Deskripsi</span>
+                        <span class="info-val" style="text-align: right; line-height: 1.45;" id="valDeskripsi">
+                            Dilakukan perpindahan aset berdasarkan SK pemberhentian ke GI Makassar
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Section 2: Berkas Pendukung & Lampiran -->
+                <div class="reg-section-card" id="sectionLampiran">
+                    <div class="reg-section-title">
+                        <div class="section-title-left">
+                            <i class="fa-solid fa-paperclip"></i> Dokumen Lampiran
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; color: var(--primary-blue);">4 Berkas</span>
+                    </div>
+
+                    <div class="file-chip-list">
+                        <div class="file-chip-item" onclick="openSingleFilePreview('SK Mutasi Direksi', 'SK_Direksi_Mutasi_Maros.pdf', '3.8 MB', 'doc')">
+                            <div class="file-chip-left">
+                                <div class="file-chip-icon icon-doc">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </div>
+                                <div class="file-chip-details">
+                                    <span class="file-chip-name">SK_Direksi_Mutasi_Maros.pdf</span>
+                                    <span class="file-chip-size">3.8 MB &bull; Surat Keputusan Resmi</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px; color: var(--text-muted);"></i>
+                        </div>
+
+                        <div class="file-chip-item" onclick="openSingleFilePreview('Berita Acara Pembongkaran', 'BA_Bongkar_Bay6AB5.pdf', '2.1 MB', 'doc')">
+                            <div class="file-chip-left">
+                                <div class="file-chip-icon icon-doc">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </div>
+                                <div class="file-chip-details">
+                                    <span class="file-chip-name">BA_Bongkar_Bay6AB5.pdf</span>
+                                    <span class="file-chip-size">2.1 MB &bull; Berita Acara Lapangan</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px; color: var(--text-muted);"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 2: DAFTAR ASET ================= -->
+            <div id="tabDaftarContent" style="display: none; flex-direction: column;">
+                
+                <!-- Group 1: GI Mampang 150kV (Tujuan Mutasi) -->
+                <div class="mutasi-group-header">
+                    <div class="mutasi-group-title" id="daftarGroupTitle">GI Mampang 150kV</div>
+                    <div class="mutasi-group-subtitle">Tujuan Mutasi</div>
+                </div>
+
+                <!-- Select All Row -->
+                <div class="select-all-row" onclick="toggleSelectAllGroup('group1')">
+                    <span>Pilih Semua</span>
+                    <div class="custom-checkbox" id="chkSelectAllGroup1">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+
+                <!-- Asset Item Cards List (Populated via JS) -->
+                <div id="daftarAsetListContainer" style="display: flex; flex-direction: column;">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sticky Footer Buttons (Tolak & Setujui) -->
+        <div class="sticky-footer" id="approvalFooter">
+            <button type="button" class="footer-btn btn-reject" onclick="triggerRejectAction()">
+                <i class="fa-solid fa-xmark"></i> Tolak
+            </button>
+            <button type="button" class="footer-btn btn-approve" onclick="triggerApproveAction()">
+                <i class="fa-solid fa-check"></i> Setujui
+            </button>
+        </div>
+
+        <!-- Center Alert Confirmation Modal (Approve) -->
+        <div class="preview-modal-overlay" id="approveModal" onclick="handleApproveOverlayClick(event)">
+            <div class="preview-modal-box">
+                <div class="preview-body">
+                    <div style="width:56px; height:56px; border-radius:18px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.18);">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                    </div>
+                    <div style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:'Outfit', sans-serif;">
+                        Konfirmasi Persetujuan Mutasi
+                    </div>
+                    <div style="font-size:11.5px; color:var(--text-muted); line-height:1.45;">
+                        Apakah Anda yakin ingin menyetujui mutasi aset ini? Seluruh aset yang dipilih akan dialihkan status kepemilikan dan unit operasinya.
+                    </div>
+
+                    <div style="width:100%; background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:12px; padding:10px 12px; text-align:left; font-size:11.5px; display:flex; flex-direction:column; gap:4px;">
+                        <div style="font-weight:800; color:var(--text-dark);" id="modalSummaryAssetTitle">Lightning Arrester</div>
+                        <div style="color:var(--text-muted); font-size:10.5px;" id="modalSummaryAssetSub">GI Maros 150kV &rarr; GI Mampang 150kV</div>
+                    </div>
+
+                    <div style="width:100%; text-align:left;">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-sub); display:block; margin-bottom:4px;">Catatan Persetujuan / Verifikasi (Opsional):</label>
+                        <textarea id="approveNoteInput" placeholder="Tambahkan catatan persetujuan atau nomor surat jika diperlukan..." style="width:100%; height:55px; padding:8px 10px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); font-size:11.5px; outline:none; resize:none; box-sizing:border-box; color:var(--text-dark);"></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:8px; width:100%; margin-top:4px;">
+                        <button type="button" onclick="closeApproveModal()" style="flex:1; padding:11px 14px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-canvas); color:var(--text-sub); font-size:12.5px; font-weight:700; cursor:pointer;">
+                            Batal
+                        </button>
+                        <button type="button" onclick="confirmApproveSubmission()" style="flex:1.4; padding:11px 14px; border-radius:12px; border:none; background:var(--header-blue, #0b4884); color:#ffffff; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 14px rgba(11, 72, 132, 0.25);">
+                            <i class="fa-solid fa-check"></i> Ya, Setujui
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Alert Confirmation Modal (Reject) -->
+        <div class="preview-modal-overlay" id="rejectModal" onclick="handleRejectOverlayClick(event)">
+            <div class="preview-modal-box">
+                <div class="preview-body">
+                    <div style="width:56px; height:56px; border-radius:18px; background:#fef2f2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.18);">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </div>
+                    <div style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:'Outfit', sans-serif;">
+                        Kembalikan untuk Revisi
+                    </div>
+                    <div style="font-size:11.5px; color:var(--text-muted); line-height:1.45;">
+                        Pilih klasifikasi penolakan dan sertakan catatan alasan perbaikan untuk pemohon mutasi.
+                    </div>
+
+                    <!-- Flag Klasifikasi Penolakan: Minor vs Mayor (Segmented Pill Text Only) -->
+                    <div style="width:100%; text-align:left;">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-sub); display:block; margin-bottom:4px;">Klasifikasi Penolakan *</label>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; background:var(--bg-canvas); padding:4px; border-radius:12px; border:1px solid var(--border-color);">
+                            <button type="button" id="btnFlagMinor" onclick="selectRejectFlag('minor')" style="padding:7px 0; border:none; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; background:#f59e0b; color:#ffffff; transition:all 0.2s;">
+                                Minor
+                            </button>
+                            <button type="button" id="btnFlagMayor" onclick="selectRejectFlag('mayor')" style="padding:7px 0; border:none; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-muted); transition:all 0.2s;">
+                                Mayor
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="width:100%; text-align:left;">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-sub); display:block; margin-bottom:4px;">Alasan Penolakan / Catatan Revisi *</label>
+                        <textarea id="rejectReasonInput" placeholder="Contoh: SK mutasi belum ditandatangani atau rincian aset tujuan belum sesuai..." style="width:100%; height:75px; padding:8px 10px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); font-size:11.5px; outline:none; resize:none; box-sizing:border-box; color:var(--text-dark);"></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:8px; width:100%; margin-top:4px;">
+                        <button type="button" onclick="closeRejectModal()" style="flex:1; padding:11px 14px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-canvas); color:var(--text-sub); font-size:12.5px; font-weight:700; cursor:pointer;">
+                            Batal
+                        </button>
+                        <button type="button" onclick="confirmRejectSubmission()" style="flex:1.4; padding:11px 14px; border-radius:12px; border:none; background:#dc2626; color:#ffffff; font-size:12.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 14px rgba(220, 38, 38, 0.25);">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Revisi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Alert Modal (Success / Reject Confirmation) -->
+        <div class="preview-modal-overlay" id="resultAlertModal">
+            <div class="preview-modal-box" style="max-width: 360px; text-align:center;">
+                <div class="preview-body" style="padding: 24px 20px; gap:14px;">
+                    <div id="resultAlertIconFrame" style="width:64px; height:64px; border-radius:22px; display:flex; align-items:center; justify-content:center; font-size:28px; margin: 0 auto; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+                        <i class="fa-solid fa-circle-check" id="resultAlertIcon"></i>
+                    </div>
+
+                    <div style="display:flex; justify-content:center;">
+                        <span class="alert-flag-badge alert-flag-success" id="resultAlertFlagBadge">
+                            <i class="fa-solid fa-circle-check"></i> BERHASIL DISETUJUI
+                        </span>
+                    </div>
+
+                    <div>
+                        <div id="resultAlertTitle" style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:'Outfit',sans-serif; margin-bottom:4px;">
+                            Persetujuan Mutasi Berhasil!
+                        </div>
+                        <div id="resultAlertSubtitle" style="font-size:11.5px; color:var(--text-muted); line-height:1.45;">
+                            Pengajuan mutasi aset telah berhasil disetujui dan status aset kini diperbarui.
+                        </div>
+                    </div>
+
+                    <div style="width:100%; background:var(--bg-canvas); border:1px solid var(--border-color); border-radius:12px; padding:10px 12px; text-align:left; font-size:11.5px; display:flex; flex-direction:column; gap:4px;">
+                        <div style="font-weight:800; color:var(--text-dark);" id="resultAlertAssetTitle">Lightning Arrester</div>
+                        <div style="color:var(--text-muted); font-size:10.5px;" id="resultAlertAssetSub">GI Maros 150kV &rarr; GI Mampang 150kV</div>
+                        <div id="resultAlertNoteRow" style="font-size:11px; color:var(--text-dark); margin-top:4px; padding-top:4px; border-top:1px dashed var(--border-color); display:none;">
+                            <strong style="color:var(--text-muted);">Catatan: </strong><span id="resultAlertNoteText">-</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="closeResultAlertAndRedirect()" style="width:100%; padding:12px; border-radius:12px; border:none; background:var(--header-blue, #0b4884); color:#ffffff; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(11, 72, 132, 0.25);">
+                        <span>Kembali ke Daftar Persetujuan</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Preview Modal -->
+        <div class="preview-modal-overlay" id="filePreviewModal" onclick="if(event.target.id==='filePreviewModal') closeFilePreview();">
+            <div class="preview-modal-box">
+                <div class="preview-header">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-file-shield" style="color:var(--primary-blue);"></i>
+                        <span id="previewModalTitle" style="font-size:13px; font-weight:800; font-family:'Outfit',sans-serif;">Pratinjau Berkas</span>
+                    </div>
+                    <button onclick="closeFilePreview()" style="background:var(--bg-canvas); border:1px solid var(--border-color); width:28px; height:28px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="preview-body" style="padding:16px;">
+                    <div id="previewVisualArea" style="width:100%;"></div>
+                    <div style="font-size:12px; font-weight:700; color:var(--text-dark);" id="previewFileName">filename.pdf</div>
+                    <div style="font-size:11px; color:var(--text-muted);" id="previewFileMeta">3.8 MB &bull; Terverifikasi Resmi</div>
+                    <button onclick="downloadDemoFile()" style="width:100%; padding:10px; border-radius:10px; background:var(--primary-blue); color:#ffffff; border:none; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:6px;">
+                        <i class="fa-solid fa-download"></i> Unduh Berkas Mutasi
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="mobile-toast" id="mobileToast">
+            <i class="fa-solid fa-circle-check" style="color:#4ade80; font-size:15px;"></i>
+            <span>Pemberitahuan</span>
+        </div>
+
+        <!-- iOS Indicator Bar -->
+        <div class="ios-bar"></div>
+    </div>
+
+    <script>
+        // Sample datasets for dynamic loading based on URL Query ?id=
+        const mutasiRecords = {
+            "MUT-01": {
+                id: "MUT-01",
+                title: "Lightning Arrester & Proteksi Bay",
+                code: "MUT-2023-MRS-001",
+                jenisMutasi: "Pindah Lokasi",
+                unitAsal: "GI Maros 150kV",
+                unitTujuan: "GI Mampang 150kV",
+                alasan: "Pemberhentian GI Maros 150kV",
+                deskripsi: "Dilakukan perpindahan aset berdasarkan SK pemberhentian ke GI Makassar & GITET Menum.",
+                docNo: "044.PJ/DAN.02.01/UPT-MKS/2023",
+                applicant: "Miami (Staff GI)",
+                date: "16 Nov 2023 , 10:54:47",
+                workflowStatus: "Menunggu ASMAN Unit Induk",
+                items: [
+                    {
+                        id: "ast-1",
+                        title: "Lightning Arrester 145kV",
+                        techidentno: "1150370000000001",
+                        eqNumber: "EQ-LA-MRS-2023-01",
+                        manufacturer: "ABB Sweden",
+                        typeModel: "EXLIM R 145kV / 0121517A12-12R",
+                        level5: "Surge Arrester System 150kV",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-2",
+                        title: "Line Current Differential (87L) + Distance (21) + Autorecloser (79)",
+                        techidentno: "1150370000000002",
+                        eqNumber: "EQ-REL-MRS-87L",
+                        manufacturer: "ABB Relion 670",
+                        typeModel: "RED670 IEC 61850 / 0121517A12-12R",
+                        level5: "Line Protection Relay System",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-3",
+                        title: "Circulating Current Protection Relay",
+                        techidentno: "1150370000000003",
+                        eqNumber: "EQ-REL-MRS-CC",
+                        manufacturer: "Schneider Electric",
+                        typeModel: "MiCOM P442 High Speed / 0121517A12-12R",
+                        level5: "Busbar Differential Protection",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-4",
+                        title: "Disconnecting Switch (PMS Bay 6AB5)",
+                        techidentno: "1150370000000004",
+                        eqNumber: "EQ-PMS-MRS-01",
+                        manufacturer: "Siemens Germany",
+                        typeModel: "3DN 170kV Double Break / 0121517A12-12R",
+                        level5: "High Voltage Disconnector Switch",
+                        status: "Operasi",
+                        checked: true
+                    }
+                ]
+            },
+            "MUT-02": {
+                id: "MUT-02",
+                title: "PMT 150kV & Control Panel",
+                code: "MUT-2026-SBY-089",
+                jenisMutasi: "Relokasi Bay",
+                unitAsal: "GI Waru 150kV",
+                unitTujuan: "GI Krian 150kV",
+                alasan: "Penguatan Interkoneksi Krian 2",
+                deskripsi: "Relokasi unit PMT cadangan operasional untuk percepatan pemulihan Bay Penghantar Krian.",
+                docNo: "099.PJ/DAN.02.01/UPT-SBY/2026",
+                applicant: "Rian Pratama (Staff ULTG)",
+                date: "Kemarin, 14:15 WIB",
+                workflowStatus: "Menunggu ASMAN Unit Induk",
+                items: [
+                    {
+                        id: "ast-5",
+                        title: "Circuit Breaker (PMT 150kV SF6)",
+                        techidentno: "161402651200000002",
+                        eqNumber: "EQ-PMT-WRU-02",
+                        manufacturer: "ABB Sakti Industri",
+                        typeModel: "LTB 145D1/B SF6 (40 kA)",
+                        level5: "Switchgear & Interrupter Unit",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-6",
+                        title: "Control Relay Panel Bay Penghantar",
+                        techidentno: "161402651200000099",
+                        eqNumber: "EQ-CRP-WRU-KRN",
+                        manufacturer: "Siemens Indonesia",
+                        typeModel: "SIPROTEC 5 Modular",
+                        level5: "Secondary Substation Automation",
+                        status: "Operasi",
+                        checked: true
+                    }
+                ]
+            },
+            "default": {
+                id: "default",
+                title: "Lightning Arrester",
+                code: "MUT-2023-MRS-001",
+                jenisMutasi: "Pindah Lokasi",
+                unitAsal: "GI Maros 150kV",
+                unitTujuan: "GI Mampang 150kV",
+                alasan: "Pemberhentian GI Maros 150kV",
+                deskripsi: "Dilakukan perpindahan aset berdasarkan SK pemberhentian ke GI Makassar",
+                docNo: "044.PJ/DAN.02.01/UPT-MKS/2023",
+                applicant: "Miami (Staff GI)",
+                date: "16 Nov 2023 , 10:54:47",
+                workflowStatus: "Menunggu ASMAN Unit Induk",
+                items: [
+                    {
+                        id: "ast-1",
+                        title: "Lightning Arrester 145kV",
+                        techidentno: "1150370000000001",
+                        eqNumber: "EQ-LA-MRS-2023-01",
+                        manufacturer: "ABB Sweden",
+                        typeModel: "EXLIM R 145kV / 0121517A12-12R",
+                        level5: "Surge Arrester System 150kV",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-2",
+                        title: "Line Current Differential (87L) + Distance (21) + Autorecloser (79)",
+                        techidentno: "1150370000000002",
+                        eqNumber: "EQ-REL-MRS-87L",
+                        manufacturer: "ABB Relion 670",
+                        typeModel: "RED670 IEC 61850 / 0121517A12-12R",
+                        level5: "Line Protection Relay System",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-3",
+                        title: "Circulating Current Protection Relay",
+                        techidentno: "1150370000000003",
+                        eqNumber: "EQ-REL-MRS-CC",
+                        manufacturer: "Schneider Electric",
+                        typeModel: "MiCOM P442 High Speed / 0121517A12-12R",
+                        level5: "Busbar Differential Protection",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-4",
+                        title: "Disconnecting Switch (PMS Bay 6AB5)",
+                        techidentno: "1150370000000004",
+                        eqNumber: "EQ-PMS-MRS-01",
+                        manufacturer: "Siemens Germany",
+                        typeModel: "3DN 170kV Double Break / 0121517A12-12R",
+                        level5: "High Voltage Disconnector Switch",
+                        status: "Operasi",
+                        checked: true
+                    }
+                ]
+            }
+        };
+
+        let currentMutasiData = null;
+
+        function initPageData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id') || 'default';
+            const data = mutasiRecords[id] || mutasiRecords['default'];
+            currentMutasiData = data;
+
+            document.getElementById('displayMutasiTitle').textContent = data.title;
+            document.getElementById('textLocationSub').textContent = `${data.unitAsal} - Mutasi Aset`;
+            document.getElementById('textAuthorRow').textContent = `${data.date} - Create by ${data.applicant}`;
+            document.getElementById('textStatusWorkflow').textContent = data.workflowStatus;
+
+            // Form data
+            document.getElementById('valDocNo').textContent = data.docNo;
+            document.getElementById('valJenisMutasi').textContent = data.jenisMutasi;
+            document.getElementById('valUnitAsal').textContent = data.unitAsal;
+            document.getElementById('valUnitTujuan').textContent = data.unitTujuan;
+            document.getElementById('valAlasan').textContent = data.alasan;
+            document.getElementById('valDeskripsi').textContent = data.deskripsi;
+
+            document.getElementById('daftarGroupTitle').textContent = data.unitTujuan;
+
+            // Modal summary
+            document.getElementById('modalSummaryAssetTitle').textContent = data.title;
+            document.getElementById('modalSummaryAssetSub').textContent = `${data.unitAsal} \u2192 ${data.unitTujuan}`;
+
+            renderDaftarAsetItems(data.items);
+        }
+
+        function renderDaftarAsetItems(items) {
+            const container = document.getElementById('daftarAsetListContainer');
+            if (!container) return;
+
+            container.innerHTML = items.map(item => `
+                <div class="asset-list-card ${item.checked ? 'selected' : ''}" id="assetCard-${item.id}" onclick="toggleItemCheckbox('${item.id}')">
+                    <div class="asset-card-top">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="custom-checkbox ${item.checked ? 'checked' : ''}" id="chkItem-${item.id}">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span class="asset-code-badge">${item.techidentno}</span>
+                        </div>
+                        <span class="status-pill status-operasi">${item.status || 'Operasi'}</span>
+                    </div>
+
+                    <div class="asset-card-title">${item.title}</div>
+
+                    <div class="asset-card-grid-box">
+                        <div class="asset-grid-col">
+                            <span class="asset-grid-label">Equipment Number</span>
+                            <span class="asset-grid-val" style="font-family:'JetBrains Mono',monospace;">${item.eqNumber}</span>
+                        </div>
+                        <div class="asset-grid-col">
+                            <span class="asset-grid-label">Pabrikan / Merk</span>
+                            <span class="asset-grid-val">${item.manufacturer}</span>
+                        </div>
+                        <div class="asset-grid-col">
+                            <span class="asset-grid-label">Tipe / Model</span>
+                            <span class="asset-grid-val">${item.typeModel}</span>
+                        </div>
+                        <div class="asset-grid-col">
+                            <span class="asset-grid-label">Klasifikasi Level 5</span>
+                            <span class="asset-grid-val" style="color:var(--primary-blue); font-weight:700;">${item.level5}</span>
+                        </div>
+                    </div>
+
+                    <div class="asset-card-footer">
+                        <span style="font-size:10px; color:var(--text-muted);">Tujuan: <strong style="color:var(--text-dark);">${currentMutasiData ? currentMutasiData.unitTujuan : '-'}</strong></span>
+                        <span style="font-size:10px; font-weight:700; color:${item.checked ? 'var(--primary-blue)' : 'var(--text-muted)'};">
+                            <i class="fa-solid ${item.checked ? 'fa-circle-check' : 'fa-circle'}"></i> ${item.checked ? 'Dipilih' : 'Tidak Dipilih'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            updateSelectAllCheckboxState();
+        }
+
+        function toggleItemCheckbox(itemId) {
+            if (!currentMutasiData) return;
+            const item = currentMutasiData.items.find(i => i.id === itemId);
+            if (item) {
+                item.checked = !item.checked;
+                const el = document.getElementById(`chkItem-${itemId}`);
+                const card = document.getElementById(`assetCard-${itemId}`);
+                if (el) {
+                    if (item.checked) el.classList.add('checked');
+                    else el.classList.remove('checked');
+                }
+                if (card) {
+                    if (item.checked) card.classList.add('selected');
+                    else card.classList.remove('selected');
+                }
+                renderDaftarAsetItems(currentMutasiData.items);
+            }
+        }
+
+        function toggleSelectAllGroup(group) {
+            if (!currentMutasiData) return;
+            const allChecked = currentMutasiData.items.every(i => i.checked);
+            const newState = !allChecked;
+
+            currentMutasiData.items.forEach(item => {
+                item.checked = newState;
+            });
+
+            renderDaftarAsetItems(currentMutasiData.items);
+        }
+
+        function updateSelectAllCheckboxState() {
+            if (!currentMutasiData) return;
+            const total = currentMutasiData.items.length;
+            const checkedCount = currentMutasiData.items.filter(i => i.checked).length;
+            const allChecked = total > 0 && checkedCount === total;
+
+            const chkAll = document.getElementById('chkSelectAllGroup1');
+            if (chkAll) {
+                if (allChecked) chkAll.classList.add('checked');
+                else chkAll.classList.remove('checked');
+            }
+
+            const selectAllRow = document.querySelector('.select-all-row span');
+            if (selectAllRow) {
+                selectAllRow.innerHTML = `Pilih Semua <span style="font-size:11px; color:var(--text-muted); font-weight:600;">(${checkedCount}/${total} Aset Terpilih)</span>`;
+            }
+
+            const badgeCount = document.getElementById('badgeTotalAsetCount');
+            if (badgeCount) {
+                badgeCount.textContent = checkedCount;
+                badgeCount.style.background = checkedCount > 0 ? '#ef4444' : '#94a3b8';
+            }
+        }
+
+        // Tab Switching
+        function switchMutasiTab(tab) {
+            const btnInfo = document.getElementById('tabBtnInfo');
+            const btnDaftar = document.getElementById('tabBtnDaftar');
+            const contentInfo = document.getElementById('tabInfoContent');
+            const contentDaftar = document.getElementById('tabDaftarContent');
+
+            if (tab === 'info') {
+                btnInfo.classList.add('active');
+                btnDaftar.classList.remove('active');
+                contentInfo.style.display = 'flex';
+                contentDaftar.style.display = 'none';
+            } else {
+                btnDaftar.classList.add('active');
+                btnInfo.classList.remove('active');
+                contentInfo.style.display = 'none';
+                contentDaftar.style.display = 'flex';
+            }
+        }
+
+        // File Previews
+        function openFilePreviewList() {
+            openSingleFilePreview('SK Mutasi Direksi', 'SK_Direksi_Mutasi_Maros.pdf', '3.8 MB', 'doc');
+        }
+
+        function openSingleFilePreview(title, name, size, type) {
+            document.getElementById('previewModalTitle').textContent = title;
+            document.getElementById('previewFileName').textContent = name;
+            document.getElementById('previewFileMeta').textContent = `${size} \u2022 Dokumen Lampiran Resmi Mutasi`;
+
+            const visual = document.getElementById('previewVisualArea');
+            visual.innerHTML = `
+                <div class="preview-img-frame" style="background:#eff6ff;">
+                    <div style="padding: 26px 10px; display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text-muted);">
+                        <i class="fa-solid fa-file-pdf" style="font-size:42px; color:#ea580c;"></i>
+                        <span style="font-size:12px; font-weight:700; color:var(--text-dark);">Dokumen PDF Terverifikasi</span>
+                        <span style="font-size:10.5px;">Surat Keputusan Resmi Pemindahan Aset Transmisi</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('filePreviewModal').classList.add('active');
+        }
+
+        function closeFilePreview() {
+            document.getElementById('filePreviewModal').classList.remove('active');
+        }
+
+        function downloadDemoFile() {
+            showToast('Mengunduh berkas SK mutasi...', 'fa-download', '#0284c7');
+            setTimeout(() => {
+                closeFilePreview();
+                showToast('Berkas berhasil diunduh', 'fa-circle-check', '#059669');
+            }, 1000);
+        }
+
+        // Action Modal Triggers
+        function triggerApproveAction() {
+            document.getElementById('approveModal').classList.add('active');
+        }
+
+        function closeApproveModal() {
+            document.getElementById('approveModal').classList.remove('active');
+        }
+
+        function handleApproveOverlayClick(e) {
+            if (e.target.id === 'approveModal') closeApproveModal();
+        }
+
+        function triggerRejectAction() {
+            document.getElementById('rejectModal').classList.add('active');
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.remove('active');
+        }
+
+        function handleRejectOverlayClick(e) {
+            if (e.target.id === 'rejectModal') closeRejectModal();
+        }
+
+        let selectedRejectFlag = 'minor';
+
+        function selectRejectFlag(flag) {
+            selectedRejectFlag = flag;
+            const btnMin = document.getElementById('btnFlagMinor');
+            const btnMay = document.getElementById('btnFlagMayor');
+            if (flag === 'minor') {
+                btnMin.style.background = '#f59e0b';
+                btnMin.style.color = '#ffffff';
+                btnMin.style.fontWeight = '800';
+                btnMay.style.background = 'transparent';
+                btnMay.style.color = 'var(--text-muted)';
+                btnMay.style.fontWeight = '700';
+            } else {
+                btnMay.style.background = '#dc2626';
+                btnMay.style.color = '#ffffff';
+                btnMay.style.fontWeight = '800';
+                btnMin.style.background = 'transparent';
+                btnMin.style.color = 'var(--text-muted)';
+                btnMin.style.fontWeight = '700';
+            }
+        }
+
+        function confirmApproveSubmission() {
+            const note = document.getElementById('approveNoteInput').value.trim();
+            closeApproveModal();
+
+            const badge = document.getElementById('badgeStatusWorkflow');
+            badge.className = 'status-badge-approved';
+            badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Disetujui (Approved)';
+
+            const footer = document.getElementById('approvalFooter');
+            footer.innerHTML = `
+                <div style="width:100%; text-align:center; padding:10px; background:#ecfdf5; border-radius:12px; border:1px solid #a7f3d0; color:#059669; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fa-solid fa-circle-check"></i> Mutasi Telah Disetujui (Status Aktif)
+                </div>
+            `;
+
+            showToast('[BERHASIL] Pengajuan Mutasi Aset Disetujui!', 'fa-circle-check', '#059669');
+
+            openResultAlertModal({
+                isSuccess: true,
+                flagText: 'BERHASIL DISETUJUI',
+                flagClass: 'alert-flag-success',
+                title: 'Persetujuan Mutasi Berhasil!',
+                subtitle: 'Pengajuan mutasi aset telah berhasil disetujui & data kepemilikan aset resmi dialihkan.',
+                note: note || 'Disetujui tanpa catatan tambahan.',
+                icon: 'fa-circle-check',
+                iconBg: '#ecfdf5',
+                iconColor: '#059669'
+            });
+        }
+
+        function confirmRejectSubmission() {
+            const reason = document.getElementById('rejectReasonInput').value.trim();
+            if (!reason) {
+                showToast('Mohon isi catatan alasan revisi mutasi', 'fa-triangle-exclamation', '#ea580c');
+                return;
+            }
+
+            closeRejectModal();
+
+            const isMinor = selectedRejectFlag === 'minor';
+            const flagText = isMinor ? 'BERHASIL DIKEMBALIKAN (REVISI MINOR)' : 'BERHASIL DIKEMBALIKAN (REVISI MAYOR)';
+            const flagClass = isMinor ? 'alert-flag-minor' : 'alert-flag-mayor';
+
+            const badge = document.getElementById('badgeStatusWorkflow');
+            badge.className = 'status-badge-rejected';
+            badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Dikembalikan (${selectedRejectFlag.toUpperCase()})`;
+
+            const footer = document.getElementById('approvalFooter');
+            footer.innerHTML = `
+                <div style="width:100%; text-align:center; padding:10px; background:#fef2f2; border-radius:12px; border:1px solid #fecaca; color:#dc2626; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fa-solid fa-rotate-left"></i> Mutasi Dikembalikan (Revisi ${selectedRejectFlag.toUpperCase()})
+                </div>
+            `;
+
+            showToast(`[BERHASIL] Mutasi Dikembalikan (Revisi ${selectedRejectFlag.toUpperCase()})`, 'fa-rotate-left', isMinor ? '#f59e0b' : '#dc2626');
+
+            openResultAlertModal({
+                isSuccess: false,
+                flagText: flagText,
+                flagClass: flagClass,
+                title: 'Pengajuan Mutasi Berhasil Dikembalikan!',
+                subtitle: `Data mutasi telah dikembalikan ke pemohon untuk perbaikan dengan klasifikasi ${selectedRejectFlag.toUpperCase()}.`,
+                note: reason,
+                icon: 'fa-rotate-left',
+                iconBg: isMinor ? '#fffbeb' : '#fef2f2',
+                iconColor: isMinor ? '#d97706' : '#dc2626'
+            });
+        }
+
+        function openResultAlertModal(config) {
+            const modal = document.getElementById('resultAlertModal');
+            const iconFrame = document.getElementById('resultAlertIconFrame');
+            const icon = document.getElementById('resultAlertIcon');
+            const badge = document.getElementById('resultAlertFlagBadge');
+            const title = document.getElementById('resultAlertTitle');
+            const sub = document.getElementById('resultAlertSubtitle');
+            const assetTitle = document.getElementById('resultAlertAssetTitle');
+            const assetSub = document.getElementById('resultAlertAssetSub');
+            const noteRow = document.getElementById('resultAlertNoteRow');
+            const noteText = document.getElementById('resultAlertNoteText');
+
+            iconFrame.style.background = config.iconBg;
+            iconFrame.style.color = config.iconColor;
+            icon.className = `fa-solid ${config.icon}`;
+
+            badge.className = `alert-flag-badge ${config.flagClass}`;
+            badge.innerHTML = `<i class="fa-solid ${config.isSuccess ? 'fa-circle-check' : 'fa-rotate-left'}"></i> ${config.flagText}`;
+
+            title.textContent = config.title;
+            sub.textContent = config.subtitle;
+
+            if (currentMutasiData) {
+                assetTitle.textContent = currentMutasiData.title;
+                assetSub.textContent = `${currentMutasiData.unitAsal} \u2192 ${currentMutasiData.unitTujuan}`;
+            }
+
+            if (config.note) {
+                noteRow.style.display = 'block';
+                noteText.textContent = config.note;
+            } else {
+                noteRow.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeResultAlertAndRedirect() {
+            const modal = document.getElementById('resultAlertModal');
+            if (modal) modal.classList.remove('active');
+            window.location.href = './persetujuan.html';
+        }
+
+        // Theme and Toast
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            if (savedTheme) return savedTheme;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                return 'light';
+            }
+            return 'dark';
+        }
+
+        function applyTheme(theme) {
+            const icon = document.getElementById('nightModeIcon');
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-sun';
+            } else {
+                document.body.classList.remove('dark-mode');
+                if (icon) icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function toggleNightModeAction() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('pln_mobile_theme', newTheme);
+            applyTheme(newTheme);
+            showToast(newTheme === 'dark' ? 'Mode Gelap diaktifkan' : 'Mode Terang diaktifkan', newTheme === 'dark' ? 'fa-moon' : 'fa-sun', newTheme === 'dark' ? '#a855f7' : '#f59e0b');
+        }
+
+        function initTheme() {
+            const theme = getPreferredTheme();
+            applyTheme(theme);
+
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.getItem('pln_mobile_theme')) {
+                        applyTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            }
+        }
+
+        function showToast(msg, icon = 'fa-circle-check', color = '#4ade80') {
+            const toast = document.getElementById('mobileToast');
+            if (toast) {
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:15px;"></i> <span>${msg}</span>`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 2400);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initPageData();
+        });
+    </script>
+</body>
+
+</html>

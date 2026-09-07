@@ -1598,6 +1598,149 @@
             color: #f8fafc;
         }
 
+        /* Registration Form Specific Styles */
+        .reg-section-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        body.dark-mode .reg-section-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .reg-section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-blue, #0b4884);
+            background: var(--primary-blue-light, #e8f1fb);
+            padding: 7px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.1px;
+            border: 1px solid rgba(11, 72, 132, 0.12);
+        }
+
+        body.dark-mode .reg-section-title {
+            background: rgba(11, 72, 132, 0.3);
+            color: #93c5fd;
+            border-color: rgba(11, 72, 132, 0.4);
+        }
+
+        .reg-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .reg-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-sub, #334155);
+            display: block;
+        }
+
+        body.dark-mode .reg-label {
+            color: #cbd5e1;
+        }
+
+        .reg-input-disabled {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            background: #e2e8f0 !important;
+            color: #64748b !important;
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: monospace;
+            cursor: not-allowed;
+            outline: none;
+        }
+
+        body.dark-mode .reg-input-disabled {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+
+        /* Upload Dropzone Styling */
+        .upload-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: var(--bg-canvas, #f8fafc);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-dropzone:hover {
+            border-color: var(--primary-blue, #0b4884);
+            background: #eff6ff;
+        }
+
+        body.dark-mode .upload-dropzone {
+            border-color: #475569;
+            background: #0f172a;
+        }
+
+        body.dark-mode .upload-dropzone:hover {
+            border-color: #38bdf8;
+            background: #172554;
+        }
+
+        .upload-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .upload-preview-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .upload-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark, #0f172a);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        body.dark-mode .upload-title {
+            color: #f8fafc;
+        }
+
+        .upload-sub {
+            font-size: 10.5px;
+            color: var(--text-muted, #64748b);
+        }
+
         .filter-status-grid {
             display: flex;
             flex-wrap: wrap;
@@ -1865,17 +2008,6 @@
                         Total <strong id="totalCountDisplay">1.000</strong> <span id="sectionTypeLabel">Data Aset</span>
                     </div>
                 </div>
-
-                <!-- Category Filter Chips -->
-                <div class="category-chips-scroll" id="categoryChips">
-                    <button class="category-chip active" onclick="filterByCategory('all', this)">Semua</button>
-                    <button class="category-chip" onclick="filterByCategory('Lightning Arrester', this)">Lightning Arrester</button>
-                    <button class="category-chip" onclick="filterByCategory('Power Trafo', this)">Power Trafo</button>
-                    <button class="category-chip" onclick="filterByCategory('PMT', this)">PMT / Breaker</button>
-                    <button class="category-chip" onclick="filterByCategory('PMS', this)">PMS / Disconnector</button>
-                    <button class="category-chip" onclick="filterByCategory('CT/PT', this)">CT / PT</button>
-                    <button class="category-chip" onclick="filterByCategory('Busbar', this)">Busbar</button>
-                </div>
             </div>
 
             <!-- Dynamic Asset List Container -->
@@ -1886,9 +2018,9 @@
         </div>
 
         <!-- Floating Add Button -->
-        <div class="fab-add" onclick="openNewAssetModal()" title="Tambah Data Aset">
+        <a href="./tambah-asset-register.html?mode=penambahan" class="fab-add" title="Tambah Data Aset">
             <i class="fa-solid fa-plus"></i>
-        </div>
+        </a>
 
         <!-- Bottom Navigation Bar -->
         <div class="bottom-nav">
@@ -2740,155 +2872,95 @@
             }
         }
 
-        function openNewAssetModal() {
-            const content = document.getElementById('drawerContent');
-            currentNewAssetType = 'Penambahan';
+        function switchRegisterFormTab(tab) {
+            const btnUmum = document.getElementById('tabBtnUmum');
+            const btnSpec = document.getElementById('tabBtnSpesifikasi');
+            const contentUmum = document.getElementById('tabUmumContent');
+            const contentSpec = document.getElementById('tabSpesifikasiContent');
 
-            content.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:#0b4884; display:flex; align-items:center; justify-content:center; font-size:15px;">
-                            <i class="fa-solid fa-plus-circle"></i>
-                        </div>
-                        <div>
-                            <div style="font-size:15px; font-weight:800; color:var(--text-dark); font-family:'Outfit', sans-serif;">Formulir Pengajuan Aset</div>
-                            <div style="font-size:11px; color:var(--text-muted);">Pilih tipe pengajuan: Penambahan / Perubahan</div>
-                        </div>
-                    </div>
-                    <button onclick="closeDrawer()" style="background:var(--bg-canvas); border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
+            if (!btnUmum || !btnSpec || !contentUmum || !contentSpec) return;
+
+            if (tab === 'umum') {
+                btnUmum.style.background = '#ffffff';
+                btnUmum.style.color = 'var(--primary-blue, #0b4884)';
+                btnUmum.style.borderColor = 'var(--primary-blue, #0b4884)';
+                btnUmum.style.boxShadow = '0 2px 6px rgba(11,72,132,0.12)';
                 
-                <div class="drawer-scroll-body">
-                    <!-- Tipe Pengajuan (Segmented Pill Button Group Text Only) -->
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:6px; display:block;">Tipe Pengajuan *</label>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; background:var(--bg-canvas); padding:4px; border-radius:10px; border:1px solid var(--border-color);">
-                            <button type="button" id="btnTipePenambahan" onclick="setNewAssetType('Penambahan')" style="padding:8px 0; border:none; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; background:var(--primary-blue, #1a65d6); color:#ffffff; transition:all 0.2s;">
-                                Penambahan
-                            </button>
-                            <button type="button" id="btnTipePerubahan" onclick="setNewAssetType('Perubahan')" style="padding:8px 0; border:none; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; background:transparent; color:var(--text-muted, #64748b); transition:all 0.2s;">
-                                Perubahan
-                            </button>
-                        </div>
-                        <input type="hidden" id="newTipePengajuan" value="Penambahan">
-                    </div>
+                btnSpec.style.background = 'transparent';
+                btnSpec.style.color = 'var(--text-muted, #64748b)';
+                btnSpec.style.borderColor = 'transparent';
+                btnSpec.style.boxShadow = 'none';
 
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Jenis Aset / Peralatan *</label>
-                        <select id="newJenisAset" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                            <optgroup label="1. Peralatan Primer">
-                                <option value="Power Transformer (Trafo Tenaga)">Power Transformer (Trafo Tenaga)</option>
-                                <option value="Circuit Breaker (PMT)">Circuit Breaker (PMT)</option>
-                                <option value="Disconnecting Switch (PMS)">Disconnecting Switch (PMS)</option>
-                                <option value="Current Transformer (CT)">Current Transformer (CT)</option>
-                                <option value="Potential Transformer (PT)">Potential Transformer (PT)</option>
-                                <option value="Lightning Arrester (LA)">Lightning Arrester (LA)</option>
-                                <option value="Neutral Grounding Resistance (NGR)">Neutral Grounding Resistance (NGR)</option>
-                                <option value="Busbar">Busbar</option>
-                                <option value="Cubicle">Cubicle</option>
-                            </optgroup>
-                            <optgroup label="2. Komponen Pendukung">
-                                <option value="On Load Tap Changer (OLTC)">On Load Tap Changer (OLTC)</option>
-                            </optgroup>
-                            <optgroup label="3. Relay & Sistem Proteksi">
-                                <option value="Distance Relay">Distance Relay</option>
-                                <option value="Over Current Relay (OCR)">Over Current Relay (OCR)</option>
-                                <option value="Transformer Differential + REF (87T+64REF)">Transformer Differential + REF (87T+64REF)</option>
-                                <option value="Auto Reclose Relay (79)">Auto Reclose Relay (79)</option>
-                                <option value="Automatic Voltage Regulator Relay (AVR)">Automatic Voltage Regulator Relay (AVR)</option>
-                            </optgroup>
-                            <optgroup label="4. Catu Daya & Fasilitas Substation">
-                                <option value="Substation Battery">Substation Battery</option>
-                                <option value="Uninterruptible Power Supply (UPS)">Uninterruptible Power Supply (UPS)</option>
-                            </optgroup>
-                            <optgroup label="5. Monitoring & Metering">
-                                <option value="Digital Fault Recorder (DFR)">Digital Fault Recorder (DFR)</option>
-                            </optgroup>
-                            <optgroup label="6. SCADA & Telekomunikasi">
-                                <option value="Remote Terminal Unit (RTU)">Remote Terminal Unit (RTU)</option>
-                                <option value="Human-Machine Interface (HMI)">Human-Machine Interface (HMI)</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Penempatan / Lokasi Bay *</label>
-                        <input type="text" id="newPenempatan" placeholder="cth: Bay TRF #2 GI MRS150kV" value="Bay TRF #2 GI MRS150kV" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Techidentno *</label>
-                        <input type="text" id="newTechidentno" placeholder="cth: 161402651200000099" value="161402651200000099" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; font-family:monospace; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                        <div>
-                            <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Merk *</label>
-                            <input type="text" id="newMerk" placeholder="cth: Techfill" value="Techfill" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                        </div>
-                        <div>
-                            <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Type *</label>
-                            <input type="text" id="newType" placeholder="cth: Techfill - 70S" value="Techfill - 70S" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                        </div>
-                    </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                        <div>
-                            <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Serial ID *</label>
-                            <input type="text" id="newSerialId" placeholder="cth: 048826-99S" value="048826-99S" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; font-family:monospace; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                        </div>
-                        <div>
-                            <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Phasa *</label>
-                            <select id="newPhasa" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                                <option value="3 Phasa">3 Phasa</option>
-                                <option value="Phasa R">Phasa R</option>
-                                <option value="Phasa S">Phasa S</option>
-                                <option value="Phasa T">Phasa T</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">User Creator (Peran Pengaju) *</label>
-                        <select id="newCreatorRole" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                            <option value="Staff GI">Staff GI</option>
-                            <option value="TL/SPV GI">TL/SPV GI</option>
-                            <option value="Staff ULTG">Staff ULTG</option>
-                            <option value="TL/SPV ULTG" selected>TL/SPV ULTG</option>
-                            <option value="Staff Asdig UPT">Staff Asdig UPT</option>
-                            <option value="Asman UPT">Asman UPT</option>
-                            <option value="TL Asdig UPT">TL Asdig UPT</option>
-                            <option value="Staff Manset UIT">Staff Manset UIT</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Nama Pembuat Pengajuan *</label>
-                        <input type="text" id="newCreatorName" placeholder="cth: Daniandra Ersya" value="Daniandra Ersya" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:var(--text-sub); margin-bottom:4px; display:block;">Status Aset *</label>
-                        <select id="newStatusAset" style="width:100%; padding:9px 12px; border:1px solid var(--border-color); border-radius:10px; font-size:12px; outline:none; background:var(--bg-canvas); color:var(--text-dark);">
-                            <option value="Operasi">Operasi</option>
-                            <option value="Tidak Operasi">Tidak Operasi</option>
-                            <option value="Rusak">Rusak</option>
-                            <option value="Hilang">Hilang</option>
-                            <option value="Relokasi">Relokasi</option>
-                            <option value="Digudangkan">Digudangkan</option>
-                            <option value="Spare">Spare</option>
-                            <option value="Berfungsi">Berfungsi</option>
-                            <option value="Berfungsi Sebagian">Berfungsi Sebagian</option>
-                            <option value="Rencana" selected>Rencana</option>
-                            <option value="Mutasi Inter">Mutasi Inter</option>
-                            <option value="Mutasi Intra">Mutasi Intra</option>
-                        </select>
-                    </div>
-                </div>
+                contentUmum.style.display = 'flex';
+                contentSpec.style.display = 'none';
+            } else {
+                btnSpec.style.background = '#ffffff';
+                btnSpec.style.color = 'var(--primary-blue, #0b4884)';
+                btnSpec.style.borderColor = 'var(--primary-blue, #0b4884)';
+                btnSpec.style.boxShadow = '0 2px 6px rgba(11,72,132,0.12)';
 
-                <div class="drawer-footer-sticky">
-                    <button class="drawer-btn drawer-btn-secondary" onclick="closeDrawer()" style="flex:1;">Batal</button>
-                    <button class="drawer-btn" onclick="submitNewAsset()" style="flex:2;">
-                        <i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan
-                    </button>
-                </div>
-            `;
-            openDrawer();
+                btnUmum.style.background = 'transparent';
+                btnUmum.style.color = 'var(--text-muted, #64748b)';
+                btnUmum.style.borderColor = 'transparent';
+                btnUmum.style.boxShadow = 'none';
+
+                contentUmum.style.display = 'none';
+                contentSpec.style.display = 'flex';
+            }
+        }
+
+        function triggerFileInput(id) {
+            const fileInput = document.getElementById(id);
+            if (fileInput) fileInput.click();
+        }
+
+        function handleFileUpload(input, previewId, iconId) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const previewEl = document.getElementById(previewId);
+                const iconEl = document.getElementById(iconId);
+
+                if (previewEl) {
+                    previewEl.innerHTML = `
+                        <span class="upload-title" style="color:#059669;"><i class="fa-solid fa-circle-check"></i> ${file.name}</span>
+                        <span class="upload-sub">Ukuran: ${(file.size / 1024).toFixed(1)} KB (Terlampir)</span>
+                    `;
+                }
+
+                if (iconEl) {
+                    iconEl.style.background = '#dcfce7';
+                    iconEl.style.color = '#059669';
+                }
+                showToast('File terlampir: ' + file.name, 'fa-circle-check', '#059669');
+            }
+        }
+
+        function calculateAssetAge() {
+            const tglAwal = document.getElementById('regTglAwalOperasi') ? document.getElementById('regTglAwalOperasi').value : null;
+            const thnBuat = document.getElementById('regTahunBuat') ? document.getElementById('regTahunBuat').value : null;
+            const currentYear = new Date().getFullYear();
+
+            if (thnBuat) {
+                const age = currentYear - parseInt(thnBuat);
+                const usiaEl = document.getElementById('regUsiaAset');
+                if (usiaEl) usiaEl.value = (age >= 0 ? age : 0) + ' Tahun';
+            }
+
+            if (tglAwal) {
+                const startYear = new Date(tglAwal).getFullYear();
+                const opAge = currentYear - startYear;
+                const usiaOpEl = document.getElementById('regUsiaOperasi');
+                if (usiaOpEl) usiaOpEl.value = (opAge >= 0 ? opAge : 0) + ' Tahun';
+            }
+        }
+
+        function submitDraftAsset() {
+            showToast('Draft Pengajuan berhasil disimpan!', 'fa-floppy-disk', '#0284c7');
+            closeDrawer();
+        }
+
+        function openNewAssetModal() {
+            window.location.href = './tambah-asset-register.html?mode=penambahan';
         }
 
         function getCategoryFromJenis(jenis) {
@@ -2910,28 +2982,24 @@
 
         function submitNewAsset() {
             const tipePengajuan = document.getElementById('newTipePengajuan') ? document.getElementById('newTipePengajuan').value : currentNewAssetType;
-            const jenisAset = document.getElementById('newJenisAset').value;
-            const penempatan = document.getElementById('newPenempatan').value;
-            const techidentno = document.getElementById('newTechidentno').value;
-            const merk = document.getElementById('newMerk').value;
-            const type = document.getElementById('newType').value;
-            const serialId = document.getElementById('newSerialId').value;
-            const phasa = document.getElementById('newPhasa').value;
-            const statusAset = document.getElementById('newStatusAset').value;
-            const creatorRole = document.getElementById('newCreatorRole').value;
-            const creatorName = document.getElementById('newCreatorName').value.trim() || 'Daniandra Ersya';
-
-            if (!penempatan || !techidentno || !merk || !type || !serialId) {
-                showToast('Mohon lengkapi seluruh field yang bertanda *!', 'fa-triangle-exclamation', '#ef4444');
-                return;
-            }
+            const jenisAset = document.getElementById('newJenisAset') ? document.getElementById('newJenisAset').value : 'Power Transformer (Trafo Tenaga)';
+            const unit5 = document.getElementById('regUnit5') ? document.getElementById('regUnit5').value : 'Bay Trafo #1 150kV';
+            const unit4 = document.getElementById('regUnit4') ? document.getElementById('regUnit4').value : 'GI WARU 150kV';
+            const techidentno = document.getElementById('newTechidentno') ? document.getElementById('newTechidentno').value : '161402651200000099';
+            const merk = document.getElementById('newMerk') ? document.getElementById('newMerk').value : 'UNINDO';
+            const type = document.getElementById('newType') ? document.getElementById('newType').value : '60 MVA 150/20kV';
+            const serialId = document.getElementById('newSerialId') ? document.getElementById('newSerialId').value : 'SN-UN-2018-9942';
+            const phasa = document.getElementById('newPhasa') ? document.getElementById('newPhasa').value : '3 Phasa';
+            const statusAset = document.getElementById('newStatusAset') ? document.getElementById('newStatusAset').value : 'Operasi';
+            const creatorRole = document.getElementById('newCreatorRole') ? document.getElementById('newCreatorRole').value : 'TL/SPV ULTG';
+            const creatorName = document.getElementById('newCreatorName') ? document.getElementById('newCreatorName').value.trim() : 'Daniandra Ersya';
 
             const newObj = {
                 id: 'PST-P' + Date.now().toString().slice(-3),
                 section: 'pengajuan',
                 jenisAset: jenisAset,
                 category: getCategoryFromJenis(jenisAset),
-                penempatan: penempatan,
+                penempatan: `${unit5} ${unit4}`,
                 techidentno: techidentno,
                 merk: merk,
                 type: type,
@@ -2940,7 +3008,7 @@
                 status: statusAset,
                 statusClass: getStatusClass(statusAset),
                 level5: 'Main System & Primary Gear',
-                gi: 'GI WARU 150kV',
+                gi: unit4,
                 pengajuanType: tipePengajuan,
                 creator: `${creatorName} (${creatorRole})`,
                 creatorRole: creatorRole
@@ -2948,8 +3016,10 @@
 
             pstAssetsData.unshift(newObj);
             closeDrawer();
+            showToast('Pengajuan Tambah Data Aset berhasil dikirim!', 'fa-paper-plane', '#059669');
+
+            // Automatically switch to Pengajuan section to view the newly submitted asset
             switchSection('pengajuan', document.getElementById('btnPengajuan'));
-            showToast(`Pengajuan [${tipePengajuan}] "${newObj.jenisAset}" (${statusAset}) berhasil dikirim!`, 'fa-circle-check', '#059669');
         }
 
         /* Cascading Unit Hierarchy Data */
@@ -3585,30 +3655,44 @@
             }
         }
 
-        function toggleNightModeAction() {
-            const isDark = document.body.classList.contains('dark-mode');
-            if (!isDark) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('pln_mobile_theme', 'dark');
-                document.getElementById('nightModeIcon').className = 'fa-solid fa-sun';
-                showToast('Mode Gelap diaktifkan', 'fa-moon', '#a855f7');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('pln_mobile_theme', 'light');
-                document.getElementById('nightModeIcon').className = 'fa-solid fa-moon';
-                showToast('Mode Terang diaktifkan', 'fa-sun', '#f59e0b');
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            if (savedTheme) return savedTheme;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                return 'light';
             }
+            return 'dark';
         }
 
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pln_mobile_theme');
+        function applyTheme(theme) {
             const icon = document.getElementById('nightModeIcon');
-            if (savedTheme === 'dark') {
+            if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
                 if (icon) icon.className = 'fa-solid fa-sun';
             } else {
                 document.body.classList.remove('dark-mode');
                 if (icon) icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function toggleNightModeAction() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('pln_mobile_theme', newTheme);
+            applyTheme(newTheme);
+            showToast(newTheme === 'dark' ? 'Mode Gelap diaktifkan' : 'Mode Terang diaktifkan', newTheme === 'dark' ? 'fa-moon' : 'fa-sun', newTheme === 'dark' ? '#a855f7' : '#f59e0b');
+        }
+
+        function initTheme() {
+            const theme = getPreferredTheme();
+            applyTheme(theme);
+
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.getItem('pln_mobile_theme')) {
+                        applyTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
             }
         }
 
