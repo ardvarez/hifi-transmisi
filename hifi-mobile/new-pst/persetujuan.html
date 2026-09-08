@@ -2049,12 +2049,12 @@
                 code: 'DIS202600000003',
                 gi: 'GI Maros 150kV',
                 jenisMutasi: 'Dismantle',
-                cakupanMutasi: '',
+                cakupanMutasi: 'Dikembalikan ke Gudang',
                 unitAsal: 'GI Maros 150kV',
                 unitTujuan: 'Gudang UPT Makassar',
                 prefix: 'DIS',
                 totalAset: 4,
-                deskripsi: 'Pembongkaran PMT & PMS lama pada bay line penghantar Maros (Decommissioned)',
+                deskripsi: 'Pembongkaran PMT & PMS lama pada bay line penghantar Maros dan dikembalikan ke gudang UPT Makassar',
                 waitingLevel: 'Waiting 2',
                 applicant: 'Budi Santoso (Staff GI)',
                 date: '02 Sep 2026',
@@ -2119,6 +2119,25 @@
                 level5: 'Capacitor Bank & Reactor',
                 serialNo: 'CAP-MPG-05',
                 status: 'pending'
+            },
+            {
+                id: 'MUT-07',
+                code: 'DIS202600000007',
+                gi: 'GI Sawahan 150kV',
+                jenisMutasi: 'Dismantle',
+                cakupanMutasi: 'Tetap di Lokasi',
+                unitAsal: 'GI Sawahan 150kV',
+                unitTujuan: 'GI Sawahan 150kV (Bay Non-Operasi)',
+                prefix: 'DIS',
+                totalAset: 2,
+                deskripsi: 'Pembongkaran (dismantle) fungsi operasi bay GI Sawahan tanpa pemindahan fisik aset (Aset tetap di lokasi bay)',
+                waitingLevel: 'Waiting 2',
+                applicant: 'Bagus Prasetyo (Staff Asdig UPT)',
+                date: 'Hari ini, 10:30 WIB',
+                docNo: 'BA-DISM/119/SWH/2026',
+                level5: 'Switchgear SF6 Circuit Breaker',
+                serialNo: 'PMT-SWH-DIS-01',
+                status: 'pending'
             }
         ];
 
@@ -2179,7 +2198,7 @@
 
                 let matchCat = true;
                 if (currentSection === 'mutasi' && currentMutationCategory !== 'all') {
-                    if (currentMutationCategory === 'Antar UPT' || currentMutationCategory === 'Antar ULTG') {
+                    if (['Antar UPT', 'Antar ULTG', 'Dikembalikan ke Gudang', 'Tetap di Lokasi'].includes(currentMutationCategory)) {
                         matchCat = item.cakupanMutasi === currentMutationCategory;
                     } else {
                         matchCat = item.jenisMutasi === currentMutationCategory;
@@ -2297,17 +2316,9 @@
                                     <span class="mutation-label">Jenis Mutasi</span>
                                     <span class="mutation-value font-bold" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                                         <span>${item.jenisMutasi}</span>
-                                        ${item.cakupanMutasi ? `<span style="font-size:10px; font-weight:800; background:${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.15)' : 'rgba(168, 85, 247, 0.15)'}; color:${item.cakupanMutasi === 'Antar UPT' ? '#0284c7' : '#9333ea'}; border:1px solid ${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.3)' : 'rgba(168, 85, 247, 0.3)'}; padding:1px 7px; border-radius:6px; letter-spacing:0.1px;">${item.cakupanMutasi}</span>` : ''}
+                                        ${item.cakupanMutasi ? `<span style="font-size:10px; font-weight:800; background:${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.15)' : (item.cakupanMutasi === 'Antar ULTG' ? 'rgba(168, 85, 247, 0.15)' : (item.cakupanMutasi === 'Dikembalikan ke Gudang' ? 'rgba(217, 119, 6, 0.15)' : 'rgba(13, 148, 136, 0.15)'))}; color:${item.cakupanMutasi === 'Antar UPT' ? '#0284c7' : (item.cakupanMutasi === 'Antar ULTG' ? '#9333ea' : (item.cakupanMutasi === 'Dikembalikan ke Gudang' ? '#d97706' : '#0d9488'))}; border:1px solid ${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.3)' : (item.cakupanMutasi === 'Antar ULTG' ? 'rgba(168, 85, 247, 0.3)' : (item.cakupanMutasi === 'Dikembalikan ke Gudang' ? 'rgba(217, 119, 6, 0.3)' : 'rgba(13, 148, 136, 0.3)'))}; padding:1px 7px; border-radius:6px; letter-spacing:0.1px;">${item.cakupanMutasi}</span>` : ''}
                                     </span>
                                 </div>
-                                ${item.unitAsal && item.unitTujuan && item.jenisMutasi === 'Pindah Unit' ? `
-                                    <div class="mutation-row">
-                                        <span class="mutation-label">Rute Mutasi</span>
-                                        <span class="mutation-value" style="font-size:11px; color:var(--text-dark); font-weight:600;">
-                                            ${item.unitAsal} <i class="fa-solid fa-arrow-right" style="font-size:9px; color:var(--primary-blue); margin:0 3px;"></i> ${item.unitTujuan}
-                                        </span>
-                                    </div>
-                                ` : ''}
                                 <div class="mutation-row">
                                     <span class="mutation-label">Total Aset</span>
                                     <span class="mutation-value font-bold">${item.totalAset}</span>
@@ -2382,7 +2393,7 @@
 
                 <div class="drawer-scroll-body">
                     ${isMutasi ? `
-                        <!-- 1. JENIS MUTASI FILTER (MTS UPT, MTS ULTG, DIS, DPS, PSG) -->
+                        <!-- 1. JENIS MUTASI FILTER (MTS UPT/ULTG, DIS Gudang/Lokasi, DPS, PSG) -->
                         <div class="filter-section-group">
                             <label class="filter-section-title">Jenis Mutasi</label>
                             <div class="filter-chips-grid">
@@ -2395,8 +2406,11 @@
                                 <button class="filter-chip-btn ${tempCat === 'Antar ULTG' ? 'active' : ''}" onclick="selectMutationCatModal('Antar ULTG', this)">
                                     <i class="fa-solid fa-network-wired"></i> MTS (Antar ULTG)
                                 </button>
-                                <button class="filter-chip-btn ${tempCat === 'Dismantle' ? 'active' : ''}" onclick="selectMutationCatModal('Dismantle', this)">
-                                    <i class="fa-solid fa-wrench"></i> DIS (Dismantle)
+                                <button class="filter-chip-btn ${tempCat === 'Dikembalikan ke Gudang' ? 'active' : ''}" onclick="selectMutationCatModal('Dikembalikan ke Gudang', this)">
+                                    <i class="fa-solid fa-warehouse"></i> DIS (Ke Gudang)
+                                </button>
+                                <button class="filter-chip-btn ${tempCat === 'Tetap di Lokasi' ? 'active' : ''}" onclick="selectMutationCatModal('Tetap di Lokasi', this)">
+                                    <i class="fa-solid fa-location-dot"></i> DIS (Tetap Lokasi)
                                 </button>
                                 <button class="filter-chip-btn ${tempCat === 'Disposal' ? 'active' : ''}" onclick="selectMutationCatModal('Disposal', this)">
                                     <i class="fa-solid fa-trash-can"></i> DPS (Disposal)
@@ -2749,12 +2763,6 @@
                                     <span style="color: var(--text-muted);">Jenis Mutasi:</span>
                                     <strong style="color:#0284c7;">${item.jenisMutasi} ${item.cakupanMutasi ? '• ' + item.cakupanMutasi : ''}</strong>
                                 </div>
-                                ${item.unitAsal && item.unitTujuan && item.jenisMutasi === 'Pindah Unit' ? `
-                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                        <span style="color: var(--text-muted);">Rute Mutasi:</span>
-                                        <strong style="color:var(--text-dark);">${item.unitAsal} &rarr; ${item.unitTujuan}</strong>
-                                    </div>
-                                ` : ''}
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
                                     <span style="color: var(--text-muted);">Total Aset Terimbas:</span>
                                     <strong style="color:#ea580c;">${item.totalAset} Aset</strong>

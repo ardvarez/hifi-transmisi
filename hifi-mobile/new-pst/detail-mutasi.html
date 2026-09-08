@@ -1017,6 +1017,10 @@
                         <span class="info-label">Jenis Mutasi</span>
                         <span class="info-val" id="valJenisMutasi" style="color: var(--primary-blue);">Pindah Lokasi</span>
                     </div>
+                    <div class="info-static-row" id="rowTipeCakupan" style="display: none;">
+                        <span class="info-label" id="labelTipeCakupan">Tipe Dismantle</span>
+                        <span class="info-val" id="valTipeCakupan" style="font-weight: 700;">Dikembalikan ke Gudang</span>
+                    </div>
                     <div class="info-static-row">
                         <span class="info-label">Unit Asal</span>
                         <span class="info-val" id="valUnitAsal">GI Maros 150kV</span>
@@ -1381,11 +1385,12 @@
                 title: "Pembongkaran PMT & PMS Bay Line",
                 code: "DIS202600000003",
                 jenisMutasi: "Dismantle",
+                cakupanMutasi: "Dikembalikan ke Gudang",
                 prefix: "DIS",
                 unitAsal: "GI Maros 150kV",
                 unitTujuan: "Gudang UPT Makassar",
                 alasan: "Decommissioning Bay Penghantar Lama",
-                deskripsi: "Pembongkaran (dismantle) peralatan switchgear SF6 & disconnecting switch lama yang telah decommissioned.",
+                deskripsi: "Pembongkaran (dismantle) peralatan switchgear SF6 & disconnecting switch lama dan dikembalikan ke gudang UPT Makassar.",
                 docNo: "BA-DISM/082/MRS/2026",
                 applicant: "Budi Santoso (Staff GI)",
                 date: "02 Sep 2026 , 11:20 WIB",
@@ -1554,6 +1559,46 @@
                     }
                 ]
             },
+            "MUT-07": {
+                id: "MUT-07",
+                title: "Dismantle Bay Line (Tetap di Lokasi)",
+                code: "DIS202600000007",
+                jenisMutasi: "Dismantle",
+                cakupanMutasi: "Tetap di Lokasi",
+                prefix: "DIS",
+                unitAsal: "GI Sawahan 150kV",
+                unitTujuan: "GI Sawahan 150kV (Bay Non-Operasi)",
+                alasan: "Decommissioning Fungsi Bay Tanpa Pemindahan Fisik Aset",
+                deskripsi: "Pembongkaran (dismantle) fungsi operasi bay GI Sawahan. Seluruh peralatan PMT & PMS tidak dipindahkan lokasinya dan standby di bay.",
+                docNo: "BA-DISM/119/SWH/2026",
+                applicant: "Bagus Prasetyo (Staff Asdig UPT)",
+                date: "Hari ini, 10:30 WIB",
+                workflowStatus: "Menunggu ASMAN Unit Induk",
+                items: [
+                    {
+                        id: "ast-17",
+                        title: "Circuit Breaker PMT 150kV (Standby Bay)",
+                        techidentno: "1150370000000101",
+                        eqNumber: "EQ-PMT-SWH-DIS-01",
+                        manufacturer: "ABB",
+                        typeModel: "LTB 145D1/B SF6 (40 kA)",
+                        level5: "High Voltage Circuit Breaker",
+                        status: "Tidak Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-18",
+                        title: "Disconnecting Switch PMS Bay Line",
+                        techidentno: "1150370000000102",
+                        eqNumber: "EQ-PMS-SWH-DIS-02",
+                        manufacturer: "Siemens",
+                        typeModel: "3DN 170kV Double Break",
+                        level5: "High Voltage Disconnector Switch",
+                        status: "Tidak Operasi",
+                        checked: true
+                    }
+                ]
+            },
             "default": {
                 id: "default",
                 title: "Lightning Arrester & Proteksi Bay",
@@ -1632,7 +1677,31 @@
 
             // Form data
             document.getElementById('valDocNo').textContent = data.docNo;
-            document.getElementById('valJenisMutasi').textContent = data.cakupanMutasi ? `${data.jenisMutasi} (${data.cakupanMutasi})` : data.jenisMutasi;
+            document.getElementById('valJenisMutasi').textContent = data.jenisMutasi;
+
+            const rowTipe = document.getElementById('rowTipeCakupan');
+            const lblTipe = document.getElementById('labelTipeCakupan');
+            const valTipe = document.getElementById('valTipeCakupan');
+            if (rowTipe && data.cakupanMutasi) {
+                rowTipe.style.display = 'flex';
+                if (data.jenisMutasi === 'Dismantle') {
+                    lblTipe.textContent = 'Tipe Dismantle';
+                    valTipe.innerHTML = `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:6px; font-size:11px; background:${data.cakupanMutasi === 'Dikembalikan ke Gudang' ? '#fef3c7' : '#ccfbf1'}; color:${data.cakupanMutasi === 'Dikembalikan ke Gudang' ? '#b45309' : '#0f766e'}; font-weight:800; border:1px solid ${data.cakupanMutasi === 'Dikembalikan ke Gudang' ? '#fde68a' : '#99f6e4'};">
+                        <i class="fa-solid ${data.cakupanMutasi === 'Dikembalikan ke Gudang' ? 'fa-warehouse' : 'fa-location-dot'}"></i> ${data.cakupanMutasi}
+                    </span>`;
+                } else if (data.jenisMutasi === 'Pindah Unit') {
+                    lblTipe.textContent = 'Cakupan Mutasi';
+                    valTipe.innerHTML = `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:6px; font-size:11px; background:${data.cakupanMutasi === 'Antar UPT' ? '#e0f2fe' : '#f3e8ff'}; color:${data.cakupanMutasi === 'Antar UPT' ? '#0369a1' : '#7e22ce'}; font-weight:800; border:1px solid ${data.cakupanMutasi === 'Antar UPT' ? '#bfdbfe' : '#e9d5ff'};">
+                        <i class="fa-solid ${data.cakupanMutasi === 'Antar UPT' ? 'fa-building' : 'fa-network-wired'}"></i> ${data.cakupanMutasi}
+                    </span>`;
+                } else {
+                    lblTipe.textContent = 'Keterangan Tipe';
+                    valTipe.textContent = data.cakupanMutasi;
+                }
+            } else if (rowTipe) {
+                rowTipe.style.display = 'none';
+            }
+
             document.getElementById('valUnitAsal').textContent = data.unitAsal;
             document.getElementById('valUnitTujuan').textContent = data.unitTujuan;
             document.getElementById('valAlasan').textContent = data.alasan;
