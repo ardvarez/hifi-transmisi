@@ -1265,26 +1265,36 @@
 
     <script>
         // Sample datasets for dynamic loading based on URL Query ?id=
+        // Mutation Code Regex Reference: ^(DIS|DPS|MTS|PSG)\d{12}$
+        // Prefix Dictionary:
+        // MTS -> Pindah Unit
+        // DIS -> Dismantle
+        // DPS -> Disposal
+        // PSG -> Installation
+        const MUTATION_CODE_REGEX = /^(DIS|DPS|MTS|PSG)\d{12}$/;
+
         const mutasiRecords = {
             "MUT-01": {
                 id: "MUT-01",
-                title: "Lightning Arrester & Proteksi Bay",
-                code: "MUT-2023-MRS-001",
-                jenisMutasi: "Pindah Lokasi",
-                unitAsal: "GI Maros 150kV",
-                unitTujuan: "GI Mampang 150kV",
-                alasan: "Pemberhentian GI Maros 150kV",
-                deskripsi: "Dilakukan perpindahan aset berdasarkan SK pemberhentian ke GI Makassar & GITET Menum.",
-                docNo: "044.PJ/DAN.02.01/UPT-MKS/2023",
-                applicant: "Miami (Staff GI)",
-                date: "16 Nov 2023 , 10:54:47",
+                title: "Pindah Unit Antar UPT (GI Maros \u2192 GI Mampang)",
+                code: "MTS202600000001",
+                jenisMutasi: "Pindah Unit",
+                cakupanMutasi: "Antar UPT",
+                prefix: "MTS",
+                unitAsal: "UPT Makassar (GI Maros 150kV)",
+                unitTujuan: "UPT Cawang (GI Mampang 150kV)",
+                alasan: "Pemberhentian GI Maros 150kV & Penataan Bay Baru Antar UPT",
+                deskripsi: "Perpindahan aset bay penghantar Antar UPT (UPT Makassar ke UPT Cawang) berdasarkan SK Direksi ke GI Mampang 150kV.",
+                docNo: "044.PJ/DAN.02.01/UPT-MKS/2026",
+                applicant: "Daniandra Ersya (TL/SPV ULTG)",
+                date: "Hari ini, 09:15 WIB",
                 workflowStatus: "Menunggu ASMAN Unit Induk",
                 items: [
                     {
                         id: "ast-1",
                         title: "Lightning Arrester 145kV",
                         techidentno: "1150370000000001",
-                        eqNumber: "EQ-LA-MRS-2023-01",
+                        eqNumber: "EQ-LA-MRS-2026-01",
                         manufacturer: "ABB Sweden",
                         typeModel: "EXLIM R 145kV / 0121517A12-12R",
                         level5: "Surge Arrester System 150kV",
@@ -1293,7 +1303,7 @@
                     },
                     {
                         id: "ast-2",
-                        title: "Line Current Differential (87L) + Distance (21) + Autorecloser (79)",
+                        title: "Line Current Differential (87L) + Distance (21)",
                         techidentno: "1150370000000002",
                         eqNumber: "EQ-REL-MRS-87L",
                         manufacturer: "ABB Relion 670",
@@ -1328,13 +1338,15 @@
             },
             "MUT-02": {
                 id: "MUT-02",
-                title: "PMT 150kV & Control Panel",
-                code: "MUT-2026-SBY-089",
-                jenisMutasi: "Relokasi Bay",
-                unitAsal: "GI Waru 150kV",
-                unitTujuan: "GI Krian 150kV",
-                alasan: "Penguatan Interkoneksi Krian 2",
-                deskripsi: "Relokasi unit PMT cadangan operasional untuk percepatan pemulihan Bay Penghantar Krian.",
+                title: "Pindah Unit Antar ULTG (GI Waru \u2192 GI Krian)",
+                code: "MTS202600000002",
+                jenisMutasi: "Pindah Unit",
+                cakupanMutasi: "Antar ULTG",
+                prefix: "MTS",
+                unitAsal: "ULTG Sby Selatan (GI Waru 150kV)",
+                unitTujuan: "ULTG Sby Utara (GI Krian 150kV)",
+                alasan: "Penguatan Interkoneksi Krian 2 Antar ULTG",
+                deskripsi: "Relokasi unit PMT cadangan operasional Antar ULTG (Surabaya Selatan ke Surabaya Utara) untuk percepatan pemulihan Bay Penghantar Krian.",
                 docNo: "099.PJ/DAN.02.01/UPT-SBY/2026",
                 applicant: "Rian Pratama (Staff ULTG)",
                 date: "Kemarin, 14:15 WIB",
@@ -1364,25 +1376,204 @@
                     }
                 ]
             },
+            "MUT-03": {
+                id: "MUT-03",
+                title: "Pembongkaran PMT & PMS Bay Line",
+                code: "DIS202600000003",
+                jenisMutasi: "Dismantle",
+                prefix: "DIS",
+                unitAsal: "GI Maros 150kV",
+                unitTujuan: "Gudang UPT Makassar",
+                alasan: "Decommissioning Bay Penghantar Lama",
+                deskripsi: "Pembongkaran (dismantle) peralatan switchgear SF6 & disconnecting switch lama yang telah decommissioned.",
+                docNo: "BA-DISM/082/MRS/2026",
+                applicant: "Budi Santoso (Staff GI)",
+                date: "02 Sep 2026 , 11:20 WIB",
+                workflowStatus: "Menunggu ASMAN Unit Induk",
+                items: [
+                    {
+                        id: "ast-7",
+                        title: "Circuit Breaker (PMT SF6 150kV)",
+                        techidentno: "1150370000000088",
+                        eqNumber: "EQ-PMT-MRS-DIS-01",
+                        manufacturer: "Alstom Grid",
+                        typeModel: "GL 314 F1 170kV",
+                        level5: "High Voltage Circuit Breaker",
+                        status: "Tidak Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-8",
+                        title: "Pemisah Rel 1 (PMS 150kV)",
+                        techidentno: "1150370000000089",
+                        eqNumber: "EQ-PMS-MRS-DIS-02",
+                        manufacturer: "Siemens",
+                        typeModel: "3DN Double Break",
+                        level5: "High Voltage Disconnector Switch",
+                        status: "Tidak Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-9",
+                        title: "Pemisah Rel 2 (PMS 150kV)",
+                        techidentno: "1150370000000090",
+                        eqNumber: "EQ-PMS-MRS-DIS-03",
+                        manufacturer: "Siemens",
+                        typeModel: "3DN Double Break",
+                        level5: "High Voltage Disconnector Switch",
+                        status: "Tidak Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-10",
+                        title: "Capacitor Voltage Transformer (CVT 150kV)",
+                        techidentno: "1150370000000091",
+                        eqNumber: "EQ-CVT-MRS-DIS-04",
+                        manufacturer: "Trench Electric",
+                        typeModel: "TECF 145kV / 0.1kV",
+                        level5: "Instrument Transformer Voltage",
+                        status: "Tidak Operasi",
+                        checked: true
+                    }
+                ]
+            },
+            "MUT-04": {
+                id: "MUT-04",
+                title: "Penghapusan Trafo Arus (CT 150kV)",
+                code: "DPS202600000004",
+                jenisMutasi: "Disposal",
+                prefix: "DPS",
+                unitAsal: "GI Waru 150kV",
+                unitTujuan: "Gudang Scrap PLN UIT JBTB",
+                alasan: "Peralatan Rusak Total Pasca Pengujian Lab",
+                deskripsi: "Penghapusan aset (scrap/disposal) current transformer 150kV rusak total pasca uji lab dengan hasil breakdown isolasi.",
+                docNo: "ND-DSP/102/UIT-JBTB/2026",
+                applicant: "Hendra Kusuma (Staff Manset UIT)",
+                date: "31 Agu 2026 , 16:40 WIB",
+                workflowStatus: "Menunggu ASMAN Unit Induk",
+                items: [
+                    {
+                        id: "ast-11",
+                        title: "Current Transformer (CT 150kV Phasa R)",
+                        techidentno: "161402651200000777",
+                        eqNumber: "EQ-CT-WRU-DSP-01",
+                        manufacturer: "Koncar Instrument Transformers",
+                        typeModel: "AGU-170 Top Core / 2000-1000/1A",
+                        level5: "Instrument Transformer Current",
+                        status: "Rusak",
+                        checked: true
+                    }
+                ]
+            },
+            "MUT-05": {
+                id: "MUT-05",
+                title: "Instalasi Baru LA 150kV & NGR System",
+                code: "PSG202600000005",
+                jenisMutasi: "Installation",
+                prefix: "PSG",
+                unitAsal: "Gudang Logistik Proyek Transmisi",
+                unitTujuan: "GI Krian 150kV",
+                alasan: "Pemasangan Aset Baru Penguatan Bay Trafo #3",
+                deskripsi: "Pemasangan/instalasi baru peralatan Lightning Arrester 150kV dan Neutral Grounding Resistor NGR pada Bay Trafo 3 GI Krian.",
+                docNo: "BA-COMM/044/KRN/2026",
+                applicant: "Ahmad Fadhil (TL/SPV GI)",
+                date: "28 Agu 2026 , 10:00 WIB",
+                workflowStatus: "Approved (Telah Disetujui)",
+                items: [
+                    {
+                        id: "ast-12",
+                        title: "Surge Arrester LA 145kV (Heavy Duty)",
+                        techidentno: "161402651200000881",
+                        eqNumber: "EQ-LA-KRN-PSG-01",
+                        manufacturer: "Siemens Energy",
+                        typeModel: "3EL2 145-2 Polymeric",
+                        level5: "Surge Arrester System 150kV",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-13",
+                        title: "Neutral Grounding Resistor (NGR 40 Ohm)",
+                        techidentno: "161402651200000882",
+                        eqNumber: "EQ-NGR-KRN-PSG-02",
+                        manufacturer: "Cressall Resistors UK",
+                        typeModel: "NGR-150-40A 10s Rating",
+                        level5: "Grounding & Resistor Protection",
+                        status: "Operasi",
+                        checked: true
+                    },
+                    {
+                        id: "ast-14",
+                        title: "Neutral Current Transformer (NCT)",
+                        techidentno: "161402651200000883",
+                        eqNumber: "EQ-NCT-KRN-PSG-03",
+                        manufacturer: "ABB",
+                        typeModel: "IMB 145kV Neutral Current",
+                        level5: "Instrument Transformer Current",
+                        status: "Operasi",
+                        checked: true
+                    }
+                ]
+            },
+            "MUT-06": {
+                id: "MUT-06",
+                title: "Disposal Kapasitor Bank Rusak Berat",
+                code: "DPS202600000006",
+                jenisMutasi: "Disposal",
+                prefix: "DPS",
+                unitAsal: "GI Mampang 150kV",
+                unitTujuan: "Gudang Karantina Scrap UPT",
+                alasan: "Kapasitor Bank Habis Masa Pakai & Uji FAT Gagal",
+                deskripsi: "Pengajuan disposal kapasitor bank (Ditolak: lampiran uji sisa usia pakai belum lengkap).",
+                docNo: "ND-DSP/077/MPG/2026",
+                applicant: "Bagus Prasetyo (Staff Asdig UPT)",
+                date: "26 Agu 2026 , 13:45 WIB",
+                workflowStatus: "Dikembalikan (Revisi Minor)",
+                items: [
+                    {
+                        id: "ast-15",
+                        title: "Capacitor Bank 150kV (Bank 1)",
+                        techidentno: "161402651200000911",
+                        eqNumber: "EQ-CAP-MPG-DPS-01",
+                        manufacturer: "Nissin Electric Japan",
+                        typeModel: "SH-CAP 50 MVAR 150kV",
+                        level5: "Capacitor Bank & Reactor",
+                        status: "Rusak",
+                        checked: true
+                    },
+                    {
+                        id: "ast-16",
+                        title: "Series Damping Reactor (Reactor 150kV)",
+                        techidentno: "161402651200000912",
+                        eqNumber: "EQ-RCT-MPG-DPS-02",
+                        manufacturer: "Trench Austria",
+                        typeModel: "Air Core Dry Type 6%",
+                        level5: "Shunt & Series Reactor",
+                        status: "Rusak",
+                        checked: true
+                    }
+                ]
+            },
             "default": {
                 id: "default",
-                title: "Lightning Arrester",
-                code: "MUT-2023-MRS-001",
-                jenisMutasi: "Pindah Lokasi",
+                title: "Lightning Arrester & Proteksi Bay",
+                code: "MTS202600000001",
+                jenisMutasi: "Pindah Unit",
+                prefix: "MTS",
                 unitAsal: "GI Maros 150kV",
                 unitTujuan: "GI Mampang 150kV",
                 alasan: "Pemberhentian GI Maros 150kV",
-                deskripsi: "Dilakukan perpindahan aset berdasarkan SK pemberhentian ke GI Makassar",
-                docNo: "044.PJ/DAN.02.01/UPT-MKS/2023",
-                applicant: "Miami (Staff GI)",
-                date: "16 Nov 2023 , 10:54:47",
+                deskripsi: "Perpindahan aset bay penghantar berdasarkan SK Direksi ke GI Mampang 150kV.",
+                docNo: "044.PJ/DAN.02.01/UPT-MKS/2026",
+                applicant: "Daniandra Ersya (TL/SPV ULTG)",
+                date: "Hari ini, 09:15 WIB",
                 workflowStatus: "Menunggu ASMAN Unit Induk",
                 items: [
                     {
                         id: "ast-1",
                         title: "Lightning Arrester 145kV",
                         techidentno: "1150370000000001",
-                        eqNumber: "EQ-LA-MRS-2023-01",
+                        eqNumber: "EQ-LA-MRS-2026-01",
                         manufacturer: "ABB Sweden",
                         typeModel: "EXLIM R 145kV / 0121517A12-12R",
                         level5: "Surge Arrester System 150kV",
@@ -1391,7 +1582,7 @@
                     },
                     {
                         id: "ast-2",
-                        title: "Line Current Differential (87L) + Distance (21) + Autorecloser (79)",
+                        title: "Line Current Differential (87L) + Distance (21)",
                         techidentno: "1150370000000002",
                         eqNumber: "EQ-REL-MRS-87L",
                         manufacturer: "ABB Relion 670",
@@ -1441,7 +1632,7 @@
 
             // Form data
             document.getElementById('valDocNo').textContent = data.docNo;
-            document.getElementById('valJenisMutasi').textContent = data.jenisMutasi;
+            document.getElementById('valJenisMutasi').textContent = data.cakupanMutasi ? `${data.jenisMutasi} (${data.cakupanMutasi})` : data.jenisMutasi;
             document.getElementById('valUnitAsal').textContent = data.unitAsal;
             document.getElementById('valUnitTujuan').textContent = data.unitTujuan;
             document.getElementById('valAlasan').textContent = data.alasan;

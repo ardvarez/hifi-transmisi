@@ -671,7 +671,81 @@
         body.dark-mode .filter-btn-trigger.active {
             background: #0284c7 !important;
             color: #ffffff !important;
-            border-color: #0284c7 !important;
+        }
+
+        /* Quick Filter Pill Buttons */
+        .quick-pills-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-pills-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+
+        .quick-pills-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quick-pill-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 11.5px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            white-space: nowrap;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+        }
+
+        .quick-pill-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .quick-pill-btn.active {
+            background: var(--header-blue, #0b4884);
+            border-color: var(--header-blue, #0b4884);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(11, 72, 132, 0.25);
+        }
+
+        .quick-pill-btn .pill-count {
+            background: rgba(0, 0, 0, 0.08);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .quick-pill-btn.active .pill-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        body.dark-mode .quick-pill-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        body.dark-mode .quick-pill-btn.active {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
         }
 
         /* Asset List Cards */
@@ -1843,7 +1917,7 @@
     </div>
 
     <script>
-        // 1. DATASET ASSET REGISTER (PRIORITAS UTAMA)
+        // 1. DATASET ASSET REGISTER (Semua item di list persetujuan adalah data yang menunggu persetujuan / pending)
         const registerData = [
             {
                 id: 'APP-01',
@@ -1907,7 +1981,7 @@
                 manufacturer: 'Trench Germany 150kV',
                 serialNo: 'CT-TR-MPG-001',
                 notes: 'Koreksi rasio CT 1200-2400/5A untuk meter billing transaksi.',
-                status: 'approved'
+                status: 'pending'
             },
             {
                 id: 'APP-05',
@@ -1922,20 +1996,27 @@
                 level5: 'Busbar Disconnector & Earthing Switch',
                 manufacturer: 'Siemens Pantograph',
                 serialNo: 'PMS-SMN-0921',
-                notes: 'Dokumen uji pabrik (FAT) belum lengkap, mohon lampirkan sertifikat kalibrasi.',
-                status: 'rejected'
+                notes: 'Penambahan unit PMS baru pada bay trafo 1 untuk peningkatan fleksibilitas manuver.',
+                status: 'pending'
             }
         ];
 
-        // 2. DATASET MUTASI ASET (4 JENIS: Pindah Lokasi, Dismantle, Disposal, Installation)
+        // 2. DATASET MUTASI ASET (Semua data pending review Waiting 2 untuk 4 jenis: MTS, DIS, DPS, PSG)
+        // Regex format: ^(DIS|DPS|MTS|PSG)\d{12}$
+        const MUTATION_CODE_REGEX = /^(DIS|DPS|MTS|PSG)\d{12}$/;
+
         const mutasiData = [
             {
                 id: 'MUT-01',
-                code: 'TRF202300000004',
+                code: 'MTS202600000001',
                 gi: 'GI Maros 150kV',
-                jenisMutasi: 'Pindah Lokasi',
+                jenisMutasi: 'Pindah Unit',
+                cakupanMutasi: 'Antar UPT',
+                unitAsal: 'UPT Makassar (GI Maros)',
+                unitTujuan: 'UPT Cawang (GI Mampang)',
+                prefix: 'MTS',
                 totalAset: 4,
-                deskripsi: 'Dilakukan perpindahan aset berdasarkan SK ke GI Makassar',
+                deskripsi: 'Perpindahan aset bay penghantar Antar UPT (UPT Makassar ke UPT Cawang) berdasarkan SK Direksi ke GI Mampang 150kV',
                 waitingLevel: 'Waiting 2',
                 applicant: 'Daniandra Ersya (TL/SPV ULTG)',
                 date: 'Hari ini, 09:15 WIB',
@@ -1946,11 +2027,15 @@
             },
             {
                 id: 'MUT-02',
-                code: 'TRF202300000003',
-                gi: 'GI Maros 150kV',
-                jenisMutasi: 'Pindah Lokasi',
-                totalAset: 4,
-                deskripsi: 'Dilakukan perpindahan aset berdasarkan SK ke GI Makassar',
+                code: 'MTS202600000002',
+                gi: 'GI Waru 150kV',
+                jenisMutasi: 'Pindah Unit',
+                cakupanMutasi: 'Antar ULTG',
+                unitAsal: 'ULTG Sby Selatan (GI Waru)',
+                unitTujuan: 'ULTG Sby Utara (GI Krian)',
+                prefix: 'MTS',
+                totalAset: 2,
+                deskripsi: 'Relokasi unit PMT cadangan operasional Antar ULTG (Surabaya Selatan ke Surabaya Utara) untuk pemulihan Bay Penghantar Krian',
                 waitingLevel: 'Waiting 2',
                 applicant: 'Rian Pratama (Staff ULTG)',
                 date: 'Kemarin, 14:15 WIB',
@@ -1961,11 +2046,15 @@
             },
             {
                 id: 'MUT-03',
-                code: 'TRF202300000002',
+                code: 'DIS202600000003',
                 gi: 'GI Maros 150kV',
                 jenisMutasi: 'Dismantle',
+                cakupanMutasi: '',
+                unitAsal: 'GI Maros 150kV',
+                unitTujuan: 'Gudang UPT Makassar',
+                prefix: 'DIS',
                 totalAset: 4,
-                deskripsi: 'Dilakukan pembongkaran PMT & PMS lama pada bay line penghantar Maros',
+                deskripsi: 'Pembongkaran PMT & PMS lama pada bay line penghantar Maros (Decommissioned)',
                 waitingLevel: 'Waiting 2',
                 applicant: 'Budi Santoso (Staff GI)',
                 date: '02 Sep 2026',
@@ -1976,11 +2065,15 @@
             },
             {
                 id: 'MUT-04',
-                code: 'TRF202300000001',
+                code: 'DPS202600000004',
                 gi: 'GI Waru 150kV',
                 jenisMutasi: 'Disposal',
+                cakupanMutasi: '',
+                unitAsal: 'GI Waru 150kV',
+                unitTujuan: 'Gudang Scrap PLN UIT JBTB',
+                prefix: 'DPS',
                 totalAset: 1,
-                deskripsi: 'Penghapusan aset (Scrap) trafo arus CT 150kV rusak total pasca pengujian lab',
+                deskripsi: 'Penghapusan aset (Scrap/Disposal) trafo arus CT 150kV rusak total pasca pengujian lab',
                 waitingLevel: 'Waiting 2',
                 applicant: 'Hendra Kusuma (Staff Manset UIT)',
                 date: '31 Agu 2026',
@@ -1991,45 +2084,54 @@
             },
             {
                 id: 'MUT-05',
-                code: 'INS202300000009',
+                code: 'PSG202600000005',
                 gi: 'GI Krian 150kV',
                 jenisMutasi: 'Installation',
+                cakupanMutasi: '',
+                unitAsal: 'Gudang Logistik Proyek Transmisi',
+                unitTujuan: 'GI Krian 150kV',
+                prefix: 'PSG',
                 totalAset: 3,
-                deskripsi: 'Instalasi baru Lightning Arrester LA 150kV dan Neutral Grounding Resistor NGR',
-                waitingLevel: 'Approved',
+                deskripsi: 'Instalasi baru Lightning Arrester LA 150kV dan Neutral Grounding Resistor NGR sistem GI Krian',
+                waitingLevel: 'Waiting 2',
                 applicant: 'Ahmad Fadhil (TL/SPV GI)',
                 date: '28 Agu 2026',
                 docNo: 'BA-COMM/044/KRN/2026',
                 level5: 'Surge Arrester & Grounding System',
                 serialNo: 'LA-KRN-150-09',
-                status: 'approved'
+                status: 'pending'
             },
             {
                 id: 'MUT-06',
-                code: 'DSP202300000005',
+                code: 'DPS202600000006',
                 gi: 'GI Mampang 150kV',
                 jenisMutasi: 'Disposal',
+                cakupanMutasi: '',
+                unitAsal: 'GI Mampang 150kV',
+                unitTujuan: 'Gudang Karantina Scrap UPT',
+                prefix: 'DPS',
                 totalAset: 2,
-                deskripsi: 'Pengajuan disposal kapasitor bank (Ditolak: lampiran uji sisa usia pakai belum lengkap)',
-                waitingLevel: 'Rejected',
+                deskripsi: 'Pengajuan disposal kapasitor bank 150kV rusak berat pasca uji kelayakan teknis lab',
+                waitingLevel: 'Waiting 2',
                 applicant: 'Bagus Prasetyo (Staff Asdig UPT)',
                 date: '26 Agu 2026',
                 docNo: 'ND-DSP/077/MPG/2026',
                 level5: 'Capacitor Bank & Reactor',
                 serialNo: 'CAP-MPG-05',
-                status: 'rejected'
+                status: 'pending'
             }
         ];
 
-        let currentSection = 'register'; // Asset Register is primary default
-        let currentTab = 'pending'; // 'all', 'pending', 'approved', 'rejected'
-        let currentMutationCategory = 'all'; // 'all', 'Pindah Lokasi', 'Dismantle', 'Disposal', 'Installation'
-        let currentRegisterType = 'all'; // 'all', 'Penambahan', 'Perubahan'
+        let currentSection = 'register';
+        let currentMutationCategory = 'all';
+        let currentRegisterType = 'all';
         let currentGiFilter = 'all';
         let searchQuery = '';
 
         function switchMainType(section) {
             currentSection = section;
+            currentMutationCategory = 'all';
+            currentRegisterType = 'all';
 
             const btnReg = document.getElementById('btnTypeRegister');
             const btnMut = document.getElementById('btnTypeMutasi');
@@ -2045,7 +2147,7 @@
                 if (pageHeader) pageHeader.textContent = 'Persetujuan Register Aset';
                 if (bannerBadge) bannerBadge.innerHTML = '<i class="fa-solid fa-stamp"></i> Approval Asset';
                 if (bannerTitle) bannerTitle.textContent = 'Persetujuan Register Aset';
-                if (bannerDesc) bannerDesc.textContent = 'Review & validasi pengajuan registrasi baru serta pembaruan data master aset.';
+                if (bannerDesc) bannerDesc.textContent = 'Daftar pengajuan registrasi baru & perubahan data master aset yang perlu disetujui.';
                 if (searchInput) searchInput.placeholder = 'Cari aset, KKS, atau pemohon...';
                 showToast('Tampilan: Persetujuan Register Aset', 'fa-database', '#0b4884');
             } else {
@@ -2054,13 +2156,14 @@
                 if (pageHeader) pageHeader.textContent = 'Pengajuan Mutasi Aset';
                 if (bannerBadge) bannerBadge.innerHTML = '<i class="fa-solid fa-right-left"></i> Persetujuan Mutasi';
                 if (bannerTitle) bannerTitle.textContent = 'Pengajuan Mutasi Aset';
-                if (bannerDesc) bannerDesc.textContent = 'Persetujuan riwayat mutasi aset: Pindah Lokasi, Dismantle, Disposal, dan Installation.';
-                if (searchInput) searchInput.placeholder = 'Cari Kode Mutasi ...';
+                if (bannerDesc) bannerDesc.textContent = 'Daftar permohonan mutasi aset (Pindah Unit Antar UPT/ULTG, DIS, DPS, PSG) yang menunggu persetujuan.';
+                if (searchInput) searchInput.placeholder = 'Cari Kode Mutasi (MTS/DIS/DPS/PSG)...';
                 showToast('Tampilan: Pengajuan Mutasi Aset', 'fa-right-left', '#ea580c');
             }
 
             renderApproval();
             updateCounts();
+            updateFilterBtnStatus();
         }
 
         function getActiveDataset() {
@@ -2072,28 +2175,27 @@
             const data = getActiveDataset();
 
             let filtered = data.filter(item => {
-                // Match status tab (if 'all' show all, otherwise match status)
-                let matchTab = (currentTab === 'all') || (item.status === currentTab);
+                if (item.status !== 'pending') return false;
 
-                // Match category for Mutasi
                 let matchCat = true;
                 if (currentSection === 'mutasi' && currentMutationCategory !== 'all') {
-                    matchCat = item.jenisMutasi === currentMutationCategory;
+                    if (currentMutationCategory === 'Antar UPT' || currentMutationCategory === 'Antar ULTG') {
+                        matchCat = item.cakupanMutasi === currentMutationCategory;
+                    } else {
+                        matchCat = item.jenisMutasi === currentMutationCategory;
+                    }
                 }
 
-                // Match register type
                 let matchRegType = true;
                 if (currentSection === 'register' && currentRegisterType !== 'all') {
                     matchRegType = item.submissionType === currentRegisterType;
                 }
 
-                // Match GI filter
                 let matchGi = true;
                 if (currentGiFilter !== 'all') {
                     matchGi = item.gi && item.gi.toLowerCase().includes(currentGiFilter.toLowerCase());
                 }
 
-                // Match search query
                 const q = searchQuery.toLowerCase();
                 let matchSearch = q === '';
                 if (!matchSearch) {
@@ -2101,6 +2203,9 @@
                         matchSearch = (item.code && item.code.toLowerCase().includes(q)) ||
                             (item.gi && item.gi.toLowerCase().includes(q)) ||
                             (item.jenisMutasi && item.jenisMutasi.toLowerCase().includes(q)) ||
+                            (item.cakupanMutasi && item.cakupanMutasi.toLowerCase().includes(q)) ||
+                            (item.unitAsal && item.unitAsal.toLowerCase().includes(q)) ||
+                            (item.unitTujuan && item.unitTujuan.toLowerCase().includes(q)) ||
                             (item.deskripsi && item.deskripsi.toLowerCase().includes(q)) ||
                             (item.applicant && item.applicant.toLowerCase().includes(q));
                     } else {
@@ -2111,18 +2216,18 @@
                     }
                 }
 
-                return matchTab && matchCat && matchRegType && matchGi && matchSearch;
+                return matchCat && matchRegType && matchGi && matchSearch;
             });
 
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state-card">
-                        <div class="empty-state-icon-box">
-                            <i class="fa-solid fa-folder-open"></i>
+                        <div class="empty-state-icon-box" style="background: #ecfdf5; color: #059669;">
+                            <i class="fa-solid fa-circle-check"></i>
                         </div>
-                        <div style="font-weight:800; color:var(--text-dark); font-size:14px; font-family:'Outfit', sans-serif;">Tidak Ada Data Pengajuan</div>
+                        <div style="font-weight:800; color:var(--text-dark); font-size:14px; font-family:'Outfit', sans-serif;">Semua Pengajuan Selesai</div>
                         <div style="font-size:11.5px; color:var(--text-muted); max-width:260px;">
-                            ${searchQuery ? `Tidak ada data yang cocok dengan kata kunci "${searchQuery}"` : 'Tidak ada permohonan yang sesuai dengan filter yang dipilih.'}
+                            ${searchQuery ? `Tidak ada data yang cocok dengan kata kunci "${searchQuery}"` : 'Tidak ada pengajuan yang memerlukan persetujuan saat ini.'}
                         </div>
                     </div>
                 `;
@@ -2130,7 +2235,6 @@
             }
 
             if (currentSection === 'register') {
-                // RENDER ASSET REGISTER CARDS (PRIORITAS UTAMA)
                 container.innerHTML = filtered.map(item => `
                     <div class="asset-list-card" id="appCard-${item.id}" onclick="openRegisterDetail('${item.id}')">
                         <div class="asset-card-top">
@@ -2158,31 +2262,20 @@
                             </div>
                         </div>
 
-                        ${item.status === 'pending' ? `
-                            <div class="approval-actions" onclick="event.stopPropagation()">
-                                <button class="btn-action-reject" onclick="rejectApproval('${item.id}', '${item.code}')">
-                                    <i class="fa-solid fa-xmark"></i> Tolak
-                                </button>
-                                <button class="btn-action-approve" onclick="approveApproval('${item.id}', '${item.code}')">
-                                    <i class="fa-solid fa-check"></i> Setujui Aset
-                                </button>
-                                <button class="btn-action-detail" onclick="openRegisterDetail('${item.id}')" title="Detail Pengajuan">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        ` : `
-                            <div style="margin-top:2px; padding-top:8px; border-top:1px dashed var(--border-color); font-size:11px; font-weight:700; color:${item.status === 'approved' ? '#059669' : '#dc2626'}; display:flex; align-items:center; justify-content:space-between;">
-                                <div style="display:flex; align-items:center; gap:5px;">
-                                    <i class="fa-solid ${item.status === 'approved' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
-                                    <span>${item.status === 'approved' ? 'Telah Disetujui (Aktif Operasi)' : 'Dikembalikan untuk Revisi'}</span>
-                                </div>
-                                <span style="font-size:10px; color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-chevron-right"></i></span>
-                            </div>
-                        `}
+                        <div class="approval-actions" onclick="event.stopPropagation()">
+                            <button class="btn-action-reject" onclick="rejectApproval('${item.id}', '${item.code}')">
+                                <i class="fa-solid fa-xmark"></i> Tolak
+                            </button>
+                            <button class="btn-action-approve" onclick="approveApproval('${item.id}', '${item.code}')">
+                                <i class="fa-solid fa-check"></i> Setujui Aset
+                            </button>
+                            <button class="btn-action-detail" onclick="openRegisterDetail('${item.id}')" title="Detail Pengajuan">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             } else {
-                // RENDER SPECIFIC MUTASI DESIGN (MATCHING SCREENSHOT)
                 container.innerHTML = filtered.map(item => {
                     const statusClass = item.status === 'pending' ? 'status-waiting' : (item.status === 'approved' ? 'status-approved' : 'status-rejected');
                     const statusLabel = item.status === 'pending' ? (item.waitingLevel || 'Waiting 2') : (item.status === 'approved' ? 'Approved' : 'Rejected');
@@ -2202,8 +2295,19 @@
                             <div class="mutation-card-body">
                                 <div class="mutation-row">
                                     <span class="mutation-label">Jenis Mutasi</span>
-                                    <span class="mutation-value font-bold">${item.jenisMutasi}</span>
+                                    <span class="mutation-value font-bold" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                        <span>${item.jenisMutasi}</span>
+                                        ${item.cakupanMutasi ? `<span style="font-size:10px; font-weight:800; background:${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.15)' : 'rgba(168, 85, 247, 0.15)'}; color:${item.cakupanMutasi === 'Antar UPT' ? '#0284c7' : '#9333ea'}; border:1px solid ${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.3)' : 'rgba(168, 85, 247, 0.3)'}; padding:1px 7px; border-radius:6px; letter-spacing:0.1px;">${item.cakupanMutasi}</span>` : ''}
+                                    </span>
                                 </div>
+                                ${item.unitAsal && item.unitTujuan && item.jenisMutasi === 'Pindah Unit' ? `
+                                    <div class="mutation-row">
+                                        <span class="mutation-label">Rute Mutasi</span>
+                                        <span class="mutation-value" style="font-size:11px; color:var(--text-dark); font-weight:600;">
+                                            ${item.unitAsal} <i class="fa-solid fa-arrow-right" style="font-size:9px; color:var(--primary-blue); margin:0 3px;"></i> ${item.unitTujuan}
+                                        </span>
+                                    </div>
+                                ` : ''}
                                 <div class="mutation-row">
                                     <span class="mutation-label">Total Aset</span>
                                     <span class="mutation-value font-bold">${item.totalAset}</span>
@@ -2214,10 +2318,10 @@
                                 </div>
                             </div>
 
-                            <div style="margin-top:2px; padding-top:8px; border-top:1px dashed var(--border-color); font-size:11px; font-weight:700; color:${item.status === 'approved' ? '#059669' : (item.status === 'rejected' ? '#dc2626' : 'var(--primary-blue)')}; display:flex; align-items:center; justify-content:space-between;">
+                            <div style="margin-top:2px; padding-top:8px; border-top:1px dashed var(--border-color); font-size:11px; font-weight:700; color:var(--primary-blue); display:flex; align-items:center; justify-content:space-between;">
                                 <div style="display:flex; align-items:center; gap:5px;">
-                                    <i class="fa-solid ${item.status === 'approved' ? 'fa-circle-check' : (item.status === 'rejected' ? 'fa-circle-xmark' : 'fa-arrow-up-right-from-square')}"></i>
-                                    <span>${item.status === 'approved' ? 'Mutasi Telah Disetujui' : (item.status === 'rejected' ? 'Dikembalikan untuk Revisi' : 'Lihat Detail Pengajuan')}</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    <span>Lihat Detail & Eksekusi Persetujuan</span>
                                 </div>
                                 <span style="font-size:10px; color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-chevron-right"></i></span>
                             </div>
@@ -2249,14 +2353,12 @@
             renderApproval();
         }
 
-        let tempTab = currentTab;
         let tempCat = currentMutationCategory;
         let tempRegType = currentRegisterType;
 
         function openFilterModal() {
             const isMutasi = currentSection === 'mutasi';
             const content = document.getElementById('drawerContent');
-            tempTab = currentTab;
             tempCat = currentMutationCategory;
             tempRegType = currentRegisterType;
 
@@ -2270,7 +2372,7 @@
                             <div style="font-size: 15px; font-weight: 800; color: var(--text-dark); font-family: 'Outfit', sans-serif;">
                                 Filter ${isMutasi ? 'Pengajuan Mutasi' : 'Asset Register'}
                             </div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Sesuaikan parameter pencarian & workflow</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Sesuaikan parameter pencarian data persetujuan</div>
                         </div>
                     </div>
                     <button onclick="closeDrawer()" style="background: var(--bg-canvas); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
@@ -2279,49 +2381,33 @@
                 </div>
 
                 <div class="drawer-scroll-body">
-                    <!-- 1. STATUS WORKFLOW FILTER -->
-                    <div class="filter-section-group">
-                        <label class="filter-section-title">Status Workflow</label>
-                        <div class="filter-chips-grid">
-                            <button class="filter-chip-btn ${tempTab === 'all' ? 'active' : ''}" onclick="selectFilterTabModal('all', this)">
-                                Semua Status
-                            </button>
-                            <button class="filter-chip-btn ${tempTab === 'pending' ? 'active' : ''}" onclick="selectFilterTabModal('pending', this)">
-                                ${isMutasi ? 'Waiting 2' : 'Menunggu Review'}
-                            </button>
-                            <button class="filter-chip-btn ${tempTab === 'approved' ? 'active' : ''}" onclick="selectFilterTabModal('approved', this)">
-                                ${isMutasi ? 'Approved' : 'Disetujui'}
-                            </button>
-                            <button class="filter-chip-btn ${tempTab === 'rejected' ? 'active' : ''}" onclick="selectFilterTabModal('rejected', this)">
-                                ${isMutasi ? 'Rejected' : 'Revisi'}
-                            </button>
-                        </div>
-                    </div>
-
                     ${isMutasi ? `
-                        <!-- 2. JENIS MUTASI FILTER (4 JENIS) -->
+                        <!-- 1. JENIS MUTASI FILTER (MTS UPT, MTS ULTG, DIS, DPS, PSG) -->
                         <div class="filter-section-group">
                             <label class="filter-section-title">Jenis Mutasi</label>
                             <div class="filter-chips-grid">
                                 <button class="filter-chip-btn ${tempCat === 'all' ? 'active' : ''}" onclick="selectMutationCatModal('all', this)">
                                     Semua Jenis
                                 </button>
-                                <button class="filter-chip-btn ${tempCat === 'Pindah Lokasi' ? 'active' : ''}" onclick="selectMutationCatModal('Pindah Lokasi', this)">
-                                    <i class="fa-solid fa-location-arrow"></i> Pindah Lokasi
+                                <button class="filter-chip-btn ${tempCat === 'Antar UPT' ? 'active' : ''}" onclick="selectMutationCatModal('Antar UPT', this)">
+                                    <i class="fa-solid fa-building"></i> MTS (Antar UPT)
+                                </button>
+                                <button class="filter-chip-btn ${tempCat === 'Antar ULTG' ? 'active' : ''}" onclick="selectMutationCatModal('Antar ULTG', this)">
+                                    <i class="fa-solid fa-network-wired"></i> MTS (Antar ULTG)
                                 </button>
                                 <button class="filter-chip-btn ${tempCat === 'Dismantle' ? 'active' : ''}" onclick="selectMutationCatModal('Dismantle', this)">
-                                    <i class="fa-solid fa-wrench"></i> Dismantle
+                                    <i class="fa-solid fa-wrench"></i> DIS (Dismantle)
                                 </button>
                                 <button class="filter-chip-btn ${tempCat === 'Disposal' ? 'active' : ''}" onclick="selectMutationCatModal('Disposal', this)">
-                                    <i class="fa-solid fa-trash-can"></i> Disposal
+                                    <i class="fa-solid fa-trash-can"></i> DPS (Disposal)
                                 </button>
                                 <button class="filter-chip-btn ${tempCat === 'Installation' ? 'active' : ''}" onclick="selectMutationCatModal('Installation', this)">
-                                    <i class="fa-solid fa-plug-circle-bolt"></i> Installation
+                                    <i class="fa-solid fa-plug-circle-bolt"></i> PSG (Installation)
                                 </button>
                             </div>
                         </div>
                     ` : `
-                        <!-- 2. TIPE REGISTRASI (Penambahan vs Perubahan) -->
+                        <!-- 1. TIPE REGISTRASI (Penambahan vs Perubahan) -->
                         <div class="filter-section-group">
                             <label class="filter-section-title">Tipe Registrasi</label>
                             <div class="filter-chips-grid">
@@ -2338,7 +2424,7 @@
                         </div>
                     `}
 
-                    <!-- 3. FILTER LOKASI GARDU INDUK -->
+                    <!-- 2. FILTER LOKASI GARDU INDUK -->
                     <div class="filter-section-group">
                         <label class="filter-section-title">Lokasi Gardu Induk</label>
                         <select id="modalGiSelect" style="width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-canvas); color: var(--text-dark); font-size: 12.5px; outline: none;">
@@ -2364,12 +2450,6 @@
             openDrawer();
         }
 
-        function selectFilterTabModal(val, btn) {
-            tempTab = val;
-            btn.parentElement.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
         function selectMutationCatModal(val, btn) {
             tempCat = val;
             btn.parentElement.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
@@ -2382,28 +2462,38 @@
             btn.classList.add('active');
         }
 
+        function updateFilterBtnStatus() {
+            const btn = document.getElementById('btnFilterTrigger');
+            if (!btn) return;
+            const hasFilter = (currentSection === 'mutasi' ? currentMutationCategory !== 'all' : currentRegisterType !== 'all') || currentGiFilter !== 'all';
+            if (hasFilter) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
         function resetFiltersModal() {
-            tempTab = 'pending';
             tempCat = 'all';
             tempRegType = 'all';
-            currentTab = 'pending';
             currentMutationCategory = 'all';
             currentRegisterType = 'all';
             currentGiFilter = 'all';
             closeDrawer();
-            quickFilterTab('pending');
+            renderApproval();
+            updateFilterBtnStatus();
             showToast('Filter berhasil direset', 'fa-rotate-left', '#0284c7');
         }
 
         function applyFiltersModal() {
-            currentTab = tempTab;
             currentMutationCategory = tempCat;
             currentRegisterType = tempRegType;
             const giSelect = document.getElementById('modalGiSelect');
             if (giSelect) currentGiFilter = giSelect.value;
 
             closeDrawer();
-            quickFilterTab(currentTab);
+            renderApproval();
+            updateFilterBtnStatus();
             showToast('Filter berhasil diterapkan', 'fa-circle-check', '#059669');
         }
 
@@ -2478,6 +2568,7 @@
 
                 showToast(`[BERHASIL] ${isReg ? 'Aset' : 'Mutasi'} ${item.code} Disetujui!`, 'fa-circle-check', '#059669');
                 renderApproval();
+                renderSubPills();
                 updateCounts();
                 closeListApproveModal();
 
@@ -2554,6 +2645,7 @@
 
                 showToast(`[BERHASIL] ${item.code} Dikembalikan (Revisi ${selectedListRejectFlag.toUpperCase()})`, 'fa-rotate-left', isMinor ? '#f59e0b' : '#dc2626');
                 renderApproval();
+                renderSubPills();
                 updateCounts();
                 closeListRejectModal();
 
@@ -2591,35 +2683,14 @@
                 bMut.style.display = mutPending > 0 ? 'inline-flex' : 'none';
             }
 
-            const data = getActiveDataset();
-            const pending = data.filter(a => a.status === 'pending').length;
-            const approved = data.filter(a => a.status === 'approved').length;
-            const rejected = data.filter(a => a.status === 'rejected').length;
+            const activePending = currentSection === 'register' ? regPending : mutPending;
+            const bannerPending = document.getElementById('bannerPendingText');
+            if (bannerPending) {
+                bannerPending.textContent = currentSection === 'register' ? `${regPending} Menunggu Persetujuan` : `${mutPending} Waiting 2 (Persetujuan)`;
+            }
 
             const statPend = document.getElementById('statPendingNum');
-            const statApp = document.getElementById('statApprovedNum');
-            const statRej = document.getElementById('statRejectedNum');
-            if (statPend) statPend.textContent = pending;
-            if (statApp) statApp.textContent = approved;
-            if (statRej) statRej.textContent = rejected;
-
-            const bannerPending = document.getElementById('bannerPendingText');
-            if (bannerPending) bannerPending.textContent = currentSection === 'register' ? `${pending} Menunggu` : `${pending} Waiting 2`;
-
-            const bannerApproved = document.getElementById('bannerApprovedText');
-            if (bannerApproved) bannerApproved.textContent = currentSection === 'register' ? `${approved} Disetujui` : `${approved} Approved`;
-
-            const mPendingLabel = document.getElementById('metricPendingLabel');
-            if (mPendingLabel) mPendingLabel.textContent = currentSection === 'register' ? 'Review' : 'Waiting 2';
-
-            const mPendingSub = document.getElementById('metricPendingSub');
-            if (mPendingSub) mPendingSub.textContent = currentSection === 'register' ? 'Menunggu Aksi' : 'Total Permohonan';
-
-            const mApprovedLabel = document.getElementById('metricApprovedLabel');
-            if (mApprovedLabel) mApprovedLabel.textContent = currentSection === 'register' ? 'Disetujui' : 'Approved';
-
-            const mRejectedLabel = document.getElementById('metricRejectedLabel');
-            if (mRejectedLabel) mRejectedLabel.textContent = currentSection === 'register' ? 'Revisi' : 'Rejected';
+            if (statPend) statPend.textContent = activePending;
         }
 
         function openRegisterDetail(id) {
@@ -2676,8 +2747,14 @@
                             ${isMutasi ? `
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
                                     <span style="color: var(--text-muted);">Jenis Mutasi:</span>
-                                    <strong style="color:#0284c7;">${item.jenisMutasi}</strong>
+                                    <strong style="color:#0284c7;">${item.jenisMutasi} ${item.cakupanMutasi ? '• ' + item.cakupanMutasi : ''}</strong>
                                 </div>
+                                ${item.unitAsal && item.unitTujuan && item.jenisMutasi === 'Pindah Unit' ? `
+                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
+                                        <span style="color: var(--text-muted);">Rute Mutasi:</span>
+                                        <strong style="color:var(--text-dark);">${item.unitAsal} &rarr; ${item.unitTujuan}</strong>
+                                    </div>
+                                ` : ''}
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
                                     <span style="color: var(--text-muted);">Total Aset Terimbas:</span>
                                     <strong style="color:#ea580c;">${item.totalAset} Aset</strong>
