@@ -2014,7 +2014,24 @@
                         <span class="grid-label">MANTAPS</span>
                     </a>
 
-                    <!-- 7. Lainnya -->
+                    <!-- 7. TFA -->
+                    <div class="grid-item" onclick="openModal('tfa')">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+                                <defs>
+                                    <linearGradient id="tfaGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#ea580c"/></linearGradient>
+                                    <linearGradient id="tfaBolt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fef08a"/><stop offset="100%" stop-color="#facc15"/></linearGradient>
+                                    <filter id="tfaShadow"><feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#9a3412" flood-opacity="0.25"/></filter>
+                                </defs>
+                                <rect x="8" y="8" width="32" height="32" rx="10" fill="url(#tfaGrad)" filter="url(#tfaShadow)"/>
+                                <path d="M 12 28 L 18 28 L 21 21 L 25 33 L 29 25 L 32 28 L 36 28" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+                                <polygon points="26,12 19,23 24,23 21,34 30,20 25,20" fill="url(#tfaBolt)" filter="url(#tfaShadow)"/>
+                            </svg>
+                        </div>
+                        <span class="grid-label">TFA</span>
+                    </div>
+
+                    <!-- 8. Lainnya -->
                     <div class="grid-item" onclick="openModal('more')">
                         <div class="icon-box">
                             <svg viewBox="0 0 48 48" width="38" height="38" fill="none">
@@ -2273,6 +2290,8 @@
             ers: { name: 'ERS (Emergency System)', desc: 'Mutasi tower, approval logistik & berita acara', enabled: true, icon: 'fa-tower-observation', color: '#9333ea', bg: '#f3e8ff' },
             ffe: { name: 'FFE (Fire Equipment)', desc: 'Reminder masa kadaluwarsa APAR & uji pompa hydrant', enabled: true, icon: 'fa-fire-extinguisher', color: '#dc2626', bg: '#fee2e2' },
             mantaps: { name: 'MANTAPS (Manajemen Transmisi & Andal)', desc: 'Monitoring performa aset & indeks keandalan jaringan', enabled: true, icon: 'fa-bolt-lightning', color: '#db2777', bg: '#fce7f3' },
+            tfa: { name: 'TFA (Failure Analysis)', desc: 'Hasil investigasi & tindak lanjut mitigasi gangguan', enabled: true, icon: 'fa-chart-line', color: '#ea580c', bg: '#ffedd5' },
+            srintami: { name: 'New Srintami (Real-time)', desc: 'Update kesiapan operasi & status pemeliharaan', enabled: true, icon: 'fa-tower-broadcast', color: '#0284c7', bg: '#e0f2fe' },
             newpst: { name: 'NEWPST Master Data', desc: 'Pembaruan katalog aset sarana penyaluran', enabled: false, icon: 'fa-database', color: '#d97706', bg: '#fef3c7' }
         };
 
@@ -2360,9 +2379,17 @@
                 title: '<i class="fa-solid fa-bolt-lightning" style="color:#db2777"></i> MANTAPS System',
                 desc: 'Manajemen Transmisi & Andal: Evaluasi keandalan, tracking aset gardu induk, dan pelaporan performa operasional.'
             },
+            tfa: {
+                title: '<i class="fa-solid fa-chart-line" style="color:#ea580c"></i> TFA System',
+                desc: 'Transmission Failure Analysis: Investigasi mendalam gangguan transmisi, analisa root cause, dan tracking rekomendasi mitigasi.'
+            },
+            srintami: {
+                title: '<i class="fa-solid fa-tower-broadcast" style="color:#0284c7"></i> New Srintami',
+                desc: 'Sistem Informasi Real-time Transmisi & Manajemen Pemeliharaan Terintegrasi PLN.'
+            },
             more: {
                 title: '<i class="fa-solid fa-border-all" style="color:#0b4884"></i> Modul & Fitur Lainnya',
-                desc: 'Daftar modul tambahan: Asset Register, Forum Feedback, MANTAPS, dan Pengaturan Aplikasi.'
+                desc: 'Daftar modul tambahan: Asset Register, Forum Feedback, MANTAPS, TFA, New Srintami, dan Pengaturan Aplikasi.'
             },
             panduan: {
                 title: '<i class="fa-solid fa-book-open" style="color:#2563eb"></i> Buku Panduan',
@@ -2587,6 +2614,122 @@
             }, 1600);
         }
 
+        function renderMoreAppsView() {
+            const contentEl = document.getElementById('drawerContent');
+            const closeBtn = document.getElementById('drawerCloseBtn');
+            if (closeBtn) closeBtn.style.display = 'none';
+
+            contentEl.innerHTML = `
+                <!-- Drawer Header -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <div class="drawer-title" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-border-all" style="color: var(--primary-blue);"></i> Semua Modul Transmisi
+                    </div>
+                    <button type="button" onclick="closeModalDirect()" style="background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer;" title="Tutup">
+                        <i class="fa-solid fa-xmark" style="font-size: 13px;"></i>
+                    </button>
+                </div>
+                <div class="drawer-desc" style="margin-bottom: 12px; font-size: 11.5px;">
+                    Pilih dan akses seluruh modul terintegrasi dalam ekosistem Transmission One:
+                </div>
+
+                <!-- Grid of All Apps -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; max-height: calc(82vh - 150px); padding-right: 2px;">
+                    
+                    <!-- 1. Power Inspect -->
+                    <a href="./power-inspect/inspeksi-rutin/sync-jadwal.html" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                            <img src="./assets/logo-power-inspect.svg" alt="Power Inspect" style="width: 32px; height: 32px; object-fit: contain;">
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">Power Inspect</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Inspeksi Rutin & CBM</div>
+                    </a>
+
+                    <!-- 2. FFE -->
+                    <a href="./forum-feedback-mobile.html" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                            <img src="./assets/logo-ffe.svg" alt="FFE" style="width: 32px; height: 32px; object-fit: contain;">
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">FFE Transmisi</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Forum Feedback Eng.</div>
+                    </a>
+
+                    <!-- 3. ERS -->
+                    <a href="./ers/home-mobile.html" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                            <img src="./assets/logo-power-swift.svg" alt="ERS" style="width: 32px; height: 32px; object-fit: contain;">
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">Power Swift (ERS)</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Tanggap Darurat Tower</div>
+                    </a>
+
+                    <!-- 4. NEW PST -->
+                    <a href="./new-pst/catalog-mobile-new-pst.html" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                            <img src="./assets/logo-new-pst.svg" alt="NEW PST" style="width: 32px; height: 32px; object-fit: contain;">
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">NEW PST</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Katalog & AHI Peralatan</div>
+                    </a>
+
+                    <!-- 5. MANTAPS -->
+                    <a href="./mantaps-mobile.html" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                            <img src="./assets/logo-mantaps.svg" alt="MANTAPS" style="width: 32px; height: 32px; object-fit: contain;">
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">MANTAPS</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Manajemen & Keandalan</div>
+                    </a>
+
+                    <!-- 6. TFA -->
+                    <div onclick="showToast('Modul TFA: Analisis kegagalan & gangguan transmisi', 'fa-chart-line', '#ea580c')" style="cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">TFA System</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Failure Analysis Transmisi</div>
+                    </div>
+
+                    <!-- 7. New Srintami -->
+                    <div onclick="showToast('Modul New Srintami: Sistem real-time siap operasi', 'fa-tower-broadcast', '#0284c7')" style="cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #06b6d4, #0284c7); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">New Srintami</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Real-time Info Transmisi</div>
+                    </div>
+
+                    <!-- 8. Dashboard -->
+                    <div onclick="showToast('Membuka statistik operasional gardu induk', 'fa-chart-pie', '#ec4899')" style="cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #f472b6, #ec4899); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">Dashboard GI</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Monitoring & Kesehatan</div>
+                    </div>
+
+                    <!-- 9. Asset Register -->
+                    <a href="./new-pst/asset-register.html" style="text-decoration: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">Asset Register</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">Data Aset & Mutasi</div>
+                    </a>
+
+                    <!-- 10. Buku Panduan -->
+                    <div onclick="renderPanduanView()" style="cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 800; color: #0f172a;">Buku Panduan</div>
+                        <div style="font-size: 10px; color: #64748b; line-height: 1.2;">SOP & Manual PDF</div>
+                    </div>
+
+                </div>
+            `;
+        }
+
         function openModal(key) {
             const contentEl = document.getElementById('drawerContent');
             const closeBtn = document.getElementById('drawerCloseBtn');
@@ -2598,6 +2741,8 @@
                 renderNotifikasiView('list', 'all');
             } else if (key === 'panduan') {
                 renderPanduanView();
+            } else if (key === 'more') {
+                renderMoreAppsView();
             } else if (key === 'infoGarduInduk' || key === 'switchLocation') {
                 actionInfoGarduInduk('header');
             } else {
