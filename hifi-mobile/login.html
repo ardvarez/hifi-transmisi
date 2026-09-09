@@ -305,6 +305,53 @@
             color: var(--text-dark);
         }
 
+        /* Captcha Styles */
+        .captcha-badge-box {
+            background: var(--bg-canvas);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            height: 48px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--text-dark);
+            letter-spacing: 1px;
+            user-select: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            flex-shrink: 0;
+        }
+
+        .btn-refresh-captcha {
+            width: 44px;
+            height: 48px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-canvas);
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-refresh-captcha:hover {
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            background: rgba(26, 101, 214, 0.05);
+        }
+
+        .btn-refresh-captcha:active {
+            transform: scale(0.95);
+        }
+
         /* Options Row */
         .login-options-row {
             display: flex;
@@ -811,6 +858,33 @@
                         </div>
                     </div>
 
+                    <!-- Field 3: Math Addition Captcha -->
+                    <div class="form-group-item">
+                        <label class="form-input-label" for="captchaInput">Kode Keamanan (Captcha)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <!-- Captcha Display Badge -->
+                            <div class="captcha-badge-box" id="captchaQuestionBadge" title="Hitung hasil penjumlahan ini">
+                                <span id="num1Text">3</span>
+                                <span style="color: #ef4444; font-weight: 800;">+</span>
+                                <span id="num2Text">4</span>
+                                <span style="color: var(--text-muted);">=</span>
+                                <span style="color: var(--primary-blue); font-weight: 800;">?</span>
+                            </div>
+                            
+                            <!-- Refresh Button -->
+                            <button type="button" class="btn-refresh-captcha" onclick="generateNewCaptcha()" title="Acak ulang captcha">
+                                <i class="fa-solid fa-arrows-rotate" id="captchaRefreshIcon"></i>
+                            </button>
+
+                            <!-- Captcha Answer Input -->
+                            <div class="form-input-box" style="flex: 1;">
+                                <input type="number" id="captchaInput" class="modern-text-input"
+                                    placeholder="Hasil" required style="padding-left: 14px; text-align: center; font-size: 15px; font-weight: 800;"
+                                    min="0" max="99">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Remember Me & Forgot Password -->
                     <div class="login-options-row">
                         <label class="remember-wrap">
@@ -901,10 +975,9 @@
 
             <!-- Footer Section -->
             <div class="login-footer-branding">
-                <div class="pln-footer-row">
-                    <span>Powered by</span>
-                    <span class="pln-bolt-square"><i class="fa-solid fa-bolt"></i></span>
-                    <strong style="color: var(--text-dark);">PT PLN (Persero)</strong>
+                <div class="pln-footer-row" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Powered by</span>
+                    <img src="../assets/logo-pln.svg" alt="PLN" style="height: 20px; width: auto; object-fit: contain;">
                 </div>
                 <div style="font-size: 10px; opacity: 0.65; margin-top: 4px;">Transmission One Mobile v2.4.0-prod</div>
             </div>
@@ -1132,6 +1205,26 @@
 
     <!-- Scripts -->
     <script>
+        // Math Addition Captcha Logic
+        let captchaResult = 0;
+        function generateNewCaptcha() {
+            const num1 = Math.floor(Math.random() * 9) + 1;
+            const num2 = Math.floor(Math.random() * 9) + 1;
+            captchaResult = num1 + num2;
+            const n1 = document.getElementById('num1Text');
+            const n2 = document.getElementById('num2Text');
+            if (n1 && n2) {
+                n1.textContent = num1;
+                n2.textContent = num2;
+            }
+            const icon = document.getElementById('captchaRefreshIcon');
+            if (icon) {
+                icon.style.transform = 'rotate(360deg)';
+                icon.style.transition = 'transform 0.4s ease';
+                setTimeout(() => { icon.style.transform = ''; icon.style.transition = ''; }, 400);
+            }
+        }
+
         // Password Visibility Toggle
         function togglePasswordVisibility() {
             const pwdInput = document.getElementById('passwordInput');
@@ -1149,6 +1242,7 @@
         function handleFormLogin() {
             const u = document.getElementById('usernameInput').value.trim();
             const p = document.getElementById('passwordInput').value.trim();
+            const cAns = parseInt(document.getElementById('captchaInput').value.trim(), 10);
 
             if (!u) {
                 showToast('Harap masukkan Email / Username!', 'fa-triangle-exclamation', '#ef4444');
@@ -1159,6 +1253,15 @@
             if (!p) {
                 showToast('Harap masukkan Password!', 'fa-triangle-exclamation', '#ef4444');
                 document.getElementById('passwordInput').focus();
+                return;
+            }
+
+            if (isNaN(cAns) || cAns !== captchaResult) {
+                showToast('Jawaban Captcha salah! Silakan coba lagi.', 'fa-triangle-exclamation', '#ef4444');
+                generateNewCaptcha();
+                const cInput = document.getElementById('captchaInput');
+                cInput.value = '';
+                cInput.focus();
                 return;
             }
 
@@ -1272,8 +1375,10 @@
             }
         }
 
-        // Init Theme from LocalStorage or Query param
+        // Init Theme and Captcha from LocalStorage or Query param
         window.addEventListener('DOMContentLoaded', () => {
+            generateNewCaptcha();
+
             const savedTheme = localStorage.getItem('pln_mobile_theme');
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-mode');
