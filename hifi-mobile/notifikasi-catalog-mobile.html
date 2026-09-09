@@ -3027,27 +3027,162 @@
 
             const contentEl = document.getElementById('drawerContent');
             contentEl.innerHTML = `
-                <div class="drawer-title" style="margin-bottom: 6px; color: #ea580c;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Hapus Data Aplikasi
+                <div class="drawer-title" style="margin-bottom: 6px; color: #dc2626; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Hapus Data & Reset Sesi
                 </div>
-                <div class="drawer-desc" style="margin-bottom: 16px;">
-                    Tindakan ini akan membersihkan data cache offline, draft form yang belum tersinkron, dan riwayat sementara dari perangkat ini.
+                <div class="drawer-desc" style="margin-bottom: 14px;">
+                    Harap perhatikan ketentuan proses pembersihan data lokal aplikasi berikut:
                 </div>
                 
-                <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 14px; padding: 12px 14px; font-size: 11.5px; color: #9a3412; line-height: 1.4; margin-bottom: 16px;">
-                    <i class="fa-solid fa-circle-exclamation" style="margin-right: 4px;"></i> Pastikan semua hasil inspeksi telah <strong>disinkronkan</strong> sebelum menghapus data lokal.
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                    <div style="display: flex; gap: 10px; background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; line-height: 1.45;">
+                        <div style="width: 28px; height: 28px; border-radius: 8px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-dark);">1. Sinkron Otomatis ke Server:</strong>
+                            <div style="color: var(--text-sub); font-size: 10.5px; margin-top: 2px;">Seluruh data hasil <strong>Inspeksi, Survey, ERS, dan Modul Lain</strong> yang berstatus <em>Selesai</em> di HP akan otomatis diunggah ke server pusat.</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; background: rgba(220, 38, 38, 0.08); border: 1px solid rgba(220, 38, 38, 0.25); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; line-height: 1.45;">
+                        <div style="width: 28px; height: 28px; border-radius: 8px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-dark);">2. Data In-Progress Akan Terhapus:</strong>
+                            <div style="color: var(--text-sub); font-size: 10.5px; margin-top: 2px;">Draft formulir atau inspeksi yang <strong>sedang berlangsung (belum selesai)</strong> akan terhapus permanen karena tidak dapat disinkronkan.</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; background: rgba(234, 88, 12, 0.08); border: 1px solid rgba(234, 88, 12, 0.25); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; line-height: 1.45;">
+                        <div style="width: 28px; height: 28px; border-radius: 8px; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-dark);">3. Reset Sesi & Kembali ke Login:</strong>
+                            <div style="color: var(--text-sub); font-size: 10.5px; margin-top: 2px;">Seluruh data lokal & cache dihapus, sesi login di-reset, dan akun dialihkan kembali ke layar <strong>Login</strong>.</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 18px;">
-                    <button class="drawer-btn" onclick="renderProfileView()" style="background: #f1f5f9; color: #475569; flex: 1;">Batal</button>
-                    <button class="drawer-btn" onclick="submitClearData()" style="background: #ea580c; color: white; flex: 2;">Ya, Hapus Data</button>
+                <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 10px;">
+                    <button class="drawer-btn" onclick="renderProfileView()" style="background: var(--bg-canvas); border: 1px solid var(--border-color); color: var(--text-sub); font-weight: 700; flex: 1;">Batal</button>
+                    <button class="drawer-btn" onclick="startClearDataProcess()" style="background: #dc2626; color: white; font-weight: 800; flex: 1.8; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);">
+                        <i class="fa-solid fa-rotate"></i> Sinkron & Hapus Data
+                    </button>
                 </div>
             `;
         }
 
-        function submitClearData() {
-            showToast('Data cache aplikasi berhasil dibersihkan!', 'fa-trash-can', '#ea580c');
-            renderProfileView();
+        function startClearDataProcess() {
+            const contentEl = document.getElementById('drawerContent');
+            contentEl.innerHTML = `
+                <div class="drawer-title" style="margin-bottom: 6px; color: var(--primary-blue); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-arrows-rotate fa-spin"></i> Memproses Hapus Data...
+                </div>
+                <div class="drawer-desc" style="margin-bottom: 16px;">
+                    Mohon tunggu beberapa saat, sistem sedang menyinkronkan data dan membersihkan cache aplikasi.
+                </div>
+
+                <!-- Progress Tracker Flow -->
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                    <!-- Step 1 -->
+                    <div id="flowStep1" style="display: flex; align-items: center; gap: 10px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; transition: all 0.3s;">
+                        <div id="flowStep1Icon" style="width: 28px; height: 28px; border-radius: 8px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-dark);" id="flowStep1Title">1. Sinkronisasi Data Selesai</div>
+                            <div style="font-size: 10px; color: var(--text-muted);" id="flowStep1Desc">Mengunggah hasil inspeksi & modul lain ke server...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div id="flowStep2" style="display: flex; align-items: center; gap: 10px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; opacity: 0.5; transition: all 0.3s;">
+                        <div id="flowStep2Icon" style="width: 28px; height: 28px; border-radius: 8px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-dark);" id="flowStep2Title">2. Pembersihan Data In-Progress & Cache</div>
+                            <div style="font-size: 10px; color: var(--text-muted);" id="flowStep2Desc">Menghapus draft belum selesai & cache lokal...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div id="flowStep3" style="display: flex; align-items: center; gap: 10px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; opacity: 0.5; transition: all 0.3s;">
+                        <div id="flowStep3Icon" style="width: 28px; height: 28px; border-radius: 8px; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; font-weight: 700; color: var(--text-dark);" id="flowStep3Title">3. Reset Sesi & Logout</div>
+                            <div style="font-size: 10px; color: var(--text-muted);" id="flowStep3Desc">Mereset akun dan mengarahkan ke halaman login...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: auto;">
+                    <div id="flowProgressBar" style="width: 25%; height: 100%; background: #1a65d6; border-radius: 4px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                </div>
+            `;
+
+            // Step 1 Finish
+            setTimeout(() => {
+                const s1Icon = document.getElementById('flowStep1Icon');
+                const s1Desc = document.getElementById('flowStep1Desc');
+                if (s1Icon) s1Icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                if (s1Icon) s1Icon.style.background = '#dcfce7';
+                if (s1Icon) s1Icon.style.color = '#16a34a';
+                if (s1Desc) s1Desc.innerHTML = '<span style="color:#16a34a; font-weight:700;">14 Data Selesai Berhasil Disinkronkan ke Server</span>';
+
+                // Activate Step 2
+                const s2 = document.getElementById('flowStep2');
+                const s2Icon = document.getElementById('flowStep2Icon');
+                if (s2) s2.style.opacity = '1';
+                if (s2Icon) s2Icon.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                const pBar = document.getElementById('flowProgressBar');
+                if (pBar) pBar.style.width = '65%';
+            }, 1000);
+
+            // Step 2 Finish
+            setTimeout(() => {
+                const s2Icon = document.getElementById('flowStep2Icon');
+                const s2Desc = document.getElementById('flowStep2Desc');
+                if (s2Icon) s2Icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                if (s2Icon) s2Icon.style.background = '#dcfce7';
+                if (s2Icon) s2Icon.style.color = '#16a34a';
+                if (s2Desc) s2Desc.innerHTML = '<span style="color:#16a34a; font-weight:700;">Data In-Progress & Cache Lokal Berhasil Dihapus</span>';
+
+                // Activate Step 3
+                const s3 = document.getElementById('flowStep3');
+                const s3Icon = document.getElementById('flowStep3Icon');
+                if (s3) s3.style.opacity = '1';
+                if (s3Icon) s3Icon.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                const pBar = document.getElementById('flowProgressBar');
+                if (pBar) pBar.style.width = '90%';
+            }, 2000);
+
+            // Step 3 Finish & Redirect
+            setTimeout(() => {
+                const s3Icon = document.getElementById('flowStep3Icon');
+                const s3Desc = document.getElementById('flowStep3Desc');
+                if (s3Icon) s3Icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                if (s3Icon) s3Icon.style.background = '#dcfce7';
+                if (s3Icon) s3Icon.style.color = '#16a34a';
+                if (s3Desc) s3Desc.innerHTML = '<span style="color:#16a34a; font-weight:700;">Sesi Direset. Mengalihkan ke Layar Login...</span>';
+                
+                const pBar = document.getElementById('flowProgressBar');
+                if (pBar) {
+                    pBar.style.width = '100%';
+                    pBar.style.background = '#16a34a';
+                }
+
+                showToast('[SUKSES] Sinkronisasi selesai & data lokal telah direset!', 'fa-circle-check', '#16a34a');
+                
+                setTimeout(() => {
+                    window.location.href = './login.html?reason=cleardata';
+                }, 1200);
+            }, 2800);
         }
 
         function actionLaporkanKendala() {
@@ -3158,7 +3293,7 @@
         function submitLogout() {
             showToast('Mengeluarkan sesi pengguna...', 'fa-arrow-right-from-bracket', '#dc2626');
             setTimeout(() => {
-                window.location.href = './power-inspect/relogin-mobile.html';
+                window.location.href = './login.html';
             }, 800);
         }
 

@@ -1513,6 +1513,201 @@
 
         // Relogin SSO
         document.getElementById('btnReloginSSO').addEventListener('click', function() {
+</head>
+<body>
+
+    <div class="mobile-container">
+        
+        <!-- 1. Background Mock App -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <a href="dashboard-mobile.html" class="action-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-group">
+                    <div class="header-name">ardan.test</div>
+                    <div class="header-sub">ULTG SURABAYA UTARA</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="action-btn"><i class="fa-regular fa-bell"></i></div>
+                <div class="action-btn"><i class="fa-solid fa-arrow-rotate-right"></i></div>
+                <div class="action-btn"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            </div>
+        </div>
+
+        <div class="app-content">
+            <div class="mock-card">
+                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">GI 150KV KALISARI</div>
+                <div style="font-size: 12px; color: var(--text-muted);">2 WO • 4 Asset Inspeksi</div>
+            </div>
+            <div class="mock-card">
+                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">GIS 150KV WONOKROMO</div>
+                <div style="font-size: 12px; color: var(--text-muted);">1 WO • 5 Asset Inspeksi</div>
+            </div>
+        </div>
+
+        <!-- 2. Session Overlay & Re-Login Card -->
+        <div class="session-overlay">
+            <div class="login-card">
+                <div class="icon-circle">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                
+                <h1 class="title">Sesi Berakhir</h1>
+                <div class="sim-toggle-wrapper">
+                    <div class="sim-toggle active" id="tabSSO">Akun SSO PLN</div>
+                    <div class="sim-toggle" id="tabNonSSO">Non-SSO</div>
+                </div>
+                <p class="subtitle" id="subtitleText">Sesi Anda telah habis. Silakan masuk kembali menggunakan akun SSO PLN Anda untuk melanjutkan inspeksi.</p>
+
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">ardan.test</div>
+                        <div class="user-role">ULTG SURABAYA UTARA</div>
+                    </div>
+                </div>
+
+                <form action="#" onsubmit="event.preventDefault();">
+                    <!-- Non-SSO Elements -->
+                    <div id="nonSsoElements" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label" for="password">Kata Sandi</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="password" class="form-input" placeholder="Masukkan kata sandi...">
+                                <i class="fa-regular fa-eye-slash toggle-password" id="togglePassword"></i>
+                            </div>
+                            <div class="error-message" id="passwordError">Silakan masukkan kata sandi Anda terlebih dahulu.</div>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="btnRelogin">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Kembali
+                        </button>
+                    </div>
+
+                    <!-- SSO Elements -->
+                    <div id="ssoElements">
+                        <button type="button" class="btn btn-primary" id="btnReloginSSO">
+                            <i class="fa-solid fa-shield-halved"></i> Lanjutkan Login SSO PLN
+                        </button>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary" id="btnLogout">
+                        Keluar (Ganti Akun)
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. SSO Mock Page Overlay -->
+        <div class="sso-mock-page" id="ssoMockPage" style="display: none;">
+            <div class="sso-content">
+                <i class="fa-solid fa-shield-halved sso-icon" id="ssoIcon"></i>
+                <h2 style="font-weight: 800; font-size: 18px; margin-bottom: 6px;">PLN Single Sign-On</h2>
+                <p id="ssoStatusText" style="color: var(--text-muted); font-size: 13px;">Menghubungkan ke server SSO...</p>
+                <div class="sso-spinner" id="ssoSpinner" style="margin-top: 20px;">
+                    <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: var(--primary-blue);"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Custom Success Alert -->
+        <div class="custom-alert-overlay" id="customAlertOverlay" style="display: none;">
+            <div class="custom-alert-box">
+                <div class="alert-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="alert-title">Berhasil!</h3>
+                <p class="alert-message" id="customAlertMessage">Autentikasi sesi berhasil dipulihkan.</p>
+                <button class="btn btn-primary" id="btnAlertOk" style="margin-bottom: 0;">Lanjutkan</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showCustomAlert(message, onOk) {
+            const overlay = document.getElementById('customAlertOverlay');
+            const msgEl = document.getElementById('customAlertMessage');
+            const btnOk = document.getElementById('btnAlertOk');
+            
+            msgEl.innerText = message;
+            overlay.style.display = 'flex';
+            
+            btnOk.onclick = function() {
+                overlay.style.display = 'none';
+                if(onOk) onOk();
+            };
+        }
+
+        const tabSSO = document.getElementById('tabSSO');
+        const tabNonSSO = document.getElementById('tabNonSSO');
+        const ssoElements = document.getElementById('ssoElements');
+        const nonSsoElements = document.getElementById('nonSsoElements');
+        const subtitleText = document.getElementById('subtitleText');
+
+        tabSSO.addEventListener('click', () => {
+            tabSSO.classList.add('active');
+            tabNonSSO.classList.remove('active');
+            ssoElements.style.display = 'block';
+            nonSsoElements.style.display = 'none';
+            subtitleText.innerText = 'Sesi Anda telah habis. Silakan masuk kembali menggunakan akun SSO PLN Anda untuk melanjutkan.';
+        });
+
+        tabNonSSO.addEventListener('click', () => {
+            tabNonSSO.classList.add('active');
+            tabSSO.classList.remove('active');
+            ssoElements.style.display = 'none';
+            nonSsoElements.style.display = 'block';
+            subtitleText.innerText = 'Sesi Anda telah habis. Silakan masukkan kata sandi untuk melanjutkan.';
+        });
+
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        password.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.remove('error');
+                document.getElementById('passwordError').style.display = 'none';
+            }
+        });
+
+        // Relogin Password
+        document.getElementById('btnRelogin').addEventListener('click', function() {
+            const passVal = password.value.trim();
+            const passwordError = document.getElementById('passwordError');
+
+            if(!passVal) {
+                password.classList.add('error');
+                passwordError.style.display = 'block';
+                password.focus();
+                return;
+            } else {
+                password.classList.remove('error');
+                passwordError.style.display = 'none';
+            }
+            
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...';
+            btn.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                showCustomAlert('Berhasil masuk kembali!\nSesi kerja Anda telah dipulihkan.', () => {
+                    window.location.href = 'dashboard-mobile.html';
+                });
+            }, 1000);
+        });
+
+        // Relogin SSO
+        document.getElementById('btnReloginSSO').addEventListener('click', function() {
             const btn = this;
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Mengalihkan ke SSO...';
@@ -1551,7 +1746,7 @@
         // Logout
         document.getElementById('btnLogout').addEventListener('click', function() {
             if(confirm('Apakah Anda yakin ingin keluar dan berganti akun?')) {
-                window.location.href = 'dashboard-mobile.html';
+                window.location.href = '../login.html';
             }
         });
     </script>
