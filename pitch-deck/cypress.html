@@ -4,24 +4,31 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Modern Web Automation & Hybrid CI/CD Pipeline</title>
+    <title>Modern Web Automation & Hybrid CI/CD Pipeline - Cypress</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            --bg: #090d16;
-            --card-bg: #111726;
-            --card-border: #1e293b;
+            --bg: #070b14;
+            --card-bg: #0f172a;
+            --card-bg-elevated: #131d35;
+            --card-border: rgba(51, 65, 85, 0.7);
+            --card-border-glow: rgba(6, 182, 212, 0.4);
             --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+            --accent-blue: #3b82f6;
             --accent-emerald: #10b981;
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
+            --accent-purple: #a855f7;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --text-sub: #cbd5e1;
+            --pln-gold: #fbbf24;
         }
 
         * {
@@ -32,64 +39,109 @@
 
         body {
             background-color: #030712;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 45%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 45%),
+                radial-gradient(at 50% 50%, rgba(124, 58, 237, 0.05) 0px, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px 16px;
+            padding: 20px 16px;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Top Controls */
+        /* Top Controls Bar */
         .deck-controls {
             width: 100%;
-            max-width: 960px;
+            max-width: 980px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            background: #0f172a;
-            border: 1px solid var(--card-border);
-            padding: 10px 18px;
-            border-radius: 12px;
+            margin-bottom: 14px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 9px 16px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
 
         .nav-btn {
             background: #1e293b;
             color: #f8fafc;
             border: 1px solid #334155;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
         }
 
-        .nav-btn:hover {
+        .nav-btn:hover:not(:disabled) {
             background: var(--accent-cyan);
-            color: #000;
+            color: #030712;
             border-color: var(--accent-cyan);
+            box-shadow: 0 0 14px var(--accent-cyan-glow);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: scale(0.96);
         }
 
         .slide-indicator {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--accent-cyan);
-            font-weight: 600;
+            font-weight: 700;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
         }
 
         /* Presentation Container */
         .slide-viewport {
             width: 100%;
-            max-width: 960px;
+            max-width: 980px;
             aspect-ratio: 16 / 9;
             position: relative;
-            perspective: 1000px;
+            perspective: 1200px;
+        }
+
+        /* Top Slim Progress Bar */
+        .slide-progress-track {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3.5px;
+            background: rgba(30, 41, 59, 0.5);
+            z-index: 50;
+            border-top-left-radius: 16px;
+            border-top-right-left-radius: 16px;
+            overflow: hidden;
+        }
+
+        .slide-progress-fill {
+            height: 100%;
+            width: 8.33%;
+            background: linear-gradient(90deg, #06b6d4, #38bdf8, #10b981);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .slide {
@@ -97,24 +149,47 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 36px 44px;
+            background: linear-gradient(145deg, #090e1a 0%, #0d1527 100%);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 18px;
+            padding: 34px 44px;
             display: none;
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
             opacity: 0;
             will-change: transform, opacity;
+        }
+
+        /* Ambient Glow Blobs inside Slide */
+        .slide::before {
+            content: "";
+            position: absolute;
+            top: -90px;
+            right: -90px;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+        }
+
+        .slide::after {
+            content: "";
+            position: absolute;
+            bottom: -110px;
+            left: -110px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
         }
 
         /* Slide Switch Animations */
         @keyframes slideInNext {
             from {
                 opacity: 0;
-                transform: translateX(40px) scale(0.98);
+                transform: translateX(45px) scale(0.98);
             }
             to {
                 opacity: 1;
@@ -125,7 +200,7 @@
         @keyframes slideInPrev {
             from {
                 opacity: 0;
-                transform: translateX(-40px) scale(0.98);
+                transform: translateX(-45px) scale(0.98);
             }
             to {
                 opacity: 1;
@@ -136,11 +211,11 @@
         .slide.active {
             display: flex;
             opacity: 1;
-            animation: slideInNext 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideInNext 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .slide.active.anim-prev {
-            animation: slideInPrev 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideInPrev 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         /* Fullscreen Presentation Mode Styles */
@@ -165,15 +240,15 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(51, 65, 85, 0.8);
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.9);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
             margin-bottom: 0;
-            max-width: 620px;
+            max-width: 640px;
             width: calc(100% - 48px);
-            opacity: 0.18;
+            opacity: 0.15;
             transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -184,68 +259,68 @@
 
         :fullscreen .slide-viewport,
         :-webkit-full-screen .slide-viewport {
-            max-width: min(96vw, 170.67vh);
-            max-height: min(94vh, 56.25vw);
+            max-width: min(97vw, 172.44vh);
+            max-height: min(95vh, 56.25vw);
             width: 100%;
             height: auto;
             aspect-ratio: 16 / 9;
         }
 
-        .slide::before {
-            content: "";
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
-            pointer-events: none;
-        }
-
-        /* Header */
+        /* Slide Header */
         .slide-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 2;
         }
 
         .category-tag {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 10.5px;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--accent-cyan);
-            background: rgba(6, 182, 212, 0.1);
-            border: 1px solid rgba(6, 182, 212, 0.25);
-            padding: 3px 8px;
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 3px 9px;
             border-radius: 999px;
             margin-bottom: 4px;
         }
 
         .slide-title {
-            font-size: 22px;
+            font-size: 21.5px;
             font-weight: 800;
             color: var(--text-main);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .slide-num {
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
-            font-weight: 600;
-            color: #475569;
+            font-weight: 700;
+            color: #64748b;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 3px 9px;
+            border-radius: 8px;
+            border: 1px solid rgba(51, 65, 85, 0.5);
         }
 
-        /* Content Layouts */
+        /* Slide Content Layouts */
         .slide-body {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
+            z-index: 2;
         }
 
         .grid-2 {
@@ -258,42 +333,54 @@
         .grid-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 14px;
+            gap: 13px;
             height: 100%;
         }
 
+        /* Glassmorphic Cards */
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 16px 18px;
+            background: linear-gradient(145deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.75) 100%);
+            border: 1px solid rgba(51, 65, 85, 0.65);
+            border-radius: 12px;
+            padding: 15px 17px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(6, 182, 212, 0.45);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.12);
         }
 
         .card-title {
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13.5px;
+            font-weight: 800;
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
+            letter-spacing: -0.01em;
         }
 
         .card-list {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            font-size: 12px;
+            gap: 7px;
+            font-size: 11.5px;
             color: var(--text-sub);
             line-height: 1.45;
         }
 
         .card-list li {
             position: relative;
-            padding-left: 16px;
+            padding-left: 18px;
         }
 
         .card-list li::before {
@@ -302,6 +389,8 @@
             left: 0;
             color: var(--accent-cyan);
             font-weight: bold;
+            font-size: 14px;
+            line-height: 1;
         }
 
         .card-list.danger li::before {
@@ -312,6 +401,43 @@
             color: var(--accent-emerald);
         }
 
+        /* macOS Style Code Window */
+        .code-window {
+            background: #070c17;
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .code-header {
+            background: #0b1120;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .code-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .code-dot.red { background: #ef4444; }
+        .code-dot.yellow { background: #f59e0b; }
+        .code-dot.green { background: #10b981; }
+
+        .code-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #64748b;
+            margin-left: 6px;
+            font-weight: 600;
+        }
+
         /* Code styling */
         pre,
         code {
@@ -319,14 +445,20 @@
         }
 
         .code-block {
-            background: #060911;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
+            background: #070c17;
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 8px;
             padding: 10px 12px;
-            font-size: 11px;
+            font-size: 10.5px;
             color: #38bdf8;
-            line-height: 1.5;
+            line-height: 1.48;
             overflow-x: auto;
+        }
+
+        .code-window .code-block {
+            border: none;
+            border-radius: 0;
+            padding: 9px 12px;
         }
 
         .code-block .comment {
@@ -335,21 +467,24 @@
 
         .code-block .keyword {
             color: #f43f5e;
+            font-weight: 700;
         }
 
         .code-block .string {
             color: #34d399;
         }
 
-        /* Footer */
+        /* Slide Footer */
         .slide-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding-top: 10px;
-            border-top: 1px solid rgba(30, 41, 59, 0.7);
-            font-size: 10px;
+            border-top: 1px solid rgba(51, 65, 85, 0.6);
+            font-size: 10.5px;
             color: #64748b;
+            position: relative;
+            z-index: 2;
         }
 
         /* Table styling */
@@ -358,20 +493,23 @@
             border-collapse: collapse;
             font-size: 11px;
             text-align: left;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .deck-table th {
-            background: rgba(30, 41, 59, 0.5);
+            background: rgba(30, 41, 59, 0.7);
             color: var(--accent-cyan);
-            padding: 7px 10px;
-            border: 1px solid var(--card-border);
-            font-weight: 600;
+            padding: 8px 12px;
+            border: 1px solid rgba(51, 65, 85, 0.6);
+            font-weight: 700;
         }
 
         .deck-table td {
-            padding: 7px 10px;
-            border: 1px solid var(--card-border);
+            padding: 8px 12px;
+            border: 1px solid rgba(51, 65, 85, 0.5);
             color: var(--text-sub);
+            background: rgba(15, 23, 42, 0.4);
         }
 
         /* Step boxes */
@@ -383,39 +521,68 @@
 
         .step-box {
             flex: 1;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 12px;
+            background: linear-gradient(145deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%);
+            border: 1px solid rgba(51, 65, 85, 0.65);
+            border-radius: 10px;
+            padding: 12px 10px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .step-box:hover {
+            transform: translateY(-2px);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 6px 18px rgba(6, 182, 212, 0.1);
         }
 
         .step-num {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.35);
             color: var(--accent-cyan);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             font-family: 'JetBrains Mono', monospace;
         }
 
         .step-title {
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 11.5px;
+            font-weight: 800;
             color: var(--text-main);
         }
 
         .step-desc {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
             line-height: 1.35;
+        }
+
+        /* Bottom helper bar */
+        .keyboard-helper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .kbd-chip {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 700;
         }
     </style>
 </head>
@@ -425,39 +592,53 @@
     <!-- Top Controller Bar -->
     <div class="deck-controls">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Sebelumnya</button>
-            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Berikutnya →</button>
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">
+                <i class="ri-arrow-left-line"></i> Sebelumnya
+            </button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">
+                Berikutnya <i class="ri-arrow-right-line"></i>
+            </button>
         </div>
         <div class="slide-indicator" id="slideIndicator">Slide 1 / 12</div>
         <div style="display: flex; align-items: center; gap: 8px;">
             <button class="nav-btn" id="fullscreenBtn" onclick="toggleFullscreen()" style="background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.35); color: var(--accent-cyan);">
-                <span id="fullscreenIcon">⛶</span> <span id="fullscreenText">Layar Penuh (F)</span>
+                <i class="ri-fullscreen-line" id="fullscreenIcon"></i> <span id="fullscreenText">Layar Penuh (F)</span>
             </button>
         </div>
     </div>
 
+    <!-- Presentation Container -->
     <div class="slide-viewport">
+
+        <!-- Top Slim Progress Bar -->
+        <div class="slide-progress-track">
+            <div class="slide-progress-fill" id="progressFill"></div>
+        </div>
 
         <!-- SLIDE 1: COVER -->
         <div class="slide active" style="justify-content: center; align-items: center; text-align: center;">
-            <div style="max-width: 680px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
-                <div class="category-tag">Automation Architecture Deck</div>
-                <h1 style="font-size: 36px; font-weight: 800; line-height: 1.2; letter-spacing: -0.03em;">
-                    Modern Web Automation <br /><span style="color: var(--accent-cyan);">with Cypress</span>
+            <div style="max-width: 700px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                <div class="category-tag">
+                    <i class="ri-shield-check-fill" style="color: var(--accent-cyan);"></i> Automation Architecture Deck
+                </div>
+                <h1 style="font-size: 38px; font-weight: 900; line-height: 1.2; letter-spacing: -0.03em; background: linear-gradient(135deg, #ffffff 30%, #38bdf8 70%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Modern Web Automation <br />with Cypress
                 </h1>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; max-width: 520px;">
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.55; max-width: 540px;">
                     Dari Analisis Bisnis, Targeting Elemen Resilient, hingga Arsitektur Hybrid CI/CD Pipeline (<code
-                        style="color: var(--accent-emerald);">.har ➔ .jmx</code>)
+                        style="color: var(--accent-emerald); font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px;">.har ➔ .jmx</code>)
                 </p>
-                <div style="margin-top: 14px;">
-                    <span
-                        style="font-size: 12px; font-weight: 600; color: #cbd5e1; background: #161f30; padding: 5px 12px; border-radius: 6px; border: 1px solid #1e293b;">
-                        IT Quality Assurance & System Analyst
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; justify-content: center;">
+                    <span style="font-size: 11.5px; font-weight: 700; color: #cbd5e1; background: #161f30; padding: 5px 12px; border-radius: 8px; border: 1px solid #1e293b; display: flex; align-items: center; gap: 6px;">
+                        <i class="ri-building-line" style="color: var(--pln-gold);"></i> IT Quality Assurance & System Analyst
+                    </span>
+                    <span style="font-size: 11.5px; font-weight: 700; color: #38bdf8; background: rgba(6, 182, 212, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(6, 182, 212, 0.25);">
+                        <i class="ri-flashlight-line"></i> PLN Transmisi Framework
                     </span>
                 </div>
             </div>
-            <div class="slide-footer" style="position: absolute; bottom: 24px; width: calc(100% - 88px);">
-                <span>E2E & Performance Strategy</span>
+            <div class="slide-footer" style="position: absolute; bottom: 22px; width: calc(100% - 88px);">
+                <span><i class="ri-terminal-box-line"></i> E2E & Performance Strategy</span>
                 <span>Slide 01</span>
             </div>
         </div>
@@ -466,37 +647,31 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 01: Strategy</div>
+                    <div class="category-tag"><i class="ri-compass-3-line"></i> Phase 01: Strategy</div>
                     <div class="slide-title">Kapan & Kenapa Harus Otomasi?</div>
                 </div>
                 <div class="slide-num">02</div>
             </div>
             <div class="slide-body">
                 <div class="grid-2">
-                    <div class="card" style="border-left: 3px solid var(--accent-emerald);">
+                    <div class="card" style="border-left: 3.5px solid var(--accent-emerald);">
                         <div class="card-title" style="color: var(--accent-emerald);">
-                            ✓ Prioritas Tinggi Otomasi (High ROI)
+                            <i class="ri-checkbox-circle-fill"></i> Prioritas Tinggi Otomasi (High ROI)
                         </div>
                         <ul class="card-list success">
-                            <li><strong>Regression Testing:</strong> Skenario berulang yang sering dijalankan setiap
-                                kali ada pull request / rilis baru.</li>
-                            <li><strong>Critical Business Path (Smoke Test):</strong> Alur wajib jalan seperti
-                                Autentikasi, Checkout, Transfer, atau Input Transaksi.</li>
-                            <li><strong>Stable Features:</strong> Modul dengan UI dan business rule yang sudah matang
-                                dan tidak berubah drastis tiap hari.</li>
+                            <li><strong>Regression Testing:</strong> Skenario berulang yang sering dijalankan setiap kali ada pull request / rilis baru.</li>
+                            <li><strong>Critical Business Path (Smoke Test):</strong> Alur wajib jalan seperti Autentikasi, Checkout, Transfer, atau Input Transaksi.</li>
+                            <li><strong>Stable Features:</strong> Modul dengan UI dan business rule yang sudah matang dan tidak berubah drastis tiap hari.</li>
                         </ul>
                     </div>
-                    <div class="card" style="border-left: 3px solid var(--accent-rose);">
+                    <div class="card" style="border-left: 3.5px solid var(--accent-rose);">
                         <div class="card-title" style="color: var(--accent-rose);">
-                            ✕ Pertahankan Manual Testing
+                            <i class="ri-close-circle-fill"></i> Pertahankan Manual Testing
                         </div>
                         <ul class="card-list danger">
-                            <li><strong>Experimental UI / A/B Testing:</strong> Modul yang tata letak atau tombolnya
-                                masih sering dirombak tim UI/UX.</li>
-                            <li><strong>One-Time Feature:</strong> Event musiman atau modul sekali pakai yang tidak ada
-                                siklus rilis berikutnya.</li>
-                            <li><strong>Usability & Visual Polish:</strong> Pengecekan estetika, kenyamanan tata letak,
-                                dan flow intuitif manusiawi.</li>
+                            <li><strong>Experimental UI / A/B Testing:</strong> Modul yang tata letak atau tombolnya masih sering dirombak tim UI/UX.</li>
+                            <li><strong>One-Time Feature:</strong> Event musiman atau modul sekali pakai yang tidak ada siklus rilis berikutnya.</li>
+                            <li><strong>Usability & Visual Polish:</strong> Pengecekan estetika, kenyamanan tata letak, dan flow intuitif manusiawi.</li>
                         </ul>
                     </div>
                 </div>
@@ -511,22 +686,24 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 01: Strategy</div>
+                    <div class="category-tag"><i class="ri-question-answer-line"></i> Phase 01: Strategy</div>
                     <div class="slide-title">Apakah Automation Menggantikan Manual Testing?</div>
                 </div>
                 <div class="slide-num">03</div>
             </div>
             <div class="slide-body">
-                <div style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 18px;">💡</span>
-                    <p style="font-size: 12px; color: var(--text-main); line-height: 1.4;">
+                <div style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(6, 182, 212, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 15px; flex-shrink: 0;">
+                        <i class="ri-lightbulb-flash-line"></i>
+                    </div>
+                    <p style="font-size: 11.5px; color: var(--text-main); line-height: 1.4;">
                         <strong>Jawaban Tegas: TIDAK.</strong> Keduanya adalah mitra komplementer — automation menguji yang <em>diketahui (checking)</em>, manual mengeksplorasi yang <em>belum diketahui (exploring)</em>.
                     </p>
                 </div>
                 <div class="grid-2">
-                    <div class="card" style="border-left: 3px solid #38bdf8;">
+                    <div class="card" style="border-left: 3.5px solid #38bdf8;">
                         <div class="card-title" style="color: #38bdf8; font-size: 13px;">
-                            👤 Keunggulan Human QA (Manual)
+                            <i class="ri-user-search-line"></i> Keunggulan Human QA (Manual)
                         </div>
                         <ul class="card-list">
                             <li><strong>Intuisi & Konteks Bisnis:</strong> Memahami ekspektasi user riil & flow rumit yang butuh empati.</li>
@@ -534,9 +711,9 @@
                             <li><strong>Usability & Visual QA:</strong> Mengevaluasi kenyamanan visual, tone bahasa, & UX adaptif.</li>
                         </ul>
                     </div>
-                    <div class="card" style="border-left: 3px solid var(--accent-emerald);">
+                    <div class="card" style="border-left: 3.5px solid var(--accent-emerald);">
                         <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">
-                            🤖 Keunggulan Automation QA (Cypress)
+                            <i class="ri-robot-2-line"></i> Keunggulan Automation QA (Cypress)
                         </div>
                         <ul class="card-list success">
                             <li><strong>Kecepatan & Skala Masif:</strong> Eksekusi ratusan test case regresi dalam hitungan menit.</li>
@@ -559,7 +736,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 02: Analysis</div>
+                    <div class="category-tag"><i class="ri-file-search-line"></i> Phase 02: Analysis</div>
                     <div class="slide-title">Persiapan Analisis Bisnis: Rules & Validasi</div>
                 </div>
                 <div class="slide-num">04</div>
@@ -567,9 +744,8 @@
             <div class="slide-body">
                 <div class="grid-3">
                     <div class="card">
-                        <div class="card-title">1. RBAC & Matrix Akses</div>
-                        <p style="font-size: 11px; color: var(--text-muted);">Memetakan kewenangan tiap role pengguna
-                            pada halaman aplikasi:</p>
+                        <div class="card-title"><i class="ri-lock-2-line" style="color: var(--accent-cyan);"></i> 1. RBAC & Matrix Akses</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Memetakan kewenangan tiap role pengguna pada halaman aplikasi:</p>
                         <ul class="card-list">
                             <li>Admin: Akses CRUD & tombol approve aktif.</li>
                             <li>Staff/Viewer: Menu terkunci, tombol edit berstatus <code>disabled</code>.</li>
@@ -577,9 +753,8 @@
                         </ul>
                     </div>
                     <div class="card">
-                        <div class="card-title">2. Client-Side Rules</div>
-                        <p style="font-size: 11px; color: var(--text-muted);">Feedback instan pada browser sebelum
-                            payload terkirim:</p>
+                        <div class="card-title"><i class="ri-code-s-slash-line" style="color: var(--accent-emerald);"></i> 2. Client-Side Rules</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Feedback instan pada browser sebelum payload terkirim:</p>
                         <ul class="card-list">
                             <li>Pemeriksaan Regex format email/password.</li>
                             <li>Limit karakter teks & batasan ukuran upload file.</li>
@@ -587,9 +762,8 @@
                         </ul>
                     </div>
                     <div class="card">
-                        <div class="card-title">3. Server Rules & Edge Cases</div>
-                        <p style="font-size: 11px; color: var(--text-muted);">Penolakan integritas data oleh API
-                            backend:</p>
+                        <div class="card-title"><i class="ri-server-line" style="color: var(--accent-amber);"></i> 3. Server Rules & Edge Cases</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Penolakan integritas data oleh API backend:</p>
                         <ul class="card-list">
                             <li>Pencegahan input duplikat nomor unik/NIK.</li>
                             <li>Validasi plafon limit transaksi harian.</li>
@@ -608,7 +782,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 03: Preparation</div>
+                    <div class="category-tag"><i class="ri-folder-shared-line"></i> Phase 03: Preparation</div>
                     <div class="slide-title">Dokumen QA & Manajemen Data Uji</div>
                 </div>
                 <div class="slide-num">05</div>
@@ -616,35 +790,37 @@
             <div class="slide-body">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-title">Dokumen Acuan Pengujian</div>
+                        <div class="card-title"><i class="ri-booklet-line" style="color: var(--accent-cyan);"></i> Dokumen Acuan Pengujian</div>
                         <ul class="card-list">
-                            <li><strong>Test Plan:</strong> Cakupan modul, scope URL target (Staging/Dev), serta
-                                Exit/Pass Criteria (100% Smoke Pass).</li>
+                            <li><strong>Test Plan:</strong> Cakupan modul, scope URL target (Staging/Dev), serta Exit/Pass Criteria (100% Smoke Pass).</li>
                             <li><strong>Test Scenarios (BDD/User Story):</strong>
-                                <br /><code
-                                    style="font-size: 10px; color: #a5f3fc;">GIVEN user di login page, WHEN mengisi sandi valid, THEN dashboard terbuka.</code>
+                                <br /><code style="font-size: 10px; color: #a5f3fc;">GIVEN user di login page, WHEN mengisi sandi valid, THEN dashboard terbuka.</code>
                             </li>
-                            <li><strong>Lingkungan Uji Terisolasi:</strong> Database staging yang tidak diacak-acak oleh
-                                user live testing lain.</li>
+                            <li><strong>Lingkungan Uji Terisolasi:</strong> Database staging yang tidak diacak-acak oleh user live testing lain.</li>
                         </ul>
                     </div>
                     <div class="card">
-                        <div class="card-title">Fixture & Test Data Management</div>
-                        <div class="code-block">
-                            <span class="comment">// cypress/fixtures/users.json</span>
-                            {
-                            <span class="keyword">"validUser"</span>: {
-                            <span class="string">"email"</span>: <span class="string">"tester.qa@pln.co.id"</span>,
-                            <span class="string">"role"</span>: <span class="string">"Approver"</span>
-                            },
-                            <span class="keyword">"lockedUser"</span>: {
-                            <span class="string">"email"</span>: <span class="string">"blocked@pln.co.id"</span>,
-                            <span class="string">"expectedError"</span>: <span class="string">"Akun terkunci"</span>
-                            }
-                            }
+                        <div class="card-title"><i class="ri-database-2-line" style="color: var(--accent-emerald);"></i> Fixture & Test Data Management</div>
+                        <div class="code-window">
+                            <div class="code-header">
+                                <span class="code-dot red"></span>
+                                <span class="code-dot yellow"></span>
+                                <span class="code-dot green"></span>
+                                <span class="code-title">cypress/fixtures/users.json</span>
+                            </div>
+                            <div class="code-block">
+<span class="comment">// Pisahkan kredensial dari script</span>
+{
+  <span class="keyword">"validUser"</span>: {
+    <span class="string">"email"</span>: <span class="string">"tester.qa@pln.co.id"</span>,
+    <span class="string">"role"</span>: <span class="string">"Approver"</span>
+  },
+  <span class="keyword">"lockedUser"</span>: {
+    <span class="string">"email"</span>: <span class="string">"blocked@pln.co.id"</span>,
+    <span class="string">"expectedError"</span>: <span class="string">"Akun terkunci"</span>
+  }
+}</div>
                         </div>
-                        <p style="font-size: 10px; color: var(--text-muted);">Pisahkan kredensial pengujian dari script
-                            code agar aman dan mudah di-maintain.</p>
                     </div>
                 </div>
             </div>
@@ -658,7 +834,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 04: Fundamentals</div>
+                    <div class="category-tag"><i class="ri-layout-3-line"></i> Phase 04: Fundamentals</div>
                     <div class="slide-title">Anatomi Web: Elemen HTML vs Komponen UI</div>
                 </div>
                 <div class="slide-num">06</div>
@@ -666,25 +842,21 @@
             <div class="slide-body">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-title">Elemen Web (HTML Native Tag)</div>
-                        <p style="font-size: 12px; color: var(--text-sub);">Elemen atomik bawaan browser yang sederhana
-                            dan minim dependensi logika.</p>
+                        <div class="card-title"><i class="ri-html5-line" style="color: #f97316;"></i> Elemen Web (HTML Native Tag)</div>
+                        <p style="font-size: 11.5px; color: var(--text-sub);">Elemen atomik bawaan browser yang sederhana dan minim dependensi logika.</p>
                         <ul class="card-list" style="margin-top: 4px;">
-                            <li>Contoh: <code>&lt;input&gt;</code>, <code>&lt;button&gt;</code>,
-                                <code>&lt;select&gt;</code>, <code>&lt;table&gt;</code>.</li>
+                            <li>Contoh: <code>&lt;input&gt;</code>, <code>&lt;button&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;table&gt;</code>.</li>
                             <li>Struktur statis, interaksi bawaan peramban (*native behavior*).</li>
                             <li>Cypress bisa langsung berinteraksi tanpa jeda animasi khusus.</li>
                         </ul>
                     </div>
                     <div class="card">
-                        <div class="card-title">Komponen Web (Modern Component)</div>
-                        <p style="font-size: 12px; color: var(--text-sub);">Gabungan tag HTML, CSS styling, dan logic
-                            interaktif (React, Vue, dll.).</p>
+                        <div class="card-title"><i class="ri-reactjs-line" style="color: #38bdf8;"></i> Komponen Web (Modern Component)</div>
+                        <p style="font-size: 11.5px; color: var(--text-sub);">Gabungan tag HTML, CSS styling, dan logic interaktif (Vue/Vuetify, React, dll.).</p>
                         <ul class="card-list" style="margin-top: 4px;">
-                            <li>Contoh: Modal Dialog, Datepicker, Custom Select, Drawer.</li>
-                            <li>Memiliki <strong>State</strong>: animasi fade-in, backdrop layer, dan DOM yang baru
-                                di-render ketika di-trigger.</li>
-                            <li>Membutuhkan <em>auto-waiting</em> agar tidak gagal saat elemen sedang beranimasi.</li>
+                            <li>Contoh: Modal Dialog, Datepicker, Custom Select, Overlay Drawer.</li>
+                            <li>Memiliki <strong>State</strong>: animasi fade-in, backdrop layer, dan DOM yang baru di-render saat di-trigger.</li>
+                            <li>Membutuhkan <em>auto-waiting / dynamic selector</em> agar tidak gagal saat rendering.</li>
                         </ul>
                     </div>
                 </div>
@@ -699,7 +871,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 05: Core Syntax</div>
+                    <div class="category-tag"><i class="ri-command-line"></i> Phase 05: Core Syntax</div>
                     <div class="slide-title">Cypress Common Commands & Chaining</div>
                 </div>
                 <div class="slide-num">07</div>
@@ -708,16 +880,16 @@
                 <table class="deck-table">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Perintah</th>
-                            <th style="width: 35%;">Fungsi</th>
-                            <th style="width: 40%;">Contoh Pemakaian</th>
+                            <th style="width: 25%;"><i class="ri-terminal-line"></i> Perintah</th>
+                            <th style="width: 35%;"><i class="ri-focus-2-line"></i> Fungsi</th>
+                            <th style="width: 40%;"><i class="ri-code-line"></i> Contoh Pemakaian</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>cy.visit()</code></td>
                             <td>Navigasi membuka URL</td>
-                            <td><code>cy.visit('/login')</code></td>
+                            <td><code>cy.visit('/perizinan')</code></td>
                         </tr>
                         <tr>
                             <td><code>cy.get()</code></td>
@@ -737,14 +909,12 @@
                         <tr>
                             <td><code>cy.contains()</code></td>
                             <td>Menemukan elemen berdasarkan teks</td>
-                            <td><code>cy.contains('button', 'Simpan').click()</code></td>
+                            <td><code>cy.contains('button', 'Tambah').click()</code></td>
                         </tr>
                     </tbody>
                 </table>
-                <div
-                    style="margin-top: 10px; background: #0c1322; padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--accent-cyan); font-size: 11px; color: var(--text-muted);">
-                    <strong style="color: var(--accent-cyan);">Pola Command Chaining:</strong> Perintah disambung dari
-                    kiri ke kanan layaknya kalimat: <br />
+                <div style="margin-top: 10px; background: rgba(12, 19, 34, 0.9); padding: 9px 14px; border-radius: 8px; border-left: 3.5px solid var(--accent-cyan); font-size: 11px; color: var(--text-muted);">
+                    <strong style="color: var(--accent-cyan);"><i class="ri-link"></i> Pola Command Chaining:</strong> Perintah disambung dari kiri ke kanan layaknya kalimat: <br />
                     <code>cy.get('[data-cy="email"]').clear().type('admin@pln.co.id').should('have.value', 'admin@pln.co.id');</code>
                 </div>
             </div>
@@ -758,43 +928,40 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 06: Best Practices</div>
+                    <div class="category-tag"><i class="ri-crosshair-2-line"></i> Phase 06: Best Practices</div>
                     <div class="slide-title">Selector Strategy: Mengapa Harus data-cy?</div>
                 </div>
                 <div class="slide-num">08</div>
             </div>
             <div class="slide-body">
                 <div class="grid-3">
-                    <div class="card" style="border-top: 3px solid var(--accent-rose);">
-                        <div class="card-title" style="color: var(--accent-rose); font-size: 13px;">1. Rentan Rusak
-                            (Flaky)</div>
+                    <div class="card" style="border-top: 3.5px solid var(--accent-rose);">
+                        <div class="card-title" style="color: var(--accent-rose); font-size: 13px;">
+                            <i class="ri-error-warning-line"></i> 1. Rentan Rusak (Flaky)
+                        </div>
                         <div class="code-block">cy.get('.btn-primary')
-                            cy.contains('Simpan')</div>
-                        <p style="font-size: 10px; color: var(--text-muted);">CSS Class sering berubah saat tim FE
-                            redesign tampilan. Copy teks rentan gagal saat ada fitur multi-bahasa.</p>
+cy.contains('Simpan')</div>
+                        <p style="font-size: 10.5px; color: var(--text-muted);">CSS Class sering berubah saat tim FE redesign tampilan. Copy teks rentan gagal saat ada fitur multi-bahasa.</p>
                     </div>
-                    <div class="card" style="border-top: 3px solid var(--accent-amber);">
-                        <div class="card-title" style="color: var(--accent-amber); font-size: 13px;">2. Cukup Aman
-                            (Fallback)</div>
+                    <div class="card" style="border-top: 3.5px solid var(--accent-amber);">
+                        <div class="card-title" style="color: var(--accent-amber); font-size: 13px;">
+                            <i class="ri-alert-line"></i> 2. Cukup Aman (Fallback)
+                        </div>
                         <div class="code-block">cy.get('input[name="user"]')
-                            cy.get('#login-form')</div>
-                        <p style="font-size: 10px; color: var(--text-muted);">Atribut native form (<code>name</code>,
-                            <code>id</code>) cukup stabil, tapi kadang ID digenerate otomatis oleh compiler framework.
-                        </p>
+cy.get('#login-form')</div>
+                        <p style="font-size: 10.5px; color: var(--text-muted);">Atribut native form (<code>name</code>, <code>id</code>) cukup stabil, tapi kadang ID digenerate otomatis oleh compiler framework.</p>
                     </div>
-                    <div class="card" style="border-top: 3px solid var(--accent-emerald);">
-                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">3. Paling
-                            Resilient</div>
+                    <div class="card" style="border-top: 3.5px solid var(--accent-emerald);">
+                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">
+                            <i class="ri-shield-star-line"></i> 3. Paling Resilient
+                        </div>
                         <div class="code-block">cy.get('[data-cy="btn-login"]')
-                            cy.getByCy('submit-form')</div>
-                        <p style="font-size: 10px; color: var(--text-muted);">Atribut khusus testing. Kebal terhadap
-                            pergantian CSS, framework UI, maupun perombakan tata letak komponen.</p>
+cy.getByCy('submit-form')</div>
+                        <p style="font-size: 10.5px; color: var(--text-muted);">Atribut khusus testing. Kebal terhadap pergantian CSS, framework UI, maupun perombakan tata letak komponen.</p>
                     </div>
                 </div>
                 <div style="margin-top: 10px; font-size: 11px; color: #94a3b8; text-align: center;">
-                    🤝 <strong>Sinergi FE & QA:</strong> Minta tim Front-End menyematkan atribut <code>data-cy</code>
-                    pada komponen dasar Design System (<code style="color: #38bdf8;">&lt;Button/&gt;</code>, <code
-                        style="color: #38bdf8;">&lt;Input/&gt;</code>).
+                    🤝 <strong>Sinergi FE & QA:</strong> Minta tim Front-End menyematkan atribut <code>data-cy</code> pada komponen dasar Design System (<code style="color: #38bdf8;">&lt;Button/&gt;</code>, <code style="color: #38bdf8;">&lt;Input/&gt;</code>).
                 </div>
             </div>
             <div class="slide-footer">
@@ -807,7 +974,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 07: Execution</div>
+                    <div class="category-tag"><i class="ri-play-circle-line"></i> Phase 07: Execution</div>
                     <div class="slide-title">5 Langkah Hands-On: Action Detail & State Flow</div>
                 </div>
                 <div class="slide-num">09</div>
@@ -817,64 +984,73 @@
                     <div class="step-box">
                         <div class="step-num">1</div>
                         <div class="step-title">Test Plan</div>
-                        <div class="step-desc">Tentukan skenario E2E (Permit Pemasangan) & kriteria lolos verifikasi.</div>
+                        <div class="step-desc">Skenario E2E Permit & kriteria lolos.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">2</div>
                         <div class="step-title">User Fixture</div>
-                        <div class="step-desc">Panggil kredensial via <code>users.json</code> (Role Asman RENEV UPT).</div>
+                        <div class="step-desc">Ambil role Asman di <code>users.json</code>.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">3</div>
                         <div class="step-title">Hooks & Session</div>
-                        <div class="step-desc">Record HAR di <code>before/after</code>, reset session & login ke sistem.</div>
+                        <div class="step-desc">Record HAR & reset session login.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">4</div>
                         <div class="step-title">Form Actions</div>
-                        <div class="step-desc">Buka menu, trigger modal, dan pilih dropdown overlay.</div>
+                        <div class="step-desc">Pilih dropdown & upload sample.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">5</div>
-                        <div class="step-title">Extract & Assert</div>
-                        <div class="step-desc">Ambil value <code>.invoke('val')</code>, simpan ke Storage/Env & Alias.</div>
+                        <div class="step-title">Extract & Alias</div>
+                        <div class="step-desc">Simpan nilai permit ke Env & Alias.</div>
                     </div>
                 </div>
-                <div class="code-block" style="margin-top: 10px; font-size: 10px; line-height: 1.42; max-height: 195px; overflow-y: auto;">
-                    <span class="keyword">describe</span>(<span class="string">"E2E Perizinan Pemasangan Transmisi"</span>, () => {
-                      <span class="keyword">before</span>(() => { cy.recordHar(); }); <span class="comment">// 1. Rekam network traffic</span>
-                      <span class="keyword">after</span>(() => { cy.saveHar({ fileName: <span class="string">"create-perizinan-pemasangan"</span> }); });
+                <div class="code-window" style="margin-top: 10px;">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">cypress/e2e/power_swift/perizinan-pemasangan.spec.cy.js</span>
+                    </div>
+                    <div class="code-block" style="font-size: 9.8px; line-height: 1.42; max-height: 180px; overflow-y: auto;">
+<span class="keyword">describe</span>(<span class="string">"E2E Perizinan Pemasangan Transmisi"</span>, () => {
+  <span class="keyword">before</span>(() => { cy.recordHar(); }); <span class="comment">// 1. Rekam network traffic HTTP</span>
+  <span class="keyword">after</span>(() => { cy.saveHar({ fileName: <span class="string">"create-perizinan-pemasangan"</span> }); });
 
-                      <span class="keyword">it</span>(<span class="string">"TC-01EPP - E2E Create Perizinan & Extract Nomor Permit"</span>, () => {
-                        <span class="comment">// 2. Clean State & Login Session</span>
-                        cy.clearAllCookies();
-                        cy.loginAs(<span class="string">"ers.asman.renev.manado"</span>);
-                        cy.visit(<span class="string">"/emergency-restoration-system/perizinan"</span>);
+  <span class="keyword">it</span>(<span class="string">"TC-01EPP - E2E Create Perizinan & Extract Nomor Permit"</span>, () => {
+    <span class="comment">// 2. Clean State & Role Login</span>
+    cy.clearAllCookies();
+    cy.loginAs(<span class="string">"ers.asman.renev.manado"</span>);
+    cy.visit(<span class="string">"/emergency-restoration-system/perizinan"</span>);
 
-                        <span class="comment">// 3. Form Navigation & Modal Trigger</span>
-                        cy.get(<span class="string">'input[placeholder="Cari Data"]'</span>).should(<span class="string">'be.visible'</span>);
-                        cy.contains(<span class="string">'button'</span>, <span class="string">'Tambah Data'</span>).should(<span class="string">'be.visible'</span>).click();
+    <span class="comment">// 3. Navigasi & Trigger Modal</span>
+    cy.get(<span class="string">'input[placeholder="Cari Data"]'</span>).should(<span class="string">'be.visible'</span>);
+    cy.contains(<span class="string">'button'</span>, <span class="string">'Tambah Data'</span>).should(<span class="string">'be.visible'</span>).click();
 
-                        <span class="comment">// 4. Dropdown Interactions</span>
-                        cy.get(<span class="string">'.title-bar'</span>).contains(<span class="string">'Tambah Perizinan'</span>).should(<span class="string">'be.visible'</span>);
-                        cy.get(<span class="string">'input[placeholder="Pilih Tipe Permit"]'</span>).click();
-                        cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).contains(<span class="string">'Pemasangan'</span>).click();
-                        cy.get(<span class="string">'input[placeholder="Pilih Nomor Referensi Perencanaan"]'</span>).click();
-                        cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).first().click();
+    <span class="comment">// 4. Dropdown Interactions & Form Input</span>
+    cy.get(<span class="string">'.title-bar'</span>).contains(<span class="string">'Tambah Perizinan'</span>).should(<span class="string">'be.visible'</span>);
+    cy.get(<span class="string">'input[placeholder="Pilih Tipe Permit"]'</span>).click();
+    cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).contains(<span class="string">'Pemasangan'</span>).click();
+    cy.get(<span class="string">'input[placeholder="Pilih Nomor Referensi Perencanaan"]'</span>).click();
+    cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).first().click();
 
-                        <span class="comment">// 5. Extract & Simpan Nomor Permit ke Local Storage, Env, dan Alias</span>
-                        cy.get(<span class="string">'input[placeholder="Masukkan Estimasi Nomor Permit"]'</span>)
-                          .should(<span class="string">'not.have.value'</span>, <span class="string">''</span>)
-                          .invoke(<span class="string">'val'</span>)
-                          .then((val) => {
-                            <span class="keyword">const</span> noPermit = val.trim();
-                            window.localStorage.setItem(<span class="string">'saved_nomor_permit'</span>, noPermit);
-                            Cypress.env(<span class="string">'nomorPermit'</span>, noPermit);
-                            cy.log(<span class="string">'Nomor Permit tersimpan:'</span>, noPermit);
-                          })
-                          .as(<span class="string">'nomorPermit'</span>);
-                      });
-                    });
+    <span class="comment">// 5. Extract & Simpan Nomor Permit ke Local Storage, Env, dan Alias</span>
+    cy.get(<span class="string">'input[placeholder*="Nomor Permit"]'</span>, { timeout: <span class="keyword">10000</span> })
+      .should(<span class="string">'not.have.value'</span>, <span class="string">''</span>)
+      .invoke(<span class="string">'val'</span>)
+      .then((val) => {
+        <span class="keyword">const</span> noPermit = val.trim();
+        window.localStorage.setItem(<span class="string">'saved_nomor_permit'</span>, noPermit);
+        Cypress.env(<span class="string">'nomorPermit'</span>, noPermit);
+      }).as(<span class="string">'nomorPermit'</span>);
+
+    <span class="comment">// 6. File Upload Attachment</span>
+    cy.contains(<span class="string">'button'</span>, <span class="string">'Upload File'</span>).click();
+    cy.get(<span class="string">'input[type="file"]'</span>).selectFile(<span class="string">'cypress/fixtures/sample.pdf'</span>, { force: <span class="keyword">true</span> });
+  });
+});</div>
                 </div>
             </div>
             <div class="slide-footer">
@@ -887,15 +1063,14 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 08: Architecture</div>
+                    <div class="category-tag"><i class="ri-git-merge-line"></i> Phase 08: Architecture</div>
                     <div class="slide-title">Arsitektur Hybrid: Cypress to JMeter (.jmx)</div>
                 </div>
                 <div class="slide-num">10</div>
             </div>
             <div class="slide-body">
                 <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">
-                    Mekanisme 6 tahap: Cypress di sisi frontend sebagai <em>user traffic recorder</em>, JMeter di CI/CD
-                    sebagai <em>lightweight pipeline executor</em>.
+                    Mekanisme 6 tahap: Cypress di sisi frontend sebagai <em>user traffic recorder</em>, JMeter di CI/CD sebagai <em>lightweight pipeline executor</em>.
                 </p>
                 <div class="step-track" style="height: auto;">
                     <div class="step-box">
@@ -911,17 +1086,17 @@
                     <div class="step-box">
                         <div class="step-num">3</div>
                         <div class="step-title" style="font-size: 11px;">Record .har</div>
-                        <div class="step-desc">Simpan network traffic ke file archive.</div>
+                        <div class="step-desc">Simpan network traffic ke archive.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">4</div>
                         <div class="step-title" style="font-size: 11px;">Convert .jmx</div>
-                        <div class="step-desc">Ubah archive jadi JMeter Test Plan.</div>
+                        <div class="step-desc">Ubah archive jadi JMeter Plan.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">5</div>
                         <div class="step-title" style="font-size: 11px;">CI/CD Run</div>
-                        <div class="step-desc">Eksekusi via JMeter Non-GUI runner.</div>
+                        <div class="step-desc">Eksekusi via JMeter Non-GUI.</div>
                     </div>
                     <div class="step-box">
                         <div class="step-num">6</div>
@@ -929,9 +1104,16 @@
                         <div class="step-desc">Dashboard hasil uji API & performa.</div>
                     </div>
                 </div>
-                <div class="code-block" style="margin-top: 10px;">
-                    <span class="comment"># Eksekusi ringan di pipeline CI/CD tanpa membuka browser</span>
-                    jmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard
+                <div class="code-window" style="margin-top: 10px;">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">Terminal CI/CD Runner (GitLab CI / Jenkins)</span>
+                    </div>
+                    <div class="code-block">
+<span class="comment"># Eksekusi super ringan di pipeline CI/CD tanpa beban render headless browser</span>
+jmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard</div>
                 </div>
             </div>
             <div class="slide-footer">
@@ -944,7 +1126,7 @@
         <div class="slide">
             <div class="slide-header">
                 <div>
-                    <div class="category-tag">Phase 09: Infrastructure</div>
+                    <div class="category-tag"><i class="ri-cpu-line"></i> Phase 09: Infrastructure</div>
                     <div class="slide-title">Keunggulan Pendekatan Hybrid di Server CI/CD</div>
                 </div>
                 <div class="slide-num">11</div>
@@ -952,38 +1134,36 @@
             <div class="slide-body">
                 <div class="grid-3">
                     <div class="card">
-                        <div class="card-title" style="color: var(--accent-cyan); font-size: 13px;">1. Hemat Compute &
-                            RAM</div>
+                        <div class="card-title" style="color: var(--accent-cyan); font-size: 13px;">
+                            <i class="ri-speed-up-line"></i> 1. Hemat Compute & RAM
+                        </div>
                         <p style="font-size: 11px; color: var(--text-sub);">
                             Browser headless Chrome butuh alokasi memori besar (<strong>~1.2 GB+</strong> per runner).
                         </p>
                         <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                            JMeter mode non-GUI hanya membutuhkan sekitar <strong>~150 MB RAM</strong>, membuat build
-                            server jauh lebih hemat dan cepat.
+                            JMeter mode non-GUI hanya membutuhkan sekitar <strong>~150 MB RAM</strong>, membuat build server jauh lebih hemat dan cepat.
                         </p>
                     </div>
                     <div class="card">
-                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">2. Kebal UI
-                            Rendering Lag</div>
+                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">
+                            <i class="ri-shield-check-line"></i> 2. Kebal UI Rendering Lag
+                        </div>
                         <p style="font-size: 11px; color: var(--text-sub);">
-                            Menghilangkan false-negative akibat delay font, viewport resolution, atau CSS render lambat
-                            di server runner.
+                            Menghilangkan false-negative akibat delay font, viewport resolution, atau CSS render lambat di server runner.
                         </p>
                         <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                            Pipeline hanya fokus pada validasi status payload, kode respon HTTP, dan kecepatan balasan
-                            server.
+                            Pipeline hanya fokus pada validasi status payload, kode respon HTTP, dan kecepatan balasan server.
                         </p>
                     </div>
                     <div class="card">
-                        <div class="card-title" style="color: var(--accent-amber); font-size: 13px;">3. Siap untuk Load
-                            Testing</div>
+                        <div class="card-title" style="color: var(--accent-amber); font-size: 13px;">
+                            <i class="ri-fire-line"></i> 3. Siap untuk Load Testing
+                        </div>
                         <p style="font-size: 11px; color: var(--text-sub);">
-                            File <code>.jmx</code> hasil convert bisa langsung di-scale menjadi uji performa/stress
-                            test.
+                            File <code>.jmx</code> hasil convert bisa langsung di-scale menjadi uji performa/stress test.
                         </p>
                         <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                            Cukup atur jumlah <em>Thread Group (Virtual Users)</em> di JMeter untuk simulasi lonjakan
-                            ribuan user serentak.
+                            Cukup atur jumlah <em>Thread Group (Virtual Users)</em> di JMeter untuk simulasi lonjakan ribuan user serentak.
                         </p>
                     </div>
                 </div>
@@ -996,38 +1176,51 @@
 
         <!-- SLIDE 12: SUMMARY & QA -->
         <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
-            <div style="max-width: 680px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
-                <div class="category-tag">Key Takeaways</div>
-                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em;">
+            <div style="max-width: 700px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                <div class="category-tag">
+                    <i class="ri-trophy-line" style="color: var(--pln-gold);"></i> Key Takeaways
+                </div>
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, #ffffff 40%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                     3 Kaidah Emas Automation
                 </h2>
                 <div class="grid-3" style="text-align: left; width: 100%; margin-top: 6px;">
-                    <div class="card">
-                        <div class="card-title" style="font-size: 13px;">1. Matangkan Hulu</div>
-                        <p style="font-size: 11px; color: var(--text-muted);">Pahami aturan bisnis, susun skenario BDD,
-                            dan pisahkan test data sebelum menulis kode.</p>
+                    <div class="card" style="border-top: 3.5px solid var(--accent-cyan);">
+                        <div class="card-title" style="font-size: 13px; color: var(--accent-cyan);">
+                            <i class="ri-checkbox-multiple-line"></i> 1. Matangkan Hulu
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Pahami aturan bisnis, susun skenario BDD, dan pisahkan test data sebelum menulis kode.</p>
                     </div>
-                    <div class="card">
-                        <div class="card-title" style="font-size: 13px;">2. Selektor Resilient</div>
-                        <p style="font-size: 11px; color: var(--text-muted);">Kolaborasi dengan FE untuk standarisasi
-                            <code>data-cy</code> agar script tahan saat UI redesign.</p>
+                    <div class="card" style="border-top: 3.5px solid var(--accent-emerald);">
+                        <div class="card-title" style="font-size: 13px; color: var(--accent-emerald);">
+                            <i class="ri-shield-star-line"></i> 2. Selektor Resilient
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Kolaborasi dengan FE untuk standarisasi <code>data-cy</code> agar script tahan saat UI redesign.</p>
                     </div>
-                    <div class="card">
-                        <div class="card-title" style="font-size: 13px;">3. Eksekusi Efisien</div>
-                        <p style="font-size: 11px; color: var(--text-muted);">Gunakan Cypress untuk rekam flow nyata,
-                            jalankan <code>.jmx</code> di pipeline agar ringan.</p>
+                    <div class="card" style="border-top: 3.5px solid var(--pln-gold);">
+                        <div class="card-title" style="font-size: 13px; color: var(--pln-gold);">
+                            <i class="ri-rocket-2-line"></i> 3. Eksekusi Efisien
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Gunakan Cypress untuk rekam flow nyata, jalankan <code>.jmx</code> di pipeline agar ringan.</p>
                     </div>
                 </div>
-                <div style="margin-top: 10px; font-size: 13px; color: var(--text-sub);">
-                    Terima Kasih! Mari masuk ke sesi tanya jawab & hands-on.
+                <div style="margin-top: 10px; font-size: 13px; color: var(--text-sub); display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-hand-heart-line" style="color: var(--accent-cyan);"></i> Terima Kasih! Mari masuk ke sesi tanya jawab & hands-on.
                 </div>
             </div>
-            <div class="slide-footer" style="position: absolute; bottom: 24px; width: calc(100% - 88px);">
+            <div class="slide-footer" style="position: absolute; bottom: 22px; width: calc(100% - 88px);">
                 <span>Modern Web Automation with Cypress</span>
                 <span>Slide 12</span>
             </div>
         </div>
 
+    </div>
+
+    <!-- Bottom Keyboard Shortcut Guide -->
+    <div class="keyboard-helper">
+        <span>Shortcut Navigasi:</span>
+        <span class="kbd-chip">← / →</span>
+        <span class="kbd-chip">Space</span>
+        <span class="kbd-chip">F (Layar Penuh)</span>
     </div>
 
     <script>
@@ -1036,6 +1229,7 @@
         const slides = document.querySelectorAll('.slide');
         const totalSlides = slides.length;
         const indicator = document.getElementById('slideIndicator');
+        const progressFill = document.getElementById('progressFill');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
 
@@ -1051,6 +1245,9 @@
                 }
             });
             indicator.textContent = `Slide ${currentSlide + 1} / ${totalSlides}`;
+            if (progressFill) {
+                progressFill.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            }
             prevBtn.disabled = currentSlide === 0;
             nextBtn.disabled = currentSlide === totalSlides - 1;
             prevBtn.style.opacity = currentSlide === 0 ? '0.4' : '1';
@@ -1090,7 +1287,7 @@
             const icon = document.getElementById('fullscreenIcon');
             if (text && icon) {
                 text.textContent = isFs ? 'Keluar Layar Penuh (F)' : 'Layar Penuh (F)';
-                icon.textContent = isFs ? '🗗' : '⛶';
+                icon.className = isFs ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line';
             }
         }
 
