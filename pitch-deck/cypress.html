@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Web Automation & Hybrid CI/CD Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: #111726;
+            --card-border: #1e293b;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #030712;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+
+        /* Top Controls */
+        .deck-controls {
+            width: 100%;
+            max-width: 960px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            padding: 10px 18px;
+            border-radius: 12px;
+        }
+
+        .nav-btn {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+        }
+
+        .slide-indicator {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Presentation Container */
+        .slide-viewport {
+            width: 100%;
+            max-width: 960px;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 36px 44px;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        /* Slide Switch Animations */
+        @keyframes slideInNext {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes slideInPrev {
+            from {
+                opacity: 0;
+                transform: translateX(-40px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            animation: slideInNext 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide.active.anim-prev {
+            animation: slideInPrev 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Fullscreen Presentation Mode Styles */
+        :fullscreen body,
+        :-webkit-full-screen body {
+            padding: 0;
+            margin: 0;
+            background: #030712;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        :fullscreen .deck-controls,
+        :-webkit-full-screen .deck-controls {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+            margin-bottom: 0;
+            max-width: 620px;
+            width: calc(100% - 48px);
+            opacity: 0.18;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        :fullscreen .deck-controls:hover,
+        :-webkit-full-screen .deck-controls:hover {
+            opacity: 1;
+        }
+
+        :fullscreen .slide-viewport,
+        :-webkit-full-screen .slide-viewport {
+            max-width: min(96vw, 170.67vh);
+            max-height: min(94vh, 56.25vw);
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
+        .slide::before {
+            content: "";
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+        }
+
+        /* Header */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .category-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            padding: 3px 8px;
+            border-radius: 999px;
+            margin-bottom: 4px;
+        }
+
+        .slide-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .slide-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        /* Content Layouts */
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            height: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-sub);
+            line-height: 1.45;
+        }
+
+        .card-list li {
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .card-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .card-list.danger li::before {
+            color: var(--accent-rose);
+        }
+
+        .card-list.success li::before {
+            color: var(--accent-emerald);
+        }
+
+        /* Code styling */
+        pre,
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-block {
+            background: #060911;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 11px;
+            color: #38bdf8;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .code-block .comment {
+            color: #64748b;
+        }
+
+        .code-block .keyword {
+            color: #f43f5e;
+        }
+
+        .code-block .string {
+            color: #34d399;
+        }
+
+        /* Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(30, 41, 59, 0.7);
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        /* Table styling */
+        .deck-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            text-align: left;
+        }
+
+        .deck-table th {
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--accent-cyan);
+            padding: 7px 10px;
+            border: 1px solid var(--card-border);
+            font-weight: 600;
+        }
+
+        .deck-table td {
+            padding: 7px 10px;
+            border: 1px solid var(--card-border);
+            color: var(--text-sub);
+        }
+
+        /* Step boxes */
+        .step-track {
+            display: flex;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .step-box {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .step-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .step-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Controller Bar -->
+    <div class="deck-controls">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Sebelumnya</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Berikutnya →</button>
+        </div>
+        <div class="slide-indicator" id="slideIndicator">Slide 1 / 12</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="nav-btn" id="fullscreenBtn" onclick="toggleFullscreen()" style="background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.35); color: var(--accent-cyan);">
+                <span id="fullscreenIcon">⛶</span> <span id="fullscreenText">Layar Penuh (F)</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="slide-viewport">
+
+        <!-- SLIDE 1: COVER -->
+        <div class="slide active" style="justify-content: center; align-items: center; text-align: center;">
+            <div style="max-width: 680px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                <div class="category-tag">Automation Architecture Deck</div>
+                <h1 style="font-size: 36px; font-weight: 800; line-height: 1.2; letter-spacing: -0.03em;">
+                    Modern Web Automation <br /><span style="color: var(--accent-cyan);">with Cypress</span>
+                </h1>
+                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; max-width: 520px;">
+                    Dari Analisis Bisnis, Targeting Elemen Resilient, hingga Arsitektur Hybrid CI/CD Pipeline (<code
+                        style="color: var(--accent-emerald);">.har ➔ .jmx</code>)
+                </p>
+                <div style="margin-top: 14px;">
+                    <span
+                        style="font-size: 12px; font-weight: 600; color: #cbd5e1; background: #161f30; padding: 5px 12px; border-radius: 6px; border: 1px solid #1e293b;">
+                        IT Quality Assurance & System Analyst
+                    </span>
+                </div>
+            </div>
+            <div class="slide-footer" style="position: absolute; bottom: 24px; width: calc(100% - 88px);">
+                <span>E2E & Performance Strategy</span>
+                <span>Slide 01</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: PRELIMINARY -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 01: Strategy</div>
+                    <div class="slide-title">Kapan & Kenapa Harus Otomasi?</div>
+                </div>
+                <div class="slide-num">02</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card" style="border-left: 3px solid var(--accent-emerald);">
+                        <div class="card-title" style="color: var(--accent-emerald);">
+                            ✓ Prioritas Tinggi Otomasi (High ROI)
+                        </div>
+                        <ul class="card-list success">
+                            <li><strong>Regression Testing:</strong> Skenario berulang yang sering dijalankan setiap
+                                kali ada pull request / rilis baru.</li>
+                            <li><strong>Critical Business Path (Smoke Test):</strong> Alur wajib jalan seperti
+                                Autentikasi, Checkout, Transfer, atau Input Transaksi.</li>
+                            <li><strong>Stable Features:</strong> Modul dengan UI dan business rule yang sudah matang
+                                dan tidak berubah drastis tiap hari.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border-left: 3px solid var(--accent-rose);">
+                        <div class="card-title" style="color: var(--accent-rose);">
+                            ✕ Pertahankan Manual Testing
+                        </div>
+                        <ul class="card-list danger">
+                            <li><strong>Experimental UI / A/B Testing:</strong> Modul yang tata letak atau tombolnya
+                                masih sering dirombak tim UI/UX.</li>
+                            <li><strong>One-Time Feature:</strong> Event musiman atau modul sekali pakai yang tidak ada
+                                siklus rilis berikutnya.</li>
+                            <li><strong>Usability & Visual Polish:</strong> Pengecekan estetika, kenyamanan tata letak,
+                                dan flow intuitif manusiawi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Prinsip: Otomasi ditujukan untuk efisiensi regresi, bukan mengotomasi semua hal.</span>
+                <span>Slide 02</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: AUTOMATION VS MANUAL MYTH -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 01: Strategy</div>
+                    <div class="slide-title">Apakah Automation Menggantikan Manual Testing?</div>
+                </div>
+                <div class="slide-num">03</div>
+            </div>
+            <div class="slide-body">
+                <div style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 18px;">💡</span>
+                    <p style="font-size: 12px; color: var(--text-main); line-height: 1.4;">
+                        <strong>Jawaban Tegas: TIDAK.</strong> Keduanya adalah mitra komplementer — automation menguji yang <em>diketahui (checking)</em>, manual mengeksplorasi yang <em>belum diketahui (exploring)</em>.
+                    </p>
+                </div>
+                <div class="grid-2">
+                    <div class="card" style="border-left: 3px solid #38bdf8;">
+                        <div class="card-title" style="color: #38bdf8; font-size: 13px;">
+                            👤 Keunggulan Human QA (Manual)
+                        </div>
+                        <ul class="card-list">
+                            <li><strong>Intuisi & Konteks Bisnis:</strong> Memahami ekspektasi user riil & flow rumit yang butuh empati.</li>
+                            <li><strong>Exploratory Testing:</strong> Menemukan anomali tak terduga di luar test case tertulis.</li>
+                            <li><strong>Usability & Visual QA:</strong> Mengevaluasi kenyamanan visual, tone bahasa, & UX adaptif.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border-left: 3px solid var(--accent-emerald);">
+                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">
+                            🤖 Keunggulan Automation QA (Cypress)
+                        </div>
+                        <ul class="card-list success">
+                            <li><strong>Kecepatan & Skala Masif:</strong> Eksekusi ratusan test case regresi dalam hitungan menit.</li>
+                            <li><strong>Eliminasi Human Fatigue:</strong> Jalankan Smoke Test identik berulang tanpa resiko lalai/bosan.</li>
+                            <li><strong>Fast Feedback CI/CD:</strong> Langsung jegal bug sebelum kode sempat masuk ke production.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); text-align: center;">
+                    🤝 <strong>Sinergi Ideal:</strong> Automation mengambil alih beban repetitif agar QA Engineer punya ruang eksplorasi mendalam pada skenario kompleks.
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Prinsip: Automation bukan pengganti QA, melainkan super-power bagi tim QA.</span>
+                <span>Slide 03</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: BUSINESS RULES & VALIDATION -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 02: Analysis</div>
+                    <div class="slide-title">Persiapan Analisis Bisnis: Rules & Validasi</div>
+                </div>
+                <div class="slide-num">04</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-title">1. RBAC & Matrix Akses</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Memetakan kewenangan tiap role pengguna
+                            pada halaman aplikasi:</p>
+                        <ul class="card-list">
+                            <li>Admin: Akses CRUD & tombol approve aktif.</li>
+                            <li>Staff/Viewer: Menu terkunci, tombol edit berstatus <code>disabled</code>.</li>
+                            <li>Multi-tenant session isolation.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">2. Client-Side Rules</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Feedback instan pada browser sebelum
+                            payload terkirim:</p>
+                        <ul class="card-list">
+                            <li>Pemeriksaan Regex format email/password.</li>
+                            <li>Limit karakter teks & batasan ukuran upload file.</li>
+                            <li>Mandatory check (* merah tidak boleh kosong).</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">3. Server Rules & Edge Cases</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Penolakan integritas data oleh API
+                            backend:</p>
+                        <ul class="card-list">
+                            <li>Pencegahan input duplikat nomor unik/NIK.</li>
+                            <li>Validasi plafon limit transaksi harian.</li>
+                            <li>Boundary value test (input nilai 0, negatif, max limit).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Quality Assurance: Memastikan sistem menolak data salah dengan tepat.</span>
+                <span>Slide 04</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: QA ARTIFACTS & FIXTURES -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 03: Preparation</div>
+                    <div class="slide-title">Dokumen QA & Manajemen Data Uji</div>
+                </div>
+                <div class="slide-num">05</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">Dokumen Acuan Pengujian</div>
+                        <ul class="card-list">
+                            <li><strong>Test Plan:</strong> Cakupan modul, scope URL target (Staging/Dev), serta
+                                Exit/Pass Criteria (100% Smoke Pass).</li>
+                            <li><strong>Test Scenarios (BDD/User Story):</strong>
+                                <br /><code
+                                    style="font-size: 10px; color: #a5f3fc;">GIVEN user di login page, WHEN mengisi sandi valid, THEN dashboard terbuka.</code>
+                            </li>
+                            <li><strong>Lingkungan Uji Terisolasi:</strong> Database staging yang tidak diacak-acak oleh
+                                user live testing lain.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Fixture & Test Data Management</div>
+                        <div class="code-block">
+                            <span class="comment">// cypress/fixtures/users.json</span>
+                            {
+                            <span class="keyword">"validUser"</span>: {
+                            <span class="string">"email"</span>: <span class="string">"tester.qa@pln.co.id"</span>,
+                            <span class="string">"role"</span>: <span class="string">"Approver"</span>
+                            },
+                            <span class="keyword">"lockedUser"</span>: {
+                            <span class="string">"email"</span>: <span class="string">"blocked@pln.co.id"</span>,
+                            <span class="string">"expectedError"</span>: <span class="string">"Akun terkunci"</span>
+                            }
+                            }
+                        </div>
+                        <p style="font-size: 10px; color: var(--text-muted);">Pisahkan kredensial pengujian dari script
+                            code agar aman dan mudah di-maintain.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Standarisasi data uji mencegah tes gagal akibat data basi.</span>
+                <span>Slide 05</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: WEB ANATOMY -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 04: Fundamentals</div>
+                    <div class="slide-title">Anatomi Web: Elemen HTML vs Komponen UI</div>
+                </div>
+                <div class="slide-num">06</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">Elemen Web (HTML Native Tag)</div>
+                        <p style="font-size: 12px; color: var(--text-sub);">Elemen atomik bawaan browser yang sederhana
+                            dan minim dependensi logika.</p>
+                        <ul class="card-list" style="margin-top: 4px;">
+                            <li>Contoh: <code>&lt;input&gt;</code>, <code>&lt;button&gt;</code>,
+                                <code>&lt;select&gt;</code>, <code>&lt;table&gt;</code>.</li>
+                            <li>Struktur statis, interaksi bawaan peramban (*native behavior*).</li>
+                            <li>Cypress bisa langsung berinteraksi tanpa jeda animasi khusus.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Komponen Web (Modern Component)</div>
+                        <p style="font-size: 12px; color: var(--text-sub);">Gabungan tag HTML, CSS styling, dan logic
+                            interaktif (React, Vue, dll.).</p>
+                        <ul class="card-list" style="margin-top: 4px;">
+                            <li>Contoh: Modal Dialog, Datepicker, Custom Select, Drawer.</li>
+                            <li>Memiliki <strong>State</strong>: animasi fade-in, backdrop layer, dan DOM yang baru
+                                di-render ketika di-trigger.</li>
+                            <li>Membutuhkan <em>auto-waiting</em> agar tidak gagal saat elemen sedang beranimasi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Memahami struktur komponen mempermudah navigasi elemen yang dinamis.</span>
+                <span>Slide 06</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: COMMON COMMANDS -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 05: Core Syntax</div>
+                    <div class="slide-title">Cypress Common Commands & Chaining</div>
+                </div>
+                <div class="slide-num">07</div>
+            </div>
+            <div class="slide-body">
+                <table class="deck-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Perintah</th>
+                            <th style="width: 35%;">Fungsi</th>
+                            <th style="width: 40%;">Contoh Pemakaian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>cy.visit()</code></td>
+                            <td>Navigasi membuka URL</td>
+                            <td><code>cy.visit('/login')</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>cy.get()</code></td>
+                            <td>Query mencari elemen di DOM</td>
+                            <td><code>cy.get('[data-cy="input-user"]')</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>.type() / .click()</code></td>
+                            <td>Action: mengisi form / menekan tombol</td>
+                            <td><code>cy.get('#pass').type('secret123')</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>.should()</code></td>
+                            <td>Assertion / validasi kondisi visual</td>
+                            <td><code>cy.get('.toast').should('be.visible')</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>cy.contains()</code></td>
+                            <td>Menemukan elemen berdasarkan teks</td>
+                            <td><code>cy.contains('button', 'Simpan').click()</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div
+                    style="margin-top: 10px; background: #0c1322; padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--accent-cyan); font-size: 11px; color: var(--text-muted);">
+                    <strong style="color: var(--accent-cyan);">Pola Command Chaining:</strong> Perintah disambung dari
+                    kiri ke kanan layaknya kalimat: <br />
+                    <code>cy.get('[data-cy="email"]').clear().type('admin@pln.co.id').should('have.value', 'admin@pln.co.id');</code>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Command Cypress berjalan asinkron dan otomatis mengantre.</span>
+                <span>Slide 07</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: SELECTOR STRATEGY -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 06: Best Practices</div>
+                    <div class="slide-title">Selector Strategy: Mengapa Harus data-cy?</div>
+                </div>
+                <div class="slide-num">08</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card" style="border-top: 3px solid var(--accent-rose);">
+                        <div class="card-title" style="color: var(--accent-rose); font-size: 13px;">1. Rentan Rusak
+                            (Flaky)</div>
+                        <div class="code-block">cy.get('.btn-primary')
+                            cy.contains('Simpan')</div>
+                        <p style="font-size: 10px; color: var(--text-muted);">CSS Class sering berubah saat tim FE
+                            redesign tampilan. Copy teks rentan gagal saat ada fitur multi-bahasa.</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--accent-amber);">
+                        <div class="card-title" style="color: var(--accent-amber); font-size: 13px;">2. Cukup Aman
+                            (Fallback)</div>
+                        <div class="code-block">cy.get('input[name="user"]')
+                            cy.get('#login-form')</div>
+                        <p style="font-size: 10px; color: var(--text-muted);">Atribut native form (<code>name</code>,
+                            <code>id</code>) cukup stabil, tapi kadang ID digenerate otomatis oleh compiler framework.
+                        </p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--accent-emerald);">
+                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">3. Paling
+                            Resilient</div>
+                        <div class="code-block">cy.get('[data-cy="btn-login"]')
+                            cy.getByCy('submit-form')</div>
+                        <p style="font-size: 10px; color: var(--text-muted);">Atribut khusus testing. Kebal terhadap
+                            pergantian CSS, framework UI, maupun perombakan tata letak komponen.</p>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 11px; color: #94a3b8; text-align: center;">
+                    🤝 <strong>Sinergi FE & QA:</strong> Minta tim Front-End menyematkan atribut <code>data-cy</code>
+                    pada komponen dasar Design System (<code style="color: #38bdf8;">&lt;Button/&gt;</code>, <code
+                        style="color: #38bdf8;">&lt;Input/&gt;</code>).
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Stabilitas automation ditentukan oleh pemilihan selector yang tidak terikat visual.</span>
+                <span>Slide 08</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: 5 STEPS HANDS-ON -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 07: Execution</div>
+                    <div class="slide-title">5 Langkah Hands-On: Action Detail & State Flow</div>
+                </div>
+                <div class="slide-num">09</div>
+            </div>
+            <div class="slide-body">
+                <div class="step-track">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-title">Test Plan</div>
+                        <div class="step-desc">Tentukan skenario E2E (Permit Pemasangan) & kriteria lolos verifikasi.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-title">User Fixture</div>
+                        <div class="step-desc">Panggil kredensial via <code>users.json</code> (Role Asman RENEV UPT).</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-title">Hooks & Session</div>
+                        <div class="step-desc">Record HAR di <code>before/after</code>, reset session & login ke sistem.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">4</div>
+                        <div class="step-title">Form Actions</div>
+                        <div class="step-desc">Buka menu, trigger modal, dan pilih dropdown overlay.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">5</div>
+                        <div class="step-title">Extract & Assert</div>
+                        <div class="step-desc">Ambil value <code>.invoke('val')</code>, simpan ke Storage/Env & Alias.</div>
+                    </div>
+                </div>
+                <div class="code-block" style="margin-top: 10px; font-size: 10px; line-height: 1.42; max-height: 195px; overflow-y: auto;">
+                    <span class="keyword">describe</span>(<span class="string">"E2E Perizinan Pemasangan Transmisi"</span>, () => {
+                      <span class="keyword">before</span>(() => { cy.recordHar(); }); <span class="comment">// 1. Rekam network traffic</span>
+                      <span class="keyword">after</span>(() => { cy.saveHar({ fileName: <span class="string">"create-perizinan-pemasangan"</span> }); });
+
+                      <span class="keyword">it</span>(<span class="string">"TC-01EPP - E2E Create Perizinan & Extract Nomor Permit"</span>, () => {
+                        <span class="comment">// 2. Clean State & Login Session</span>
+                        cy.clearAllCookies();
+                        cy.loginAs(<span class="string">"ers.asman.renev.manado"</span>);
+                        cy.visit(<span class="string">"/emergency-restoration-system/perizinan"</span>);
+
+                        <span class="comment">// 3. Form Navigation & Modal Trigger</span>
+                        cy.get(<span class="string">'input[placeholder="Cari Data"]'</span>).should(<span class="string">'be.visible'</span>);
+                        cy.contains(<span class="string">'button'</span>, <span class="string">'Tambah Data'</span>).should(<span class="string">'be.visible'</span>).click();
+
+                        <span class="comment">// 4. Dropdown Interactions</span>
+                        cy.get(<span class="string">'.title-bar'</span>).contains(<span class="string">'Tambah Perizinan'</span>).should(<span class="string">'be.visible'</span>);
+                        cy.get(<span class="string">'input[placeholder="Pilih Tipe Permit"]'</span>).click();
+                        cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).contains(<span class="string">'Pemasangan'</span>).click();
+                        cy.get(<span class="string">'input[placeholder="Pilih Nomor Referensi Perencanaan"]'</span>).click();
+                        cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).first().click();
+
+                        <span class="comment">// 5. Extract & Simpan Nomor Permit ke Local Storage, Env, dan Alias</span>
+                        cy.get(<span class="string">'input[placeholder="Masukkan Estimasi Nomor Permit"]'</span>)
+                          .should(<span class="string">'not.have.value'</span>, <span class="string">''</span>)
+                          .invoke(<span class="string">'val'</span>)
+                          .then((val) => {
+                            <span class="keyword">const</span> noPermit = val.trim();
+                            window.localStorage.setItem(<span class="string">'saved_nomor_permit'</span>, noPermit);
+                            Cypress.env(<span class="string">'nomorPermit'</span>, noPermit);
+                            cy.log(<span class="string">'Nomor Permit tersimpan:'</span>, noPermit);
+                          })
+                          .as(<span class="string">'nomorPermit'</span>);
+                      });
+                    });
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Praktik sistematis: rancang skenario, eksekusi action detail, simpan state data antar-step.</span>
+                <span>Slide 09</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: HYBRID ARCHITECTURE PIPELINE -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 08: Architecture</div>
+                    <div class="slide-title">Arsitektur Hybrid: Cypress to JMeter (.jmx)</div>
+                </div>
+                <div class="slide-num">10</div>
+            </div>
+            <div class="slide-body">
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">
+                    Mekanisme 6 tahap: Cypress di sisi frontend sebagai <em>user traffic recorder</em>, JMeter di CI/CD
+                    sebagai <em>lightweight pipeline executor</em>.
+                </p>
+                <div class="step-track" style="height: auto;">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-title" style="font-size: 11px;">Create Script</div>
+                        <div class="step-desc">Buat skenario flow user di Cypress.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-title" style="font-size: 11px;">Run Local</div>
+                        <div class="step-desc">Trigger real HTTP request di browser.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-title" style="font-size: 11px;">Record .har</div>
+                        <div class="step-desc">Simpan network traffic ke file archive.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">4</div>
+                        <div class="step-title" style="font-size: 11px;">Convert .jmx</div>
+                        <div class="step-desc">Ubah archive jadi JMeter Test Plan.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">5</div>
+                        <div class="step-title" style="font-size: 11px;">CI/CD Run</div>
+                        <div class="step-desc">Eksekusi via JMeter Non-GUI runner.</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">6</div>
+                        <div class="step-title" style="font-size: 11px;">Report</div>
+                        <div class="step-desc">Dashboard hasil uji API & performa.</div>
+                    </div>
+                </div>
+                <div class="code-block" style="margin-top: 10px;">
+                    <span class="comment"># Eksekusi ringan di pipeline CI/CD tanpa membuka browser</span>
+                    jmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Menggabungkan kemudahan UI simulation dengan efisiensi backend runner.</span>
+                <span>Slide 10</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: HYBRID BENEFITS -->
+        <div class="slide">
+            <div class="slide-header">
+                <div>
+                    <div class="category-tag">Phase 09: Infrastructure</div>
+                    <div class="slide-title">Keunggulan Pendekatan Hybrid di Server CI/CD</div>
+                </div>
+                <div class="slide-num">11</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-title" style="color: var(--accent-cyan); font-size: 13px;">1. Hemat Compute &
+                            RAM</div>
+                        <p style="font-size: 11px; color: var(--text-sub);">
+                            Browser headless Chrome butuh alokasi memori besar (<strong>~1.2 GB+</strong> per runner).
+                        </p>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            JMeter mode non-GUI hanya membutuhkan sekitar <strong>~150 MB RAM</strong>, membuat build
+                            server jauh lebih hemat dan cepat.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title" style="color: var(--accent-emerald); font-size: 13px;">2. Kebal UI
+                            Rendering Lag</div>
+                        <p style="font-size: 11px; color: var(--text-sub);">
+                            Menghilangkan false-negative akibat delay font, viewport resolution, atau CSS render lambat
+                            di server runner.
+                        </p>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            Pipeline hanya fokus pada validasi status payload, kode respon HTTP, dan kecepatan balasan
+                            server.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title" style="color: var(--accent-amber); font-size: 13px;">3. Siap untuk Load
+                            Testing</div>
+                        <p style="font-size: 11px; color: var(--text-sub);">
+                            File <code>.jmx</code> hasil convert bisa langsung di-scale menjadi uji performa/stress
+                            test.
+                        </p>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            Cukup atur jumlah <em>Thread Group (Virtual Users)</em> di JMeter untuk simulasi lonjakan
+                            ribuan user serentak.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Optimalisasi resource: Pipeline cepat, biaya server efisien.</span>
+                <span>Slide 11</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: SUMMARY & QA -->
+        <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+            <div style="max-width: 680px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                <div class="category-tag">Key Takeaways</div>
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em;">
+                    3 Kaidah Emas Automation
+                </h2>
+                <div class="grid-3" style="text-align: left; width: 100%; margin-top: 6px;">
+                    <div class="card">
+                        <div class="card-title" style="font-size: 13px;">1. Matangkan Hulu</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Pahami aturan bisnis, susun skenario BDD,
+                            dan pisahkan test data sebelum menulis kode.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title" style="font-size: 13px;">2. Selektor Resilient</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Kolaborasi dengan FE untuk standarisasi
+                            <code>data-cy</code> agar script tahan saat UI redesign.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title" style="font-size: 13px;">3. Eksekusi Efisien</div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Gunakan Cypress untuk rekam flow nyata,
+                            jalankan <code>.jmx</code> di pipeline agar ringan.</p>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 13px; color: var(--text-sub);">
+                    Terima Kasih! Mari masuk ke sesi tanya jawab & hands-on.
+                </div>
+            </div>
+            <div class="slide-footer" style="position: absolute; bottom: 24px; width: calc(100% - 88px);">
+                <span>Modern Web Automation with Cypress</span>
+                <span>Slide 12</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let slideDirection = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const indicator = document.getElementById('slideIndicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                const isActive = index === currentSlide;
+                slide.classList.remove('active', 'anim-prev');
+                if (isActive) {
+                    if (slideDirection === -1) {
+                        slide.classList.add('anim-prev');
+                    }
+                    slide.classList.add('active');
+                }
+            });
+            indicator.textContent = `Slide ${currentSlide + 1} / ${totalSlides}`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            prevBtn.style.opacity = currentSlide === 0 ? '0.4' : '1';
+            nextBtn.style.opacity = currentSlide === totalSlides - 1 ? '0.4' : '1';
+        }
+
+        function changeSlide(direction) {
+            if ((direction === -1 && currentSlide === 0) || (direction === 1 && currentSlide === totalSlides - 1)) {
+                return;
+            }
+            slideDirection = direction;
+            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
+            updateSlide();
+        }
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        function updateFullscreenUI() {
+            const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            const text = document.getElementById('fullscreenText');
+            const icon = document.getElementById('fullscreenIcon');
+            if (text && icon) {
+                text.textContent = isFs ? 'Keluar Layar Penuh (F)' : 'Layar Penuh (F)';
+                icon.textContent = isFs ? '🗗' : '⛶';
+            }
+        }
+
+        document.addEventListener('fullscreenchange', updateFullscreenUI);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                changeSlide(-1);
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+
+</html>
