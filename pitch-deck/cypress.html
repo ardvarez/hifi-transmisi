@@ -983,31 +983,44 @@ cy.getByCy('submit-form')</div>
                         <span class="code-dot red"></span>
                         <span class="code-dot yellow"></span>
                         <span class="code-dot green"></span>
-                        <span class="code-title">cypress/e2e/power_swift/perizinan-pemasangan.spec.cy.js</span>
+                        <span class="code-title">cypress/e2e/power_swift/perizinan/perizinan-pemasangan.spec.cy.js</span>
                     </div>
-                    <div class="code-block" style="font-size: 9.8px; line-height: 1.42; max-height: 180px; overflow-y: auto;">
-<span class="keyword">describe</span>(<span class="string">"Pengujian Formulir Perizinan Pemasangan"</span>, () => {
-  <span class="keyword">before</span>(() => { cy.recordHar(); }); <span class="comment">// 1. Mulai rekam lalu lintas permintaan data</span>
-  <span class="keyword">after</span>(() => { cy.saveHar({ fileName: <span class="string">"hasil-rekaman-perizinan"</span> }); });
+                    <div class="code-block" style="font-size: 9.6px; line-height: 1.42; max-height: 185px; overflow-y: auto;">
+<span class="keyword">describe</span>(<span class="string">"E2E Perizinan Pemasangan"</span>, () => {
+  <span class="keyword">before</span>(() => {
+    cy.recordHar(); <span class="comment">// 1. Rekam jejak network HTTP</span>
+  });
+  
+  <span class="keyword">after</span>(() => {
+    cy.saveHar({ fileName: <span class="string">"create-perizinan-pemasangan"</span> });
+  });
 
-  <span class="keyword">it</span>(<span class="string">"TC-01: Berhasil membuat izin baru & mendapatkan nomor registrasi"</span>, () => {
-    <span class="comment">// 2. Masuk menggunakan akun Asman</span>
+  <span class="keyword">it</span>(<span class="string">"TC-01EPP-01 - E2E Create Perizinan Pemasangan"</span>, () => {
+    <span class="comment">// 2. Reset session & storage</span>
     cy.clearAllCookies();
+    cy.clearAllLocalStorage();
+    cy.clearAllSessionStorage();
+
+    <span class="comment">// 3. Login Asman & buka menu</span>
     cy.loginAs(<span class="string">"ers.asman.renev.manado"</span>);
+    cy.wait(<span class="keyword">2000</span>);
     cy.visit(<span class="string">"/emergency-restoration-system/perizinan"</span>);
+    cy.wait(<span class="keyword">2000</span>);
 
-    <span class="comment">// 3. Tekan tombol Tambah Data</span>
+    <span class="comment">// 4. Cari halaman & buka modal tambah</span>
     cy.get(<span class="string">'input[placeholder="Cari Data"]'</span>).should(<span class="string">'be.visible'</span>);
+    cy.contains(<span class="string">'button'</span>, <span class="string">'Filter'</span>).should(<span class="string">'be.visible'</span>);
     cy.contains(<span class="string">'button'</span>, <span class="string">'Tambah Data'</span>).should(<span class="string">'be.visible'</span>).click();
+    cy.wait(<span class="keyword">1000</span>);
 
-    <span class="comment">// 4. Isi pilihan formulir</span>
+    <span class="comment">// 5. Isi form perizinan & dropdown</span>
     cy.get(<span class="string">'.title-bar'</span>).contains(<span class="string">'Tambah Perizinan'</span>).should(<span class="string">'be.visible'</span>);
     cy.get(<span class="string">'input[placeholder="Pilih Tipe Permit"]'</span>).click();
     cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).contains(<span class="string">'Pemasangan'</span>).click();
     cy.get(<span class="string">'input[placeholder="Pilih Nomor Referensi Perencanaan"]'</span>).click();
     cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).first().click();
 
-    <span class="comment">// 5. Pastikan nomor izin muncul dan simpan nilainya</span>
+    <span class="comment">// 6. Extract & simpan nomor permit ke Storage & Alias</span>
     cy.get(<span class="string">'input[placeholder*="Nomor Permit"]'</span>, { timeout: <span class="keyword">10000</span> })
       .should(<span class="string">'not.have.value'</span>, <span class="string">''</span>)
       .invoke(<span class="string">'val'</span>)
@@ -1015,11 +1028,18 @@ cy.getByCy('submit-form')</div>
         <span class="keyword">const</span> noPermit = val.trim();
         window.localStorage.setItem(<span class="string">'saved_nomor_permit'</span>, noPermit);
         Cypress.env(<span class="string">'nomorPermit'</span>, noPermit);
-      }).as(<span class="string">'nomorPermit'</span>);
-
-    <span class="comment">// 6. Unggah dokumen pendukung</span>
+        cy.log(<span class="string">'Nomor Permit tersimpan:'</span>, noPermit);
+      })
+      .as(<span class="string">'nomorPermit'</span>);
+    
+    cy.get(<span class="string">'input[placeholder="Pilih PIC Pemasangan"]'</span>).click();
+    cy.get(<span class="string">'.v-overlay__content .v-list-item'</span>).first().click();
+    
+    <span class="comment">// 7. Upload berkas PDF dummy</span>
     cy.contains(<span class="string">'button'</span>, <span class="string">'Upload File'</span>).click();
     cy.get(<span class="string">'input[type="file"]'</span>).selectFile(<span class="string">'cypress/fixtures/sample.pdf'</span>, { force: <span class="keyword">true</span> });
+    cy.wait(<span class="keyword">1000</span>);
+    cy.get(<span class="string">'.v-dialog:visible .v-btn--icon'</span>).click();
   });
 });</div>
                 </div>
