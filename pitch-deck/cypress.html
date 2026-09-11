@@ -11,7 +11,40 @@
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <style>
+        @media print {
+            body {
+                background: #0b1120 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .deck-controls, .keyboard-helper, .slide-progress-track, .code-modal-backdrop {
+                display: none !important;
+            }
+            .slide-viewport {
+                max-width: 100% !important;
+                aspect-ratio: auto !important;
+                height: auto !important;
+                perspective: none !important;
+            }
+            .slide {
+                display: flex !important;
+                position: relative !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                opacity: 1 !important;
+            }
+        }
+
         :root {
             --bg: #0b1120;
             --card-bg: #151f32;
@@ -721,6 +754,12 @@
         </div>
         <div class="slide-indicator" id="slideIndicator">Slide 1 / 12</div>
         <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="nav-btn" id="exportPptxBtn" onclick="exportToPPTX()" title="Download sebagai PowerPoint (.pptx) dengan teks, shape, dan tabel yang 100% editable" style="background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.35); color: #fbbf24;">
+                <i class="ri-file-ppt-2-line"></i> <span id="pptxBtnText">Export PPTX (Editable)</span>
+            </button>
+            <button class="nav-btn" id="printBtn" onclick="window.print()" title="Cetak slide ke PDF / Printer" style="background: rgba(14, 165, 233, 0.12); border-color: rgba(14, 165, 233, 0.3); color: #38bdf8;">
+                <i class="ri-printer-line"></i> <span>Cetak</span>
+            </button>
             <button class="nav-btn" id="fullscreenBtn" onclick="toggleFullscreen()" style="background: rgba(37, 99, 235, 0.12); border-color: rgba(37, 99, 235, 0.3); color: #60a5fa;">
                 <i class="ri-fullscreen-line" id="fullscreenIcon"></i> <span id="fullscreenText">Layar Penuh (F)</span>
             </button>
@@ -908,8 +947,8 @@
             </div>
             <div class="slide-body">
                 <div class="grid-2">
-                    <div class="card">
-                        <div class="card-title"><i class="ri-booklet-line" style="color: #60a5fa;"></i> Dokumen Acuan Pengujian</div>
+                    <div class="card" style="border-left: 3.5px solid #3b82f6;">
+                        <div class="card-title" style="color: #60a5fa;"><i class="ri-booklet-line"></i> Dokumen Acuan Pengujian</div>
                         <ul class="card-list">
                             <li><strong>Rencana Pengujian (Test Plan):</strong> Menentukan modul mana yang diuji, alamat web target, dan syarat lolos uji.</li>
                             <li><strong>Skenario Alur Pengguna:</strong>
@@ -918,27 +957,48 @@
                             <li><strong>Lingkungan Uji Aman (Staging):</strong> Menggunakan server uji coba agar aktivitas pengetesan tidak mengganggu data asli.</li>
                         </ul>
                     </div>
-                    <div class="card">
-                        <div class="card-title"><i class="ri-database-2-line" style="color: var(--accent-emerald);"></i> Data Uji Siap Pakai (Fixtures)</div>
-                        <div class="code-window">
-                            <div class="code-header">
-                                <span class="code-dot red"></span>
-                                <span class="code-dot yellow"></span>
-                                <span class="code-dot green"></span>
-                                <span class="code-title">cypress/fixtures/users.json</span>
+                    <div class="card" style="border-left: 3.5px solid var(--accent-emerald); justify-content: space-between;">
+                        <div>
+                            <div class="card-title" style="color: var(--accent-emerald); justify-content: space-between;">
+                                <span style="display: flex; align-items: center; gap: 7px;">
+                                    <i class="ri-database-2-line"></i> Data Uji Siap Pakai (Fixtures)
+                                </span>
+                                <span style="font-size: 9.5px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.12); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25); font-family: 'JetBrains Mono', monospace;">
+                                    cy.fixture('users')
+                                </span>
                             </div>
-                            <div class="code-block">
-<span class="comment">// Simpan akun uji di file terpisah agar mudah diganti</span>
-{
-  <span class="keyword">"akunValid"</span>: {
-    <span class="string">"email"</span>: <span class="string">"tester.qa@pln.co.id"</span>,
-    <span class="string">"peran"</span>: <span class="string">"Approver"</span>
+                            <p style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.4;">
+                                Dataset terpusat (JSON) untuk simulasi berbagai skenario peran tanpa mengotori skrip:
+                            </p>
+                        </div>
+                        <div class="code-window" style="margin-top: 2px;">
+                            <div class="code-header" style="justify-content: space-between; padding: 5px 10px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="code-dot red"></span>
+                                    <span class="code-dot yellow"></span>
+                                    <span class="code-dot green"></span>
+                                    <span class="code-title" style="font-size: 9.5px; color: #cbd5e1; display: flex; align-items: center; gap: 5px;">
+                                        <i class="ri-file-code-line" style="color: #34d399;"></i> cypress/fixtures/users.json
+                                    </span>
+                                </div>
+                                <span style="font-size: 9px; color: #64748b; font-family: 'JetBrains Mono', monospace;">JSON Mock</span>
+                            </div>
+                            <div class="code-block" style="font-size: 10px; line-height: 1.42; padding: 7px 10px;">{
+  <span class="keyword">"asmanValid"</span>: {
+    <span class="string">"email"</span>: <span class="string">"asman.transmisi@pln.co.id"</span>,
+    <span class="string">"role"</span>: <span class="string">"Approver"</span>,
+    <span class="string">"unit"</span>: <span class="string">"ULTG Bandung"</span>
   },
-  <span class="keyword">"akunTerkunci"</span>: {
-    <span class="string">"email"</span>: <span class="string">"blocked@pln.co.id"</span>,
-    <span class="string">"pesanHarapan"</span>: <span class="string">"Akun dinonaktifkan"</span>
+  <span class="keyword">"stafViewer"</span>: {
+    <span class="string">"email"</span>: <span class="string">"viewer@pln.co.id"</span>,
+    <span class="string">"role"</span>: <span class="string">"ViewerOnly"</span>
   }
 }</div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 8px; background: rgba(16, 185, 129, 0.06); border: 1px dashed rgba(16, 185, 129, 0.2); border-radius: 6px; font-size: 9.5px; color: #cbd5e1; margin-top: 2px;">
+                            <span style="display: flex; align-items: center; gap: 4px;"><i class="ri-shield-check-line" style="color: #34d399;"></i> Bebas Hardcode</span>
+                            <span style="display: flex; align-items: center; gap: 4px;"><i class="ri-refresh-line" style="color: #38bdf8;"></i> Reusable Antar Uji</span>
+                            <span style="display: flex; align-items: center; gap: 4px;"><i class="ri-user-settings-line" style="color: #fbbf24;"></i> Multi-Role Ready</span>
                         </div>
                     </div>
                 </div>
@@ -1317,6 +1377,7 @@ jmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard</div>
         <span class="kbd-chip">← / →</span>
         <span class="kbd-chip">Space</span>
         <span class="kbd-chip">F (Layar Penuh)</span>
+        <span class="kbd-chip">P (Export PPTX)</span>
     </div>
 
     <!-- Interactive Code Modal Viewer -->
@@ -1586,6 +1647,520 @@ jmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard</div>
             }
         }
 
+        // Export All Slides to 100% Native Editable PowerPoint (.pptx)
+        let isExporting = false;
+        async function exportToPPTX() {
+            if (isExporting) return;
+
+            const btn = document.getElementById('exportPptxBtn');
+            const btnText = document.getElementById('pptxBtnText');
+            const originalText = 'Export PPTX (Editable)';
+
+            if (typeof PptxGenJS === 'undefined') {
+                alert('Library PPTX sedang dimuat. Pastikan koneksi internet aktif lalu coba kembali.');
+                return;
+            }
+
+            isExporting = true;
+            if (btn) btn.disabled = true;
+
+            try {
+                if (btnText) btnText.textContent = 'Membuat Slide Editable...';
+                const pptx = new PptxGenJS();
+                pptx.layout = 'LAYOUT_16x9';
+                pptx.author = 'Tim QA & Analis Sistem PLN';
+                pptx.company = 'PT PLN (Persero)';
+                pptx.subject = 'Otomasi Pengujian Web dengan Cypress';
+                pptx.title = 'Modern Web Automation & Hybrid CI/CD Pipeline - Cypress';
+
+                const BG_DARK = '0B1120';
+                const CARD_BG = '151F32';
+                const CARD_ELEV = '18243C';
+                const TEXT_MAIN = 'F8FAFC';
+                const TEXT_MUTED = '94A3B8';
+                const TEXT_SUB = 'CBD5E1';
+                const ACCENT_BLUE = '3B82F6';
+                const ACCENT_SKY = '38BDF8';
+                const ACCENT_EMERALD = '10B981';
+                const ACCENT_AMBER = 'F59E0B';
+                const ACCENT_ROSE = 'F43F5E';
+                const BORDER_COLOR = '334155';
+
+                // Helper: Slide Header
+                function addSlideHeader(slide, category, title, slideNum) {
+                    slide.background = { color: BG_DARK };
+
+                    // Category Pill
+                    slide.addShape(pptx.ShapeType.roundRect, {
+                        x: 0.6, y: 0.35, w: 2.8, h: 0.3,
+                        fill: { color: '0EA5E9', transparency: 85 },
+                        line: { color: '38BDF8', width: 1, transparency: 50 },
+                        rectRadius: 0.15
+                    });
+                    slide.addText(category.toUpperCase(), {
+                        x: 0.6, y: 0.35, w: 2.8, h: 0.3,
+                        fontSize: 9, fontFace: 'Calibri', color: ACCENT_SKY, bold: true, align: 'center', valign: 'middle'
+                    });
+
+                    // Slide Title
+                    slide.addText(title, {
+                        x: 0.6, y: 0.72, w: 8.0, h: 0.5,
+                        fontSize: 18, fontFace: 'Arial', color: TEXT_MAIN, bold: true, valign: 'middle'
+                    });
+
+                    // Slide Number Pill
+                    slide.addShape(pptx.ShapeType.roundRect, {
+                        x: 8.7, y: 0.45, w: 0.7, h: 0.35,
+                        fill: { color: '1E293B', transparency: 20 },
+                        line: { color: BORDER_COLOR, width: 1 },
+                        rectRadius: 0.1
+                    });
+                    slide.addText(slideNum, {
+                        x: 8.7, y: 0.45, w: 0.7, h: 0.35,
+                        fontSize: 11, fontFace: 'Courier New', color: TEXT_MUTED, bold: true, align: 'center', valign: 'middle'
+                    });
+                }
+
+                // Helper: Slide Footer
+                function addSlideFooter(slide, leftText, rightText = 'Standar PLN Transmisi') {
+                    slide.addShape(pptx.ShapeType.line, {
+                        x: 0.6, y: 5.15, w: 8.8, h: 0,
+                        line: { color: BORDER_COLOR, width: 0.75 }
+                    });
+                    slide.addText(leftText, {
+                        x: 0.6, y: 5.2, w: 6.5, h: 0.3,
+                        fontSize: 8.5, fontFace: 'Calibri', color: '64748B'
+                    });
+                    slide.addText(rightText, {
+                        x: 7.1, y: 5.2, w: 2.3, h: 0.3,
+                        fontSize: 8.5, fontFace: 'Calibri', color: '64748B', align: 'right'
+                    });
+                }
+
+                // Helper: Card Box Shape
+                function addCardBox(slide, x, y, w, h, borderColor = BORDER_COLOR, borderWidth = 1) {
+                    slide.addShape(pptx.ShapeType.roundRect, {
+                        x, y, w, h,
+                        fill: { color: CARD_BG },
+                        line: { color: borderColor, width: borderWidth },
+                        rectRadius: 0.12
+                    });
+                }
+
+                // ================= SLIDE 1: COVER =================
+                const s1 = pptx.addSlide();
+                s1.background = { color: BG_DARK };
+                s1.addShape(pptx.ShapeType.roundRect, {
+                    x: 3.5, y: 1.0, w: 3.0, h: 0.35,
+                    fill: { color: '0EA5E9', transparency: 85 },
+                    line: { color: '38BDF8', width: 1, transparency: 50 },
+                    rectRadius: 0.15
+                });
+                s1.addText('PANDUAN PENGUJIAN SISTEM', {
+                    x: 3.5, y: 1.0, w: 3.0, h: 0.35,
+                    fontSize: 10, fontFace: 'Calibri', color: ACCENT_SKY, bold: true, align: 'center', valign: 'middle'
+                });
+                s1.addText('Otomasi Pengujian Web\ndengan Cypress', {
+                    x: 1.0, y: 1.5, w: 8.0, h: 1.5,
+                    fontSize: 32, fontFace: 'Arial', color: TEXT_MAIN, bold: true, align: 'center', lineSpacing: 38
+                });
+                s1.addText('Mulai dari memahami aturan bisnis, memilih tombol yang tepat, hingga menjalankan pengujian otomatis yang cepat dan hemat memori di server.', {
+                    x: 1.5, y: 3.1, w: 7.0, h: 0.8,
+                    fontSize: 12, fontFace: 'Calibri', color: TEXT_MUTED, align: 'center'
+                });
+                // Badges
+                s1.addShape(pptx.ShapeType.roundRect, {
+                    x: 2.8, y: 4.1, w: 2.1, h: 0.4,
+                    fill: { color: CARD_ELEV }, line: { color: BORDER_COLOR, width: 1 }, rectRadius: 0.1
+                });
+                s1.addText('🏢 Tim QA & Analis', {
+                    x: 2.8, y: 4.1, w: 2.1, h: 0.4,
+                    fontSize: 10, fontFace: 'Calibri', color: ACCENT_AMBER, bold: true, align: 'center', valign: 'middle'
+                });
+                s1.addShape(pptx.ShapeType.roundRect, {
+                    x: 5.1, y: 4.1, w: 2.2, h: 0.4,
+                    fill: { color: '2563EB', transparency: 85 }, line: { color: '3B82F6', width: 1, transparency: 40 }, rectRadius: 0.1
+                });
+                s1.addText('⚡ Standar PLN Transmisi', {
+                    x: 5.1, y: 4.1, w: 2.2, h: 0.4,
+                    fontSize: 10, fontFace: 'Calibri', color: '93C5FD', bold: true, align: 'center', valign: 'middle'
+                });
+                addSlideFooter(s1, 'Strategi Pengujian Kualitas & Keandalan Web', 'Slide 01');
+
+                // ================= SLIDE 2: Kapan Waktunya Otomasi =================
+                const s2 = pptx.addSlide();
+                addSlideHeader(s2, 'Tahap 01: Strategi Awal', 'Kapan Waktunya Menggunakan Otomasi?', '02');
+                addCardBox(s2, 0.6, 1.4, 4.25, 3.55, ACCENT_EMERALD, 2);
+                s2.addText('Sangat Cocok Diotomasi (Hemat Waktu & Tenaga)', {
+                    x: 0.8, y: 1.55, w: 3.85, h: 0.45,
+                    fontSize: 13, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true
+                });
+                s2.addText([
+                    { text: '• Pengujian Rutin Berulang:\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Alur fitur yang harus dicek ulang setiap kali ada pembaruan aplikasi.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Alur Utama & Kritis:\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Fitur wajib jalan yang tidak boleh error sama sekali (Login, Simpan, Upload, Approval).\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Fitur yang Sudah Matang:\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Halaman dengan alur bisnis yang sudah stabil dan tidak berubah-ubah tiap hari.', options: { color: TEXT_SUB } }
+                ], { x: 0.8, y: 2.05, w: 3.85, h: 2.7, fontSize: 10.5, fontFace: 'Calibri' });
+
+                addCardBox(s2, 5.15, 1.4, 4.25, 3.55, ACCENT_ROSE, 2);
+                s2.addText('Tetap Lebih Baik Uji Manual', {
+                    x: 5.35, y: 1.55, w: 3.85, h: 0.45,
+                    fontSize: 13, fontFace: 'Arial', color: ACCENT_ROSE, bold: true
+                });
+                s2.addText([
+                    { text: '• Tampilan yang Masih Sering Berubah:\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Tata letak atau tombol yang masih terus dieksplorasi tim desain.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Fitur Sekali Pakai:\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Halaman event musiman atau modul khusus yang hanya digunakan sebentar.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Kenyamanan Pengguna:\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Menilai apakah susunan tampilan, warna, dan tulisan sudah enak dilihat & dipahami.', options: { color: TEXT_SUB } }
+                ], { x: 5.35, y: 2.05, w: 3.85, h: 2.7, fontSize: 10.5, fontFace: 'Calibri' });
+                addSlideFooter(s2, 'Prinsip: Otomasi bertujuan membebaskan tim dari tugas berulang yang membosankan.', 'Slide 02');
+
+                // ================= SLIDE 3: Otomasi vs Manual =================
+                const s3 = pptx.addSlide();
+                addSlideHeader(s3, 'Tahap 01: Strategi Awal', 'Apakah Otomasi Menggantikan Pengujian Manual?', '03');
+                // Banner
+                s3.addShape(pptx.ShapeType.roundRect, {
+                    x: 0.6, y: 1.35, w: 8.8, h: 0.65,
+                    fill: { color: '2563EB', transparency: 85 }, line: { color: '3B82F6', width: 1, transparency: 50 }, rectRadius: 0.1
+                });
+                s3.addText('Jawaban: Tidak Menggantikan, Melainkan Saling Melengkapi. Otomasi memeriksa rutinitas secara kilat, manusia fokus mengeksplorasi kasus nyata yang butuh logika & empati.', {
+                    x: 0.75, y: 1.38, w: 8.5, h: 0.58,
+                    fontSize: 10.5, fontFace: 'Calibri', color: TEXT_MAIN, bold: true, valign: 'middle'
+                });
+                // Left
+                addCardBox(s3, 0.6, 2.1, 4.25, 2.45, ACCENT_SKY, 1.5);
+                s3.addText('Keunggulan Penguji Manusia (Manual)', {
+                    x: 0.8, y: 2.2, w: 3.85, h: 0.35,
+                    fontSize: 12, fontFace: 'Arial', color: ACCENT_SKY, bold: true
+                });
+                s3.addText([
+                    { text: '• Punya Logika & Empati: ', options: { bold: true, color: TEXT_MAIN } },
+                    { text: 'Memahami cara berpikir & kebiasaan pengguna sebenarnya.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Eksplorasi Kasus Tak Terduga: ', options: { bold: true, color: TEXT_MAIN } },
+                    { text: 'Menemukan celah kesalahan yang belum tertulis di dokumen.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Menilai Kenyamanan Visual: ', options: { bold: true, color: TEXT_MAIN } },
+                    { text: 'Memastikan tata letak rapi & nyaman dibaca.', options: { color: TEXT_SUB } }
+                ], { x: 0.8, y: 2.55, w: 3.85, h: 1.9, fontSize: 9.5, fontFace: 'Calibri' });
+                // Right
+                addCardBox(s3, 5.15, 2.1, 4.25, 2.45, ACCENT_EMERALD, 1.5);
+                s3.addText('Keunggulan Pengujian Otomasi (Cypress)', {
+                    x: 5.35, y: 2.2, w: 3.85, h: 0.35,
+                    fontSize: 12, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true
+                });
+                s3.addText([
+                    { text: '• Kecepatan Tinggi: ', options: { bold: true, color: TEXT_MAIN } },
+                    { text: 'Menguji ratusan skenario form & tombol dalam hitungan menit.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Bebas Rasa Lelah: ', options: { bold: true, color: TEXT_MAIN } },
+                    { text: 'Menjalankan langkah sama berulang kali tanpa risiko salah klik.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Pemberitahuan Instan: ', options: { bold: true, color: TEXT_MAIN } },
+                    { text: 'Menemukan error seketika sebelum aplikasi dirilis.', options: { color: TEXT_SUB } }
+                ], { x: 5.35, y: 2.55, w: 3.85, h: 1.9, fontSize: 9.5, fontFace: 'Calibri' });
+                // Tip
+                s3.addText('🤝 Kerjasama Terbaik: Biarkan robot mengurus rutinitas yang membosankan, agar tim QA bisa fokus meneliti skenario yang rumit.', {
+                    x: 0.6, y: 4.68, w: 8.8, h: 0.35,
+                    fontSize: 10, fontFace: 'Calibri', color: TEXT_MUTED, align: 'center', italic: true
+                });
+                addSlideFooter(s3, 'Prinsip: Otomasi adalah alat bantu super cepat bagi tim penguji, bukan pengganti manusia.', 'Slide 03');
+
+                // ================= SLIDE 4: Aturan Bisnis & Validasi =================
+                const s4 = pptx.addSlide();
+                addSlideHeader(s4, 'Tahap 02: Analisis Kebutuhan', 'Memahami Aturan Bisnis & Validasi Data', '04');
+                const cardWidth3 = 2.75;
+                // Col 1
+                addCardBox(s4, 0.6, 1.4, cardWidth3, 3.55, ACCENT_BLUE, 1.5);
+                s4.addText('1. Hak Akses Pengguna', { x: 0.75, y: 1.55, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: '60A5FA', bold: true });
+                s4.addText('Memastikan tiap jenis akun hanya bisa mengakses fitur miliknya:\n\n• Admin/Approver: Tombol simpan & persetujuan aktif.\n• Staf/Viewer: Hanya melihat data, tombol ubah/hapus terkunci.\n• Data antar unit tidak saling tertukar.', {
+                    x: 0.75, y: 1.95, w: 2.45, h: 2.8, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                // Col 2
+                addCardBox(s4, 3.62, 1.4, cardWidth3, 3.55, ACCENT_EMERALD, 1.5);
+                s4.addText('2. Pengecekan di Formulir', { x: 3.77, y: 1.55, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true });
+                s4.addText('Pemberitahuan instan di layar saat pengguna mengisi form:\n\n• Format email atau nomor kontak langsung dicek.\n• Peringatan jika kolom bintang (*) belum diisi.\n• Pembatasan jumlah huruf atau ukuran berkas upload.', {
+                    x: 3.77, y: 1.95, w: 2.45, h: 2.8, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                // Col 3
+                addCardBox(s4, 6.65, 1.4, cardWidth3, 3.55, ACCENT_AMBER, 1.5);
+                s4.addText('3. Pengecekan di Server', { x: 6.8, y: 1.55, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: ACCENT_AMBER, bold: true });
+                s4.addText('Penolakan data yang salah oleh sistem backend:\n\n• Mencegah nomor registrasi / ID ganda tersimpan.\n• Pengecekan batas angka (tidak boleh negatif / lewat batas).\n• Pesan kesalahan jelas jika sistem menolak data.', {
+                    x: 6.8, y: 1.95, w: 2.45, h: 2.8, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                addSlideFooter(s4, 'Tujuan Utama: Memastikan sistem menerima data yang benar dan menolak data yang salah.', 'Slide 04');
+
+                // ================= SLIDE 5: QA ARTIFACTS & FIXTURES =================
+                const s5 = pptx.addSlide();
+                addSlideHeader(s5, 'Tahap 03: Persiapan Data', 'Dokumen Rencana Uji & Pengelolaan Data', '05');
+                // Left Card
+                addCardBox(s5, 0.6, 1.4, 4.25, 3.55, ACCENT_BLUE, 1.5);
+                s5.addText('Dokumen Acuan Pengujian', { x: 0.8, y: 1.55, w: 3.85, h: 0.35, fontSize: 13, fontFace: 'Arial', color: '60A5FA', bold: true });
+                s5.addText([
+                    { text: '• Rencana Pengujian (Test Plan):\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Menentukan modul target, URL uji, dan syarat kelulusan.\n\n', options: { color: TEXT_SUB } },
+                    { text: '• Skenario Alur Pengguna (Gherkin):\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  JIKA buka halaman login, KETIKA mengisi sandi benar, MAKA halaman utama terbuka.\n\n', options: { color: '93C5FD' } },
+                    { text: '• Lingkungan Uji Aman (Staging):\n', options: { bold: true, color: TEXT_MAIN } },
+                    { text: '  Server uji coba terisolasi agar tidak mengganggu data asli produksi.', options: { color: TEXT_SUB } }
+                ], { x: 0.8, y: 1.95, w: 3.85, h: 2.8, fontSize: 10, fontFace: 'Calibri' });
+
+                // Right Card (Fixtures)
+                addCardBox(s5, 5.15, 1.4, 4.25, 3.55, ACCENT_EMERALD, 1.5);
+                s5.addText('Data Uji Siap Pakai (Fixtures)', { x: 5.35, y: 1.55, w: 2.6, h: 0.35, fontSize: 13, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true });
+                // Pill tag
+                s5.addShape(pptx.ShapeType.roundRect, {
+                    x: 8.0, y: 1.55, w: 1.25, h: 0.28,
+                    fill: { color: '10B981', transparency: 85 }, line: { color: '10B981', width: 1 }, rectRadius: 0.1
+                });
+                s5.addText("cy.fixture('users')", { x: 8.0, y: 1.55, w: 1.25, h: 0.28, fontSize: 8, fontFace: 'Courier New', color: '34D399', bold: true, align: 'center', valign: 'middle' });
+
+                s5.addText('Dataset terpusat (JSON) untuk simulasi peran tanpa mengotori skrip:', { x: 5.35, y: 1.9, w: 3.85, h: 0.35, fontSize: 9.5, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                // Code Box inside
+                s5.addShape(pptx.ShapeType.rect, {
+                    x: 5.35, y: 2.3, w: 3.85, h: 1.85,
+                    fill: { color: '090E1A' }, line: { color: '334155', width: 1 }
+                });
+                s5.addText('📁 cypress/fixtures/users.json', { x: 5.45, y: 2.35, w: 3.65, h: 0.25, fontSize: 8.5, fontFace: 'Courier New', color: '94A3B8', bold: true });
+                s5.addText('{\n  "asmanValid": {\n    "email": "asman.transmisi@pln.co.id",\n    "role": "Approver",\n    "unit": "ULTG Bandung"\n  },\n  "stafViewer": {\n    "email": "viewer@pln.co.id",\n    "role": "ViewerOnly"\n  }\n}', {
+                    x: 5.45, y: 2.6, w: 3.65, h: 1.5, fontSize: 8.5, fontFace: 'Courier New', color: '86EFAC'
+                });
+
+                // Bottom Pills
+                s5.addShape(pptx.ShapeType.roundRect, {
+                    x: 5.35, y: 4.25, w: 3.85, h: 0.45,
+                    fill: { color: '10B981', transparency: 90 }, line: { color: '10B981', width: 1, transparency: 60 }, rectRadius: 0.08
+                });
+                s5.addText('🛡️ Bebas Hardcode   |   🔄 Reusable Antar Uji   |   ⚡ Multi-Role Ready', {
+                    x: 5.35, y: 4.25, w: 3.85, h: 0.45, fontSize: 8.5, fontFace: 'Calibri', color: TEXT_SUB, align: 'center', valign: 'middle'
+                });
+                addSlideFooter(s5, 'Memisahkan data uji membuat pengujian lebih rapi dan mudah dirawat kapan saja.', 'Slide 05');
+
+                // ================= SLIDE 6: Mengenal Elemen Web =================
+                const s6 = pptx.addSlide();
+                addSlideHeader(s6, 'Tahap 04: Memahami Halaman Web', 'Mengenal Elemen Dasar vs Komponen Interaktif', '06');
+                addCardBox(s6, 0.6, 1.4, 4.25, 3.55, 'F97316', 1.5);
+                s6.addText('1. Elemen Standar Web (HTML Biasa)', { x: 0.8, y: 1.55, w: 3.85, h: 0.35, fontSize: 13, fontFace: 'Arial', color: 'F97316', bold: true });
+                s6.addText('Bagian dasar halaman web yang sederhana dan langsung aktif.\n\n• Contoh: Kotak ketik biasa, tombol standar, tabel data sederhana.\n• Langsung siap digunakan begitu halaman terbuka.\n• Skrip pengujian bisa langsung mengetik atau mengklik tanpa jeda tambahan.', {
+                    x: 0.8, y: 1.95, w: 3.85, h: 2.8, fontSize: 10.5, fontFace: 'Calibri', color: TEXT_SUB
+                });
+
+                addCardBox(s6, 5.15, 1.4, 4.25, 3.55, ACCENT_SKY, 1.5);
+                s6.addText('2. Komponen Interaktif Modern', { x: 5.35, y: 1.55, w: 3.85, h: 0.35, fontSize: 13, fontFace: 'Arial', color: ACCENT_SKY, bold: true });
+                s6.addText('Gabungan tampilan dan logika modern dengan animasi interaktif.\n\n• Contoh: Jendela pop-up (dialog), pilihan kalender, dropdown bertingkat.\n• Memiliki animasi: Membutuhkan waktu sejenak untuk muncul di layar.\n• Skrip pengujian perlu memastikan komponen sudah muncul sempurna sebelum aksi klik.', {
+                    x: 5.35, y: 1.95, w: 3.85, h: 2.8, fontSize: 10.5, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                addSlideFooter(s6, 'Memahami sifat komponen mencegah skrip mengklik tombol yang belum selesai muncul.', 'Slide 06');
+
+                // ================= SLIDE 7: Perintah Dasar (Table) =================
+                const s7 = pptx.addSlide();
+                addSlideHeader(s7, 'Tahap 05: Perintah Dasar', 'Perintah Sederhana yang Sering Digunakan', '07');
+                const tableRows = [
+                    [
+                        { text: 'Perintah', options: { bold: true, color: '93C5FD', fill: '172338', fontSize: 10, fontFace: 'Calibri' } },
+                        { text: 'Kegunaan', options: { bold: true, color: '93C5FD', fill: '172338', fontSize: 10, fontFace: 'Calibri' } },
+                        { text: 'Contoh Penggunaan', options: { bold: true, color: '93C5FD', fill: '172338', fontSize: 10, fontFace: 'Calibri' } }
+                    ],
+                    [
+                        { text: 'cy.visit()', options: { color: 'F472B6', fontFace: 'Courier New', fontSize: 9.5, fill: '111A2C' } },
+                        { text: 'Buka halaman web tujuan', options: { color: TEXT_SUB, fontFace: 'Calibri', fontSize: 9.5, fill: '111A2C' } },
+                        { text: "cy.visit('/perizinan')", options: { color: '86EFAC', fontFace: 'Courier New', fontSize: 9.5, fill: '111A2C' } }
+                    ],
+                    [
+                        { text: 'cy.get()', options: { color: 'F472B6', fontFace: 'Courier New', fontSize: 9.5, fill: '152034' } },
+                        { text: 'Cari tombol atau kolom isian', options: { color: TEXT_SUB, fontFace: 'Calibri', fontSize: 9.5, fill: '152034' } },
+                        { text: "cy.get('[data-cy=\"input-user\"]')", options: { color: '86EFAC', fontFace: 'Courier New', fontSize: 9.5, fill: '152034' } }
+                    ],
+                    [
+                        { text: '.type() / .click()', options: { color: 'F472B6', fontFace: 'Courier New', fontSize: 9.5, fill: '111A2C' } },
+                        { text: 'Ketik teks atau tekan tombol', options: { color: TEXT_SUB, fontFace: 'Calibri', fontSize: 9.5, fill: '111A2C' } },
+                        { text: "cy.get('#pass').type('secret123')", options: { color: '86EFAC', fontFace: 'Courier New', fontSize: 9.5, fill: '111A2C' } }
+                    ],
+                    [
+                        { text: '.should()', options: { color: 'F472B6', fontFace: 'Courier New', fontSize: 9.5, fill: '152034' } },
+                        { text: 'Pastikan hasil/tampilan sudah benar', options: { color: TEXT_SUB, fontFace: 'Calibri', fontSize: 9.5, fill: '152034' } },
+                        { text: "cy.get('.pesan-sukses').should('be.visible')", options: { color: '86EFAC', fontFace: 'Courier New', fontSize: 9.5, fill: '152034' } }
+                    ],
+                    [
+                        { text: 'cy.contains()', options: { color: 'F472B6', fontFace: 'Courier New', fontSize: 9.5, fill: '111A2C' } },
+                        { text: 'Cari elemen berdasarkan tulisan', options: { color: TEXT_SUB, fontFace: 'Calibri', fontSize: 9.5, fill: '111A2C' } },
+                        { text: "cy.contains('button', 'Tambah').click()", options: { color: '86EFAC', fontFace: 'Courier New', fontSize: 9.5, fill: '111A2C' } }
+                    ]
+                ];
+                s7.addTable(tableRows, {
+                    x: 0.6, y: 1.4, w: 8.8,
+                    colW: [2.0, 3.2, 3.6],
+                    border: { color: '334155', pt: 0.75 }
+                });
+                // Chaining box
+                s7.addShape(pptx.ShapeType.roundRect, {
+                    x: 0.6, y: 4.15, w: 8.8, h: 0.75,
+                    fill: { color: CARD_BG }, line: { color: '3B82F6', width: 1.5 }, rectRadius: 0.08
+                });
+                s7.addText('🔗 Rangkaian Alur (Chaining): Perintah disambung berurutan layaknya membaca cerita:\ncy.get(\'[data-cy="email"]\').clear().type(\'admin@pln.co.id\').should(\'have.value\', \'admin@pln.co.id\');', {
+                    x: 0.75, y: 4.2, w: 8.5, h: 0.65, fontSize: 9.5, fontFace: 'Courier New', color: '93C5FD'
+                });
+                addSlideFooter(s7, 'Cypress menjalankan perintah secara berurutan dan menunggu respon sistem otomatis.', 'Slide 07');
+
+                // ================= SLIDE 8: Selector Strategy =================
+                const s8 = pptx.addSlide();
+                addSlideHeader(s8, 'Tahap 06: Tips Terbaik', 'Memilih Penanda Elemen yang Awet & Kebal Redesign', '08');
+                // Col 1
+                addCardBox(s8, 0.6, 1.4, cardWidth3, 3.1, ACCENT_ROSE, 2);
+                s8.addText('1. Rentan Rusak (Kurang Baik)', { x: 0.75, y: 1.55, w: 2.45, h: 0.35, fontSize: 11.5, fontFace: 'Arial', color: ACCENT_ROSE, bold: true });
+                s8.addShape(pptx.ShapeType.rect, { x: 0.75, y: 1.95, w: 2.45, h: 0.65, fill: { color: '090E1A' }, line: { color: '334155', width: 0.5 } });
+                s8.addText("cy.get('.btn-primary')\ncy.contains('Simpan')", { x: 0.8, y: 2.0, w: 2.35, h: 0.55, fontSize: 9, fontFace: 'Courier New', color: 'F43F5E' });
+                s8.addText('Mengandalkan kelas warna atau kata. Jika ganti desain atau ganti bahasa, tes langsung gagal.', { x: 0.75, y: 2.7, w: 2.45, h: 1.6, fontSize: 9.5, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                // Col 2
+                addCardBox(s8, 3.62, 1.4, cardWidth3, 3.1, ACCENT_AMBER, 2);
+                s8.addText('2. Cukup Aman (Lumayan)', { x: 3.77, y: 1.55, w: 2.45, h: 0.35, fontSize: 11.5, fontFace: 'Arial', color: ACCENT_AMBER, bold: true });
+                s8.addShape(pptx.ShapeType.rect, { x: 3.77, y: 1.95, w: 2.45, h: 0.65, fill: { color: '090E1A' }, line: { color: '334155', width: 0.5 } });
+                s8.addText("cy.get('input[name=\"user\"]')\ncy.get('#login-form')", { x: 3.82, y: 2.0, w: 2.35, h: 0.55, fontSize: 9, fontFace: 'Courier New', color: 'FBBF24' });
+                s8.addText('Menggunakan name atau id bawaan form. Cukup stabil, namun ID bisa berubah saat kompilasi.', { x: 3.77, y: 2.7, w: 2.45, h: 1.6, fontSize: 9.5, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                // Col 3
+                addCardBox(s8, 6.65, 1.4, cardWidth3, 3.1, ACCENT_EMERALD, 2);
+                s8.addText('3. Paling Kuat & Awet', { x: 6.8, y: 1.55, w: 2.45, h: 0.35, fontSize: 11.5, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true });
+                s8.addShape(pptx.ShapeType.rect, { x: 6.8, y: 1.95, w: 2.45, h: 0.65, fill: { color: '090E1A' }, line: { color: '334155', width: 0.5 } });
+                s8.addText("cy.get('[data-cy=\"btn-login\"]')\ncy.getByCy('submit-form')", { x: 6.85, y: 2.0, w: 2.35, h: 0.55, fontSize: 9, fontFace: 'Courier New', color: '34D399' });
+                s8.addText('Penanda khusus pengujian. Kebal perombakan gaya CSS, warna tombol, & pergantian bahasa.', { x: 6.8, y: 2.7, w: 2.45, h: 1.6, fontSize: 9.5, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                s8.addText('🤝 Kerjasama Tim: Minta tim pengembang memberikan tanda khusus (seperti data-cy) pada tombol & kolom input utama.', {
+                    x: 0.6, y: 4.65, w: 8.8, h: 0.35, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB, align: 'center'
+                });
+                addSlideFooter(s8, 'Kunci kestabilan: jangan mengikat penanda pada gaya visual yang mudah berubah.', 'Slide 08');
+
+                // ================= SLIDE 9: 5 Langkah Praktik =================
+                const s9 = pptx.addSlide();
+                addSlideHeader(s9, 'Tahap 07: Contoh Nyata', '5 Langkah Praktik: Alur Form Perizinan', '09');
+                const steps = [
+                    { num: '1', title: 'Tentukan Alur', desc: 'Skenario izin & syarat lolos' },
+                    { num: '2', title: 'Pilih Akun', desc: 'Role Asman dari users.json' },
+                    { num: '3', title: 'Login & Masuk', desc: 'Rekam HAR & reset session' },
+                    { num: '4', title: 'Isi Formulir', desc: 'Dropdown, data, & upload PDF' },
+                    { num: '5', title: 'Simpan & Cek', desc: 'Pastikan nomor permit terbit' }
+                ];
+                steps.forEach((st, idx) => {
+                    const stX = 0.6 + idx * 1.8;
+                    addCardBox(s9, stX, 1.4, 1.6, 1.35, '2563EB', 1);
+                    s9.addText(st.num, { x: stX + 0.1, y: 1.48, w: 0.3, h: 0.3, fontSize: 10, fontFace: 'Arial', color: '60A5FA', bold: true, align: 'center' });
+                    s9.addText(st.title, { x: stX + 0.45, y: 1.48, w: 1.05, h: 0.3, fontSize: 10, fontFace: 'Arial', color: TEXT_MAIN, bold: true });
+                    s9.addText(st.desc, { x: stX + 0.1, y: 1.85, w: 1.4, h: 0.8, fontSize: 8.5, fontFace: 'Calibri', color: TEXT_MUTED });
+                });
+
+                // Script Preview Card
+                addCardBox(s9, 0.6, 2.9, 8.8, 2.05, '3B82F6', 1.5);
+                s9.addText('📜 perizinan-pemasangan.spec.cy.js  [E2E Active]', { x: 0.8, y: 3.0, w: 5.5, h: 0.3, fontSize: 11, fontFace: 'Courier New', color: '93C5FD', bold: true });
+                s9.addShape(pptx.ShapeType.rect, { x: 0.8, y: 3.35, w: 8.4, h: 1.45, fill: { color: '090E1A' }, line: { color: '334155', width: 0.5 } });
+                s9.addText('describe("E2E Perizinan Pemasangan", () => {\n  before(() => cy.recordHar());\n  it("TC-01 - Buat Izin", () => {\n    cy.loginAs("asman.transmisi@pln.co.id");\n    cy.visit("/emergency-restoration-system/perizinan");\n    cy.get(\'[data-cy="tambah-izin"]\').click();\n    cy.get(\'input[type="file"]\').selectFile("cypress/fixtures/sample.pdf", { force: true });\n  });\n});', {
+                    x: 0.9, y: 3.4, w: 8.2, h: 1.35, fontSize: 8.5, fontFace: 'Courier New', color: '7DD3FC'
+                });
+                addSlideFooter(s9, 'Alur terstruktur: siapkan data, jalankan langkah formulir, lalu simpan nomor hasil.', 'Slide 09');
+
+                // ================= SLIDE 10: Hybrid Pipeline =================
+                const s10 = pptx.addSlide();
+                addSlideHeader(s10, 'Tahap 08: Integrasi Otomatis', 'Cara Kerja Pengujian Ringan & Cepat di Server', '10');
+                s10.addText('Cypress digunakan di laptop untuk merekam alur interaksi nyata, lalu jalankan alurnya di server pengujian secara otomatis tanpa beban membuka visual browser.', {
+                    x: 0.6, y: 1.35, w: 8.8, h: 0.45, fontSize: 10.5, fontFace: 'Calibri', color: TEXT_MUTED
+                });
+                const pipeSteps = [
+                    { num: '1', title: 'Tulis Skenario', desc: 'Alur uji Cypress' },
+                    { num: '2', title: 'Jalankan Nyata', desc: 'Simulasi klik & ketik' },
+                    { num: '3', title: 'Rekam Jejak', desc: 'Simpan HAR traffic' },
+                    { num: '4', title: 'Ubah Format', desc: 'Konversi ke JMX' },
+                    { num: '5', title: 'Uji di Server', desc: 'Eksekusi cepat CI/CD' },
+                    { num: '6', title: 'Laporan Siap', desc: 'Dashboard hasil' }
+                ];
+                pipeSteps.forEach((st, idx) => {
+                    const stX = 0.6 + idx * 1.5;
+                    addCardBox(s10, stX, 1.9, 1.35, 1.35, '3B82F6', 1);
+                    s10.addText(st.num, { x: stX + 0.1, y: 2.0, w: 0.25, h: 0.25, fontSize: 9, fontFace: 'Arial', color: '60A5FA', bold: true });
+                    s10.addText(st.title, { x: stX + 0.38, y: 2.0, w: 0.9, h: 0.25, fontSize: 8.5, fontFace: 'Arial', color: TEXT_MAIN, bold: true });
+                    s10.addText(st.desc, { x: stX + 0.1, y: 2.3, w: 1.15, h: 0.8, fontSize: 8, fontFace: 'Calibri', color: TEXT_MUTED });
+                });
+
+                // Server Command Box
+                s10.addShape(pptx.ShapeType.rect, { x: 0.6, y: 3.45, w: 8.8, h: 1.5, fill: { color: '090E1A' }, line: { color: '334155', width: 1 } });
+                s10.addText('💻 Perintah Pengujian di Server (GitLab CI / Jenkins):', { x: 0.8, y: 3.55, w: 8.4, h: 0.3, fontSize: 9.5, fontFace: 'Courier New', color: '94A3B8', bold: true });
+                s10.addText('# Pengujian berjalan super cepat tanpa memakan RAM besar untuk visual browser:\njmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard', {
+                    x: 0.8, y: 3.9, w: 8.4, h: 0.9, fontSize: 9.5, fontFace: 'Courier New', color: '86EFAC'
+                });
+                addSlideFooter(s10, 'Menggabungkan kemudahan simulasi di laptop dengan kecepatan eksekusi di server.', 'Slide 10');
+
+                // ================= SLIDE 11: Hybrid Benefits =================
+                const s11 = pptx.addSlide();
+                addSlideHeader(s11, 'Tahap 09: Manfaat Teknis', 'Keuntungan Menjalankan Pengujian Ringan di Server', '11');
+                // Col 1
+                addCardBox(s11, 0.6, 1.4, cardWidth3, 3.55, '60A5FA', 1.5);
+                s11.addText('1. Sangat Hemat Memori', { x: 0.75, y: 1.55, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: '60A5FA', bold: true });
+                s11.addText('Membuka browser penuh di server membutuhkan memori besar (~1.2 GB+ per pengujian).\n\nPengujian data langsung hanya membutuhkan ~150 MB RAM, membuat proses uji jauh lebih hemat dan kilat.', {
+                    x: 0.75, y: 1.95, w: 2.45, h: 2.8, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                // Col 2
+                addCardBox(s11, 3.62, 1.4, cardWidth3, 3.55, ACCENT_EMERALD, 1.5);
+                s11.addText('2. Kebal Tampilan Lelet', { x: 3.77, y: 1.55, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true });
+                s11.addText('Bebas dari kesalahan uji palsu akibat gambar, font, atau animasi yang terlambat muncul di layar.\n\nServer langsung fokus memastikan data terkirim dengan benar dan respon sistem tetap cepat.', {
+                    x: 3.77, y: 1.95, w: 2.45, h: 2.8, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                // Col 3
+                addCardBox(s11, 6.65, 1.4, cardWidth3, 3.55, ACCENT_AMBER, 1.5);
+                s11.addText('3. Siap Uji Beban Massal', { x: 6.8, y: 1.55, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: ACCENT_AMBER, bold: true });
+                s11.addText('Hasil rekaman alur uji bisa langsung dipakai untuk menguji ketahanan aplikasi saat diakses banyak orang bersamaan.\n\nCukup atur jumlah simulasi virtual user untuk stress testing.', {
+                    x: 6.8, y: 1.95, w: 2.45, h: 2.8, fontSize: 10, fontFace: 'Calibri', color: TEXT_SUB
+                });
+                addSlideFooter(s11, 'Optimalisasi: Proses rilis aplikasi cepat, biaya server pengujian jauh lebih hemat.', 'Slide 11');
+
+                // ================= SLIDE 12: Summary =================
+                const s12 = pptx.addSlide();
+                s12.background = { color: BG_DARK };
+                s12.addShape(pptx.ShapeType.roundRect, {
+                    x: 3.8, y: 0.6, w: 2.4, h: 0.32,
+                    fill: { color: 'F59E0B', transparency: 85 }, line: { color: 'F59E0B', width: 1 }, rectRadius: 0.15
+                });
+                s12.addText('🏆 RANGKUMAN PENTING', { x: 3.8, y: 0.6, w: 2.4, h: 0.32, fontSize: 9.5, fontFace: 'Calibri', color: ACCENT_AMBER, bold: true, align: 'center', valign: 'middle' });
+                s12.addText('3 Kunci Sukses Pengujian Otomasi', {
+                    x: 1.0, y: 1.05, w: 8.0, h: 0.5, fontSize: 22, fontFace: 'Arial', color: TEXT_MAIN, bold: true, align: 'center'
+                });
+
+                // 3 Cards
+                addCardBox(s12, 0.6, 1.7, cardWidth3, 2.7, '3B82F6', 2);
+                s12.addText('1. Matangkan di Awal', { x: 0.75, y: 1.85, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: '60A5FA', bold: true });
+                s12.addText('Pahami alur bisnis, susun skenario yang jelas, dan siapkan data uji di file terpisah agar rapi.', { x: 0.75, y: 2.25, w: 2.45, h: 1.9, fontSize: 10, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                addCardBox(s12, 3.62, 1.7, cardWidth3, 2.7, ACCENT_EMERALD, 2);
+                s12.addText('2. Penanda yang Awet', { x: 3.77, y: 1.85, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: ACCENT_EMERALD, bold: true });
+                s12.addText('Gunakan penanda khusus seperti data-cy agar skrip tidak mudah rusak saat desain aplikasi diubah.', { x: 3.77, y: 2.25, w: 2.45, h: 1.9, fontSize: 10, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                addCardBox(s12, 6.65, 1.7, cardWidth3, 2.7, ACCENT_AMBER, 2);
+                s12.addText('3. Eksekusi Ringan', { x: 6.8, y: 1.85, w: 2.45, h: 0.35, fontSize: 12, fontFace: 'Arial', color: ACCENT_AMBER, bold: true });
+                s12.addText('Rekam alur nyata di laptop penguji, lalu jalankan pengujian tanpa beban browser di server otomatis.', { x: 6.8, y: 2.25, w: 2.45, h: 1.9, fontSize: 10, fontFace: 'Calibri', color: TEXT_MUTED });
+
+                // Closing note
+                s12.addText('✨ Terima Kasih! Mari masuk ke sesi tanya jawab & diskusi.', {
+                    x: 0.6, y: 4.6, w: 8.8, h: 0.4, fontSize: 12, fontFace: 'Calibri', color: '93C5FD', bold: true, align: 'center'
+                });
+                addSlideFooter(s12, 'Otomasi Pengujian Web dengan Cypress', 'Slide 12');
+
+                if (btnText) btnText.textContent = 'Menyimpan PPTX...';
+                await pptx.writeFile({ fileName: 'Otomasi_Pengujian_Cypress_PLN_Editable.pptx' });
+
+                if (btnText) btnText.textContent = 'Tersimpan (Editable)! 🎉';
+                setTimeout(() => {
+                    if (btnText) btnText.textContent = originalText;
+                }, 3000);
+
+            } catch (err) {
+                console.error('PPTX Export Error:', err);
+                alert('Gagal membuat PPTX: ' + (err.message || err));
+                if (btnText) btnText.textContent = originalText;
+            } finally {
+                isExporting = false;
+                if (btn) btn.disabled = false;
+            }
+        }
+
         // Keyboard navigation support
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -1603,6 +2178,8 @@ jmeter -n -t test_scenario.jmx -l results.jtl -e -o ./ci-report-dashboard</div>
                 changeSlide(-1);
             } else if (e.key === 'f' || e.key === 'F') {
                 toggleFullscreen();
+            } else if (e.key === 'p' || e.key === 'P') {
+                exportToPPTX();
             }
         });
 
