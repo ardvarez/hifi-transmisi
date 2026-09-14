@@ -203,6 +203,138 @@
             cursor: not-allowed;
         }
 
+        /* Toolbar & Search Section (asset-register style) */
+        .toolbar-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-main);
+            background: transparent;
+            font-weight: 500;
+        }
+        
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .search-box i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Category Chips Horizontal Scroll */
+        .category-chips-scroll {
+            display: flex;
+            gap: 8px;
+            padding-bottom: 10px;
+            margin-bottom: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .category-chips-scroll::-webkit-scrollbar { display: none; }
+
+        .category-chip {
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+        }
+
+        /* Filter Chips Row */
+        .filter-chips-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-chips-row::-webkit-scrollbar { display: none; }
+
+        .chip-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .chip-btn.active {
+            background: #1a65d6;
+            color: #ffffff;
+            border-color: #1a65d6;
+        }
+
+        .result-stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .btn-reset-filters {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .empty-state-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 16px;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+        .empty-icon { font-size: 32px; color: #cbd5e1; margin-bottom: 8px; }
+        .empty-title { font-size: 13.5px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+        .empty-sub { font-size: 11.5px; color: var(--text-muted); }
+
         /* List Container */
         .list-container {
             display: flex;
@@ -1443,6 +1575,37 @@
                 </button>
             </div>
 
+            <!-- Toolbar (Search Box) -->
+            <div class="toolbar-wrap">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="syncSearchInput" placeholder="Cari siklus periode jadwal...">
+                </div>
+            </div>
+
+            <!-- Category Chips Horizontal Scroll -->
+            <div class="category-chips-scroll">
+                <button class="category-chip active" data-filter="all" onclick="setJadwalFilter('all', this)">Semua (7)</button>
+                <button class="category-chip" data-filter="harian_mingguan" onclick="setJadwalFilter('harian_mingguan', this)">Harian / Mingguan (3)</button>
+                <button class="category-chip" data-filter="bulanan" onclick="setJadwalFilter('bulanan', this)">Bulanan (2)</button>
+                <button class="category-chip" data-filter="tahunan" onclick="setJadwalFilter('tahunan', this)">Tahunan (1)</button>
+            </div>
+
+            <!-- Result Counter -->
+            <div class="result-stats-row">
+                <span id="jadwalResultCounter">Menampilkan 7 Siklus Jadwal</span>
+                <button type="button" id="btnResetJadwalFilter" class="btn-reset-filters" onclick="resetJadwalFilters()">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state-box" id="jadwalEmptyState">
+                <div class="empty-icon"><i class="fa-regular fa-calendar-xmark"></i></div>
+                <div class="empty-title">Jadwal Tidak Ditemukan</div>
+                <div class="empty-sub">Tidak ditemukan siklus jadwal yang cocok dengan kata kunci atau filter.</div>
+            </div>
+
             <!-- Sync Task Cards List -->
             <div class="list-container" id="syncList">
                 <!-- Cards managed by JS -->
@@ -1453,61 +1616,106 @@
     <script>
         // Data Jadwal
         const syncData = [
-            { id: 1, title: '2 Mingguan', count: '7 Jadwal WO Inspeksi' },
-            { id: 2, title: '3 Bulanan', count: '1 Jadwal WO Inspeksi', failKey: true },
-            { id: 3, title: 'Tahunan', count: '3 Jadwal WO Inspeksi' },
-            { id: 4, title: 'Harian', count: '28 Jadwal WO Inspeksi' },
-            { id: 5, title: 'Bulanan', count: '9 Jadwal WO Inspeksi' },
-            { id: 6, title: 'Mingguan', count: '18 Jadwal WO Inspeksi' },
-            { id: 7, title: 'Finalisasi data lokal', count: 'Sinkron inspeksi lama, auto-close expired, dan FCM' }
+            { id: 1, title: '2 Mingguan', count: '7 Jadwal WO Inspeksi', type: 'harian_mingguan' },
+            { id: 2, title: '3 Bulanan', count: '1 Jadwal WO Inspeksi', type: 'bulanan', failKey: true },
+            { id: 3, title: 'Tahunan', count: '3 Jadwal WO Inspeksi', type: 'tahunan' },
+            { id: 4, title: 'Harian', count: '28 Jadwal WO Inspeksi', type: 'harian_mingguan' },
+            { id: 5, title: 'Bulanan', count: '9 Jadwal WO Inspeksi', type: 'bulanan' },
+            { id: 6, title: 'Mingguan', count: '18 Jadwal WO Inspeksi', type: 'harian_mingguan' },
+            { id: 7, title: 'Finalisasi data lokal', count: 'Sinkron inspeksi lama, auto-close expired, dan FCM', type: 'other' }
         ];
+
+        let currentJadwalFilter = 'all';
+        let jadwalSearchQuery = '';
 
         const listContainer = document.getElementById('syncList');
         const btnStart = document.getElementById('btnStart');
         const toast = document.getElementById('toastSuccess');
         const modal = document.getElementById('modalFailed');
 
-        // Initialize Cards
+        function setJadwalFilter(type, btn) {
+            currentJadwalFilter = type;
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCards();
+        }
+
+        function resetJadwalFilters() {
+            currentJadwalFilter = 'all';
+            jadwalSearchQuery = '';
+            const searchInput = document.getElementById('syncSearchInput');
+            if (searchInput) searchInput.value = '';
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-filter') === 'all');
+            });
+            renderCards();
+        }
+
+        // Initialize Cards with filtering
         function renderCards() {
             const urlParams = new URLSearchParams(window.location.search);
             const actionParam = urlParams.get('action');
             const retryPeriod = urlParams.get('period');
 
             listContainer.innerHTML = '';
+            const q = jadwalSearchQuery.toLowerCase().trim();
+            const emptyState = document.getElementById('jadwalEmptyState');
+            const counterText = document.getElementById('jadwalResultCounter');
+            const resetBtn = document.getElementById('btnResetJadwalFilter');
+
+            const isFiltered = (currentJadwalFilter !== 'all' || q !== '');
+            if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-flex' : 'none';
+
+            let visibleCount = 0;
+
             syncData.forEach(item => {
-                const card = document.createElement('div');
-                
-                if (actionParam === 'retry' && item.id != retryPeriod) {
-                    card.className = 'sync-card success';
-                    card.id = `card-${item.id}`;
-                    card.innerHTML = `
-                        <div class="icon-wrapper">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="card-content">
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-subtitle">${item.count}</div>
-                            <div class="badge"><i class="fas fa-check"></i> Selesai</div>
-                        </div>
-                    `;
-                } else {
-                    card.className = 'sync-card waiting';
-                    card.id = `card-${item.id}`;
-                    card.innerHTML = `
-                        <div class="icon-wrapper">
-                            <i class="far fa-clock"></i>
-                        </div>
-                        <div class="card-content">
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-subtitle">${item.count}</div>
-                            <div class="badge"><i class="far fa-clock"></i> Menunggu</div>
-                        </div>
-                    `;
+                const matchesFilter = (currentJadwalFilter === 'all') || (item.type === currentJadwalFilter);
+                const matchesQuery = !q || item.title.toLowerCase().includes(q) || item.count.toLowerCase().includes(q);
+
+                if (matchesFilter && matchesQuery) {
+                    visibleCount++;
+                    const card = document.createElement('div');
+                    
+                    if (actionParam === 'retry' && item.id != retryPeriod) {
+                        card.className = 'sync-card success';
+                        card.id = `card-${item.id}`;
+                        card.innerHTML = `
+                            <div class="icon-wrapper">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">${item.title}</div>
+                                <div class="card-subtitle">${item.count}</div>
+                                <div class="badge"><i class="fas fa-check"></i> Selesai</div>
+                            </div>
+                        `;
+                    } else {
+                        card.className = 'sync-card waiting';
+                        card.id = `card-${item.id}`;
+                        card.innerHTML = `
+                            <div class="icon-wrapper">
+                                <i class="far fa-clock"></i>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">${item.title}</div>
+                                <div class="card-subtitle">${item.count}</div>
+                                <div class="badge"><i class="far fa-clock"></i> Menunggu</div>
+                            </div>
+                        `;
+                    }
+                    
+                    listContainer.appendChild(card);
                 }
-                
-                listContainer.appendChild(card);
             });
+
+            if (emptyState) emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            if (counterText) counterText.textContent = `Menampilkan ${visibleCount} dari ${syncData.length} Siklus Jadwal`;
         }
+
+        document.getElementById('syncSearchInput')?.addEventListener('input', function(e) {
+            jadwalSearchQuery = e.target.value;
+            renderCards();
+        });
 
         // Run on load
         renderCards();

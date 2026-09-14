@@ -194,33 +194,386 @@
             line-height: 1.45;
         }
 
-        /* Filter Chips Row */
-        .filter-chips-row {
+        /* Toolbar & Search Section (asset-register style) */
+        .toolbar-wrap {
             display: flex;
             gap: 8px;
-            margin-bottom: 14px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-main);
+            background: transparent;
+            font-weight: 500;
+        }
+        
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .search-box i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .filter-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .filter-btn:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .filter-btn.active-filter {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+        }
+
+        .filter-active-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid white;
+            display: none;
+        }
+
+        /* Category Chips Horizontal Scroll */
+        .category-chips-scroll {
+            display: flex;
+            gap: 8px;
+            padding-bottom: 10px;
+            margin-bottom: 4px;
             overflow-x: auto;
             scrollbar-width: none;
         }
-        .filter-chips-row::-webkit-scrollbar { display: none; }
+        .category-chips-scroll::-webkit-scrollbar { display: none; }
 
-        .chip-btn {
+        .category-chip {
             padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
             border-radius: 20px;
             font-size: 11.5px;
             font-weight: 700;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            color: #64748b;
-            cursor: pointer;
+            color: var(--text-muted);
             white-space: nowrap;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
-        .chip-btn.active {
-            background: #1a65d6;
-            color: #ffffff;
-            border-color: #1a65d6;
+        .category-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+        }
+
+        /* Modal Drawer (Exact asset-register.html styling) */
+        .filter-drawer-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .filter-drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .filter-drawer-card {
+            width: 100%;
+            max-width: 412px;
+            height: 85%;
+            max-height: 88%;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg, #ffffff);
+            border-top: 1px solid var(--border-color);
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 12px 16px 18px;
+            box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.28);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .filter-drawer-overlay.active .filter-drawer-card {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 42px;
+            height: 5px;
+            background: #cbd5e1;
+            border-radius: 3px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-handle:hover {
+            background: #94a3b8;
+            transform: scaleX(1.1);
+        }
+
+        .drawer-scroll-body {
+            flex: 1 1 auto;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding-right: 4px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar {
+            width: 5px;
+        }
+        .drawer-scroll-body::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+        }
+
+        .drawer-footer-sticky {
+            flex-shrink: 0;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg, #ffffff);
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .drawer-btn {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--primary-blue, #1a65d6);
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.2);
+        }
+
+        .drawer-btn-secondary {
+            background: #f8fafc !important;
+            color: var(--text-main, #1e293b) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: none !important;
+        }
+
+        .drawer-btn-secondary:hover {
+            background: #f1f5f9 !important;
+        }
+
+        .filter-field-group {
+            margin-bottom: 12px;
+        }
+
+        .filter-field-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main, #1e293b);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .filter-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .filter-select-wrapper::after {
+            content: "\f078";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 11px;
+            color: var(--primary-blue);
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 36px 10px 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text-main, #1e293b);
+            font-size: 12.5px;
+            font-weight: 600;
+            appearance: none;
+            -webkit-appearance: none;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.12);
+        }
+
+        .filter-status-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color, #e2e8f0);
+        }
+
+        .filter-status-pill {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-status-pill.selected {
+            background: #eff6ff;
+            color: var(--primary-blue, #1a65d6);
+            border-color: #93c5fd;
+        }
+
+        .filter-status-pill.selected i {
+            display: inline-block;
+        }
+
+        .filter-status-pill i {
+            display: none;
+            font-size: 10px;
+        }
+
+        /* Result Counter & Empty State */
+        .result-stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .btn-reset-filters {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .empty-state-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 16px;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+        .empty-icon {
+            font-size: 32px;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+        .empty-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .empty-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
         }
 
         /* Inspection Result Card */
@@ -768,6 +1121,79 @@
 
     <div class="mobile-container">
         
+        <!-- Filter Drawer Modal (asset-register standard) -->
+        <div id="syncFilterDrawerModal" class="filter-drawer-overlay" onclick="closeSyncFilterDrawer(event)">
+            <div class="filter-drawer-card" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeSyncFilterDrawer()"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+                    <h3 style="font-size: 15px; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-sliders" style="color: var(--primary-blue);"></i> Filter Hasil Inspeksi
+                    </h3>
+                    <button type="button" onclick="resetSyncFilter()" style="background: none; border: none; font-size: 12px; font-weight: 700; color: var(--danger-color); cursor: pointer;">
+                        Reset Filter
+                    </button>
+                </div>
+
+                <div class="drawer-scroll-body">
+                    <!-- Status Sinkronisasi Filter (Multi-Select Checklist Pills) -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Status Sinkronisasi</label>
+                        <div class="filter-status-grid" id="syncStatusPills">
+                            <div class="filter-status-pill selected" data-status="semua" onclick="toggleSyncStatusPill(this)">
+                                <i class="fa-solid fa-check"></i> Semua Status
+                            </div>
+                            <div class="filter-status-pill" data-status="lokal" onclick="toggleSyncStatusPill(this)">
+                                <i class="fa-solid fa-check"></i> Lokal / Siap Kirim
+                            </div>
+                            <div class="filter-status-pill" data-status="gagal" onclick="toggleSyncStatusPill(this)">
+                                <i class="fa-solid fa-check"></i> Gagal Sinkron
+                            </div>
+                            <div class="filter-status-pill" data-status="server" onclick="toggleSyncStatusPill(this)">
+                                <i class="fa-solid fa-check"></i> Tersinkron Server
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gardu Induk Dropdown -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Gardu Induk</label>
+                        <div class="filter-select-wrapper">
+                            <select id="syncGiSelect" class="filter-select">
+                                <option value="all">Semua Gardu Induk</option>
+                                <option value="GIS 150KV WONOKROMO">GIS 150KV WONOKROMO</option>
+                                <option value="GI 150KV KALISARI">GI 150KV KALISARI</option>
+                                <option value="GI 150KV RUNGKUT">GI 150KV RUNGKUT</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- No. WO / Keyword Search -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">No. Work Order</label>
+                        <input type="text" id="syncWoInput" class="filter-input" placeholder="Contoh: INS202600131960...">
+                    </div>
+
+                    <!-- Sort By -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Urutkan Berdasarkan</label>
+                        <div class="filter-select-wrapper">
+                            <select id="syncSortSelect" class="filter-select">
+                                <option value="default">Default</option>
+                                <option value="newest">Waktu Terkini</option>
+                                <option value="name-asc">Nama Aset (A - Z)</option>
+                                <option value="name-desc">Nama Aset (Z - A)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button type="button" class="drawer-btn drawer-btn-secondary" onclick="closeSyncFilterDrawer()">Batal</button>
+                    <button type="button" class="drawer-btn" onclick="applySyncDrawerFilters()">Terapkan Filter</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal Sync Progress / Result Notification (Inside Frame) -->
         <div id="modalSyncProgress" class="modal-overlay" onclick="finishSyncModal()">
             
@@ -846,12 +1272,39 @@
                 <div class="sync-hero-desc" id="counterStats">1 Total Inspeksi (0 Server, 1 Lokal & 0 Sedang Berlangsung)</div>
             </div>
 
-            <!-- Filter Chips -->
-            <div class="filter-chips-row">
-                <button class="chip-btn active" onclick="filterSync('semua', this)">Semua (3)</button>
-                <button class="chip-btn" onclick="filterSync('lokal', this)">Lokal / Belum Upload (2)</button>
-                <button class="chip-btn" onclick="filterSync('gagal', this)">Gagal Sinkron (1)</button>
-                <button class="chip-btn" onclick="filterSync('server', this)">Tersinkron Server (0)</button>
+            <!-- Toolbar (Search Box + Filter Button) -->
+            <div class="toolbar-wrap">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="syncSearchInput" placeholder="Cari aset, No. WO, gardu induk, bay...">
+                </div>
+                <button type="button" id="btnFilterTrigger" class="filter-btn" onclick="openSyncFilterDrawer()" title="Buka Filter Lengkap">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span class="filter-active-dot" id="filterBadgeDot"></span>
+                </button>
+            </div>
+
+            <!-- Category Chips Horizontal Scroll -->
+            <div class="category-chips-scroll">
+                <button class="category-chip active" data-filter="semua" onclick="filterSync('semua', this)">Semua (3)</button>
+                <button class="category-chip" data-filter="lokal" onclick="filterSync('lokal', this)">Lokal / Siap Kirim (2)</button>
+                <button class="category-chip" data-filter="gagal" onclick="filterSync('gagal', this)">Gagal Sinkron (1)</button>
+                <button class="category-chip" data-filter="server" onclick="filterSync('server', this)">Tersinkron Server (0)</button>
+            </div>
+
+            <!-- Result Stats Row -->
+            <div class="result-stats-row">
+                <span id="syncResultCounter">Menampilkan 3 Hasil Inspeksi</span>
+                <button type="button" id="btnResetSyncFilter" class="btn-reset-filters" onclick="resetSyncFilter()">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <!-- Empty State Box -->
+            <div class="empty-state-box" id="syncEmptyState">
+                <div class="empty-icon"><i class="fa-solid fa-cloud-moon"></i></div>
+                <div class="empty-title">Hasil Inspeksi Tidak Ditemukan</div>
+                <div class="empty-sub">Tidak ada data hasil inspeksi yang cocok dengan filter atau kata kunci pencarian.</div>
             </div>
 
             <!-- Card 1: Over Current Relay (Exact Reference) -->
@@ -1055,24 +1508,206 @@
             }
         }
 
-        function filterSync(type, btn) {
-            document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        let currentSyncChip = 'semua';
+        let syncSearchQuery = '';
 
-            const cards = document.querySelectorAll('.result-card');
-            cards.forEach(card => {
-                const st = card.getAttribute('data-status');
-                if (type === 'semua') {
-                    card.style.display = 'block';
-                } else if (type === 'lokal') {
-                    card.style.display = (st === 'lokal') ? 'block' : 'none';
-                } else if (type === 'gagal') {
-                    card.style.display = (st === 'gagal') ? 'block' : 'none';
-                } else if (type === 'server') {
-                    card.style.display = (st === 'server') ? 'block' : 'none';
+        // Filter State
+        const syncFilterState = {
+            search: '',
+            statuses: ['semua'],
+            gi: 'all',
+            wo: '',
+            sort: 'default'
+        };
+
+        function openSyncFilterDrawer() {
+            const modal = document.getElementById('syncFilterDrawerModal');
+            if (modal) {
+                modal.classList.add('active');
+                syncDrawerFromFilterState();
+            }
+        }
+
+        function closeSyncFilterDrawer(e) {
+            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('drawer-handle')) {
+                return;
+            }
+            const modal = document.getElementById('syncFilterDrawerModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function toggleSyncStatusPill(pill) {
+            const status = pill.getAttribute('data-status');
+            const container = document.getElementById('syncStatusPills');
+            const allPills = container.querySelectorAll('.filter-status-pill');
+
+            if (status === 'semua') {
+                allPills.forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                syncFilterState.statuses = ['semua'];
+            } else {
+                const allPill = container.querySelector('[data-status="semua"]');
+                if (allPill) allPill.classList.remove('selected');
+
+                pill.classList.toggle('selected');
+
+                const selected = Array.from(container.querySelectorAll('.filter-status-pill.selected'))
+                    .map(p => p.getAttribute('data-status'))
+                    .filter(s => s !== 'semua');
+
+                if (selected.length === 0) {
+                    if (allPill) allPill.classList.add('selected');
+                    syncFilterState.statuses = ['semua'];
+                } else {
+                    syncFilterState.statuses = selected;
+                }
+            }
+        }
+
+        function syncDrawerFromFilterState() {
+            const container = document.getElementById('syncStatusPills');
+            if (container) {
+                const allPills = container.querySelectorAll('.filter-status-pill');
+                allPills.forEach(p => {
+                    const st = p.getAttribute('data-status');
+                    if (syncFilterState.statuses.includes('semua')) {
+                        p.classList.toggle('selected', st === 'semua');
+                    } else {
+                        p.classList.toggle('selected', syncFilterState.statuses.includes(st));
+                    }
+                });
+            }
+
+            const giSelect = document.getElementById('syncGiSelect');
+            if (giSelect) giSelect.value = syncFilterState.gi;
+
+            const woInput = document.getElementById('syncWoInput');
+            if (woInput) woInput.value = syncFilterState.wo;
+
+            const sortSelect = document.getElementById('syncSortSelect');
+            if (sortSelect) sortSelect.value = syncFilterState.sort;
+        }
+
+        function applySyncDrawerFilters() {
+            const giSelect = document.getElementById('syncGiSelect');
+            const woInput = document.getElementById('syncWoInput');
+            const sortSelect = document.getElementById('syncSortSelect');
+
+            syncFilterState.gi = giSelect ? giSelect.value : 'all';
+            syncFilterState.wo = woInput ? woInput.value.trim() : '';
+            syncFilterState.sort = sortSelect ? sortSelect.value : 'default';
+
+            syncChipsWithDrawerFilter();
+            applyAllSyncFilters();
+            const modal = document.getElementById('syncFilterDrawerModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function syncChipsWithDrawerFilter() {
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(btn => {
+                const filterVal = btn.getAttribute('data-filter');
+                if (filterVal === 'semua') {
+                    btn.classList.toggle('active', syncFilterState.statuses.includes('semua') && syncFilterState.gi === 'all');
+                } else {
+                    btn.classList.toggle('active', syncFilterState.statuses.includes(filterVal));
                 }
             });
         }
+
+        function filterSync(type, btn) {
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (type === 'semua') {
+                syncFilterState.statuses = ['semua'];
+            } else {
+                syncFilterState.statuses = [type];
+            }
+
+            syncDrawerFromFilterState();
+            applyAllSyncFilters();
+        }
+
+        function resetSyncFilter() {
+            syncFilterState.search = '';
+            syncFilterState.statuses = ['semua'];
+            syncFilterState.gi = 'all';
+            syncFilterState.wo = '';
+            syncFilterState.sort = 'default';
+
+            const searchInput = document.getElementById('syncSearchInput');
+            if (searchInput) searchInput.value = '';
+
+            syncDrawerFromFilterState();
+
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-filter') === 'semua');
+            });
+
+            applyAllSyncFilters();
+            const modal = document.getElementById('syncFilterDrawerModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function applyAllSyncFilters() {
+            const cards = Array.from(document.querySelectorAll('.result-card'));
+            const emptyState = document.getElementById('syncEmptyState');
+            const counterText = document.getElementById('syncResultCounter');
+            const resetBtn = document.getElementById('btnResetSyncFilter');
+            const filterDot = document.getElementById('filterBadgeDot');
+            const filterTrigger = document.getElementById('btnFilterTrigger');
+
+            const hasActiveDrawerFilter = (!syncFilterState.statuses.includes('semua') || syncFilterState.gi !== 'all' || syncFilterState.wo !== '' || syncFilterState.sort !== 'default');
+            const isFiltered = (syncFilterState.search.trim() !== '' || hasActiveDrawerFilter);
+
+            if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-flex' : 'none';
+            if (filterDot) filterDot.style.display = hasActiveDrawerFilter ? 'block' : 'none';
+            if (filterTrigger) filterTrigger.classList.toggle('active-filter', hasActiveDrawerFilter);
+
+            let count = 0;
+            const q = syncFilterState.search.toLowerCase().trim();
+            const woQ = syncFilterState.wo.toLowerCase().trim();
+
+            cards.forEach(card => {
+                const st = card.getAttribute('data-status') || '';
+                const text = card.textContent.toLowerCase();
+
+                const matchStatus = syncFilterState.statuses.includes('semua') || syncFilterState.statuses.includes(st);
+                const matchGi = (syncFilterState.gi === 'all') || text.includes(syncFilterState.gi.toLowerCase());
+                const matchWo = !woQ || text.includes(woQ);
+                const matchQuery = !q || text.includes(q);
+
+                if (matchStatus && matchGi && matchWo && matchQuery) {
+                    card.style.display = 'block';
+                    count++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Sorting
+            if (syncFilterState.sort !== 'default') {
+                const container = document.querySelector('.content-scroll');
+                if (container) {
+                    cards.sort((a, b) => {
+                        const titleA = (a.querySelector('.result-card-title')?.innerText || '').toLowerCase();
+                        const titleB = (b.querySelector('.result-card-title')?.innerText || '').toLowerCase();
+                        if (syncFilterState.sort === 'name-asc') return titleA.localeCompare(titleB);
+                        if (syncFilterState.sort === 'name-desc') return titleB.localeCompare(titleA);
+                        return 0;
+                    });
+                    cards.forEach(card => container.appendChild(card));
+                }
+            }
+
+            if (emptyState) emptyState.style.display = count === 0 ? 'block' : 'none';
+            if (counterText) counterText.textContent = `Menampilkan ${count} dari ${cards.length} Hasil Inspeksi`;
+        }
+
+        document.getElementById('syncSearchInput')?.addEventListener('input', function(e) {
+            syncFilterState.search = e.target.value;
+            applyAllSyncFilters();
+        });
 
         function clearAllCache() {
             if (confirm('Bersihkan seluruh cache inspeksi lokal yang telah tersinkron? Data lokal yang belum sinkron tidak akan terhapus.')) {

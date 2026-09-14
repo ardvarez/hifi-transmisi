@@ -26,11 +26,84 @@
         .header-title { font-size: 15px; font-weight: 800; color: var(--text-main); }
         .header-sub { font-size: 11px; color: var(--primary-blue); font-weight: 700; }
 
-        .search-section { padding: 12px 18px 8px; background: white; border-bottom: 1px solid var(--border-color); }
-        .search-box { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; }
-        .search-box input { border: none; background: transparent; width: 100%; font-size: 13px; outline: none; }
+        /* Toolbar & Search Section (asset-register style) */
+        .toolbar-wrap {
+            padding: 12px 18px 0;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
 
-        .stats-banner { margin: 14px 18px 10px; background: linear-gradient(135deg, #1a65d6 0%, #0d47a1 100%); border-radius: 16px; padding: 16px; color: white; box-shadow: 0 6px 18px rgba(26,101,214,0.25); }
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-main);
+            background: transparent;
+            font-weight: 500;
+        }
+        
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .search-box i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Category Chips Horizontal Scroll */
+        .category-chips-scroll {
+            display: flex;
+            gap: 8px;
+            padding: 10px 18px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .category-chips-scroll::-webkit-scrollbar { display: none; }
+
+        .category-chip {
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+        }
+        
+        .result-stats-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 8px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+        .btn-reset-filters { background: transparent; border: none; color: #ef4444; font-weight: 700; font-size: 11px; cursor: pointer; display: none; align-items: center; gap: 4px; }
+        
+        .empty-state-box { background: white; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px 16px; text-align: center; display: none; margin-top: 10px; }
+        .empty-icon { font-size: 32px; color: #cbd5e1; margin-bottom: 8px; }
+        .empty-title { font-size: 13.5px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+        .empty-sub { font-size: 11.5px; color: var(--text-muted); }
+
+        .stats-banner { margin: 12px 18px 10px; background: linear-gradient(135deg, #1a65d6 0%, #0d47a1 100%); border-radius: 16px; padding: 16px; color: white; box-shadow: 0 6px 18px rgba(26,101,214,0.25); }
         .stats-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
         .stats-desc { font-size: 11.5px; opacity: 0.9; }
 
@@ -72,11 +145,20 @@
             <div style="font-size: 18px; color: #1a65d6;"><i class="fa-solid fa-layer-group"></i></div>
         </div>
 
-        <div class="search-section">
+        <!-- Toolbar (Search Box) -->
+        <div class="toolbar-wrap">
             <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8;"></i>
-                <input type="text" placeholder="Cari No. WO atau Nama Gardu Induk...">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Cari No. WO, Gardu Induk, atau Bay...">
             </div>
+        </div>
+
+        <!-- Category Chips Horizontal Scroll -->
+        <div class="category-chips-scroll">
+            <button class="category-chip active" data-filter="all" onclick="setWoFilter('all', this)">Semua (4)</button>
+            <button class="category-chip" data-filter="lokal" onclick="setWoFilter('lokal', this)">Siap Upload (2)</button>
+            <button class="category-chip" data-filter="gagal" onclick="setWoFilter('gagal', this)">Gagal Sync (1)</button>
+            <button class="category-chip" data-filter="sukses" onclick="setWoFilter('sukses', this)">Sudah Sinkron (1)</button>
         </div>
 
         <div class="stats-banner">
@@ -84,11 +166,23 @@
             <div class="stats-desc">Total 6 hasil inspeksi aset tersimpan lokal, 2 inspeksi aset berhasil tersinkron ke server.</div>
         </div>
 
-        <div class="content-scroll">
-            <div class="section-label">Daftar Work Order Sync</div>
+        <div class="content-scroll" id="woListScroll">
+            <div class="result-stats-row">
+                <span id="woCounterText">Daftar Work Order Sync (4 WO)</span>
+                <button type="button" id="btnResetWoFilter" class="btn-reset-filters" onclick="resetWoFilters()">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state-box" id="woEmptyState">
+                <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                <div class="empty-title">Tidak Ada Work Order</div>
+                <div class="empty-sub">Tidak ditemukan WO yang cocok dengan pencarian atau filter yang dipilih.</div>
+            </div>
 
             <!-- WO Card 1 -->
-            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600131960'">
+            <div class="wo-card" data-status="lokal" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600131960'">
                 <div class="wo-header">
                     <div>
                         <div class="wo-num">INS202600131960</div>
@@ -107,7 +201,7 @@
             </div>
 
             <!-- WO Card 2 -->
-            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600129841'">
+            <div class="wo-card" data-status="gagal" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600129841'">
                 <div class="wo-header">
                     <div>
                         <div class="wo-num">INS202600129841</div>
@@ -126,7 +220,7 @@
             </div>
 
             <!-- WO Card 3 -->
-            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600142810'">
+            <div class="wo-card" data-status="lokal" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600142810'">
                 <div class="wo-header">
                     <div>
                         <div class="wo-num">INS202600142810</div>
@@ -145,7 +239,7 @@
             </div>
 
             <!-- WO Card 4 (Sudah Berhasil Sinkron ke Server) -->
-            <div class="wo-card" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600118429'">
+            <div class="wo-card" data-status="sukses" onclick="window.location.href='sync-hasil-inspeksi.html?wo=INS202600118429'">
                 <div class="wo-header">
                     <div>
                         <div class="wo-num">INS202600118429</div>
@@ -170,6 +264,64 @@
             </button>
         </div>
     </div>
+
+    <script>
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function setWoFilter(filterType, btn) {
+            currentFilter = filterType;
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyWoFilters();
+        }
+
+        function resetWoFilters() {
+            currentFilter = 'all';
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-filter') === 'all');
+            });
+            applyWoFilters();
+        }
+
+        function applyWoFilters() {
+            const cards = document.querySelectorAll('.wo-card');
+            const emptyState = document.getElementById('woEmptyState');
+            const counterText = document.getElementById('woCounterText');
+            const resetBtn = document.getElementById('btnResetWoFilter');
+
+            const isFiltered = (currentFilter !== 'all' || searchQuery.trim() !== '');
+            if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-flex' : 'none';
+
+            let count = 0;
+            const q = searchQuery.toLowerCase().trim();
+
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status') || '';
+                const cardText = card.textContent.toLowerCase();
+
+                const matchStatus = (currentFilter === 'all') || (cardStatus === currentFilter);
+                const matchSearch = !q || cardText.includes(q);
+
+                if (matchStatus && matchSearch) {
+                    card.style.display = 'block';
+                    count++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (emptyState) emptyState.style.display = count === 0 ? 'block' : 'none';
+            if (counterText) counterText.textContent = `Daftar Work Order Sync (${count} WO)`;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            applyWoFilters();
+        });
+    </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
     <style>

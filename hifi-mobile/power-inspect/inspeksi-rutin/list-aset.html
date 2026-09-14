@@ -253,31 +253,454 @@
             gap: 6px;
         }
 
-        /* Search Input */
-        .search-container {
-            margin-bottom: 14px;
-            position: relative;
+        /* Toolbar & Search Section (asset-register style) */
+        .toolbar-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
         }
-        .search-input {
-            width: 100%;
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             background: #ffffff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 10px 38px 10px 14px;
+            padding: 10px 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
             font-size: 13px;
             color: var(--text-main);
-            outline: none;
+            background: transparent;
+            font-weight: 500;
         }
-        .search-input:focus {
+        
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .search-box i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .filter-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .filter-btn:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .filter-btn.active-filter {
+            background: var(--primary-blue);
+            color: #ffffff;
             border-color: var(--primary-blue);
         }
-        .search-icon {
+
+        .filter-active-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid white;
+            display: none;
+        }
+
+        /* Category Chips Horizontal Scroll */
+        .category-chips-scroll {
+            display: flex;
+            gap: 8px;
+            padding-bottom: 10px;
+            margin-bottom: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .category-chips-scroll::-webkit-scrollbar { display: none; }
+
+        .category-chip {
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+        }
+
+        /* Result Counter & Reset Button */
+        .result-stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .result-stats-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .btn-reset-filters {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--danger-color);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-reset-filters:hover {
+            text-decoration: underline;
+        }
+
+        /* Empty State */
+        .empty-state-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px 20px;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+        .empty-icon {
+            font-size: 36px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+        .empty-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .empty-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Modal Drawer (Exact asset-register.html styling) */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 412px;
+            height: 85%;
+            max-height: 88%;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg, #ffffff);
+            border-top: 1px solid var(--border-color);
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 12px 16px 18px;
+            box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.28);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 42px;
+            height: 5px;
+            background: #cbd5e1;
+            border-radius: 3px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-handle:hover {
+            background: #94a3b8;
+            transform: scaleX(1.1);
+        }
+
+        #drawerContent {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100%;
+            max-height: 100%;
+            min-height: 0;
+            flex: 1 1 auto;
+        }
+
+        .drawer-scroll-body {
+            flex: 1 1 auto;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding-right: 4px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar {
+            width: 5px;
+        }
+        .drawer-scroll-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .drawer-scroll-body::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+        }
+
+        .drawer-footer-sticky {
+            flex-shrink: 0;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg, #ffffff);
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .drawer-btn {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--primary-blue, #1a65d6);
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.2);
+        }
+
+        .drawer-btn:hover {
+            opacity: 0.95;
+            box-shadow: 0 6px 16px rgba(26, 101, 214, 0.3);
+        }
+
+        .drawer-btn-secondary {
+            background: #f8fafc !important;
+            color: var(--text-main, #1e293b) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: none !important;
+        }
+
+        .drawer-btn-secondary:hover {
+            background: #f1f5f9 !important;
+        }
+
+        .filter-field-group {
+            margin-bottom: 12px;
+        }
+
+        .filter-field-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main, #1e293b);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .filter-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .filter-select-wrapper::after {
+            content: "\f078";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 11px;
+            color: var(--primary-blue);
             position: absolute;
             right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 36px 10px 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text-main, #1e293b);
+            font-size: 12.5px;
+            font-weight: 600;
+            appearance: none;
+            -webkit-appearance: none;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.12);
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text-main, #1e293b);
+            font-size: 12.5px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-sizing: border-box;
+        }
+
+        .filter-status-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color, #e2e8f0);
+        }
+
+        .filter-status-pill {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-status-pill.selected {
+            background: #eff6ff;
+            color: var(--primary-blue, #1a65d6);
+            border-color: #93c5fd;
+        }
+
+        .filter-status-pill.selected i {
+            display: inline-block;
+        }
+
+        .filter-status-pill i {
+            display: none;
+            font-size: 10px;
+        }
+
+        .filter-segmented-wrap {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .filter-segment-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .filter-segment-btn.active {
+            background: #ffffff;
+            color: var(--primary-blue);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
         }
 
         /* Asset Card New Layout (Faithful to PLN Power Inspect Reference) */
@@ -1557,6 +1980,85 @@
             </div>
         </div>
         
+        <!-- Filter Modal Drawer (Exact asset-register.html standard) -->
+        <div id="assetFilterModal" class="modal-overlay" onclick="closeAssetFilterModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeAssetFilterModal()"></div>
+                <div id="drawerContent">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+                        <h3 style="font-size: 15px; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-sliders" style="color: var(--primary-blue);"></i> Filter Peralatan Bay
+                        </h3>
+                        <button type="button" onclick="resetAllAssetFilters()" style="background: none; border: none; font-size: 12px; font-weight: 700; color: var(--danger-color); cursor: pointer;">
+                            Reset Filter
+                        </button>
+                    </div>
+
+                    <div class="drawer-scroll-body">
+                        <!-- Status Filter (Multi Select Checklist Pill Grid) -->
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Status Inspeksi (Multi-Select)</label>
+                            <div class="filter-status-grid" id="statusPillsContainer">
+                                <div class="filter-status-pill selected" data-status="all" onclick="toggleStatusPill(this)">
+                                    <i class="fa-solid fa-check"></i> Semua Status
+                                </div>
+                                <div class="filter-status-pill" data-status="belum" onclick="toggleStatusPill(this)">
+                                    <i class="fa-solid fa-check"></i> Belum Inspeksi
+                                </div>
+                                <div class="filter-status-pill" data-status="sedang" onclick="toggleStatusPill(this)">
+                                    <i class="fa-solid fa-check"></i> Sedang Inspeksi
+                                </div>
+                                <div class="filter-status-pill" data-status="sudah" onclick="toggleStatusPill(this)">
+                                    <i class="fa-solid fa-check"></i> Sudah Inspeksi
+                                </div>
+                                <div class="filter-status-pill" data-status="gagal" onclick="toggleStatusPill(this)">
+                                    <i class="fa-solid fa-check"></i> Sinkron Gagal
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Merk Peralatan Dropdown -->
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Merk Peralatan</label>
+                            <div class="filter-select-wrapper">
+                                <select id="filterMerkSelect" class="filter-select">
+                                    <option value="all">Semua Merk</option>
+                                    <option value="UNINDO">UNINDO</option>
+                                    <option value="ABB">ABB</option>
+                                    <option value="SIEMENS">SIEMENS</option>
+                                    <option value="ALSTOM">ALSTOM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Serial ID / Keyword -->
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Nomor Seri / ID Aset</label>
+                            <input type="text" id="filterSerialInput" class="filter-input" placeholder="Contoh: 36163288, PJI2026...">
+                        </div>
+
+                        <!-- Sort By -->
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Urutkan Berdasarkan</label>
+                            <div class="filter-select-wrapper">
+                                <select id="assetSortSelect" class="filter-select">
+                                    <option value="default">Default (Urutan Bay)</option>
+                                    <option value="name-asc">Nama Peralatan (A - Z)</option>
+                                    <option value="name-desc">Nama Peralatan (Z - A)</option>
+                                    <option value="status-progress">Status Paling Prioritas</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drawer-footer-sticky">
+                        <button type="button" class="drawer-btn drawer-btn-secondary" onclick="closeAssetFilterModal()">Batal</button>
+                        <button type="button" class="drawer-btn" onclick="applyDrawerAssetFilters()">Terapkan Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- App Header -->
         <div class="app-header">
             <div class="header-left-group">
@@ -1602,25 +2104,50 @@
                 </div>
             </div>
 
-            <!-- Search Bar -->
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Cari aset, type, atau merk...">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <!-- Toolbar (Search Box + Filter Button) -->
+            <div class="toolbar-wrap">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Cari peralatan, merk, tipe, serial...">
+                </div>
+                <button type="button" id="btnFilterTrigger" class="filter-btn" onclick="openAssetFilterModal()" title="Buka Filter Lengkap">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span class="filter-active-dot" id="filterBadgeDot"></span>
+                </button>
             </div>
 
-            <!-- Section Title -->
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fa-solid fa-boxes-stacked" style="color: var(--primary-blue);"></i> Daftar Peralatan (5 Aset)
+            <!-- Category Chips Horizontal Scroll -->
+            <div class="category-chips-scroll">
+                <button class="category-chip active" data-chip="all" onclick="applyQuickChip('all', this)">Semua (5)</button>
+                <button class="category-chip" data-chip="belum" onclick="applyQuickChip('belum', this)">Belum Inspeksi</button>
+                <button class="category-chip" data-chip="sedang" onclick="applyQuickChip('sedang', this)">Sedang Inspeksi</button>
+                <button class="category-chip" data-chip="sudah" onclick="applyQuickChip('sudah', this)">Sudah Inspeksi</button>
+                <button class="category-chip" data-chip="gagal" onclick="applyQuickChip('gagal', this)">Sinkron Gagal</button>
+                <button class="category-chip" data-chip="UNINDO" onclick="applyQuickChip('UNINDO', this)">Merk UNINDO</button>
+            </div>
+
+            <!-- Section Title & Counter -->
+            <div class="result-stats-row">
+                <div class="result-stats-text" id="resultCountText">
+                    <i class="fa-solid fa-boxes-stacked" style="color: var(--primary-blue); margin-right: 4px;"></i> Menampilkan 5 dari 5 Aset
                 </div>
-                <span style="font-size: 11px; font-weight: 700; color: var(--primary-blue);">1/5 Selesai</span>
+                <button type="button" id="btnResetFilters" class="btn-reset-filters" onclick="resetAllAssetFilters()">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                </button>
+            </div>
+
+            <!-- Empty State Box -->
+            <div class="empty-state-box" id="assetEmptyState">
+                <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+                <div class="empty-title">Peralatan Tidak Ditemukan</div>
+                <div class="empty-sub">Tidak ada aset bay yang sesuai dengan filter atau kata kunci pencarian Anda.</div>
             </div>
 
             <!-- Asset Cards List (Combined Format faithful to user design) -->
             <div class="asset-list" id="assetListContainer">
                 
                 <!-- Card 1: Power Transformer (Belum Inspeksi -> Button Mulai Inspeksi) -->
-                <div class="asset-card">
+                <div class="asset-card" data-nama="Power Transformer" data-status="belum" data-merk="UNINDO" data-tipe="N-RANGE" data-phasa="RST" data-lokasi="Switchyard 150kV">
                     <div class="asset-card-title">Power<br>Transformer</div>
                     <div class="asset-card-sub">PJI20260000003 • IL1 - Harian Bulanan</div>
                     <div class="asset-pills-row">
@@ -1650,7 +2177,7 @@
                 </div>
 
                 <!-- Card 2: Power Transformer (Sedang Inspeksi) -->
-                <div class="asset-card">
+                <div class="asset-card" data-nama="Power Transformer Proteksi" data-status="sedang" data-merk="UNINDO" data-tipe="N-RANGE" data-phasa="RST" data-lokasi="Switchyard 150kV">
                     <div class="asset-card-title">Power<br>Transformer</div>
                     <div class="asset-card-sub">PJI20260000003 • IL1 - Harian Bulanan</div>
                     <div class="asset-pills-row">
@@ -1676,7 +2203,7 @@
                 </div>
 
                 <!-- Card 3: Power Transformer (Sudah Inspeksi Local -> Button Sinkron Data) -->
-                <div class="asset-card">
+                <div class="asset-card" data-nama="Power Transformer OLTC" data-status="sudah" data-merk="UNINDO" data-tipe="N-RANGE" data-phasa="RST" data-lokasi="Switchyard 150kV">
                     <div class="asset-card-title">Power<br>Transformer</div>
                     <div class="asset-card-sub">PJI20260000003 • IL1 - Harian Bulanan</div>
                     <div class="asset-pills-row">
@@ -1707,7 +2234,7 @@
                 </div>
 
                 <!-- Card 4: Power Transformer (Sinkron Gagal -> Alert Box + Sinkron & Lihat Pesan) -->
-                <div class="asset-card">
+                <div class="asset-card" data-nama="Power Transformer Bushing" data-status="gagal" data-merk="UNINDO" data-tipe="N-RANGE" data-phasa="RST" data-lokasi="Switchyard 150kV">
                     <div class="asset-card-title">Power<br>Transformer</div>
                     <div class="asset-card-sub">PJI20260000003 • IL1 - Harian Bulanan</div>
                     <div class="asset-pills-row">
@@ -1745,7 +2272,7 @@
                 </div>
 
                 <!-- Card 5: Power Transformer (Sudah Inspeksi Selesai Server) -->
-                <div class="asset-card">
+                <div class="asset-card" data-nama="Power Transformer NGR" data-status="sudah" data-merk="UNINDO" data-tipe="N-RANGE" data-phasa="RST" data-lokasi="Switchyard 150kV">
                     <div class="asset-card-title">Power<br>Transformer</div>
                     <div class="asset-card-sub">PJI20260000003 • IL1 - Harian Bulanan</div>
                     <div class="asset-pills-row">
@@ -1847,14 +2374,226 @@
             }, 300);
         }
 
-        // Live Search Filter
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.asset-card');
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? 'flex' : 'none';
+        // ==========================================
+        // ADVANCED FILTER & SEARCH SYSTEM (asset-register standard)
+        // ==========================================
+        const filterState = {
+            search: '',
+            statuses: ['all'],
+            merk: 'all',
+            serial: '',
+            sort: 'default'
+        };
+
+        function openAssetFilterModal() {
+            const modal = document.getElementById('assetFilterModal');
+            if (modal) {
+                modal.classList.add('active');
+                syncDrawerFromState();
+            }
+        }
+
+        function closeAssetFilterModal(e) {
+            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('drawer-handle')) {
+                return;
+            }
+            const modal = document.getElementById('assetFilterModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function toggleStatusPill(pill) {
+            const status = pill.getAttribute('data-status');
+            const container = document.getElementById('statusPillsContainer');
+            const allPills = container.querySelectorAll('.filter-status-pill');
+
+            if (status === 'all') {
+                allPills.forEach(p => p.classList.remove('selected'));
+                pill.classList.add('selected');
+                filterState.statuses = ['all'];
+            } else {
+                const allPill = container.querySelector('[data-status="all"]');
+                if (allPill) allPill.classList.remove('selected');
+
+                pill.classList.toggle('selected');
+
+                const selected = Array.from(container.querySelectorAll('.filter-status-pill.selected'))
+                    .map(p => p.getAttribute('data-status'))
+                    .filter(s => s !== 'all');
+
+                if (selected.length === 0) {
+                    if (allPill) allPill.classList.add('selected');
+                    filterState.statuses = ['all'];
+                } else {
+                    filterState.statuses = selected;
+                }
+            }
+        }
+
+        function syncDrawerFromState() {
+            // Status pills
+            const container = document.getElementById('statusPillsContainer');
+            if (container) {
+                const allPills = container.querySelectorAll('.filter-status-pill');
+                allPills.forEach(p => {
+                    const st = p.getAttribute('data-status');
+                    if (filterState.statuses.includes('all')) {
+                        p.classList.toggle('selected', st === 'all');
+                    } else {
+                        p.classList.toggle('selected', filterState.statuses.includes(st));
+                    }
+                });
+            }
+
+            // Merk select
+            const merkSelect = document.getElementById('filterMerkSelect');
+            if (merkSelect) merkSelect.value = filterState.merk;
+
+            // Serial input
+            const serialInput = document.getElementById('filterSerialInput');
+            if (serialInput) serialInput.value = filterState.serial;
+
+            // Sort select
+            const sortSelect = document.getElementById('assetSortSelect');
+            if (sortSelect) sortSelect.value = filterState.sort;
+        }
+
+        function applyDrawerAssetFilters() {
+            const merkSelect = document.getElementById('filterMerkSelect');
+            const serialInput = document.getElementById('filterSerialInput');
+            const sortSelect = document.getElementById('assetSortSelect');
+
+            filterState.merk = merkSelect ? merkSelect.value : 'all';
+            filterState.serial = serialInput ? serialInput.value.trim() : '';
+            filterState.sort = sortSelect ? sortSelect.value : 'default';
+
+            syncChipsWithDrawer();
+            applyAssetFilters();
+            const modal = document.getElementById('assetFilterModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function syncChipsWithDrawer() {
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(btn => {
+                const chipVal = btn.getAttribute('data-chip');
+                if (chipVal === 'all') {
+                    btn.classList.toggle('active', filterState.statuses.includes('all') && filterState.merk === 'all');
+                } else if (chipVal === 'UNINDO') {
+                    btn.classList.toggle('active', filterState.merk === 'UNINDO');
+                } else {
+                    btn.classList.toggle('active', filterState.statuses.includes(chipVal));
+                }
             });
+        }
+
+        function applyQuickChip(chipVal, btn) {
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (chipVal === 'all') {
+                filterState.statuses = ['all'];
+                filterState.merk = 'all';
+            } else if (chipVal === 'UNINDO') {
+                filterState.merk = 'UNINDO';
+                filterState.statuses = ['all'];
+            } else {
+                filterState.statuses = [chipVal];
+                filterState.merk = 'all';
+            }
+
+            syncDrawerFromState();
+            applyAssetFilters();
+        }
+
+        function resetAllAssetFilters() {
+            filterState.search = '';
+            filterState.statuses = ['all'];
+            filterState.merk = 'all';
+            filterState.serial = '';
+            filterState.sort = 'default';
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+
+            syncDrawerFromState();
+
+            document.querySelectorAll('.category-chips-scroll .category-chip').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-chip') === 'all');
+            });
+
+            applyAssetFilters();
+            const modal = document.getElementById('assetFilterModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function applyAssetFilters() {
+            const container = document.getElementById('assetListContainer');
+            if (!container) return;
+
+            const cards = Array.from(container.querySelectorAll('.asset-card'));
+            const emptyState = document.getElementById('assetEmptyState');
+            const countText = document.getElementById('resultCountText');
+            const resetBtn = document.getElementById('btnResetFilters');
+            const filterDot = document.getElementById('filterBadgeDot');
+            const filterTrigger = document.getElementById('btnFilterTrigger');
+
+            const hasActiveFilter = (!filterState.statuses.includes('all') || filterState.merk !== 'all' || filterState.serial !== '' || filterState.sort !== 'default');
+            const isFiltered = (filterState.search.trim() !== '' || hasActiveFilter);
+            
+            if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-flex' : 'none';
+            if (filterDot) filterDot.style.display = hasActiveFilter ? 'block' : 'none';
+            if (filterTrigger) filterTrigger.classList.toggle('active-filter', hasActiveFilter);
+
+            let visibleCount = 0;
+            const query = filterState.search.toLowerCase().trim();
+            const serialQuery = filterState.serial.toLowerCase().trim();
+
+            cards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                const cardStatus = card.getAttribute('data-status') || '';
+                const cardMerk = (card.getAttribute('data-merk') || '').toLowerCase();
+
+                const matchesSearch = !query || cardText.includes(query);
+                const matchesSerial = !serialQuery || cardText.includes(serialQuery);
+                const matchesStatus = filterState.statuses.includes('all') || filterState.statuses.includes(cardStatus);
+                const matchesMerk = (filterState.merk === 'all') || (cardMerk === filterState.merk.toLowerCase());
+
+                if (matchesSearch && matchesSerial && matchesStatus && matchesMerk) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Sorting
+            if (filterState.sort !== 'default') {
+                cards.sort((a, b) => {
+                    const titleA = (a.querySelector('.asset-card-title')?.innerText || '').toLowerCase();
+                    const titleB = (b.querySelector('.asset-card-title')?.innerText || '').toLowerCase();
+                    if (filterState.sort === 'name-asc') return titleA.localeCompare(titleB);
+                    if (filterState.sort === 'name-desc') return titleB.localeCompare(titleA);
+                    if (filterState.sort === 'status-progress') {
+                        const score = st => (st === 'gagal' ? 1 : st === 'belum' ? 2 : st === 'sedang' ? 3 : 4);
+                        return score(a.getAttribute('data-status')) - score(b.getAttribute('data-status'));
+                    }
+                    return 0;
+                });
+                cards.forEach(card => container.appendChild(card));
+            }
+
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+
+            if (countText) {
+                countText.innerHTML = `<i class="fa-solid fa-boxes-stacked" style="color: var(--primary-blue); margin-right: 4px;"></i> Menampilkan ${visibleCount} dari ${cards.length} Aset`;
+            }
+        }
+
+        // Live Search Input Listener
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            filterState.search = e.target.value;
+            applyAssetFilters();
         });
 
         // Error Bottom Sheet Functions

@@ -149,28 +149,31 @@
             border: 2px solid white;
         }
 
-        /* Search Section */
-        .search-container {
-            padding: 14px 18px 8px;
-            background-color: var(--bg-color);
-        }
-        
-        .search-box {
+        /* Toolbar & Search Section (asset-register style) */
+        .toolbar-wrap {
             display: flex;
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 11px 16px;
+            gap: 8px;
             align-items: center;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            padding: 12px 18px 8px;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
             gap: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
         
         .search-box input {
             border: none;
             outline: none;
             flex: 1;
-            font-size: 13.5px;
+            font-size: 13px;
             color: var(--text-main);
             background: transparent;
             font-weight: 500;
@@ -181,21 +184,61 @@
         }
         
         .search-box i {
-            color: var(--text-muted);
+            color: #94a3b8;
             font-size: 14px;
         }
 
-        /* Filter Chips */
-        .filter-chips-row {
+        .filter-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .filter-btn:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .filter-btn.active-filter {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+        }
+
+        .filter-active-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid white;
+            display: none;
+        }
+
+        /* Category Chips Horizontal Scroll */
+        .category-chips-scroll {
             display: flex;
             gap: 8px;
-            padding: 8px 18px 12px;
+            padding: 4px 18px 10px;
             overflow-x: auto;
             scrollbar-width: none;
         }
-        .filter-chips-row::-webkit-scrollbar { display: none; }
+        .category-chips-scroll::-webkit-scrollbar { display: none; }
 
-        .filter-chip {
+        .category-chip {
             padding: 6px 14px;
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -206,13 +249,297 @@
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.2s;
+            border: 1px solid var(--border-color);
         }
 
-        .filter-chip.active {
-            background: #1a65d6;
+        .category-chip.active {
+            background: var(--primary-blue);
             color: white;
-            border-color: #1a65d6;
+            border-color: var(--primary-blue);
             box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+        }
+
+        /* Modal Drawer (Exact asset-register.html styling) */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 412px;
+            height: 85%;
+            max-height: 88%;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg, #ffffff);
+            border-top: 1px solid var(--border-color);
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 12px 16px 18px;
+            box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.28);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 42px;
+            height: 5px;
+            background: #cbd5e1;
+            border-radius: 3px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-handle:hover {
+            background: #94a3b8;
+            transform: scaleX(1.1);
+        }
+
+        #drawerContent {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100%;
+            max-height: 100%;
+            min-height: 0;
+            flex: 1 1 auto;
+        }
+
+        .drawer-scroll-body {
+            flex: 1 1 auto;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding-right: 4px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar {
+            width: 5px;
+        }
+        .drawer-scroll-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .drawer-scroll-body::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+        }
+
+        .drawer-footer-sticky {
+            flex-shrink: 0;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg, #ffffff);
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .drawer-btn {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--primary-blue, #1a65d6);
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.2);
+        }
+
+        .drawer-btn:hover {
+            opacity: 0.95;
+            box-shadow: 0 6px 16px rgba(26, 101, 214, 0.3);
+        }
+
+        .drawer-btn-secondary {
+            background: #f8fafc !important;
+            color: var(--text-main, #1e293b) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: none !important;
+        }
+
+        .drawer-btn-secondary:hover {
+            background: #f1f5f9 !important;
+        }
+
+        .filter-field-group {
+            margin-bottom: 12px;
+        }
+
+        .filter-field-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main, #1e293b);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .filter-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .filter-select-wrapper::after {
+            content: "\f078";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 11px;
+            color: var(--primary-blue);
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 36px 10px 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text-main, #1e293b);
+            font-size: 12.5px;
+            font-weight: 600;
+            appearance: none;
+            -webkit-appearance: none;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.12);
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text-main, #1e293b);
+            font-size: 12.5px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-sizing: border-box;
+        }
+
+        .filter-status-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color, #e2e8f0);
+        }
+
+        .filter-status-pill {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .filter-status-pill:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .filter-status-pill.selected {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            font-weight: 700;
+            box-shadow: 0 1px 4px rgba(26, 101, 214, 0.15);
+        }
+
+        .filter-segmented-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-segment-btn {
+            padding: 6px 0;
+            border: none;
+            border-radius: 7px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .filter-segment-btn.active {
+            background: var(--primary-blue);
+            color: #ffffff;
         }
 
         /* List Content Area */
@@ -1193,28 +1520,42 @@
             </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
+        <!-- Search Bar with Filter Trigger Button (asset-register.html style) -->
+        <div class="toolbar-wrap">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama Gardu Induk...">
-                <i class="fa-solid fa-sliders" style="cursor: pointer;" title="Filter"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama Gardu Induk, tipe, atau status...">
             </div>
+            <button type="button" class="filter-btn" id="filterBtnTrigger" onclick="openFilterDrawer()" title="Filter Data Gardu Induk">
+                <i class="fa-solid fa-sliders"></i>
+                <span class="filter-active-dot" id="filterActiveDot"></span>
+            </button>
         </div>
 
-        <!-- Filter Chips -->
-        <div class="filter-chips-row">
-            <div class="filter-chip active" onclick="filterChip(this, 'all')">Semua GI (8)</div>
-            <div class="filter-chip" onclick="filterChip(this, '150kv')">150 kV</div>
-            <div class="filter-chip" onclick="filterChip(this, 'gis')">GIS</div>
-            <div class="filter-chip" onclick="filterChip(this, 'trafo')">Trafo</div>
+        <!-- Filter Category Chips Row -->
+        <div class="category-chips-scroll" id="categoryChipsRow">
+            <button type="button" class="category-chip active" onclick="filterCategoryChip(this, 'all')">Semua GI (5)</button>
+            <button type="button" class="category-chip" onclick="filterCategoryChip(this, '150kv')">150 kV</button>
+            <button type="button" class="category-chip" onclick="filterCategoryChip(this, 'gis')">GIS</button>
+            <button type="button" class="category-chip" onclick="filterCategoryChip(this, 'ais')">AIS</button>
+            <button type="button" class="category-chip" onclick="filterCategoryChip(this, 'mulai')">Mulai Inspeksi</button>
+            <button type="button" class="category-chip" onclick="filterCategoryChip(this, 'proses')">On Progress</button>
+            <button type="button" class="category-chip" onclick="filterCategoryChip(this, 'selesai')">Selesai</button>
+        </div>
+
+        <!-- Filter Result Counter Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 18px 8px; font-size: 11px; font-weight: 700; color: var(--text-muted);">
+            <span id="giFilterCount">Menampilkan 5 Gardu Induk</span>
+            <button onclick="resetAllFilters()" id="btnResetFilter" style="display: none; background: none; border: none; color: var(--primary-blue); font-size: 11px; font-weight: 700; cursor: pointer;">
+                <i class="fa-solid fa-rotate-left"></i> Reset Filter
+            </button>
         </div>
 
         <!-- List Content -->
         <div class="app-content" id="taskListContainer">
             
             <!-- Card 1 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV KALISARI')">
+            <div class="task-card" data-tipe="ais 150kv" data-status="mulai" data-wo="2" data-progress="0" data-gi="GI 150KV KALISARI" data-ki="UIT JBTB" data-up="UPT Surabaya" data-ultg="ULTG Surabaya Utara" onclick="openDetailGI('GI 150KV KALISARI')">
                 <div class="task-header">
                     <div>
                         <div class="task-title">GI 150KV KALISARI</div>
@@ -1231,7 +1572,7 @@
             </div>
             
             <!-- Card 2 -->
-            <div class="task-card" onclick="openDetailGI('GIS 150KV WONOKROMO')">
+            <div class="task-card" data-tipe="gis 150kv" data-status="mulai" data-wo="1" data-progress="0" data-gi="GIS 150KV WONOKROMO" data-ki="UIT JBTB" data-up="UPT Surabaya" data-ultg="ULTG Surabaya Selatan" onclick="openDetailGI('GIS 150KV WONOKROMO')">
                 <div class="task-header">
                     <div>
                         <div class="task-title">GIS 150KV WONOKROMO</div>
@@ -1248,7 +1589,7 @@
             </div>
 
             <!-- Card 3 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV SURABAYA SELATAN')">
+            <div class="task-card" data-tipe="ais 150kv" data-status="mulai" data-wo="3" data-progress="0" data-gi="GI 150KV SURABAYA SELATAN" data-ki="UIT JBTB" data-up="UPT Surabaya" data-ultg="ULTG Surabaya Selatan" onclick="openDetailGI('GI 150KV SURABAYA SELATAN')">
                 <div class="task-header">
                     <div>
                         <div class="task-title">GI 150KV SURABAYA SELATAN</div>
@@ -1265,7 +1606,7 @@
             </div>
 
             <!-- Card 4 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV RUNGKUT')">
+            <div class="task-card" data-tipe="ais 150kv" data-status="proses" data-wo="2" data-progress="2" data-gi="GI 150KV RUNGKUT" data-ki="UIT JBTB" data-up="UPT Surabaya" data-ultg="ULTG Surabaya Utara" onclick="openDetailGI('GI 150KV RUNGKUT')">
                 <div class="task-header">
                     <div>
                         <div class="task-title">GI 150KV RUNGKUT</div>
@@ -1282,7 +1623,7 @@
             </div>
 
             <!-- Card 5 -->
-            <div class="task-card" onclick="openDetailGI('GI 150KV WARU')">
+            <div class="task-card" data-tipe="ais 150kv" data-status="selesai" data-wo="4" data-progress="4" data-gi="GI 150KV WARU" data-ki="UIT JBTB" data-up="UPT Surabaya" data-ultg="ULTG Surabaya Utara" onclick="openDetailGI('GI 150KV WARU')">
                 <div class="task-header">
                     <div>
                         <div class="task-title">GI 150KV WARU</div>
@@ -1298,10 +1639,334 @@
                 </div>
             </div>
 
+            <!-- Empty State -->
+            <div id="emptyStateBox" style="display: none; text-align: center; padding: 40px 20px; background: white; border-radius: 18px; border: 1px dashed var(--border-color); margin-top: 10px;">
+                <i class="fa-solid fa-filter-circle-xmark" style="font-size: 32px; color: #94a3b8; margin-bottom: 10px;"></i>
+                <div style="font-size: 13.5px; font-weight: 800; color: var(--text-main);">Tidak ada Gardu Induk</div>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px; margin-bottom: 14px;">Tidak ditemukan data yang sesuai dengan kombinasi filter dan kata kunci pencarian.</div>
+                <button onclick="resetAllFilters()" style="padding: 8px 18px; border-radius: 20px; background: var(--primary-blue); color: white; border: none; font-size: 12px; font-weight: 700; cursor: pointer;">
+                    Reset Filter
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Filter Drawer Bottom Sheet (Exact asset-register.html architecture) -->
+        <div id="filterModalOverlay" class="modal-overlay" onclick="closeDrawer(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeDrawer()"></div>
+                <div id="drawerContent">
+                    <!-- Injected dynamically in openFilterDrawer() -->
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        /* Cascading Unit Hierarchy Data */
+        const unitHierarchyData = {
+            "Semua Kantor Induk": {
+                "Semua Unit": {
+                    "Semua ULTG": ["Semua Gardu Induk"]
+                }
+            },
+            "UIT JBTB": {
+                "UPT Surabaya": {
+                    "ULTG Surabaya Utara": [
+                        "GI 150KV KALISARI",
+                        "GI 150KV RUNGKUT",
+                        "GI 150KV WARU",
+                        "GI Krian 150kV",
+                        "GI Kenjeran 150kV"
+                    ],
+                    "ULTG Surabaya Selatan": [
+                        "GIS 150KV WONOKROMO",
+                        "GI 150KV SURABAYA SELATAN",
+                        "GI Ngagel 150kV",
+                        "GI Sidoarjo 150kV"
+                    ],
+                    "ULTG Gresik": [
+                        "GI Gresik 150kV",
+                        "GI Petrokimia 150kV",
+                        "GI Manyar 150kV"
+                    ]
+                },
+                "UPT Malang": {
+                    "ULTG Malang": [
+                        "GI Kebonagung 150kV",
+                        "GI Blimbing 150kV"
+                    ]
+                }
+            },
+            "UIT JBB": {
+                "UPT Cawang": {
+                    "ULTG Cawang": [
+                        "GI Cawang 150kV",
+                        "GI Depok 150kV"
+                    ]
+                }
+            }
+        };
+
+        let currentCategoryChip = 'all';
+        let filterState = {
+            kantorInduk: 'Semua Kantor Induk',
+            unitPelaksana: 'Semua Unit',
+            ultg: 'Semua ULTG',
+            garduInduk: 'Semua Gardu Induk',
+            tipeGardu: 'Semua',
+            selectedStatuses: [],
+            sort: 'default'
+        };
+
+        function getKantorIndukOptions(selected) {
+            let options = '<option value="Semua Kantor Induk">Semua Kantor Induk</option>';
+            for (let ki in unitHierarchyData) {
+                if (ki !== 'Semua Kantor Induk') {
+                    options += `<option value="${ki}" ${selected === ki ? 'selected' : ''}>${ki}</option>`;
+                }
+            }
+            return options;
+        }
+
+        function getUptOptions(ki, selected) {
+            let options = '<option value="Semua Unit">Semua Unit Pelaksana</option>';
+            if (ki && unitHierarchyData[ki]) {
+                for (let upt in unitHierarchyData[ki]) {
+                    if (upt !== 'Semua Unit') {
+                        options += `<option value="${upt}" ${selected === upt ? 'selected' : ''}>${upt}</option>`;
+                    }
+                }
+            }
+            return options;
+        }
+
+        function getUltgOptions(ki, up, selected) {
+            let options = '<option value="Semua ULTG">Semua ULTG</option>';
+            if (ki && up && unitHierarchyData[ki] && unitHierarchyData[ki][up]) {
+                for (let ultg in unitHierarchyData[ki][up]) {
+                    if (ultg !== 'Semua ULTG') {
+                        options += `<option value="${ultg}" ${selected === ultg ? 'selected' : ''}>${ultg}</option>`;
+                    }
+                }
+            }
+            return options;
+        }
+
+        function getGiOptions(ki, up, ul, selected) {
+            let options = '<option value="Semua Gardu Induk">Semua Gardu Induk</option>';
+            if (ki && up && ul && unitHierarchyData[ki] && unitHierarchyData[ki][up] && unitHierarchyData[ki][up][ul]) {
+                unitHierarchyData[ki][up][ul].forEach(gi => {
+                    if (gi !== 'Semua Gardu Induk') {
+                        options += `<option value="${gi}" ${selected === gi ? 'selected' : ''}>${gi}</option>`;
+                    }
+                });
+            }
+            return options;
+        }
+
+        function onFilterKantorIndukChange() {
+            const ki = document.getElementById('filterKantorInduk').value;
+            const upSelect = document.getElementById('filterUnitPelaksana');
+            if (upSelect) {
+                upSelect.innerHTML = getUptOptions(ki, '');
+                onFilterUptChange();
+            }
+        }
+
+        function onFilterUptChange() {
+            const ki = document.getElementById('filterKantorInduk').value;
+            const up = document.getElementById('filterUnitPelaksana').value;
+            const ulSelect = document.getElementById('filterUltg');
+            if (ulSelect) {
+                ulSelect.innerHTML = getUltgOptions(ki, up, '');
+                onFilterUltgChange();
+            }
+        }
+
+        function onFilterUltgChange() {
+            const ki = document.getElementById('filterKantorInduk').value;
+            const up = document.getElementById('filterUnitPelaksana').value;
+            const ul = document.getElementById('filterUltg').value;
+            const giSelect = document.getElementById('filterGarduInduk');
+            if (giSelect) {
+                giSelect.innerHTML = getGiOptions(ki, up, ul, '');
+            }
+        }
+
+        function toggleFilterStatusChip(el) {
+            el.classList.toggle('selected');
+        }
+
+        function setFilterTipe(val, el) {
+            const group = el.parentElement;
+            group.querySelectorAll('.filter-segment-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            filterState.tipeGardu = val;
+        }
+
+        function openFilterDrawer() {
+            const overlay = document.getElementById('filterModalOverlay');
+            const content = document.getElementById('drawerContent');
+
+            const statusList = [
+                { id: 'mulai', label: 'Mulai Inspeksi' },
+                { id: 'proses', label: 'On Progress' },
+                { id: 'selesai', label: 'Selesai' }
+            ];
+
+            const statusChipsHtml = statusList.map(st => {
+                const isSelected = filterState.selectedStatuses && filterState.selectedStatuses.includes(st.id);
+                return `<button type="button" class="filter-status-pill ${isSelected ? 'selected' : ''}" data-status="${st.id}" onclick="toggleFilterStatusChip(this)">${st.label}</button>`;
+            }).join('');
+
+            const kiOptions = getKantorIndukOptions(filterState.kantorInduk);
+            const upOptions = getUptOptions(filterState.kantorInduk, filterState.unitPelaksana);
+            const ultgOptions = getUltgOptions(filterState.kantorInduk, filterState.unitPelaksana, filterState.ultg);
+            const giOptions = getGiOptions(filterState.kantorInduk, filterState.unitPelaksana, filterState.ultg, filterState.garduInduk);
+
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-size:15px;">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-main);">Filter Data Gardu Induk</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Saring berdasarkan unit, tipe, dan status</div>
+                        </div>
+                    </div>
+                    <button onclick="closeDrawer()" style="background:#f8fafc; border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                
+                <div class="drawer-scroll-body">
+                    <!-- 1. Kantor Induk -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Kantor Induk</label>
+                        <div class="filter-select-wrapper">
+                            <select id="filterKantorInduk" class="filter-select" onchange="onFilterKantorIndukChange()">
+                                ${kiOptions}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 2. Unit Pelaksana -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Unit Pelaksana</label>
+                        <div class="filter-select-wrapper">
+                            <select id="filterUnitPelaksana" class="filter-select" onchange="onFilterUptChange()">
+                                ${upOptions}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. ULTG -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">ULTG</label>
+                        <div class="filter-select-wrapper">
+                            <select id="filterUltg" class="filter-select" onchange="onFilterUltgChange()">
+                                ${ultgOptions}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 4. Gardu Induk -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Gardu Induk</label>
+                        <div class="filter-select-wrapper">
+                            <select id="filterGarduInduk" class="filter-select">
+                                ${giOptions}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 5. Tipe Gardu (Segmented Pill Text Only) -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Tipe Gardu</label>
+                        <div class="filter-segmented-wrap">
+                            <button type="button" class="filter-segment-btn ${filterState.tipeGardu === 'Semua' ? 'active' : ''}" onclick="setFilterTipe('Semua', this)">Semua</button>
+                            <button type="button" class="filter-segment-btn ${filterState.tipeGardu === '150kv' ? 'active' : ''}" onclick="setFilterTipe('150kv', this)">150 kV</button>
+                            <button type="button" class="filter-segment-btn ${filterState.tipeGardu === 'gis' ? 'active' : ''}" onclick="setFilterTipe('gis', this)">GIS</button>
+                            <button type="button" class="filter-segment-btn ${filterState.tipeGardu === 'ais' ? 'active' : ''}" onclick="setFilterTipe('ais', this)">AIS</button>
+                        </div>
+                    </div>
+
+                    <!-- 6. Status Inspeksi (Multi-Select Chips) -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Status Inspeksi</label>
+                        <div class="filter-status-grid" id="filterStatusGrid">
+                            ${statusChipsHtml}
+                        </div>
+                    </div>
+
+                    <!-- 7. Urutkan -->
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Urutkan</label>
+                        <div class="filter-select-wrapper">
+                            <select id="filterSort" class="filter-select">
+                                <option value="default" ${filterState.sort === 'default' ? 'selected' : ''}>Default (Urutan Sistem)</option>
+                                <option value="name_asc" ${filterState.sort === 'name_asc' ? 'selected' : ''}>Nama Gardu Induk (A - Z)</option>
+                                <option value="name_desc" ${filterState.sort === 'name_desc' ? 'selected' : ''}>Nama Gardu Induk (Z - A)</option>
+                                <option value="wo_desc" ${filterState.sort === 'wo_desc' ? 'selected' : ''}>Jumlah WO Terbanyak</option>
+                                <option value="progress_desc" ${filterState.sort === 'progress_desc' ? 'selected' : ''}>Progres Tertinggi</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button class="drawer-btn drawer-btn-secondary" onclick="resetDrawerFilter()" style="flex:1;">Reset</button>
+                    <button class="drawer-btn" onclick="applyDrawerFilter()" style="flex:2;">
+                        <i class="fa-solid fa-filter"></i> Terapkan Filter
+                    </button>
+                </div>
+            `;
+
+            overlay.classList.add('active');
+        }
+
+        function closeDrawer(e) {
+            if (!e || e.target.id === 'filterModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
+                document.getElementById('filterModalOverlay').classList.remove('active');
+            }
+        }
+
+        function applyDrawerFilter() {
+            const ki = document.getElementById('filterKantorInduk');
+            const up = document.getElementById('filterUnitPelaksana');
+            const ul = document.getElementById('filterUltg');
+            const gi = document.getElementById('filterGarduInduk');
+            const sort = document.getElementById('filterSort');
+
+            if (ki) filterState.kantorInduk = ki.value;
+            if (up) filterState.unitPelaksana = up.value;
+            if (ul) filterState.ultg = ul.value;
+            if (gi) filterState.garduInduk = gi.value;
+            if (sort) filterState.sort = sort.value;
+
+            // Collect selected statuses
+            const selectedPills = document.querySelectorAll('#filterStatusGrid .filter-status-pill.selected');
+            filterState.selectedStatuses = Array.from(selectedPills).map(p => p.getAttribute('data-status'));
+
+            closeDrawer();
+            applyFilters();
+        }
+
+        function resetDrawerFilter() {
+            filterState = {
+                kantorInduk: 'Semua Kantor Induk',
+                unitPelaksana: 'Semua Unit',
+                ultg: 'Semua ULTG',
+                garduInduk: 'Semua Gardu Induk',
+                tipeGardu: 'Semua',
+                selectedStatuses: [],
+                sort: 'default'
+            };
+            openFilterDrawer();
+        }
+
         function openDetailGI(giName) {
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
@@ -1310,34 +1975,121 @@
             }, 300);
         }
 
-        function filterChip(el, filterType) {
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        function filterCategoryChip(el, filterType) {
+            document.querySelectorAll('#categoryChipsRow .category-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-
-            const cards = document.querySelectorAll('.task-card');
-            cards.forEach(card => {
-                const title = card.querySelector('.task-title').textContent.toLowerCase();
-                if (filterType === 'all') {
-                    card.style.display = 'block';
-                } else if (filterType === '150kv') {
-                    card.style.display = title.includes('150kv') ? 'block' : 'none';
-                } else if (filterType === 'gis') {
-                    card.style.display = title.includes('gis') ? 'block' : 'none';
-                } else if (filterType === 'trafo') {
-                    card.style.display = title.includes('trafo') || title.includes('kalisari') ? 'block' : 'none';
-                }
-            });
+            currentCategoryChip = filterType;
+            applyFilters();
         }
 
-        // Live Search
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.task-card');
+        function applyFilters() {
+            const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const cardsContainer = document.getElementById('taskListContainer');
+            const cards = Array.from(cardsContainer.querySelectorAll('.task-card'));
+            const emptyBox = document.getElementById('emptyStateBox');
+            const countLabel = document.getElementById('giFilterCount');
+            const resetBtn = document.getElementById('btnResetFilter');
+            const activeDot = document.getElementById('filterActiveDot');
+            const filterBtn = document.getElementById('filterBtnTrigger');
+
+            let visibleCount = 0;
+
             cards.forEach(card => {
                 const title = card.querySelector('.task-title').textContent.toLowerCase();
-                card.style.display = title.includes(query) ? 'block' : 'none';
+                const cardTipe = (card.getAttribute('data-tipe') || '').toLowerCase();
+                const cardStatus = (card.getAttribute('data-status') || '').toLowerCase();
+                const cardKi = card.getAttribute('data-ki') || '';
+                const cardUp = card.getAttribute('data-up') || '';
+                const cardUltg = card.getAttribute('data-ultg') || '';
+                const cardGi = card.getAttribute('data-gi') || '';
+
+                // 1. Search Query
+                const matchesSearch = query === '' || title.includes(query) || cardTipe.includes(query) || cardStatus.includes(query);
+
+                // 2. Category Chip Filter
+                let matchesChip = true;
+                if (currentCategoryChip === '150kv') matchesChip = cardTipe.includes('150kv') || title.includes('150kv');
+                else if (currentCategoryChip === 'gis') matchesChip = cardTipe.includes('gis') || title.includes('gis');
+                else if (currentCategoryChip === 'ais') matchesChip = cardTipe.includes('ais') || (!title.includes('gis'));
+                else if (currentCategoryChip === 'mulai') matchesChip = cardStatus === 'mulai';
+                else if (currentCategoryChip === 'proses') matchesChip = cardStatus === 'proses';
+                else if (currentCategoryChip === 'selesai') matchesChip = cardStatus === 'selesai';
+
+                // 3. Drawer Hierarchy Filters
+                let matchesKi = filterState.kantorInduk === 'Semua Kantor Induk' || cardKi === filterState.kantorInduk;
+                let matchesUp = filterState.unitPelaksana === 'Semua Unit' || cardUp === filterState.unitPelaksana;
+                let matchesUltg = filterState.ultg === 'Semua ULTG' || cardUltg === filterState.ultg;
+                let matchesGi = filterState.garduInduk === 'Semua Gardu Induk' || cardGi === filterState.garduInduk;
+
+                // 4. Drawer Tipe Gardu
+                let matchesDrawerTipe = true;
+                if (filterState.tipeGardu !== 'Semua') {
+                    matchesDrawerTipe = cardTipe.includes(filterState.tipeGardu) || (filterState.tipeGardu === 'ais' && !title.includes('gis'));
+                }
+
+                // 5. Drawer Status Multi-Select
+                let matchesDrawerStatus = true;
+                if (filterState.selectedStatuses && filterState.selectedStatuses.length > 0) {
+                    matchesDrawerStatus = filterState.selectedStatuses.includes(cardStatus);
+                }
+
+                const isVisible = matchesSearch && matchesChip && matchesKi && matchesUp && matchesUltg && matchesGi && matchesDrawerTipe && matchesDrawerStatus;
+
+                if (isVisible) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
             });
-        });
+
+            // Sorting logic
+            if (filterState.sort === 'name_asc') {
+                cards.sort((a, b) => a.querySelector('.task-title').textContent.localeCompare(b.querySelector('.task-title').textContent));
+            } else if (filterState.sort === 'name_desc') {
+                cards.sort((a, b) => b.querySelector('.task-title').textContent.localeCompare(a.querySelector('.task-title').textContent));
+            } else if (filterState.sort === 'wo_desc') {
+                cards.sort((a, b) => (parseInt(b.getAttribute('data-wo')) || 0) - (parseInt(a.getAttribute('data-wo')) || 0));
+            } else if (filterState.sort === 'progress_desc') {
+                cards.sort((a, b) => (parseInt(b.getAttribute('data-progress')) || 0) - (parseInt(a.getAttribute('data-progress')) || 0));
+            }
+            cards.forEach(card => cardsContainer.appendChild(card));
+
+            // Update UI count & empty state
+            countLabel.textContent = `Menampilkan ${visibleCount} dari ${cards.length} Gardu Induk`;
+            emptyBox.style.display = visibleCount === 0 ? 'block' : 'none';
+
+            // Show reset button & active dot if filter is active
+            const hasDrawerFilter = filterState.kantorInduk !== 'Semua Kantor Induk' || filterState.unitPelaksana !== 'Semua Unit' || filterState.ultg !== 'Semua ULTG' || filterState.garduInduk !== 'Semua Gardu Induk' || filterState.tipeGardu !== 'Semua' || (filterState.selectedStatuses && filterState.selectedStatuses.length > 0) || filterState.sort !== 'default';
+            const isFiltered = query !== '' || currentCategoryChip !== 'all' || hasDrawerFilter;
+
+            resetBtn.style.display = isFiltered ? 'inline-block' : 'none';
+            if (activeDot) activeDot.style.display = hasDrawerFilter ? 'block' : 'none';
+            if (filterBtn) filterBtn.classList.toggle('active-filter', hasDrawerFilter);
+        }
+
+        function resetAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('#categoryChipsRow .category-chip').forEach(c => c.classList.remove('active'));
+            const firstChip = document.querySelector('#categoryChipsRow .category-chip');
+            if (firstChip) firstChip.classList.add('active');
+            currentCategoryChip = 'all';
+
+            filterState = {
+                kantorInduk: 'Semua Kantor Induk',
+                unitPelaksana: 'Semua Unit',
+                ultg: 'Semua ULTG',
+                garduInduk: 'Semua Gardu Induk',
+                tipeGardu: 'Semua',
+                selectedStatuses: [],
+                sort: 'default'
+            };
+
+            applyFilters();
+        }
+
+        // Live Search event
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
 
         // Check for URL query parameter
         const urlParams = new URLSearchParams(window.location.search);
