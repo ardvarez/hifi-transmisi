@@ -741,27 +741,99 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11.5px;
+            font-size: 12px;
             color: var(--text-muted);
             border-top: 1px solid #f1f5f9;
-            padding-top: 10px;
+            padding-top: 12px;
         }
 
         .btn-inspect-bay {
-            padding: 6px 14px;
+            padding: 8px 16px;
             background: #1a65d6;
             color: white;
             border: none;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            box-shadow: 0 2px 6px rgba(26, 101, 214, 0.2);
+            transition: all 0.2s;
+        }
+        .btn-inspect-bay:active { 
+            background: #134db0;
+            transform: scale(0.97);
+        }
+
+        .bay-summary-chip {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .btn-more-bay-chip {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 5px 12px;
             font-size: 11.5px;
             font-weight: 700;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 30px;
+            transition: all 0.2s;
+        }
+        .btn-more-bay-chip:hover, .btn-more-bay-chip:active {
+            background: #dbeafe;
+            border-color: var(--primary-blue);
+            transform: scale(0.98);
+        }
+        .all-bay-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 9px;
+            min-height: 54px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .all-bay-item-card:hover {
+            border-color: var(--primary-blue);
+            background: #f8fafc;
+        }
+        .all-bay-item-card:active {
+            transform: scale(0.99);
+        }
+        .all-bay-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .all-bay-item-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .all-bay-item-meta {
+            font-size: 11.5px;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 4px;
-            transition: background 0.2s;
+            gap: 8px;
         }
-        .btn-inspect-bay:active { background: #134db0; }
 
         /* Universal Sync Modal Styles */
         .sync-badge-count {
@@ -1630,7 +1702,21 @@
                         Pilih Bay / Sektor gardu induk di bawah untuk melanjutkan pemeriksaan peralatan teknis dan pencatatan parameter lapangan.
                     </div>
                 </div>
-                <div class="arahan-footer">
+                
+                <!-- Bay Overview Row with Action to Open Bottom Sheet -->
+                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-layer-group" style="color: var(--primary-blue);"></i> Cakupan Bay (6 Bay):</span>
+                        <span style="font-size: 10.5px; color: var(--primary-blue); font-weight: 700; cursor: pointer;" onclick="openAllBaysDrawer()">Lihat Semua <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i></span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px; align-items: center;">
+                        <span class="bay-summary-chip">Bay Trafo 1 150kV</span>
+                        <span class="bay-summary-chip">Bay Line Kalisari - Kenjeran</span>
+                        <button type="button" class="btn-more-bay-chip" onclick="openAllBaysDrawer()">+4 Bay Lainnya <i class="fa-solid fa-chevron-down" style="font-size: 8px;"></i></button>
+                    </div>
+                </div>
+
+                <div class="arahan-footer" style="margin-top: 8px;">
                     <span class="arahan-author"><i class="fa-solid fa-user-tie"></i> Spv. Pemeliharaan Gardu Induk</span>
                 </div>
             </div>
@@ -1748,6 +1834,120 @@
 
         </div>
 
+        <!-- All Bays List Bottom Sheet Drawer -->
+        <div id="allBaysModalOverlay" class="modal-overlay" onclick="closeAllBaysDrawer(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeAllBaysDrawer()"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-size:15px;">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-main);">Daftar Semua Bay WO</div>
+                            <div style="font-size:11px; color:var(--text-muted);" id="allBaysSubTitle">GI 150KV KALISARI • 6 Bay Terdaftar</div>
+                        </div>
+                    </div>
+                    <button onclick="closeAllBaysDrawer()" style="background:#f8fafc; border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="drawer-scroll-body" id="allBaysDrawerList">
+                    <!-- Bay Items List -->
+                    <div class="all-bay-item-card" onclick="openBayAssets('Bay Trafo 1 150kV')">
+                        <div class="all-bay-item-info">
+                            <div class="all-bay-item-name">Bay Trafo 1 150kV</div>
+                            <div class="all-bay-item-meta">
+                                <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> Trafo Daya</span>
+                                <span>•</span>
+                                <span>2 Peralatan</span>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" onclick="event.stopPropagation(); openBayAssets('Bay Trafo 1 150kV')">
+                            Buka Aset <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="all-bay-item-card" onclick="openBayAssets('Bay Line Kalisari - Kenjeran')">
+                        <div class="all-bay-item-info">
+                            <div class="all-bay-item-name">Bay Line Kalisari - Kenjeran</div>
+                            <div class="all-bay-item-meta">
+                                <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> Transmisi Line</span>
+                                <span>•</span>
+                                <span>2 Peralatan</span>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" onclick="event.stopPropagation(); openBayAssets('Bay Line Kalisari - Kenjeran')">
+                            Buka Aset <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="all-bay-item-card" onclick="openBayAssets('Bay Kopel 150kV')">
+                        <div class="all-bay-item-info">
+                            <div class="all-bay-item-name">Bay Kopel 150kV</div>
+                            <div class="all-bay-item-meta">
+                                <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> Bus Kopel</span>
+                                <span>•</span>
+                                <span>3 Peralatan</span>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" onclick="event.stopPropagation(); openBayAssets('Bay Kopel 150kV')">
+                            Buka Aset <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="all-bay-item-card" onclick="openBayAssets('Bay Trafo 2 150/20kV')">
+                        <div class="all-bay-item-info">
+                            <div class="all-bay-item-name">Bay Trafo 2 150/20kV</div>
+                            <div class="all-bay-item-meta">
+                                <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> Trafo Daya</span>
+                                <span>•</span>
+                                <span>3 Peralatan</span>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" onclick="event.stopPropagation(); openBayAssets('Bay Trafo 2 150/20kV')">
+                            Buka Aset <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="all-bay-item-card" onclick="openBayAssets('Bay Kapasitor #1 150kV')">
+                        <div class="all-bay-item-info">
+                            <div class="all-bay-item-name">Bay Kapasitor #1 150kV</div>
+                            <div class="all-bay-item-meta">
+                                <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> Kapasitor</span>
+                                <span>•</span>
+                                <span>2 Peralatan</span>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" onclick="event.stopPropagation(); openBayAssets('Bay Kapasitor #1 150kV')">
+                            Buka Aset <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+                        </button>
+                    </div>
+
+                    <div class="all-bay-item-card" onclick="openBayAssets('Bay Line Kalisari - Kerten 1')">
+                        <div class="all-bay-item-info">
+                            <div class="all-bay-item-name">Bay Line Kalisari - Kerten 1</div>
+                            <div class="all-bay-item-meta">
+                                <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> Transmisi Line</span>
+                                <span>•</span>
+                                <span>2 Peralatan</span>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" onclick="event.stopPropagation(); openBayAssets('Bay Line Kalisari - Kerten 1')">
+                            Buka Aset <i class="fa-solid fa-chevron-right" style="font-size:9px;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button class="drawer-btn drawer-btn-secondary" onclick="closeAllBaysDrawer()" style="width:100%;">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Filter Drawer Bottom Sheet for Bay (asset-register.html style) -->
         <div id="bayFilterModalOverlay" class="modal-overlay" onclick="closeBayDrawer(event)">
             <div class="modal-drawer" onclick="event.stopPropagation()">
@@ -1861,6 +2061,16 @@
         function closeBayDrawer(e) {
             if (!e || e.target.id === 'bayFilterModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
                 document.getElementById('bayFilterModalOverlay').classList.remove('active');
+            }
+        }
+
+        function openAllBaysDrawer() {
+            document.getElementById('allBaysModalOverlay').classList.add('active');
+        }
+
+        function closeAllBaysDrawer(e) {
+            if (!e || e.target.id === 'allBaysModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
+                document.getElementById('allBaysModalOverlay').classList.remove('active');
             }
         }
 
@@ -2108,7 +2318,8 @@
       </h3>
       <ul>
         <li><strong>Struktur Bay:</strong> Menampilkan daftar Bay/Sektor yang termasuk dalam Work Order yang dipilih.</li>
-        <li><strong>Navigasi:</strong> Klik Bay akan membuka daftar aset peralatan di dalam bay tersebut.</li>
+        <li><strong>Daftar Semua Bay:</strong> Klik tombol <em>"+X Bay Lainnya" / "Lihat Semua"</em> untuk membuka bottom sheet daftar seluruh bay dalam WO.</li>
+        <li><strong>Navigasi:</strong> Klik Bay atau tombol "Buka Aset" akan membuka daftar aset peralatan di dalam bay tersebut.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->

@@ -855,26 +855,90 @@
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
+            align-items: center;
         }
 
         .bay-pill-chip {
             background: #ffffff;
             border: 1px solid #cbd5e1;
-            padding: 4px 10px;
+            padding: 5px 11px;
             border-radius: 20px;
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 700;
             color: #475569;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
 
         .bay-pill-chip.more-badge {
-            background: #f1f5f9;
-            border-color: #e2e8f0;
-            color: #64748b;
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            color: var(--primary-blue);
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 11.5px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+        .bay-pill-chip.more-badge:hover, .bay-pill-chip.more-badge:active {
+            background: #dbeafe;
+            border-color: var(--primary-blue);
+            transform: scale(0.98);
+        }
+
+        .all-bay-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 9px;
+            min-height: 52px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .all-bay-item-card:hover {
+            border-color: var(--primary-blue);
+            background: #f8fafc;
+        }
+        .all-bay-item-card:active {
+            transform: scale(0.99);
+        }
+        .all-bay-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .all-bay-item-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .all-bay-item-meta {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-inspect-bay {
+            padding: 6px 14px;
+            background: #1a65d6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        .btn-inspect-bay:active { background: #134db0; }
 
         /* Universal Sync Modal Styles */
         .sync-badge-count {
@@ -1829,7 +1893,7 @@
                         <span class="bay-pill-chip">BAY TRF#2 150/22KV</span>
                         <span class="bay-pill-chip">KAPASITOR #1 150/22KV</span>
                         <span class="bay-pill-chip">KAPASITOR #2 150/22KV</span>
-                        <span class="bay-pill-chip more-badge">+7 Lainnya</span>
+                        <span class="bay-pill-chip more-badge" onclick="event.stopPropagation(); openWOBaysDrawer('INS202600000003')">+7 Lainnya</span>
                     </div>
                 </div>
 
@@ -1867,7 +1931,7 @@
                     <div class="bay-chips-container">
                         <span class="bay-pill-chip">BAY TRF#1 150/20KV</span>
                         <span class="bay-pill-chip">BAY LINE KALISARI-KENJERAN</span>
-                        <span class="bay-pill-chip more-badge">+16 Lainnya</span>
+                        <span class="bay-pill-chip more-badge" onclick="event.stopPropagation(); openWOBaysDrawer('INS202600000002')">+16 Lainnya</span>
                     </div>
                 </div>
 
@@ -1913,7 +1977,7 @@
                     <div class="bay-chips-container">
                         <span class="bay-pill-chip">PANEL RTU & SCADA KALISARI</span>
                         <span class="bay-pill-chip">METERING TRANSAKSI 150KV</span>
-                        <span class="bay-pill-chip more-badge">+4 Lainnya</span>
+                        <span class="bay-pill-chip more-badge" onclick="event.stopPropagation(); openWOBaysDrawer('INS202600000012')">+4 Lainnya</span>
                     </div>
                 </div>
 
@@ -1927,6 +1991,37 @@
                     </button>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- All Bays List Bottom Sheet Drawer for WO -->
+        <div id="woBaysModalOverlay" class="modal-overlay" onclick="closeWOBaysDrawer(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeWOBaysDrawer()"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-size:15px;">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-main);">Daftar Bay dalam WO</div>
+                            <div style="font-size:11px; color:var(--text-muted);" id="woBaysSubTitle">INS202600000003 • GI KALISARI</div>
+                        </div>
+                    </div>
+                    <button onclick="closeWOBaysDrawer()" style="background:#f8fafc; border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="drawer-scroll-body" id="woBaysDrawerList">
+                    <!-- Dynamic Bay Items List -->
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button class="drawer-btn drawer-btn-secondary" onclick="closeWOBaysDrawer()" style="width:100%;">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1948,6 +2043,48 @@
 
         document.querySelector('.header-sub').textContent = giParam;
         document.getElementById('heroGIName').textContent = giParam;
+
+        function openWOBaysDrawer(woCode) {
+            const overlay = document.getElementById('woBaysModalOverlay');
+            const subTitle = document.getElementById('woBaysSubTitle');
+            const listContainer = document.getElementById('woBaysDrawerList');
+            
+            subTitle.textContent = `${woCode} • ${giParam}`;
+
+            const sampleBays = [
+                { name: 'BAY TRF#2 150/22KV', type: 'Trafo Daya', assets: 2, status: 'Belum Selesai' },
+                { name: 'KAPASITOR #1 150/22KV', type: 'Kapasitor', assets: 2, status: 'Selesai' },
+                { name: 'KAPASITOR #2 150/22KV', type: 'Kapasitor', assets: 2, status: 'Belum Selesai' },
+                { name: 'BAY LINE KALISARI - KENJERAN', type: 'Line', assets: 2, status: 'Belum Selesai' },
+                { name: 'BAY KOPEL 150KV', type: 'Bus Kopel', assets: 3, status: 'Belum Selesai' },
+                { name: 'BAY TRF#1 150/20KV', type: 'Trafo Daya', assets: 2, status: 'Selesai' },
+                { name: 'BAY LINE KALISARI - KERTEN 1', type: 'Line', assets: 2, status: 'Belum Selesai' }
+            ];
+
+            listContainer.innerHTML = sampleBays.map(bay => `
+                <div class="all-bay-item-card" onclick="window.location.href='list-bay.html?wo=${encodeURIComponent(woCode)}&gi=${encodeURIComponent(giParam)}'">
+                    <div class="all-bay-item-info">
+                        <div class="all-bay-item-name">${bay.name}</div>
+                        <div class="all-bay-item-meta">
+                            <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> ${bay.type}</span>
+                            <span>•</span>
+                            <span>${bay.assets} Peralatan</span>
+                        </div>
+                    </div>
+                    <span style="font-size:11px; font-weight:700; color:${bay.status === 'Selesai' ? '#15803d' : '#1a65d6'}; background:${bay.status === 'Selesai' ? '#f0fdf4' : '#eff6ff'}; padding:3px 8px; border-radius:6px;">
+                        ${bay.status}
+                    </span>
+                </div>
+            `).join('');
+
+            overlay.classList.add('active');
+        }
+
+        function closeWOBaysDrawer(e) {
+            if (!e || e.target.id === 'woBaysModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
+                document.getElementById('woBaysModalOverlay').classList.remove('active');
+            }
+        }
 
         let currentWOCategoryChip = 'all';
         let woFilterState = {

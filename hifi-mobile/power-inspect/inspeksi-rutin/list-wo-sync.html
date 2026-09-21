@@ -120,13 +120,263 @@
         .badge-gagal { background: #fee2e2; color: #991b1b; }
         .badge-sukses { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
 
-        .wo-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 10px; font-size: 11px; }
+        .wo-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 10px; font-size: 11px; align-items: start; }
         .info-lbl { color: var(--text-muted); font-size: 10px; }
         .info-val { font-weight: 700; color: var(--text-main); }
 
-        .wo-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); font-size: 12px; }
-        .asset-count { font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
-        .arrow-link { color: var(--primary-blue); font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+        .bay-cell { display: flex; flex-direction: column; align-items: flex-start; }
+        .btn-toggle-bay {
+            margin-top: 4px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            min-height: 26px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-toggle-bay:hover, .btn-toggle-bay:active {
+            background: #dbeafe;
+            border-color: var(--primary-blue);
+            transform: scale(0.98);
+        }
+
+        .asset-types-section {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .asset-types-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .asset-pills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        .asset-pill {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 4px 9px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .asset-pill i {
+            color: var(--primary-blue);
+            font-size: 10px;
+        }
+        .btn-toggle-asset {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            min-height: 26px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-toggle-asset:hover, .btn-toggle-asset:active {
+            background: #dbeafe;
+            border-color: var(--primary-blue);
+            transform: scale(0.98);
+        }
+
+        /* Modal Drawer */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 440px;
+            height: 75%;
+            max-height: 80%;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg, #ffffff);
+            border-top: 1px solid var(--border-color);
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 12px 16px 18px;
+            box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.28);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-sizing: border-box;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 42px;
+            height: 5px;
+            background: #cbd5e1;
+            border-radius: 3px;
+            margin: 0 auto 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-handle:hover {
+            background: #94a3b8;
+            transform: scaleX(1.1);
+        }
+
+        .drawer-scroll-body {
+            flex: 1 1 auto;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .drawer-scroll-body::-webkit-scrollbar {
+            width: 5px;
+        }
+        .drawer-scroll-body::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+        }
+
+        .drawer-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            min-height: 52px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .drawer-item-card:hover {
+            border-color: var(--primary-blue);
+            background: #f8fafc;
+        }
+        .drawer-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .drawer-item-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .drawer-item-meta {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drawer-footer-sticky {
+            flex-shrink: 0;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg, #ffffff);
+            display: flex;
+            gap: 8px;
+        }
+
+        .drawer-btn {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 12px;
+            background: var(--primary-blue, #1a65d6);
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.2);
+            transition: all 0.2s;
+        }
+        .drawer-btn:active {
+            transform: scale(0.98);
+        }
+
+        .wo-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; font-size: 11.5px; }
+        .asset-count { font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .arrow-link { 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            font-size: 11.5px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+            padding: 4px 10px; 
+            background: #eff6ff; 
+            border-radius: 8px; 
+            transition: all 0.2s;
+        }
+        .arrow-link:active {
+            background: #dbeafe;
+        }
 
         .bottom-action-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 18px; background: white; border-top: 1px solid var(--border-color); box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
         .btn-sync-all { width: 100%; padding: 14px; border-radius: 14px; background: #1a65d6; color: white; border: none; font-size: 13.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(26,101,214,0.3); }
@@ -149,7 +399,7 @@
         <div class="toolbar-wrap">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Cari No. WO, Gardu Induk, atau Bay...">
+                <input type="text" id="searchInput" placeholder="Cari No. WO, GI, Bay, atau Jenis Aset...">
             </div>
         </div>
 
@@ -162,8 +412,8 @@
         </div>
 
         <div class="stats-banner">
-            <div class="stats-title"><i class="fa-solid fa-cloud-arrow-up"></i> 3 WO Siap Upload • 1 Sudah Sinkron</div>
-            <div class="stats-desc">Total 6 hasil inspeksi aset tersimpan lokal, 2 inspeksi aset berhasil tersinkron ke server.</div>
+            <div class="stats-title"><i class="fa-solid fa-cloud-arrow-up"></i> 3 WO Belum Sync • 1 Sudah Sinkron</div>
+            <div class="stats-desc">Total 8 hasil inspeksi aset tersimpan lokal (termasuk gagal sync), 3 aset berhasil tersinkron.</div>
         </div>
 
         <div class="content-scroll" id="woListScroll">
@@ -188,15 +438,33 @@
                         <div class="wo-num">INS202600131960</div>
                         <div class="wo-gi">GI 150KV KALISARI</div>
                     </div>
-                    <span class="badge-status badge-lokal">2 Asset Offline</span>
+                    <span class="badge-status badge-lokal">3 Asset Offline</span>
                 </div>
                 <div class="wo-info-grid">
-                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">TRF#4 150/20kV</span></div>
+                    <div class="bay-cell">
+                        <span class="info-lbl">Bay (3):</span>
+                        <span class="info-val">TRF#4 150/20kV</span>
+                        <button type="button" class="btn-toggle-bay" onclick="event.stopPropagation(); openSyncBaysDrawer('INS202600131960')">
+                            +2 Bay Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
                     <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Rutin 2 Tahunan</span></div>
                 </div>
+                <div class="asset-types-section">
+                    <div class="asset-types-label">
+                        <span><i class="fa-solid fa-layer-group"></i> Jenis Aset (3)</span>
+                        <button type="button" class="btn-toggle-asset" onclick="event.stopPropagation(); openSyncAssetsDrawer('INS202600131960')">
+                            +1 Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
+                    <div class="asset-pills-wrap">
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Power Transformer</span>
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Potential Transformer</span>
+                    </div>
+                </div>
                 <div class="wo-footer">
-                    <div class="asset-count"><i class="fa-solid fa-cube" style="color:#1a65d6;"></i> Over Current Relay & Trafo 4</div>
-                    <div class="arrow-link">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="asset-count"><i class="fa-solid fa-circle-dot" style="color:#1a65d6; font-size: 9px;"></i> 3 Inspeksi Tersimpan Lokal</div>
+                    <div class="arrow-link">Lihat Detail <i class="fa-solid fa-chevron-right"></i></div>
                 </div>
             </div>
 
@@ -207,15 +475,30 @@
                         <div class="wo-num">INS202600129841</div>
                         <div class="wo-gi">GI 150KV RUNGKUT</div>
                     </div>
-                    <span class="badge-status badge-gagal">1 Asset Gagal Sync</span>
+                    <span class="badge-status badge-gagal">2 Asset Gagal Sync</span>
                 </div>
                 <div class="wo-info-grid">
-                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">BAY KOPEL 150KV</span></div>
-                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Pengukuran LA</span></div>
+                    <div class="bay-cell">
+                        <span class="info-lbl">Bay (2):</span>
+                        <span class="info-val">BAY KOPEL 150KV</span>
+                        <button type="button" class="btn-toggle-bay" onclick="event.stopPropagation(); openSyncBaysDrawer('INS202600129841')">
+                            +1 Bay Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
+                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Pengukuran & Termovisi</span></div>
+                </div>
+                <div class="asset-types-section">
+                    <div class="asset-types-label">
+                        <span><i class="fa-solid fa-layer-group"></i> Jenis Aset (2)</span>
+                    </div>
+                    <div class="asset-pills-wrap">
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Lightning Arrester</span>
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Disconnecting Switch</span>
+                    </div>
                 </div>
                 <div class="wo-footer">
-                    <div class="asset-count"><i class="fa-solid fa-cube" style="color:#ef4444;"></i> Lightning Arrester (LA)</div>
-                    <div class="arrow-link">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="asset-count"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; font-size: 11px;"></i> Perlu Sync Ulang</div>
+                    <div class="arrow-link">Lihat Detail <i class="fa-solid fa-chevron-right"></i></div>
                 </div>
             </div>
 
@@ -229,12 +512,30 @@
                     <span class="badge-status badge-lokal">3 Asset Offline</span>
                 </div>
                 <div class="wo-info-grid">
-                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">BAY FEET 1</span></div>
-                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Inspeksi Termovisi</span></div>
+                    <div class="bay-cell">
+                        <span class="info-lbl">Bay (4):</span>
+                        <span class="info-val">BAY FEEDER 1</span>
+                        <button type="button" class="btn-toggle-bay" onclick="event.stopPropagation(); openSyncBaysDrawer('INS202600142810')">
+                            +3 Bay Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
+                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Inspeksi Rutin Mingguan</span></div>
+                </div>
+                <div class="asset-types-section">
+                    <div class="asset-types-label">
+                        <span><i class="fa-solid fa-layer-group"></i> Jenis Aset (3)</span>
+                        <button type="button" class="btn-toggle-asset" onclick="event.stopPropagation(); openSyncAssetsDrawer('INS202600142810')">
+                            +1 Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
+                    <div class="asset-pills-wrap">
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Mobile Power Transformer</span>
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> High Voltage Test</span>
+                    </div>
                 </div>
                 <div class="wo-footer">
-                    <div class="asset-count"><i class="fa-solid fa-cube" style="color:#1a65d6;"></i> Busbar, PMT, CT 150kV</div>
-                    <div class="arrow-link">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="asset-count"><i class="fa-solid fa-circle-dot" style="color:#1a65d6; font-size: 9px;"></i> 3 Inspeksi Tersimpan Lokal</div>
+                    <div class="arrow-link">Lihat Detail <i class="fa-solid fa-chevron-right"></i></div>
                 </div>
             </div>
 
@@ -248,26 +549,229 @@
                     <span class="badge-status badge-sukses"><i class="fa-solid fa-circle-check"></i> Sudah Sinkron</span>
                 </div>
                 <div class="wo-info-grid">
-                    <div><span class="info-lbl">Bay:</span><br><span class="info-val">BAY TRAFO #1 150KV</span></div>
-                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Inspeksi Rutin Mingguan</span></div>
+                    <div class="bay-cell">
+                        <span class="info-lbl">Bay (2):</span>
+                        <span class="info-val">BAY TRAFO #1 150KV</span>
+                        <button type="button" class="btn-toggle-bay" onclick="event.stopPropagation(); openSyncBaysDrawer('INS202600118429')">
+                            +1 Bay Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
+                    <div><span class="info-lbl">Tipe Inspeksi:</span><br><span class="info-val">Inspeksi Rutin Bulanan</span></div>
+                </div>
+                <div class="asset-types-section">
+                    <div class="asset-types-label">
+                        <span><i class="fa-solid fa-layer-group"></i> Jenis Aset (3)</span>
+                        <button type="button" class="btn-toggle-asset" onclick="event.stopPropagation(); openSyncAssetsDrawer('INS202600118429')">
+                            +1 Lainnya <i class="fa-solid fa-chevron-right" style="font-size: 8px;"></i>
+                        </button>
+                    </div>
+                    <div class="asset-pills-wrap">
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Substation Building</span>
+                        <span class="asset-pill"><i class="fa-solid fa-cube"></i> Lightning Arrester</span>
+                    </div>
                 </div>
                 <div class="wo-footer">
-                    <div class="asset-count"><i class="fa-solid fa-circle-check" style="color:#15803d;"></i> 2 Asset Berhasil Sinkron</div>
-                    <div class="arrow-link" style="color:#15803d;">Lihat Asset <i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="asset-count"><i class="fa-solid fa-circle-check" style="color:#15803d; font-size: 11px;"></i> 3 Asset Berhasil Sinkron</div>
+                    <div class="arrow-link" style="color:#15803d;">Lihat Detail <i class="fa-solid fa-chevron-right"></i></div>
                 </div>
             </div>
         </div>
 
         <div class="bottom-action-bar">
             <button class="btn-sync-all" onclick="window.location.href='sync-hasil-inspeksi.html'">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Semua WO (6 Asset)
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Semua WO (8 Asset)
             </button>
+        </div>
+
+        <!-- Sync Bays Bottom Sheet Drawer -->
+        <div id="syncBaysModalOverlay" class="modal-overlay" onclick="closeSyncBaysDrawer(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeSyncBaysDrawer()"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-size:15px;">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-main);">Daftar Bay Work Order</div>
+                            <div style="font-size:11px; color:var(--text-muted);" id="syncBaysDrawerSub">Cakupan Seluruh Bay</div>
+                        </div>
+                    </div>
+                    <button onclick="closeSyncBaysDrawer()" style="background:#f8fafc; border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="drawer-scroll-body" id="syncBaysDrawerList">
+                    <!-- Populated via JS -->
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button class="drawer-btn" onclick="closeSyncBaysDrawer()">
+                        <i class="fa-solid fa-check"></i> Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sync Asset Types Bottom Sheet Drawer -->
+        <div id="syncAssetsModalOverlay" class="modal-overlay" onclick="closeSyncAssetsDrawer(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeSyncAssetsDrawer()"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-size:15px;">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-main);">Jenis Aset Inspeksi</div>
+                            <div style="font-size:11px; color:var(--text-muted);" id="syncAssetsDrawerSub">Daftar Peralatan Terdaftar</div>
+                        </div>
+                    </div>
+                    <button onclick="closeSyncAssetsDrawer()" style="background:#f8fafc; border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="drawer-scroll-body" id="syncAssetsDrawerList">
+                    <!-- Populated via JS -->
+                </div>
+
+                <div class="drawer-footer-sticky">
+                    <button class="drawer-btn" onclick="closeSyncAssetsDrawer()">
+                        <i class="fa-solid fa-check"></i> Tutup
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let currentFilter = 'all';
         let searchQuery = '';
+
+        const woDataMap = {
+            'INS202600131960': {
+                gi: 'GI 150KV KALISARI',
+                bays: [
+                    { name: 'TRF#4 150/20kV', type: 'Trafo Daya', count: '1 Peralatan' },
+                    { name: 'BAY LINE KERTEN 1', type: 'Transmisi Line', count: '1 Peralatan' },
+                    { name: 'BAY KOPEL 150KV', type: 'Kopel Busbar', count: '1 Peralatan' }
+                ],
+                assets: [
+                    { name: 'Power Transformer', desc: 'Transformator Daya Utama', icon: 'fa-cube' },
+                    { name: 'Potential Transformer', desc: 'Trafo Tegangan Pengukuran', icon: 'fa-cube' },
+                    { name: 'Circuit Breaker', desc: 'Pemutus Tenaga (PMT)', icon: 'fa-cube' }
+                ]
+            },
+            'INS202600129841': {
+                gi: 'GI 150KV RUNGKUT',
+                bays: [
+                    { name: 'BAY KOPEL 150KV', type: 'Kopel Busbar', count: '1 Peralatan' },
+                    { name: 'BAY TRAFO #2 150KV', type: 'Trafo Daya', count: '1 Peralatan' }
+                ],
+                assets: [
+                    { name: 'Lightning Arrester', desc: 'Pengaman Tegangan Lebih', icon: 'fa-cube' },
+                    { name: 'Disconnecting Switch', desc: 'Pemisah Beban (PMS)', icon: 'fa-cube' }
+                ]
+            },
+            'INS202600142810': {
+                gi: 'GIS 150KV WONOKROMO',
+                bays: [
+                    { name: 'BAY FEEDER 1', type: 'Feeder Penyulang', count: '1 Peralatan' },
+                    { name: 'BAY FEEDER 2', type: 'Feeder Penyulang', count: '1 Peralatan' },
+                    { name: 'BAY TRAFO #1', type: 'Trafo Daya', count: '1 Peralatan' },
+                    { name: 'BAY KOPEL', type: 'Kopel Busbar', count: '1 Peralatan' }
+                ],
+                assets: [
+                    { name: 'Mobile Power Transformer', desc: 'Trafo Mobile Cadangan', icon: 'fa-cube' },
+                    { name: 'High Voltage Test', desc: 'Peralatan Uji Tegangan Tinggi', icon: 'fa-cube' },
+                    { name: 'Cable Duct', desc: 'Saluran Kabel Bawah Tanah', icon: 'fa-cube' }
+                ]
+            },
+            'INS202600118429': {
+                gi: 'GI 150KV WARU',
+                bays: [
+                    { name: 'BAY TRAFO #1 150KV', type: 'Trafo Daya', count: '2 Peralatan' },
+                    { name: 'BAY LINE SIDOARJO 1', type: 'Transmisi Line', count: '1 Peralatan' }
+                ],
+                assets: [
+                    { name: 'Substation Building', desc: 'Gedung Kontrol & Fasilitas Gardu', icon: 'fa-cube' },
+                    { name: 'Lightning Arrester', desc: 'Pengaman Tegangan Lebih', icon: 'fa-cube' },
+                    { name: 'Circuit Breaker', desc: 'Pemutus Tenaga (PMT)', icon: 'fa-cube' }
+                ]
+            }
+        };
+
+        function openSyncBaysDrawer(woCode) {
+            const data = woDataMap[woCode];
+            if (!data) return;
+
+            document.getElementById('syncBaysDrawerSub').textContent = `${data.gi} • ${data.bays.length} Bay Terdaftar`;
+            const listContainer = document.getElementById('syncBaysDrawerList');
+            listContainer.innerHTML = '';
+
+            data.bays.forEach((bay, index) => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'drawer-item-card';
+                itemCard.innerHTML = `
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-name">${index + 1}. ${bay.name}</div>
+                        <div class="drawer-item-meta">
+                            <span><i class="fa-solid fa-tag" style="color:var(--primary-blue);"></i> ${bay.type}</span>
+                            <span>•</span>
+                            <span><i class="fa-solid fa-cubes"></i> ${bay.count}</span>
+                        </div>
+                    </div>
+                    <span style="font-size:11px; font-weight:700; color:var(--primary-blue); background:#eff6ff; padding:3px 8px; border-radius:6px;">
+                        Tersedia
+                    </span>
+                `;
+                listContainer.appendChild(itemCard);
+            });
+
+            document.getElementById('syncBaysModalOverlay').classList.add('active');
+        }
+
+        function closeSyncBaysDrawer(e) {
+            if (!e || e.target.id === 'syncBaysModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
+                document.getElementById('syncBaysModalOverlay').classList.remove('active');
+            }
+        }
+
+        function openSyncAssetsDrawer(woCode) {
+            const data = woDataMap[woCode];
+            if (!data) return;
+
+            document.getElementById('syncAssetsDrawerSub').textContent = `${woCode} • ${data.assets.length} Jenis Aset`;
+            const listContainer = document.getElementById('syncAssetsDrawerList');
+            listContainer.innerHTML = '';
+
+            data.assets.forEach((asset, index) => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'drawer-item-card';
+                itemCard.innerHTML = `
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-name"><i class="fa-solid ${asset.icon}" style="color:var(--primary-blue); margin-right:4px;"></i> ${asset.name}</div>
+                        <div class="drawer-item-meta">
+                            <span>${asset.desc}</span>
+                        </div>
+                    </div>
+                    <span style="font-size:10.5px; font-weight:700; color:#16a34a; background:#f0fdf4; border:1px solid #bbf7d0; padding:3px 8px; border-radius:6px;">
+                        Aktif
+                    </span>
+                `;
+                listContainer.appendChild(itemCard);
+            });
+
+            document.getElementById('syncAssetsModalOverlay').classList.add('active');
+        }
+
+        function closeSyncAssetsDrawer(e) {
+            if (!e || e.target.id === 'syncAssetsModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
+                document.getElementById('syncAssetsModalOverlay').classList.remove('active');
+            }
+        }
 
         function setWoFilter(filterType, btn) {
             currentFilter = filterType;
@@ -403,10 +907,10 @@
         Notes & Validasi
       </h3>
       <ul>
-        <!-- TODO: UPDATE NOTES HERE -->
-        <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
-        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
-        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+        <li><strong>Bottom Sheet Seragam:</strong> Seluruh elemen dengan potensi multiple data (seperti Multiple Bay dan Multiple Jenis Aset) membuka Bottom Sheet Drawer modal agar tampilan kartu tetap ringkas dan seragam di mobile.</li>
+        <li><strong>Jenis Aset Multiple:</strong> 1 Work Order (WO) dapat mencakup lebih dari 1 jenis aset inspeksi (contoh: Lightning Arrester, Power Transformer, Potential Transformer, Circuit Breaker, Disconnecting Switch, Mobile Power Transformer, High Voltage Test, Substation Building, Cable Duct).</li>
+        <li><strong>Pencarian:</strong> Kolom pencarian mendukung pencarian berdasarkan No. WO, Gardu Induk, Bay, maupun Jenis Aset.</li>
+        <li><strong>Sinkronisasi:</strong> Hasil inspeksi offline dapat di-upload per WO maupun secara keseluruhan (Upload Semua WO).</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
