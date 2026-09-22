@@ -409,6 +409,40 @@
 
         .badge-active { background: var(--success-bg); color: var(--success); }
         .badge-draft { background: var(--warning-bg); color: var(--warning); }
+
+        /* SUB-TAB SEGMENTED PILL STYLES */
+        .sub-tab-group {
+            display: inline-flex;
+            background: #F1F5F9;
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+            gap: 2px;
+        }
+        .sub-tab-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 500;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+        .sub-tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .sub-tab-btn.active {
+            background: #fff;
+            color: var(--pln-blue);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
@@ -569,52 +603,123 @@
 
                     <!-- Parameter 2: Tekanan Gas SF6 -->
                     <div style="margin-bottom: 40px; border: 1px solid var(--border); padding: 24px; border-radius: var(--radius-md); background: #fff;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <h3 style="font-size: 15px; font-weight: 600; color: var(--pln-blue-mid);">2. Trend: Tekanan Gas SF6</h3>
+                                <h3 style="font-size: 15px; font-weight: 600; color: var(--pln-blue-mid); margin: 0;">2. Trend: Tekanan Gas SF6</h3>
                                 <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--pln-blue-light); color: var(--pln-blue-mid); border: 1px solid rgba(26,92,181,0.2);" title="Parameter ini berkontribusi langsung pada perhitungan Asset Health Index (AHI)">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                                     MEMPENGARUHI AHI
                                 </span>
                             </div>
-                            <span class="badge badge-active">Status Terakhir: Normal (6.2 Bar)</span>
+                            
+                            <!-- Sub-tabs Angka / Kondisi -->
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <div class="sub-tab-group">
+                                    <button type="button" id="sf6-subtab-grafik-angka" class="sub-tab-btn active" onclick="switchSF6SubTab('angka', 'grafik')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                                        Uraian Angka (Bar)
+                                    </button>
+                                    <button type="button" id="sf6-subtab-grafik-kondisi" class="sub-tab-btn" onclick="switchSF6SubTab('kondisi', 'grafik')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                        Uraian Kondisi
+                                    </button>
+                                </div>
+                                <span class="badge badge-active">Status Terakhir: Normal (6.2 Bar)</span>
+                            </div>
                         </div>
-                        <div class="chart-container"><canvas id="trendChartSF6"></canvas></div>
-                        <div style="overflow-x: auto; margin-top: 16px;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Nomor WO</th>
-                                        <th>Tanggal</th>
-                                        <th>Tekanan Gas SF6</th>
-                                        <th>Temperatur Sekitar</th>
-                                        <th>Kondisi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>INS202600883600</td>
-                                        <td>15 Juni 2026</td>
-                                        <td>6.5 Bar</td>
-                                        <td>31.2 °C</td>
-                                        <td><span class="badge badge-active">Normal</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>INS202600883601</td>
-                                        <td>16 Juni 2026</td>
-                                        <td>6.3 Bar</td>
-                                        <td>32.0 °C</td>
-                                        <td><span class="badge badge-active">Normal</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>INS202600883602</td>
-                                        <td>17 Juni 2026</td>
-                                        <td>6.2 Bar</td>
-                                        <td>32.5 °C</td>
-                                        <td><span class="badge badge-active">Normal</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+
+                        <!-- CONTENT SUB-TAB 1: ANGKA -->
+                        <div id="sf6-content-grafik-angka">
+                            <div class="chart-container"><canvas id="trendChartSF6"></canvas></div>
+                            <div style="overflow-x: auto; margin-top: 16px;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Nomor WO</th>
+                                            <th>Tanggal</th>
+                                            <th>Tekanan Gas SF6</th>
+                                            <th>Temperatur Sekitar</th>
+                                            <th>Kondisi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>INS202600883600</td>
+                                            <td>15 Juni 2026</td>
+                                            <td>6.5 Bar</td>
+                                            <td>31.2 °C</td>
+                                            <td><span class="badge badge-active">Normal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>INS202600883601</td>
+                                            <td>16 Juni 2026</td>
+                                            <td>6.3 Bar</td>
+                                            <td>32.0 °C</td>
+                                            <td><span class="badge badge-active">Normal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>INS202600883602</td>
+                                            <td>17 Juni 2026</td>
+                                            <td>6.2 Bar</td>
+                                            <td>32.5 °C</td>
+                                            <td><span class="badge badge-active">Normal</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- CONTENT SUB-TAB 2: KONDISI -->
+                        <div id="sf6-content-grafik-kondisi" style="display: none;">
+                            <div class="chart-container"><canvas id="trendChartSF6Kondisi"></canvas></div>
+                            <div style="overflow-x: auto; margin-top: 16px;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Nomor WO</th>
+                                            <th>Tanggal</th>
+                                            <th>Manometer Fasa R</th>
+                                            <th>Manometer Fasa S</th>
+                                            <th>Manometer Fasa T</th>
+                                            <th>Indikasi Kebocoran</th>
+                                            <th>Kondisi Valve / Seal</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>INS202600883600</td>
+                                            <td>15 Juni 2026</td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td>Nihil (Aman)</td>
+                                            <td>Baik & Rapat</td>
+                                            <td><span class="badge badge-active">3 - Normal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>INS202600883601</td>
+                                            <td>16 Juni 2026</td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td>Nihil (Aman)</td>
+                                            <td>Baik & Rapat</td>
+                                            <td><span class="badge badge-active">3 - Normal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>INS202600883602</td>
+                                            <td>17 Juni 2026</td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                            <td>Nihil (Aman)</td>
+                                            <td>Baik & Rapat</td>
+                                            <td><span class="badge badge-active">3 - Normal</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -734,14 +839,30 @@
 
                     <!-- Parameter 2: Tekanan Gas SF6 -->
                     <div style="margin-bottom: 32px; border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-md); background: #fff;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                            <h3 style="font-size: 15px; font-weight: 600; color: var(--pln-blue-mid); margin-bottom: 0;">2. Detail Data: Tekanan Gas SF6</h3>
-                            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--pln-blue-light); color: var(--pln-blue-mid); border: 1px solid rgba(26,92,181,0.2);" title="Parameter ini berkontribusi langsung pada perhitungan Asset Health Index (AHI)">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                                MEMPENGARUHI AHI
-                            </span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: 15px; font-weight: 600; color: var(--pln-blue-mid); margin-bottom: 0;">2. Detail Data: Tekanan Gas SF6</h3>
+                                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--pln-blue-light); color: var(--pln-blue-mid); border: 1px solid rgba(26,92,181,0.2);" title="Parameter ini berkontribusi langsung pada perhitungan Asset Health Index (AHI)">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                    MEMPENGARUHI AHI
+                                </span>
+                            </div>
+
+                            <!-- Sub-tabs Angka / Kondisi -->
+                            <div class="sub-tab-group">
+                                <button type="button" id="sf6-subtab-tabel-angka" class="sub-tab-btn active" onclick="switchSF6SubTab('angka', 'tabel')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                                    Uraian Angka (Bar)
+                                </button>
+                                <button type="button" id="sf6-subtab-tabel-kondisi" class="sub-tab-btn" onclick="switchSF6SubTab('kondisi', 'tabel')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Uraian Kondisi
+                                </button>
+                            </div>
                         </div>
-                        <div style="overflow-x: auto;">
+
+                        <!-- TABEL SUB-TAB 1: ANGKA -->
+                        <div id="sf6-content-tabel-angka" style="overflow-x: auto;">
                             <table>
                                 <thead>
                                     <tr>
@@ -749,6 +870,8 @@
                                         <th>Tanggal</th>
                                         <th>Tekanan Gas SF6</th>
                                         <th>Temperatur Sekitar</th>
+                                        <th>Tekanan Standar</th>
+                                        <th>Deviasi</th>
                                         <th>Kondisi</th>
                                     </tr>
                                 </thead>
@@ -758,6 +881,8 @@
                                         <td>15 Juni 2026</td>
                                         <td>6.5 Bar</td>
                                         <td>31.2 °C</td>
+                                        <td>6.0 - 6.8 Bar</td>
+                                        <td>0.0 Bar</td>
                                         <td><span class="badge badge-active">Normal</span></td>
                                     </tr>
                                     <tr>
@@ -765,6 +890,8 @@
                                         <td>16 Juni 2026</td>
                                         <td>6.3 Bar</td>
                                         <td>32.0 °C</td>
+                                        <td>6.0 - 6.8 Bar</td>
+                                        <td>-0.2 Bar</td>
                                         <td><span class="badge badge-active">Normal</span></td>
                                     </tr>
                                     <tr>
@@ -772,7 +899,63 @@
                                         <td>17 Juni 2026</td>
                                         <td>6.2 Bar</td>
                                         <td>32.5 °C</td>
+                                        <td>6.0 - 6.8 Bar</td>
+                                        <td>-0.3 Bar</td>
                                         <td><span class="badge badge-active">Normal</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- TABEL SUB-TAB 2: KONDISI -->
+                        <div id="sf6-content-tabel-kondisi" style="display: none; overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nomor WO</th>
+                                        <th>Tanggal</th>
+                                        <th>Manometer R</th>
+                                        <th>Manometer S</th>
+                                        <th>Manometer T</th>
+                                        <th>Indikasi Kebocoran</th>
+                                        <th>Kondisi Katup / Seal</th>
+                                        <th>Catatan Lapangan</th>
+                                        <th>Hasil Evaluasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>INS202600883600</td>
+                                        <td>15 Juni 2026</td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td>Nihil</td>
+                                        <td>Rapat & Tidak Korosi</td>
+                                        <td>Jarum pada area batas aman operasi</td>
+                                        <td><span class="badge badge-active">3 - Normal</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883601</td>
+                                        <td>16 Juni 2026</td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td>Nihil</td>
+                                        <td>Rapat & Tidak Korosi</td>
+                                        <td>Jarum stabil pada zona hijau</td>
+                                        <td><span class="badge badge-active">3 - Normal</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>INS202600883602</td>
+                                        <td>17 Juni 2026</td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td><span class="badge badge-active">🟢 Hijau</span></td>
+                                        <td>Nihil</td>
+                                        <td>Rapat & Tidak Korosi</td>
+                                        <td>Pemeriksaan visual rutin aman</td>
+                                        <td><span class="badge badge-active">3 - Normal</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -895,6 +1078,124 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabName).classList.add('active');
         evt.currentTarget.classList.add('active');
+    }
+
+    function switchSF6SubTab(type, section) {
+        const isAngka = type === 'angka';
+        if (section === 'grafik') {
+            document.getElementById('sf6-subtab-grafik-angka').classList.toggle('active', isAngka);
+            document.getElementById('sf6-subtab-grafik-kondisi').classList.toggle('active', !isAngka);
+            document.getElementById('sf6-content-grafik-angka').style.display = isAngka ? 'block' : 'none';
+            document.getElementById('sf6-content-grafik-kondisi').style.display = !isAngka ? 'block' : 'none';
+
+            if (!isAngka && !charts.sf6Kondisi) {
+                initSF6KondisiChart();
+            }
+        } else if (section === 'tabel') {
+            document.getElementById('sf6-subtab-tabel-angka').classList.toggle('active', isAngka);
+            document.getElementById('sf6-subtab-tabel-kondisi').classList.toggle('active', !isAngka);
+            document.getElementById('sf6-content-tabel-angka').style.display = isAngka ? 'block' : 'none';
+            document.getElementById('sf6-content-tabel-kondisi').style.display = !isAngka ? 'block' : 'none';
+        }
+    }
+
+    function initSF6KondisiChart() {
+        const labels = ['13 Jun', '14 Jun', '15 Jun', '16 Jun', '17 Jun'];
+        const canvas = document.getElementById('trendChartSF6Kondisi');
+        if (!canvas) return;
+        const ctxKondisi = canvas.getContext('2d');
+        charts.sf6Kondisi = new Chart(ctxKondisi, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Manometer Fasa R',
+                        data: [3, 3, 3, 3, 3],
+                        borderColor: '#EF4444',
+                        backgroundColor: '#EF4444',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        tension: 0.2,
+                        statusText: ['Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)']
+                    },
+                    {
+                        label: 'Manometer Fasa S',
+                        data: [3, 3, 3, 3, 3],
+                        borderColor: '#F59E0B',
+                        backgroundColor: '#F59E0B',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        tension: 0.2,
+                        statusText: ['Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)']
+                    },
+                    {
+                        label: 'Manometer Fasa T',
+                        data: [3, 3, 3, 3, 3],
+                        borderColor: '#003B8E',
+                        backgroundColor: '#003B8E',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        tension: 0.2,
+                        statusText: ['Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)', 'Zona Hijau (Normal)']
+                    },
+                    {
+                        label: 'Status Kerapatan & Kebocoran',
+                        data: [3, 3, 3, 3, 3],
+                        borderColor: '#10B981',
+                        backgroundColor: '#10B981',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        tension: 0.2,
+                        statusText: ['Nihil (Tidak Ada Kebocoran)', 'Nihil (Tidak Ada Kebocoran)', 'Nihil (Tidak Ada Kebocoran)', 'Nihil (Tidak Ada Kebocoran)', 'Nihil (Tidak Ada Kebocoran)']
+                    },
+                    {
+                        label: 'Kondisi Valve & Sealing',
+                        data: [3, 3, 3, 3, 3],
+                        borderColor: '#8B5CF6',
+                        backgroundColor: '#8B5CF6',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        borderDash: [4, 4],
+                        tension: 0.2,
+                        statusText: ['Baik & Rapat', 'Baik & Rapat', 'Baik & Rapat', 'Baik & Rapat', 'Baik & Rapat']
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top', labels: { font: { family: "'Inter', sans-serif", size: 12 }, usePointStyle: true } },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.dataset.statusText[context.dataIndex];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0.5,
+                        max: 3.5,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                if (value === 3) return '🟢 3 - Normal / Hijau';
+                                if (value === 2) return '🟡 2 - Waspada / Kuning';
+                                if (value === 1) return '🔴 1 - Kritis / Merah';
+                                return '';
+                            }
+                        },
+                        grid: { color: '#EAF1FB' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
     }
 
     function triggerSearch() {
