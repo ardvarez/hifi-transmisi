@@ -228,6 +228,24 @@
             color: #475569;
         }
 
+        /* Sticky / Freeze Search & Filter Bar */
+        .sticky-search-filter-section {
+            position: sticky;
+            top: -16px;
+            background: var(--bg-color);
+            z-index: 20;
+            padding-top: 12px;
+            padding-bottom: 4px;
+            margin-left: -18px;
+            margin-right: -18px;
+            padding-left: 18px;
+            padding-right: 18px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            margin-bottom: 10px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
         /* Toolbar & Search Section (asset-register style) */
         .toolbar-wrap {
             display: flex;
@@ -742,6 +760,9 @@
 
         .filter-segment-btn.active {
             background: var(--primary-blue);
+            color: #ffffff;
+        }
+
         /* Section Title & Header UX */
         .section-header {
             display: flex;
@@ -903,19 +924,19 @@
         }
 
         .btn-inspect-bay {
-            padding: 8px 16px;
+            padding: 10px 18px;
             background: #1a65d6;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 12.5px;
-            font-weight: 700;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            min-height: 36px;
-            box-shadow: 0 2px 6px rgba(26, 101, 214, 0.2);
+            min-height: 42px;
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.22);
             transition: all 0.2s;
         }
         .btn-inspect-bay:active { 
@@ -952,6 +973,61 @@
             border-color: var(--primary-blue);
             transform: scale(0.98);
         }
+
+        .btn-more-asset-chip {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 10.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-more-asset-chip:hover, .btn-more-asset-chip:active {
+            background: #dbeafe;
+            border-color: var(--primary-blue);
+            transform: scale(0.98);
+        }
+
+        .bay-asset-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .bay-asset-item-card:hover {
+            border-color: var(--primary-blue);
+            background: #f8fafc;
+        }
+        .bay-asset-item-card:active {
+            transform: scale(0.99);
+        }
+        .bay-asset-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            border: 1px solid #dbeafe;
+        }
+
         .all-bay-item-card {
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -1767,6 +1843,11 @@
             background: #ffffff !important;
         }
 
+        body.dark-mode .sticky-search-filter-section {
+            background: var(--bg-color) !important;
+            border-bottom-color: #334155 !important;
+        }
+
     </style>
 </head>
 <body>
@@ -1876,27 +1957,30 @@
                 </div>
             </div>
 
-            <!-- Search Bar with Filter Trigger Button (asset-register.html style) -->
-            <div class="toolbar-wrap">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="Cari nama bay, tipe, atau peralatan...">
+            <!-- Sticky / Freeze Search & Filter Bar -->
+            <div class="sticky-search-filter-section">
+                <!-- Search Bar with Filter Trigger Button (asset-register.html style) -->
+                <div class="toolbar-wrap">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" placeholder="Cari nama bay, tipe, atau peralatan...">
+                    </div>
+                    <button type="button" class="filter-btn" id="bayFilterBtnTrigger" onclick="openBayFilterDrawer()" title="Filter Data Bay">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span class="filter-active-dot" id="bayFilterActiveDot"></span>
+                    </button>
                 </div>
-                <button type="button" class="filter-btn" id="bayFilterBtnTrigger" onclick="openBayFilterDrawer()" title="Filter Data Bay">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span class="filter-active-dot" id="bayFilterActiveDot"></span>
-                </button>
-            </div>
 
-            <!-- Filter Category Chips Row -->
-            <div class="category-chips-scroll" id="bayCategoryChipsRow">
-                <button type="button" class="category-chip active" onclick="filterBayCategoryChip(this, 'all')">Semua Bay (6)</button>
-                <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'trafo')">Trafo Daya (2)</button>
-                <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'line')">Transmisi Line (2)</button>
-                <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'kopel')">Bus Kopel (1)</button>
-                <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'kapasitor')">Kapasitor (1)</button>
-                <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'belum')">Belum Selesai (4)</button>
-                <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'selesai')">Selesai (2)</button>
+                <!-- Filter Category Chips Row -->
+                <div class="category-chips-scroll" id="bayCategoryChipsRow">
+                    <button type="button" class="category-chip active" onclick="filterBayCategoryChip(this, 'all')">Semua Bay (6)</button>
+                    <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'trafo')">Trafo Daya (2)</button>
+                    <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'line')">Transmisi Line (2)</button>
+                    <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'kopel')">Bus Kopel (1)</button>
+                    <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'kapasitor')">Kapasitor (1)</button>
+                    <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'belum')">Belum Selesai (4)</button>
+                    <button type="button" class="category-chip" onclick="filterBayCategoryChip(this, 'selesai')">Selesai (2)</button>
+                </div>
             </div>
 
             <!-- Section Header: Clean Title, Counter Badge & Reset Button -->
@@ -1922,18 +2006,19 @@
                             <span class="bay-type-badge">Trafo Daya & Proteksi</span>
                         </div>
                         <span class="bay-progress-pill">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/2 Aset
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/6 Aset
                         </span>
                     </div>
 
                     <div class="bay-asset-preview">
                         <div class="bay-asset-title">
-                            <span>Daftar Aset (2 Peralatan)</span>
+                            <span>Daftar Aset (6 Peralatan)</span>
                             <span style="color: var(--text-muted); font-size: 10.5px;">Siap Inspeksi</span>
                         </div>
                         <div class="bay-asset-chips">
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Trafo Daya 1 (60 MVA)</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Power Transformer 1</span>
                             <span class="asset-chip"><i class="fa-solid fa-circle"></i> Lightning Arrester (LA)</span>
+                            <button type="button" class="btn-more-asset-chip" onclick="event.stopPropagation(); openBayAssetsDrawer('Bay Trafo 1 150kV')">+4 Aset Lainnya</button>
                         </div>
                     </div>
 
@@ -1953,18 +2038,19 @@
                             <span class="bay-type-badge">Transmisi Penghantar</span>
                         </div>
                         <span class="bay-progress-pill">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/2 Aset
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/5 Aset
                         </span>
                     </div>
 
                     <div class="bay-asset-preview">
                         <div class="bay-asset-title">
-                            <span>Daftar Aset (2 Peralatan)</span>
+                            <span>Daftar Aset (5 Peralatan)</span>
                             <span style="color: var(--text-muted); font-size: 10.5px;">Siap Inspeksi</span>
                         </div>
                         <div class="bay-asset-chips">
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> PMT 150kV Line 1</span>
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> PMS Line & Tanah</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Circuit Breaker (PMT)</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Disconnecting Switch (PMS)</span>
+                            <button type="button" class="btn-more-asset-chip" onclick="event.stopPropagation(); openBayAssetsDrawer('Bay Line Kalisari - Kenjeran')">+3 Aset Lainnya</button>
                         </div>
                     </div>
 
@@ -1984,19 +2070,19 @@
                             <span class="bay-type-badge">Bus Kopel & Tie</span>
                         </div>
                         <span class="bay-progress-pill">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/3 Aset
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/4 Aset
                         </span>
                     </div>
 
                     <div class="bay-asset-preview">
                         <div class="bay-asset-title">
-                            <span>Daftar Aset (3 Peralatan)</span>
+                            <span>Daftar Aset (4 Peralatan)</span>
                             <span style="color: var(--text-muted); font-size: 10.5px;">Siap Inspeksi</span>
                         </div>
                         <div class="bay-asset-chips">
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> PMT Kopel 150kV</span>
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> CT Kopel</span>
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Disconnecting Switch</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Circuit Breaker (PMT)</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Current Transformer (CT)</span>
+                            <button type="button" class="btn-more-asset-chip" onclick="event.stopPropagation(); openBayAssetsDrawer('Bay Kopel 150kV')">+2 Aset Lainnya</button>
                         </div>
                     </div>
 
@@ -2016,18 +2102,19 @@
                             <span class="bay-type-badge">Kapasitor Shunt 25 MVAR</span>
                         </div>
                         <span class="bay-progress-pill" style="background: #dcfce7; color: #15803d;">
-                            <i class="fa-solid fa-check" style="font-size: 9px;"></i> 2/2 Selesai
+                            <i class="fa-solid fa-check" style="font-size: 9px;"></i> 4/4 Selesai
                         </span>
                     </div>
 
                     <div class="bay-asset-preview">
                         <div class="bay-asset-title">
-                            <span>Daftar Aset (2 Peralatan)</span>
+                            <span>Daftar Aset (4 Peralatan)</span>
                             <span style="color: #15803d; font-size: 10.5px; font-weight: 700;">Inspeksi Selesai</span>
                         </div>
                         <div class="bay-asset-chips">
                             <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> Bank Kapasitor #1</span>
-                            <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> PMT Kapasitor</span>
+                            <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> Circuit Breaker (PMT)</span>
+                            <button type="button" class="btn-more-asset-chip" onclick="event.stopPropagation(); openBayAssetsDrawer('Kapasitor #1 150/22kV')">+2 Aset Lainnya</button>
                         </div>
                     </div>
 
@@ -2047,18 +2134,19 @@
                             <span class="bay-type-badge">Trafo Daya & Proteksi</span>
                         </div>
                         <span class="bay-progress-pill" style="background: #dcfce7; color: #15803d;">
-                            <i class="fa-solid fa-check" style="font-size: 9px;"></i> 2/2 Selesai
+                            <i class="fa-solid fa-check" style="font-size: 9px;"></i> 5/5 Selesai
                         </span>
                     </div>
 
                     <div class="bay-asset-preview">
                         <div class="bay-asset-title">
-                            <span>Daftar Aset (2 Peralatan)</span>
+                            <span>Daftar Aset (5 Peralatan)</span>
                             <span style="color: #15803d; font-size: 10.5px; font-weight: 700;">Inspeksi Selesai</span>
                         </div>
                         <div class="bay-asset-chips">
-                            <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> Trafo Daya 2 (60 MVA)</span>
-                            <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> LA Trafo 2</span>
+                            <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> Power Transformer 2</span>
+                            <span class="asset-chip" style="border-color: #bbf7d0;"><i class="fa-solid fa-circle" style="color: #15803d;"></i> Lightning Arrester (LA)</span>
+                            <button type="button" class="btn-more-asset-chip" onclick="event.stopPropagation(); openBayAssetsDrawer('Bay Trafo 2 150kV')">+3 Aset Lainnya</button>
                         </div>
                     </div>
 
@@ -2078,18 +2166,19 @@
                             <span class="bay-type-badge">Transmisi Penghantar</span>
                         </div>
                         <span class="bay-progress-pill">
-                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/2 Aset
+                            <i class="fa-solid fa-play" style="font-size: 9px;"></i> 0/4 Aset
                         </span>
                     </div>
 
                     <div class="bay-asset-preview">
                         <div class="bay-asset-title">
-                            <span>Daftar Aset (2 Peralatan)</span>
+                            <span>Daftar Aset (4 Peralatan)</span>
                             <span style="color: var(--text-muted); font-size: 10.5px;">Siap Inspeksi</span>
                         </div>
                         <div class="bay-asset-chips">
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> PMT 150kV Line Kerten</span>
-                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> CT Line Kerten</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Circuit Breaker (PMT)</span>
+                            <span class="asset-chip"><i class="fa-solid fa-circle"></i> Current Transformer (CT)</span>
+                            <button type="button" class="btn-more-asset-chip" onclick="event.stopPropagation(); openBayAssetsDrawer('Bay Line Kalisari - Kerten 1')">+2 Aset Lainnya</button>
                         </div>
                     </div>
 
@@ -2229,6 +2318,40 @@
             </div>
         </div>
 
+        <!-- Bay Assets List Bottom Sheet Drawer -->
+        <div id="bayAssetsModalOverlay" class="modal-overlay" onclick="closeBayAssetsDrawer(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeBayAssetsDrawer()"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-color); flex-shrink:0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-size:15px;">
+                            <i class="fa-solid fa-cubes-stacked"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-main);" id="bayAssetsDrawerTitle">Daftar Aset Bay</div>
+                            <div style="font-size:11px; color:var(--text-muted);" id="bayAssetsDrawerSubTitle">Bay Trafo 1 150kV • 6 Peralatan</div>
+                        </div>
+                    </div>
+                    <button onclick="closeBayAssetsDrawer()" style="background:#f8fafc; border:1px solid var(--border-color); width:32px; height:32px; border-radius:50%; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="drawer-scroll-body" id="bayAssetsDrawerList">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="drawer-footer-sticky" style="display:flex; gap:8px;">
+                    <button class="drawer-btn drawer-btn-secondary" onclick="closeBayAssetsDrawer()" style="flex:1;">
+                        Tutup
+                    </button>
+                    <button class="drawer-btn" id="btnGoToFullAssetList" onclick="goToCurrentBayAssetsPage()" style="flex:2;">
+                        <i class="fa-solid fa-list-check"></i> Buka Lembar Aset
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Filter Drawer Bottom Sheet for Bay (asset-register.html style) -->
         <div id="bayFilterModalOverlay" class="modal-overlay" onclick="closeBayDrawer(event)">
             <div class="modal-drawer" onclick="event.stopPropagation()">
@@ -2247,6 +2370,134 @@
 
         document.getElementById('headerGIName').textContent = giParam;
         document.getElementById('woCodeBadge').textContent = woParam;
+
+        let currentSelectedBayForDrawer = '';
+
+        const bayAssetsData = {
+            'Bay Trafo 1 150kV': {
+                type: 'Trafo Daya & Proteksi',
+                status: 'Belum Selesai',
+                assets: [
+                    { name: 'Power Transformer 1 (60 MVA)', tag: 'TRF-01-150KV', type: 'Power Transformer', status: 'Belum', icon: 'fa-bolt' },
+                    { name: 'Lightning Arrester 150kV (LA)', tag: 'LA-TRF-01', type: 'Lightning Arrester', status: 'Belum', icon: 'fa-shield-halved' },
+                    { name: 'Potential Transformer 150kV (PT)', tag: 'PT-TRF-01', type: 'Potential Transformer', status: 'Belum', icon: 'fa-gauge-high' },
+                    { name: 'Circuit Breaker 150kV (PMT)', tag: 'PMT-TRF-01', type: 'Circuit Breaker', status: 'Belum', icon: 'fa-toggle-on' },
+                    { name: 'Disconnecting Switch (PMS)', tag: 'PMS-TRF-01', type: 'Disconnecting Switch', status: 'Belum', icon: 'fa-arrows-split-up-and-left' },
+                    { name: 'Cable Duct & Control Cable', tag: 'CD-TRF-01', type: 'Cable Duct', status: 'Belum', icon: 'fa-network-wired' }
+                ]
+            },
+            'Bay Line Kalisari - Kenjeran': {
+                type: 'Transmisi Penghantar',
+                status: 'Belum Selesai',
+                assets: [
+                    { name: 'Circuit Breaker (PMT 150kV Line 1)', tag: 'PMT-LINE-01', type: 'Circuit Breaker', status: 'Belum', icon: 'fa-toggle-on' },
+                    { name: 'Disconnecting Switch Line & Tanah (PMS)', tag: 'PMS-LINE-01', type: 'Disconnecting Switch', status: 'Belum', icon: 'fa-arrows-split-up-and-left' },
+                    { name: 'Current Transformer 150kV (CT)', tag: 'CT-LINE-01', type: 'Current Transformer', status: 'Belum', icon: 'fa-circle-notch' },
+                    { name: 'Potential Transformer 150kV (CVT)', tag: 'CVT-LINE-01', type: 'Potential Transformer', status: 'Belum', icon: 'fa-gauge-high' },
+                    { name: 'Lightning Arrester Line 150kV (LA)', tag: 'LA-LINE-01', type: 'Lightning Arrester', status: 'Belum', icon: 'fa-shield-halved' }
+                ]
+            },
+            'Bay Kopel 150kV': {
+                type: 'Bus Kopel & Tie',
+                status: 'Belum Selesai',
+                assets: [
+                    { name: 'Circuit Breaker Kopel (PMT 150kV)', tag: 'PMT-KOPEL-01', type: 'Circuit Breaker', status: 'Belum', icon: 'fa-toggle-on' },
+                    { name: 'Current Transformer Kopel (CT)', tag: 'CT-KOPEL-01', type: 'Current Transformer', status: 'Belum', icon: 'fa-circle-notch' },
+                    { name: 'Disconnecting Switch Rel 1 & 2 (PMS)', tag: 'PMS-KOPEL-01', type: 'Disconnecting Switch', status: 'Belum', icon: 'fa-arrows-split-up-and-left' },
+                    { name: 'Control & Relay Panel Kopel', tag: 'PNL-KOPEL-01', type: 'Substation Building', status: 'Belum', icon: 'fa-server' }
+                ]
+            },
+            'Kapasitor #1 150/22kV': {
+                type: 'Kapasitor Shunt 25 MVAR',
+                status: 'Selesai',
+                assets: [
+                    { name: 'Bank Kapasitor #1 (25 MVAR)', tag: 'CAP-01-22KV', type: 'Capacitor Bank', status: 'Selesai', icon: 'fa-microchip' },
+                    { name: 'Circuit Breaker Kapasitor (PMT)', tag: 'PMT-CAP-01', type: 'Circuit Breaker', status: 'Selesai', icon: 'fa-toggle-on' },
+                    { name: 'Series Reactor Kapasitor', tag: 'REACT-CAP-01', type: 'Reactor', status: 'Selesai', icon: 'fa-ring' },
+                    { name: 'Disconnecting Switch (PMS)', tag: 'PMS-CAP-01', type: 'Disconnecting Switch', status: 'Selesai', icon: 'fa-arrows-split-up-and-left' }
+                ]
+            },
+            'Bay Trafo 2 150kV': {
+                type: 'Trafo Daya & Proteksi',
+                status: 'Selesai',
+                assets: [
+                    { name: 'Power Transformer 2 (60 MVA)', tag: 'TRF-02-150KV', type: 'Power Transformer', status: 'Selesai', icon: 'fa-bolt' },
+                    { name: 'Lightning Arrester Trafo 2 (LA)', tag: 'LA-TRF-02', type: 'Lightning Arrester', status: 'Selesai', icon: 'fa-shield-halved' },
+                    { name: 'Potential Transformer Trafo 2 (PT)', tag: 'PT-TRF-02', type: 'Potential Transformer', status: 'Selesai', icon: 'fa-gauge-high' },
+                    { name: 'Circuit Breaker Trafo 2 (PMT)', tag: 'PMT-TRF-02', type: 'Circuit Breaker', status: 'Selesai', icon: 'fa-toggle-on' },
+                    { name: 'Disconnecting Switch Trafo 2 (PMS)', tag: 'PMS-TRF-02', type: 'Disconnecting Switch', status: 'Selesai', icon: 'fa-arrows-split-up-and-left' }
+                ]
+            },
+            'Bay Line Kalisari - Kerten 1': {
+                type: 'Transmisi Penghantar',
+                status: 'Belum Selesai',
+                assets: [
+                    { name: 'Circuit Breaker (PMT 150kV Line Kerten)', tag: 'PMT-LINE-02', type: 'Circuit Breaker', status: 'Belum', icon: 'fa-toggle-on' },
+                    { name: 'Current Transformer Line Kerten (CT)', tag: 'CT-LINE-02', type: 'Current Transformer', status: 'Belum', icon: 'fa-circle-notch' },
+                    { name: 'Disconnecting Switch Line Kerten (PMS)', tag: 'PMS-LINE-02', type: 'Disconnecting Switch', status: 'Belum', icon: 'fa-arrows-split-up-and-left' },
+                    { name: 'Lightning Arrester Line Kerten (LA)', tag: 'LA-LINE-02', type: 'Lightning Arrester', status: 'Belum', icon: 'fa-shield-halved' }
+                ]
+            }
+        };
+
+        function openBayAssetsDrawer(bayName) {
+            currentSelectedBayForDrawer = bayName;
+            const overlay = document.getElementById('bayAssetsModalOverlay');
+            const titleEl = document.getElementById('bayAssetsDrawerTitle');
+            const subTitleEl = document.getElementById('bayAssetsDrawerSubTitle');
+            const listContainer = document.getElementById('bayAssetsDrawerList');
+
+            const bayInfo = bayAssetsData[bayName] || {
+                type: 'Bay Gardu Induk',
+                status: 'Siap',
+                assets: [
+                    { name: 'Power Transformer', tag: 'TRF-01', type: 'Power Transformer', status: 'Belum', icon: 'fa-bolt' },
+                    { name: 'Lightning Arrester', tag: 'LA-01', type: 'Lightning Arrester', status: 'Belum', icon: 'fa-shield-halved' }
+                ]
+            };
+
+            titleEl.textContent = bayName;
+            subTitleEl.textContent = `${bayInfo.type} • ${bayInfo.assets.length} Peralatan`;
+
+            listContainer.innerHTML = bayInfo.assets.map(asset => {
+                const isSelesai = asset.status === 'Selesai';
+                const badgeStyle = isSelesai ? 'background:#dcfce7; color:#15803d;' : 'background:#eff6ff; color:#1a65d6;';
+                return `
+                    <div class="bay-asset-item-card" onclick="openBayAssets('${bayName}')">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                            <div class="bay-asset-icon-box">
+                                <i class="fa-solid ${asset.icon}"></i>
+                            </div>
+                            <div style="min-width:0; flex:1;">
+                                <div style="font-size:13px; font-weight:800; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${asset.name}</div>
+                                <div style="font-size:11px; color:var(--text-muted); display:flex; gap:6px; align-items:center; margin-top:2px;">
+                                    <span>${asset.tag}</span>
+                                    <span>•</span>
+                                    <span style="padding:1px 6px; border-radius:4px; font-size:10px; font-weight:700; ${badgeStyle}">${asset.status}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-inspect-bay" style="padding:6px 12px; min-height:32px; font-size:11.5px;" onclick="event.stopPropagation(); openBayAssets('${bayName}')">
+                            ${isSelesai ? 'Hasil' : 'Inspeksi'} <i class="fa-solid fa-chevron-right" style="font-size:8px;"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            overlay.classList.add('active');
+        }
+
+        function closeBayAssetsDrawer(e) {
+            if (!e || e.target.id === 'bayAssetsModalOverlay' || e.target.classList.contains('drawer-handle') || e.target.closest('button')) {
+                document.getElementById('bayAssetsModalOverlay').classList.remove('active');
+            }
+        }
+
+        function goToCurrentBayAssetsPage() {
+            if (currentSelectedBayForDrawer) {
+                openBayAssets(currentSelectedBayForDrawer);
+            }
+        }
 
         let currentBayCategoryChip = 'all';
         let bayFilterState = {
