@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Swift (ERS) - Pusat Notifikasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-purple: #9333ea;
+            --primary-purple-hover: #7e22ce;
+            --primary-light: #f3e8ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --blue-color: #2563eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px; 
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* App Header */
+        .app-header {
+            padding: 18px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 15px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-purple); 
+            font-weight: 800; 
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-purple);
+            border-color: #e9d5ff;
+        }
+
+        /* Filter Chips */
+        .filter-chips-row {
+            display: flex;
+            gap: 8px;
+            padding: 14px 18px 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background-color: var(--bg-color);
+        }
+        .filter-chips-row::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--primary-purple);
+            color: white;
+            border-color: var(--primary-purple);
+            box-shadow: 0 2px 8px rgba(147, 51, 234, 0.25);
+        }
+
+        /* Notification List */
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 18px 24px;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .notif-list::-webkit-scrollbar { display: none; }
+        
+        .notif-item {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+
+        .notif-item:active {
+            transform: scale(0.98);
+            border-color: var(--primary-purple);
+        }
+
+        .notif-item.unread {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+        }
+
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-purple);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #ffffff;
+        }
+
+        .notif-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        /* Icon color variants */
+        .notif-purple .notif-icon-box { background-color: #f3e8ff; color: #9333ea; }
+        .notif-info .notif-icon-box { background-color: #eff6ff; color: #2563eb; }
+        .notif-warning .notif-icon-box { background-color: #fffbeb; color: #f59e0b; }
+        .notif-danger .notif-icon-box { background-color: #fef2f2; color: #ef4444; }
+        .notif-success .notif-icon-box { background-color: #f0fdf4; color: #10b981; }
+
+        .notif-content {
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .notif-title {
+            font-weight: 800;
+            font-size: 13.5px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.25;
+        }
+
+        .notif-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .notif-time {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Dark Mode Support */
+        body.dark-mode {
+            background-color: #090d16;
+        }
+        body.dark-mode .mobile-container {
+            background-color: #0b1120;
+            border-color: #1e293b;
+        }
+        body.dark-mode .app-header {
+            background: #0f172a !important;
+            border-bottom-color: #334155 !important;
+        }
+        body.dark-mode .header-name {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .action-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode .filter-chips-row {
+            background-color: #0b1120 !important;
+        }
+        body.dark-mode .filter-chip {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .filter-chip.active {
+            background: #9333ea !important;
+            border-color: #9333ea !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode .notif-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .notif-title {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .notif-desc {
+            color: #94a3b8 !important;
+        }
+    </style>
+    <script>
+        (function() {
+            function checkTheme() {
+                try {
+                    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (localStorage.getItem('pln_mobile_theme') === 'dark' || (isDark && localStorage.getItem('pln_mobile_theme') !== 'light')) {
+                        document.documentElement.classList.add('dark-mode');
+                        if (document.body) document.body.classList.add('dark-mode');
+                    } else {
+                        document.documentElement.classList.remove('dark-mode');
+                        if (document.body) document.body.classList.remove('dark-mode');
+                    }
+                } catch(e) {}
+            }
+            checkTheme();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkTheme);
+            }
+        })();
+    </script>
+</head>
+<body>
+
+    <div class="mobile-container">
+        
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <a href="javascript:void(0)" onclick="goBack()" class="action-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-group">
+                    <div class="header-name">Pusat Notifikasi</div>
+                    <div class="header-sub">POWER SWIFT (ERS)</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="action-btn" onclick="markAllRead()" title="Tandai Semua Dibaca">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Chips Row -->
+        <div class="filter-chips-row">
+            <div class="filter-chip active" onclick="filterNotif(this, 'all')">Semua (5)</div>
+            <div class="filter-chip" onclick="filterNotif(this, 'unread')">Belum Dibaca (5)</div>
+            <div class="filter-chip" onclick="filterNotif(this, 'permit')">Permit ERS (3)</div>
+            <div class="filter-chip" onclick="filterNotif(this, 'so')">Stock Opname (2)</div>
+        </div>
+
+        <!-- Notifications List Container -->
+        <div class="notif-list" id="notifListContainer">
+
+            <!-- 1. Permit Baru Pemasangan -->
+            <div class="notif-item unread notif-info" data-type="permit" data-status="unread" onclick="openNotifDetail(this, './Pemasangan/list-pemasangan.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-wrench"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">Permit Baru: Pemasangan ERS</div>
+                    <div class="notif-desc">Permit <b>PMT-ERS-2026-0042</b>: Penugasan instalasi Tower ERS Span T.14 - T.15 SUTT 150kV siap dieksekusi tim lapangan.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 20 mnt lalu</div>
+                </div>
+            </div>
+
+            <!-- 2. Permit Baru Pembongkaran -->
+            <div class="notif-item unread notif-warning" data-type="permit" data-status="unread" onclick="openNotifDetail(this, './Pembongkaran/list-pembongkaran.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-dolly"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">Permit Baru: Pembongkaran ERS</div>
+                    <div class="notif-desc">Permit <b>PBG-ERS-2026-0018</b>: Rekonstruksi tower permanen selesai, izin pembongkaran tower darurat telah aktif.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 1 jam lalu</div>
+                </div>
+            </div>
+
+            <!-- 3. Permit Baru Pengembalian & Karantina -->
+            <div class="notif-item unread notif-purple" data-type="permit" data-status="unread" onclick="openNotifDetail(this, './Karantina & Pengembalian/list-karantina.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-box-archive"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">Permit Baru: Pengembalian & Karantina</div>
+                    <div class="notif-desc">Permit pengembalian <b>12 Modul Kolom ERS</b> pasca recovery. Material masuk karantina untuk uji kelayakan.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 2 jam lalu</div>
+                </div>
+            </div>
+
+            <!-- 4. Stock Opname baru -->
+            <div class="notif-item unread notif-success" data-type="so" data-status="unread" onclick="openNotifDetail(this, './Stock Opname/home-mobile.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">Jadwal Stock Opname Baru</div>
+                    <div class="notif-desc">Jadwal SO Triwulan I <b>Gudang Sentral ERS Cikupa</b> telah dirilis. Segera lakukan penghitungan fisik material.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 5 jam lalu</div>
+                </div>
+            </div>
+
+            <!-- 5. Stock Opname ulang -->
+            <div class="notif-item unread notif-danger" data-type="so" data-status="unread" onclick="openNotifDetail(this, './Stock Opname/home-mobile.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-rotate"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">Perintah Stock Opname Ulang</div>
+                    <div class="notif-desc">Ditemukan deviasi stock pada <b>2 batch guy wire & base plate</b>. Diminta melakukan hitung ulang di gudang.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> Kemarin, 11:00</div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                if (document.referrer && (document.referrer.includes('home-mobile.html') || document.referrer.includes('dashboard-mobile.html'))) {
+                    window.location.href = document.referrer;
+                } else {
+                    window.location.href = 'home-mobile.html';
+                }
+            }, 300);
+        }
+
+        function openNotifDetail(cardEl, targetUrl) {
+            if (cardEl && cardEl.classList.contains('unread')) {
+                cardEl.classList.remove('unread');
+                cardEl.setAttribute('data-status', 'read');
+            }
+            if (targetUrl) {
+                const container = document.querySelector('.mobile-container');
+                container.classList.add('page-slide-out');
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 300);
+            }
+        }
+
+        function markAllRead() {
+            document.querySelectorAll('.notif-item.unread').forEach(item => {
+                item.classList.remove('unread');
+                item.setAttribute('data-status', 'read');
+            });
+            const unreadChip = document.querySelector('.filter-chip:nth-child(2)');
+            if (unreadChip) unreadChip.textContent = 'Belum Dibaca (0)';
+        }
+
+        function filterNotif(el, filter) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            const items = document.querySelectorAll('.notif-item');
+            items.forEach(item => {
+                const type = item.getAttribute('data-type');
+                const isUnread = item.classList.contains('unread');
+
+                if (filter === 'all') {
+                    item.style.display = 'flex';
+                } else if (filter === 'unread') {
+                    item.style.display = isUnread ? 'flex' : 'none';
+                } else if (filter === 'permit') {
+                    item.style.display = type === 'permit' ? 'flex' : 'none';
+                } else if (filter === 'so') {
+                    item.style.display = type === 'so' ? 'flex' : 'none';
+                }
+            });
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--primary-purple, #9333ea);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: #7e22ce;
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--primary-purple, #9333ea);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Fitur Notifikasi Power Swift (ERS)
+      </h3>
+      <ul>
+        <li><strong>Fitur Notifikasi Power Swift (ERS):</strong>
+          <ul>
+            <li>1. Permit Baru Pemasangan</li>
+            <li>2. Permit Baru Pembongkaran</li>
+            <li>3. Permit Baru Pengembalian & Karantina</li>
+            <li>4. Stock Opname baru</li>
+            <li>5. Stock Opname ulang</li>
+          </ul>
+        </li>
+        <li><strong>Aksi Langsung:</strong> Mengetuk notifikasi permit / stock opname akan membuka form terkait.</li>
+        <li><strong>Desain Seragam:</strong> Sesuai standar desain mobile PLN & Dark Mode support.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+</html>

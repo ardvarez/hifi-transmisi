@@ -1351,48 +1351,52 @@
             });
         })();
     </script>
-
 </head>
 <body>
 
     <!-- Universal Sync Modal -->
-    <div id="universalSyncModal" class="sync-modal-overlay">
+    <div class="sync-modal-overlay" id="universalSyncModal" onclick="if(event.target === this) closeUniversalSync()">
         <div class="sync-modal-card">
             <div class="sync-modal-header">
                 <div class="sync-modal-icon">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                 </div>
-                <div class="sync-modal-title-box">
-                    <div class="sync-modal-title">Upload Data Offline</div>
-                    <div class="sync-modal-sub">Sinkronisasi hasil inspeksi lokal ke server PLN</div>
+                <div>
+                    <div class="sync-modal-title">Unggah Data Inspeksi</div>
+                    <div class="sync-modal-sub">Sinkronisasi offline ke server PLN</div>
                 </div>
             </div>
+
             <div class="sync-status-indicator">
-                <span class="pulse-dot"></span> Mode Online (Siap Kirim)
+                <div class="pulse-dot"></div> Siap Disinkronkan
             </div>
+
             <div class="sync-item-row">
                 <div class="sync-item-info">
-                    <span class="item-title">Inspeksi GI Kalisari (Bay Trafo 1)</span>
-                    <span class="item-time">Tersimpan offline • 20 Agu 12:45</span>
+                    <span class="item-title">GI 150kV Cawang (Bay Trafo 1)</span>
+                    <span class="item-time">4 Aset Inspeksi • 10 mnt lalu</span>
                 </div>
-                <span class="sync-item-badge">Siap Upload</span>
+                <span class="sync-item-badge">Pending</span>
             </div>
+
             <div class="sync-item-row">
                 <div class="sync-item-info">
-                    <span class="item-title">Checklist LA Trafo 1 (3 Foto)</span>
-                    <span class="item-time">Tersimpan offline • 20 Agu 13:02</span>
+                    <span class="item-title">GI 150kV Depok (Bay Line 1)</span>
+                    <span class="item-time">1 Aset Anomali • 45 mnt lalu</span>
                 </div>
-                <span class="sync-item-badge">Siap Upload</span>
+                <span class="sync-item-badge">Pending</span>
             </div>
-            <div id="syncProgressBox" style="display:none; margin-top:12px;">
+
+            <div id="syncProgressBox" style="display: none; margin-top: 14px;">
                 <div class="sync-progress-bar-bg">
-                    <div id="syncProgressBar" class="sync-progress-bar-fill"></div>
+                    <div class="sync-progress-bar-fill" id="syncProgressBar"></div>
                 </div>
-                <div class="sync-progress-label">Mengunggah 2 data inspeksi... (80%)</div>
+                <div class="sync-progress-label" id="syncProgressLabel">Mengunggah 0%...</div>
             </div>
+
             <div class="sync-modal-footer">
-                <button class="btn-cancel-sync" onclick="closeUniversalSync()">Tutup</button>
-                <button id="btnStartSync" class="btn-confirm-sync" onclick="startUniversalSyncProcess()">
+                <button class="btn-cancel-sync" onclick="closeUniversalSync()">Batal</button>
+                <button class="btn-confirm-sync" id="btnStartSync" onclick="startUniversalSyncProcess()">
                     <i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang
                 </button>
             </div>
@@ -1404,84 +1408,83 @@
         <!-- App Header -->
         <div class="app-header">
             <div class="header-left-group">
-                <button class="action-btn" onclick="goBack()" title="Kembali">
+                <a href="javascript:void(0)" onclick="goBack()" class="action-btn">
                     <i class="fa-solid fa-arrow-left"></i>
-                </button>
+                </a>
                 <div class="header-title-group">
                     <div class="header-name">Pusat Notifikasi</div>
-                    <div class="header-sub">5 NOTIFIKASI AKTIF</div>
+                    <div class="header-sub">POWER INSPECT</div>
                 </div>
             </div>
             <div class="header-actions">
-                <!-- Upload Offline Inspection Button with Counter -->
-                <div class="action-btn" onclick="triggerUniversalSync()" title="Upload Hasil Inspeksi Offline">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                <div class="action-btn" onclick="markAllRead()" title="Tandai Semua Dibaca">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+                <div class="action-btn" onclick="triggerUniversalSync()" title="Sinkronisasi Data" style="position: relative;">
+                    <i class="fa-solid fa-rotate"></i>
                     <span class="sync-badge-count">2</span>
                 </div>
-                <button class="action-btn" onclick="markAllRead()" title="Tandai Semua Dibaca">
-                    <i class="fa-solid fa-check-double"></i>
-                </button>
             </div>
         </div>
 
-        <!-- Filter Chips -->
+        <!-- Filter Chips Row -->
         <div class="filter-chips-row">
             <div class="filter-chip active" onclick="filterNotif(this, 'all')">Semua (5)</div>
-            <div class="filter-chip" onclick="filterNotif(this, 'unread')">Belum Dibaca (3)</div>
-            <div class="filter-chip" onclick="filterNotif(this, 'sync')">Sinkronisasi</div>
-            <div class="filter-chip" onclick="filterNotif(this, 'wo')">Work Order</div>
+            <div class="filter-chip" onclick="filterNotif(this, 'unread')">Belum Dibaca (4)</div>
+            <div class="filter-chip" onclick="filterNotif(this, 'wo')">Work Order (4)</div>
+            <div class="filter-chip" onclick="filterNotif(this, 'anomali')">Anomali (1)</div>
         </div>
 
-        <!-- Notification List -->
-        <div class="notif-list">
-            
-            <!-- Priority 1: Gagal Download Jadwal -->
-            <div class="notif-item unread notif-danger" onclick="syncUlang(2)">
+        <!-- Notifications List Container -->
+        <div class="notif-list" id="notifListContainer">
+
+            <!-- 1. Inspeksi Ulang WO + jumlah aset yang diinspeksi ulang -->
+            <div class="notif-item unread notif-warning" data-type="wo" data-status="unread" onclick="openNotifDetail(this, './inspeksi-rutin/list-wo.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-rotate-left"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">Inspeksi Ulang WO (4 Aset)</div>
+                    <div class="notif-desc">WO-2026-03-0112: Diperlukan inspeksi ulang pada <b>4 aset</b> di Bay Line Cawang 1 karena data thermovisi anomali belum lengkap.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 10 mnt lalu</div>
+                </div>
+            </div>
+
+            <!-- 2. WO Baru dari Tindak Lanjut -->
+            <div class="notif-item unread notif-info" data-type="wo" data-status="unread" onclick="openNotifDetail(this, './inspeksi-rutin/list-wo.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-clipboard-list"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">WO Baru dari Tindak Lanjut</div>
+                    <div class="notif-desc">WO-2026-TL-0089 diterbitkan otomatis dari rekomendasi tindak lanjut Hotspot Klem Trafo 2 GI Cibinong.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 45 mnt lalu</div>
+                </div>
+            </div>
+
+            <!-- 3. WO Baru dari Perencanaan Jadwal -->
+            <div class="notif-item unread notif-info" data-type="wo" data-status="unread" onclick="openNotifDetail(this, './inspeksi-rutin/list-wo.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-calendar-day"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">WO Baru dari Perencanaan Jadwal</div>
+                    <div class="notif-desc">WO-2026-03-0105: Penjadwalan inspeksi rutin level 1 periode Maret 2026 GI Depok Baru siap dilaksanakan.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 2 jam lalu</div>
+                </div>
+            </div>
+
+            <!-- 4. WO Baru kondisional -->
+            <div class="notif-item unread notif-purple" data-type="wo" data-status="unread" onclick="openNotifDetail(this, './inspeksi-rutin/list-wo.html')">
+                <div class="notif-icon-box"><i class="fa-solid fa-bolt"></i></div>
+                <div class="notif-content">
+                    <div class="notif-title">WO Baru Kondisional</div>
+                    <div class="notif-desc">WO-2026-KD-0041: Perintah inspeksi kondisional pasca trip sambaran petir Bay Penghantar Salak-Bogor.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 4 jam lalu</div>
+                </div>
+            </div>
+
+            <!-- 5. Aset Anomali dari inspeksi terbaru -->
+            <div class="notif-item notif-danger" data-type="anomali" data-status="read" onclick="openNotifDetail(this, './inspeksi-rutin/list-bay.html')">
                 <div class="notif-icon-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
                 <div class="notif-content">
-                    <div class="notif-title">Gagal Sinkron: 3 Bulanan</div>
-                    <div class="notif-desc">Jadwal inspeksi periode <b>3 Bulanan</b> gagal tersinkronisasi dari server. Ketuk untuk sinkronisasi ulang.</div>
-                    <div class="notif-time"><i class="fa-regular fa-clock"></i> Baru saja</div>
-                </div>
-            </div>
-
-            <!-- Priority 2: Jadwal Baru Perencanaan -->
-            <div class="notif-item unread notif-info" onclick="goToSyncAll()">
-                <div class="notif-icon-box"><i class="fa-solid fa-calendar-plus"></i></div>
-                <div class="notif-content">
-                    <div class="notif-title">Jadwal Perencanaan Baru</div>
-                    <div class="notif-desc">Terdapat 5 jadwal inspeksi baru yang ditugaskan kepada Anda berdasarkan perencanaan bulan ini.</div>
-                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 30 menit yang lalu</div>
-                </div>
-            </div>
-
-            <!-- Priority 3: Inspeksi Ulang (Verifikasi) -->
-            <div class="notif-item unread notif-warning" onclick="goToSyncAll()">
-                <div class="notif-icon-box"><i class="fa-solid fa-clipboard-check"></i></div>
-                <div class="notif-content">
-                    <div class="notif-title">Verifikasi: Inspeksi Ulang</div>
-                    <div class="notif-desc">Laporan inspeksi pada <b>Bay Trafo 1</b> memerlukan verifikasi ulang berdasarkan catatan supervisor.</div>
-                    <div class="notif-time"><i class="fa-regular fa-clock"></i> 2 jam yang lalu</div>
-                </div>
-            </div>
-
-            <!-- Priority 4: WO Kedaluwarsa -->
-            <div class="notif-item notif-purple" onclick="goToSyncAll()">
-                <div class="notif-icon-box"><i class="fa-solid fa-hourglass-half"></i></div>
-                <div class="notif-content">
-                    <div class="notif-title">Peringatan: WO Mendekati Batas</div>
-                    <div class="notif-desc">Terdapat 2 Work Order (WO) yang akan mencapai batas waktu besok. Segera selesaikan inspeksi lapangan.</div>
-                    <div class="notif-time"><i class="fa-regular fa-clock"></i> Kemarin, 17:00</div>
-                </div>
-            </div>
-
-            <!-- Priority 5: Tindak Lanjut Inspeksi -->
-            <div class="notif-item notif-success" onclick="goToSyncAll()">
-                <div class="notif-icon-box"><i class="fa-solid fa-wrench"></i></div>
-                <div class="notif-content">
-                    <div class="notif-title">Jadwal Tindak Lanjut Baru</div>
-                    <div class="notif-desc">Sistem membuat jadwal baru berdasarkan temuan anomali pada inspeksi <b>Bay Line 2</b> sebelumnya.</div>
-                    <div class="notif-time"><i class="fa-regular fa-clock"></i> Kemarin, 09:30</div>
+                    <div class="notif-title">Aset Anomali dari Inspeksi Terbaru</div>
+                    <div class="notif-desc">Ditemukan <b>2 Aset Anomali Kritis</b> (&Delta;T &gt; 35&deg;C) pada Bay Trafo 1 GI Gandul hasil inspeksi sesi pagi.</div>
+                    <div class="notif-time"><i class="fa-regular fa-clock"></i> Kemarin, 16:30</div>
                 </div>
             </div>
             
@@ -1493,16 +1496,26 @@
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
             setTimeout(() => {
-                window.location.href = 'dashboard-mobile.html';
+                if (document.referrer && document.referrer.includes('dashboard-mobile.html')) {
+                    window.location.href = document.referrer;
+                } else {
+                    window.location.href = 'dashboard-mobile.html';
+                }
             }, 300);
         }
 
-        function syncUlang(periodId) {
-            const container = document.querySelector('.mobile-container');
-            container.classList.add('page-slide-out');
-            setTimeout(() => {
-                window.location.href = `./inspeksi-rutin/sync-jadwal.html?action=retry&period=${periodId}`;
-            }, 300);
+        function openNotifDetail(cardEl, targetUrl) {
+            if (cardEl && cardEl.classList.contains('unread')) {
+                cardEl.classList.remove('unread');
+                cardEl.setAttribute('data-status', 'read');
+            }
+            if (targetUrl) {
+                const container = document.querySelector('.mobile-container');
+                container.classList.add('page-slide-out');
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 300);
+            }
         }
 
         function goToSyncAll() {
@@ -1516,13 +1529,31 @@
         function markAllRead() {
             document.querySelectorAll('.notif-item.unread').forEach(item => {
                 item.classList.remove('unread');
+                item.setAttribute('data-status', 'read');
             });
-            alert('Semua notifikasi telah ditandai sebagai dibaca.');
+            const unreadChip = document.querySelector('.filter-chip:nth-child(2)');
+            if (unreadChip) unreadChip.textContent = 'Belum Dibaca (0)';
         }
 
         function filterNotif(el, filter) {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+
+            const items = document.querySelectorAll('.notif-item');
+            items.forEach(item => {
+                const type = item.getAttribute('data-type');
+                const isUnread = item.classList.contains('unread');
+
+                if (filter === 'all') {
+                    item.style.display = 'flex';
+                } else if (filter === 'unread') {
+                    item.style.display = isUnread ? 'flex' : 'none';
+                } else if (filter === 'wo') {
+                    item.style.display = type === 'wo' ? 'flex' : 'none';
+                } else if (filter === 'anomali') {
+                    item.style.display = type === 'anomali' ? 'flex' : 'none';
+                }
+            });
         }
 
         // Universal Sync Functions
@@ -1538,15 +1569,20 @@
             const btn = document.getElementById('btnStartSync');
             const pBox = document.getElementById('syncProgressBox');
             const pBar = document.getElementById('syncProgressBar');
+            const pLabel = document.getElementById('syncProgressLabel');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...';
             pBox.style.display = 'block';
             
             let progress = 10;
             pBar.style.width = progress + '%';
+            if (pLabel) pLabel.textContent = `Mengunggah ${progress}%...`;
+
             const interval = setInterval(() => {
                 progress += 30;
                 pBar.style.width = Math.min(progress, 100) + '%';
+                if (pLabel) pLabel.textContent = `Mengunggah ${Math.min(progress, 100)}%...`;
+
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
@@ -1640,17 +1676,22 @@
     <div class="notes-panel" id="notesPanel">
       <h3>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        Notes & Validasi
+        Fitur Notifikasi Power Inspect
       </h3>
       <ul>
-        <li><strong>Sinkronisasi Parsial:</strong> Mengetuk notifikasi gagal sinkron akan langsung memicu proses sinkronisasi ulang hanya pada jadwal terkait.</li>
-        <li><strong>Desain Seragam:</strong> Layout dan tone warna disesuaikan dengan Dashboard Power Inspect.</li>
-        <li><strong>Navigasi:</strong> Tombol Back kembali ke Dashboard Power Inspect (`dashboard-mobile.html`).</li>
+        <li><strong>Fitur Notifikasi Power Inspect:</strong>
+          <ul>
+            <li>1. Inspeksi Ulang WO + jumlah aset yang diinspeksi ulang</li>
+            <li>2. WO Baru dari Tindak Lanjut</li>
+            <li>3. WO Baru dari Perencanaan Jadwal</li>
+            <li>4. WO Baru kondisional</li>
+            <li>5. Aset Anomali dari inspeksi terbaru</li>
+          </ul>
+        </li>
+        <li><strong>Sinkronisasi & Navigasi:</strong> Notifikasi terhubung ke detail WO dan Bay terkait.</li>
+        <li><strong>Desain Seragam:</strong> Sesuai standar Hifi Mobile PLN & Dark Mode support.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
-
-    
-
 </body>
 </html>

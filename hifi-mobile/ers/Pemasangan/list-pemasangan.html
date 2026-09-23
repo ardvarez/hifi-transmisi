@@ -1766,6 +1766,55 @@
             }
         }
 
+        function openModal() {
+            const modal = document.getElementById('filterModal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function openFilterModal() {
+            renderFilterSheetContent();
+            openModal();
+        }
+
+        function openFilterModalDrawer() {
+            openFilterModal();
+        }
+
+        function viewLocation(towerName, countStr) {
+            const count = parseInt(countStr, 10) || 4;
+            const startNum = 85;
+            let itemsHtml = '';
+            for (let i = 0; i < count; i++) {
+                const towerNum = String(startNum + i).padStart(4, '0');
+                itemsHtml += `
+                    <div class="location-item-card">
+                        <div class="location-icon-wrapper">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div class="location-item-info">
+                            <div class="location-item-title" style="margin-bottom:0;">TOWER SUTT 150kV Ungaran-Weleri #${towerNum}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div class="location-bottom-sheet">
+                    <div class="location-sheet-header">
+                        <h2 class="location-sheet-title">Lokasi</h2>
+                        <span class="location-count-badge">${count} Lokasi Tower</span>
+                    </div>
+                    <div class="location-subtitle">Daftar lokasi pemasangan <strong>${towerName}</strong></div>
+                    <div class="location-items-list">
+                        ${itemsHtml}
+                    </div>
+                    <button type="button" class="btn-filter-submit" onclick="closeFilterModalDirect()">Tutup</button>
+                </div>
+            `;
+            openModal();
+        }
+
         function renderFilterSheetContent() {
             const allStatuses = ['Sedang Dikirim', 'Siap Pasang', 'Sedang Dipasang', 'Sudah Terpasang'];
             const allMerks = ['Tower Solution', 'SBB', 'Lindsey'];
