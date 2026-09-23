@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Tambah Inspeksi Kondisional CBM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-border: #cbd5e1;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --purple-color: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(20%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .page-slide-out { 
+            animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
+        @keyframes slideOutLeft { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(-20%); opacity: 0; } 
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Status Bar (Harmonized with list-cbm.html) */
+        .status-bar {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 22px 6px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* App Header (Harmonized with list-cbm.html) */
+        .app-header {
+            flex-shrink: 0;
+            padding: 12px 18px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 17px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+            letter-spacing: -0.3px;
+        }
+        
+        .header-sub { 
+            font-size: 11.5px; 
+            color: var(--purple-color); 
+            font-weight: 700;
+            margin-top: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 38px; 
+            height: 38px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: #ffffff;
+        }
+
+        /* Form Scroll Area */
+        .form-content-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px 16px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scrollbar-width: none;
+        }
+        .form-content-scroll::-webkit-scrollbar { display: none; }
+
+        /* Eye-catching Intro Banner */
+        .form-intro-banner {
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: white;
+            box-shadow: 0 6px 18px rgba(29, 78, 216, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-intro-banner::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            bottom: -20px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .intro-text-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 1;
+        }
+
+        .intro-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 7px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            width: fit-content;
+            margin-bottom: 2px;
+        }
+
+        .intro-title {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+        }
+
+        .intro-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.88);
+        }
+
+        .intro-icon {
+            font-size: 26px;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 1;
+            margin-right: 4px;
+        }
+
+        /* Form Card Containers */
+        .form-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-section-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-section-title i {
+            color: var(--primary-blue);
+            font-size: 13px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-label i {
+            color: var(--primary-blue);
+            font-size: 11.5px;
+        }
+
+        .required-star {
+            color: var(--danger-color);
+            font-weight: 800;
+        }
+
+        .form-textarea {
+            width: 100%;
+            background: #f8fafc;
+            border: 1.5px solid var(--input-border);
+            border-radius: 12px;
+            padding: 11px 13px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+            height: 80px;
+            line-height: 1.4;
+        }
+
+        .form-textarea:focus {
+            background: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.12);
+        }
+
+        .form-textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .char-counter {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .form-select {
+            width: 100%;
+            background: #f8fafc;
+            border: 1.5px solid var(--input-border);
+            border-radius: 12px;
+            padding: 10px 36px 10px 13px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .form-select:focus {
+            background: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.12);
+        }
+
+        .select-chevron {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-blue);
+            pointer-events: none;
+            font-size: 11.5px;
+        }
+
+        /* Footer Section */
+        .footer-action {
+            flex-shrink: 0;
+            padding: 14px 18px 18px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            z-index: 20;
+            box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .btn-simpan {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(26, 101, 214, 0.28);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-simpan:hover {
+            background: var(--primary-blue-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-simpan:active {
+            transform: scale(0.98);
+        }
+
+        /* Toast Popup */
+        .toast-popup {
+            position: absolute;
+            top: 20px;
+            left: 18px;
+            right: 18px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 200;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast-popup.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: #10b981;
+            font-size: 15px;
+        }
+
+        /* Dark Mode */
+        body.dark-mode .mobile-container {
+            --bg-color: #0b1329 !important;
+            --card-bg: #1e293b !important;
+            --text-main: #f8fafc !important;
+            --text-muted: #94a3b8 !important;
+            --border-color: #334155 !important;
+            --input-border: #475569 !important;
+            background-color: #0b1329 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .status-bar,
+        body.dark-mode .app-header,
+        body.dark-mode .footer-action {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .form-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .card-section-title {
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .form-textarea,
+        body.dark-mode .form-select,
+        body.dark-mode .back-btn,
+        body.dark-mode .action-btn {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            function checkTheme() {
+                try {
+                    const isDark = localStorage.getItem('pln_mobile_theme') === 'dark' || 
+                                   localStorage.getItem('hifi-portal-theme') === 'dark' ||
+                                   (window.parent && window.parent.document && window.parent.document.documentElement && window.parent.document.documentElement.getAttribute('data-theme') === 'dark');
+                    if (isDark) {
+                        document.documentElement.classList.add('dark-mode');
+                        if (document.body) document.body.classList.add('dark-mode');
+                    } else {
+                        document.documentElement.classList.remove('dark-mode');
+                        if (document.body) document.body.classList.remove('dark-mode');
+                    }
+                } catch(e) {
+                    if (localStorage.getItem('pln_mobile_theme') === 'dark') {
+                        document.documentElement.classList.add('dark-mode');
+                        if (document.body) document.body.classList.add('dark-mode');
+                    }
+                }
+            }
+            checkTheme();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkTheme);
+            }
+            window.addEventListener('message', function(e) {
+                if (e.data && e.data.type === 'THEME_CHANGE') {
+                    if (e.data.theme === 'dark') {
+                        document.documentElement.classList.add('dark-mode');
+                        if (document.body) document.body.classList.add('dark-mode');
+                    } else {
+                        document.documentElement.classList.remove('dark-mode');
+                        if (document.body) document.body.classList.remove('dark-mode');
+                    }
+                }
+            });
+        })();
+    </script>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <!-- Toast Notification -->
+        <div class="toast-popup" id="toastNotification">
+            <i class="fa-solid fa-circle-check toast-icon"></i>
+            <span id="toastMessage">Inspeksi CBM berhasil disimpan!</span>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>14:17</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- App Header (Harmonized with list-cbm.html) -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <button class="back-btn" onclick="goBack()" title="Kembali ke List CBM">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title-group">
+                    <div class="header-name">Tambah CBM</div>
+                    <div class="header-sub">Inspeksi Kondisional</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Scrollable Area -->
+        <div class="form-content-scroll">
+            
+            <!-- Eye-catching Intro Card -->
+            <div class="form-intro-banner">
+                <div class="intro-text-box">
+                    <span class="intro-badge">
+                        <i class="fa-solid fa-bolt-lightning"></i> CBM Module
+                    </span>
+                    <div class="intro-title">Form Inspeksi Baru</div>
+                    <div class="intro-sub">Lengkapi data gardu, bay, dan formulir pengujian.</div>
+                </div>
+                <i class="fa-solid fa-clipboard-check intro-icon"></i>
+            </div>
+
+            <!-- Card 1: Informasi Task / Deskripsi -->
+            <div class="form-card">
+                <div class="card-section-title">
+                    <i class="fa-solid fa-align-left"></i>
+                    <span>Informasi Tugas</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="inputDeskripsi">
+                        <span>Deskripsi Anomali / Catatan</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <textarea 
+                        id="inputDeskripsi" 
+                        class="form-textarea" 
+                        maxlength="200" 
+                        placeholder="Contoh: Pemeriksaan anomali hotspot sambungan klem bay..."
+                        oninput="updateCharCount(this)"
+                    ></textarea>
+                    <div class="char-counter" id="charCounter">0/200</div>
+                </div>
+            </div>
+
+            <!-- Card 2: Lokasi & Asset Unit -->
+            <div class="form-card">
+                <div class="card-section-title">
+                    <i class="fa-solid fa-tower-observation"></i>
+                    <span>Lokasi & Peralatan</span>
+                </div>
+
+                <!-- Gardu Induk -->
+                <div class="form-group">
+                    <label class="form-label" for="selectGardu">
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span>Gardu Induk</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="selectGardu" class="form-select" onchange="onGarduChange()">
+                            <option value="" disabled selected>Pilih Gardu Induk</option>
+                            <option value="GI 150KV MRANGGEN">GI 150KV MRANGGEN</option>
+                            <option value="GI 150KV KRAPYAK">GI 150KV KRAPYAK</option>
+                            <option value="GI 150KV UNGARAN">GI 150KV UNGARAN</option>
+                            <option value="GI 150KV BAWEN">GI 150KV BAWEN</option>
+                            <option value="GI 150KV KALISARI">GI 150KV KALISARI</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+
+                <!-- Bay -->
+                <div class="form-group">
+                    <label class="form-label" for="selectBay">
+                        <i class="fa-solid fa-network-wired"></i>
+                        <span>Bay Peralatan</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="selectBay" class="form-select" onchange="onBayChange()" disabled>
+                            <option value="" disabled selected>Pilih Gardu Induk terlebih dahulu</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+
+                <!-- Jenis Asset -->
+                <div class="form-group">
+                    <label class="form-label" for="selectJenisAsset">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Jenis Asset</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="selectJenisAsset" class="form-select" onchange="onJenisAssetChange()" disabled>
+                            <option value="" disabled selected>Pilih Bay terlebih dahulu</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+
+                <!-- Aset Combobox -->
+                <div class="form-group">
+                    <label class="form-label" for="selectAsset">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Aset</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="selectAsset" class="form-select" disabled>
+                            <option value="" disabled selected>Pilih Jenis Asset terlebih dahulu</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Level & Formulir CBM -->
+            <div class="form-card">
+                <div class="card-section-title">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span>Formulir & Level Inspeksi</span>
+                </div>
+
+                <!-- Level Inspeksi -->
+                <div class="form-group">
+                    <label class="form-label" for="selectLevel">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Level Inspeksi</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="selectLevel" class="form-select">
+                            <option value="" disabled selected>Pilih Level</option>
+                            <option value="Inspeksi Level 1">Inspeksi Level 1</option>
+                            <option value="Inspeksi Level 2" selected>Inspeksi Level 2</option>
+                            <option value="Inspeksi Level 3">Inspeksi Level 3</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+
+                <!-- Formulir -->
+                <div class="form-group">
+                    <label class="form-label" for="selectFormulir">
+                        <i class="fa-solid fa-file-lines"></i>
+                        <span>Formulir Checklist</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="selectFormulir" class="form-select">
+                            <option value="" disabled selected>Pilih Formulir</option>
+                            <option value="[OPEN QA] Form Trafo Daya GIS - 6 Bulanan - IL2">[OPEN QA] Form Trafo Daya GIS - 6 Bulanan - IL2</option>
+                            <option value="[OPEN QA] Form Bay Penghantar SUTT - IL2">[OPEN QA] Form Bay Penghantar SUTT - IL2</option>
+                            <option value="[OPEN QA] Form Current Transformer CT 150kV - IL3">[OPEN QA] Form Current Transformer CT 150kV - IL3</option>
+                            <option value="Form Bay Trafo 150kV - IL1">Form Bay Trafo 150kV - IL1</option>
+                            <option value="Form Pemeliharaan Rutin IL2">Form Pemeliharaan Rutin IL2</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sticky Footer Button -->
+        <div class="footer-action">
+            <button class="btn-simpan" id="btnSimpan" onclick="handleSimpan()">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Simpan Penugasan CBM</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Hierarchical Dataset: GI -> Bay -> Jenis Asset -> Aset
+        const HIERARCHY_DATA = {
+            "GI 150KV MRANGGEN": {
+                "TRF#1 150/20KV": {
+                    "Power Transformer": [
+                        "TRF#1 150/20KV 60MVA",
+                        "TRAFO D1 150/20KV - MAIN TANK"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV BAY TRAFO 1",
+                        "PMT 20KV INCOMING 1"
+                    ],
+                    "Disconnecting Switch (PMS)": [
+                        "PMS BUS 1 150KV BAY TRF 1",
+                        "PMS BUS 2 150KV BAY TRF 1"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT 150KV BAY TRF 1 PH-R",
+                        "CT 150KV BAY TRF 1 PH-S",
+                        "CT 150KV BAY TRF 1 PH-T"
+                    ],
+                    "Lightning Arrester (LA)": [
+                        "LA 150KV BAY TRF 1 SET"
+                    ]
+                },
+                "TRF#2 150/20KV": {
+                    "Power Transformer": [
+                        "TRF#2 150/20KV 60MVA",
+                        "TRAFO D2 150/20KV - MAIN TANK"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV BAY TRAFO 2"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT 150KV BAY TRF 2 SET"
+                    ]
+                },
+                "LINE 1 MRANGGEN-UNGARAN": {
+                    "Bay Penghantar": [
+                        "SUTT 150KV MRANGGEN-UNGARAN 1"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV LINE UNGARAN 1"
+                    ],
+                    "Disconnecting Switch (PMS)": [
+                        "PMS LINE 150KV UNGARAN 1",
+                        "PMS BUS 1 150KV LINE UNGARAN 1"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT 150KV LINE UNGARAN 1 SET"
+                    ],
+                    "Lightning Arrester (LA)": [
+                        "LA 150KV LINE UNGARAN 1 SET"
+                    ]
+                },
+                "LINE 2 MRANGGEN-KALISARI": {
+                    "Bay Penghantar": [
+                        "SUTT 150KV MRANGGEN-KALISARI 2"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV LINE KALISARI 2"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT 150KV LINE KALISARI 2 SET"
+                    ]
+                },
+                "KOPEL 150KV": {
+                    "Circuit Breaker (PMT)": [
+                        "PMT KOPEL 150KV MRANGGEN"
+                    ],
+                    "Disconnecting Switch (PMS)": [
+                        "PMS KOPEL BUS 1 150KV",
+                        "PMS KOPEL BUS 2 150KV"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT KOPEL 150KV SET"
+                    ]
+                }
+            },
+            "GI 150KV KRAPYAK": {
+                "BAY KRAPYAK 1": {
+                    "Bay Penghantar": [
+                        "SUTT 150KV KRAPYAK - WELERI 1"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV BAY KRAPYAK 1"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT 150KV BAY KRAPYAK 1"
+                    ]
+                },
+                "BAY TRAFO 1": {
+                    "Power Transformer": [
+                        "TRF#1 150/20KV KRAPYAK 60MVA"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV BAY TRAFO 1 KRAPYAK"
+                    ]
+                }
+            },
+            "GI 150KV UNGARAN": {
+                "BAY UNGARAN-MRANGGEN 1": {
+                    "Bay Penghantar": [
+                        "SUTT 150KV UNGARAN - MRANGGEN 1"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV UNGARAN - MRANGGEN 1"
+                    ]
+                },
+                "BAY IBT 1 500/150KV": {
+                    "Power Transformer": [
+                        "IBT#1 500/150KV 500MVA UNGARAN"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV IBT 1 UNGARAN"
+                    ]
+                }
+            },
+            "GI 150KV BAWEN": {
+                "BAY BAWEN-UNGARAN 1": {
+                    "Bay Penghantar": [
+                        "SUTT 150KV BAWEN-UNGARAN 1"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV LINE BAWEN-UNGARAN 1"
+                    ]
+                },
+                "BAY TRAFO 1 BAWEN": {
+                    "Power Transformer": [
+                        "TRF#1 150/20KV 30MVA BAWEN"
+                    ]
+                }
+            },
+            "GI 150KV KALISARI": {
+                "BAY TRAFO 2": {
+                    "Power Transformer": [
+                        "TRF#2 150/20KV 60MVA KALISARI"
+                    ],
+                    "Current Transformer (CT)": [
+                        "CT 150KV KALISARI BAY TRAFO 2 PH-R",
+                        "CT 150KV KALISARI BAY TRAFO 2 PH-S",
+                        "CT 150KV KALISARI BAY TRAFO 2 PH-T"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV BAY TRAFO 2 KALISARI"
+                    ]
+                },
+                "BAY PENGHANTAR KALISARI-MRANGGEN": {
+                    "Bay Penghantar": [
+                        "SUTT 150KV KALISARI - MRANGGEN"
+                    ],
+                    "Circuit Breaker (PMT)": [
+                        "PMT 150KV BAY PENGHANTAR KALISARI"
+                    ]
+                }
+            }
+        };
+
+        function goBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = 'list-cbm.html';
+            }, 300);
+        }
+
+        function resetForm() {
+            document.getElementById('inputDeskripsi').value = '';
+            document.getElementById('charCounter').innerText = '0/200';
+            
+            const selectGardu = document.getElementById('selectGardu');
+            const selectBay = document.getElementById('selectBay');
+            const selectJenisAsset = document.getElementById('selectJenisAsset');
+            const selectAsset = document.getElementById('selectAsset');
+            
+            selectGardu.selectedIndex = 0;
+            
+            selectBay.innerHTML = '<option value="" disabled selected>Pilih Gardu Induk terlebih dahulu</option>';
+            selectBay.disabled = true;
+            
+            selectJenisAsset.innerHTML = '<option value="" disabled selected>Pilih Bay terlebih dahulu</option>';
+            selectJenisAsset.disabled = true;
+            
+            selectAsset.innerHTML = '<option value="" disabled selected>Pilih Jenis Asset terlebih dahulu</option>';
+            selectAsset.disabled = true;
+            
+            document.getElementById('selectLevel').selectedIndex = 2; // Level 2 default
+            document.getElementById('selectFormulir').selectedIndex = 0;
+            showToast('Form berhasil di-reset');
+        }
+
+        function updateCharCount(el) {
+            const current = el.value.length;
+            document.getElementById('charCounter').innerText = `${current}/200`;
+        }
+
+        function onGarduChange() {
+            const gardu = document.getElementById('selectGardu').value;
+            const baySelect = document.getElementById('selectBay');
+            const jenisAssetSelect = document.getElementById('selectJenisAsset');
+            const assetSelect = document.getElementById('selectAsset');
+            
+            // Reset downstream selects
+            baySelect.innerHTML = '<option value="" disabled selected>Pilih Bay</option>';
+            jenisAssetSelect.innerHTML = '<option value="" disabled selected>Pilih Bay terlebih dahulu</option>';
+            jenisAssetSelect.disabled = true;
+            assetSelect.innerHTML = '<option value="" disabled selected>Pilih Jenis Asset terlebih dahulu</option>';
+            assetSelect.disabled = true;
+
+            if (HIERARCHY_DATA[gardu]) {
+                const bays = Object.keys(HIERARCHY_DATA[gardu]);
+                bays.forEach(bay => {
+                    baySelect.innerHTML += `<option value="${bay}">${bay}</option>`;
+                });
+                baySelect.disabled = false;
+            } else {
+                baySelect.disabled = true;
+            }
+        }
+
+        function onBayChange() {
+            const gardu = document.getElementById('selectGardu').value;
+            const bay = document.getElementById('selectBay').value;
+            const jenisAssetSelect = document.getElementById('selectJenisAsset');
+            const assetSelect = document.getElementById('selectAsset');
+
+            // Reset downstream selects
+            jenisAssetSelect.innerHTML = '<option value="" disabled selected>Pilih Jenis Asset</option>';
+            assetSelect.innerHTML = '<option value="" disabled selected>Pilih Jenis Asset terlebih dahulu</option>';
+            assetSelect.disabled = true;
+
+            if (HIERARCHY_DATA[gardu] && HIERARCHY_DATA[gardu][bay]) {
+                const jenisAssets = Object.keys(HIERARCHY_DATA[gardu][bay]);
+                jenisAssets.forEach(ja => {
+                    jenisAssetSelect.innerHTML += `<option value="${ja}">${ja}</option>`;
+                });
+                jenisAssetSelect.disabled = false;
+            } else {
+                jenisAssetSelect.disabled = true;
+            }
+        }
+
+        function onJenisAssetChange() {
+            const gardu = document.getElementById('selectGardu').value;
+            const bay = document.getElementById('selectBay').value;
+            const jenisAsset = document.getElementById('selectJenisAsset').value;
+            const assetSelect = document.getElementById('selectAsset');
+            const formSelect = document.getElementById('selectFormulir');
+            
+            // Populate Asset dropdown based on selected GI, Bay, and Jenis Asset
+            assetSelect.innerHTML = '<option value="" disabled selected>Pilih Aset</option>';
+            
+            if (HIERARCHY_DATA[gardu] && HIERARCHY_DATA[gardu][bay] && HIERARCHY_DATA[gardu][bay][jenisAsset]) {
+                const assets = HIERARCHY_DATA[gardu][bay][jenisAsset];
+                assets.forEach(ast => {
+                    assetSelect.innerHTML += `<option value="${ast}">${ast}</option>`;
+                });
+                assetSelect.disabled = false;
+            } else {
+                assetSelect.disabled = true;
+            }
+
+            // Auto-recommend Checklist Form
+            if (jenisAsset === 'Power Transformer') {
+                formSelect.value = '[OPEN QA] Form Trafo Daya GIS - 6 Bulanan - IL2';
+            } else if (jenisAsset === 'Bay Penghantar') {
+                formSelect.value = '[OPEN QA] Form Bay Penghantar SUTT - IL2';
+            } else if (jenisAsset.includes('Circuit Breaker') || jenisAsset.includes('PMT')) {
+                formSelect.value = 'Form Pemeliharaan Rutin IL2';
+            } else if (jenisAsset.includes('Disconnecting') || jenisAsset.includes('PMS')) {
+                formSelect.value = 'Form Pemeliharaan Rutin IL2';
+            } else if (jenisAsset.includes('Current Transformer') || jenisAsset.includes('CT')) {
+                formSelect.value = '[OPEN QA] Form Current Transformer CT 150kV - IL3';
+            } else if (jenisAsset.includes('Lightning Arrester') || jenisAsset.includes('LA')) {
+                formSelect.value = 'Form Bay Trafo 150kV - IL1';
+            }
+        }
+
+        function handleSimpan() {
+            const deskripsi = document.getElementById('inputDeskripsi').value.trim() || 'Inspeksi Kondisional CBM';
+            const gardu = document.getElementById('selectGardu').value;
+            const bay = document.getElementById('selectBay').value;
+            const jenisAsset = document.getElementById('selectJenisAsset').value;
+            const asset = document.getElementById('selectAsset').value;
+            const level = document.getElementById('selectLevel').value || 'Inspeksi Level 2';
+            const formulir = document.getElementById('selectFormulir').value;
+
+            if (!gardu) {
+                alert('Silakan pilih Gardu Induk.');
+                return;
+            }
+            if (!bay) {
+                alert('Silakan pilih Bay.');
+                return;
+            }
+            if (!jenisAsset) {
+                alert('Silakan pilih Jenis Asset.');
+                return;
+            }
+            if (!asset) {
+                alert('Silakan pilih Aset.');
+                return;
+            }
+            if (!level) {
+                alert('Silakan pilih Level Inspeksi.');
+                return;
+            }
+            if (!formulir) {
+                alert('Silakan pilih Formulir Checklist.');
+                return;
+            }
+
+            // Generate randomized WO Number
+            const randomWoNum = 'CDT2026' + String(Math.floor(10000000 + Math.random() * 90000000));
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + 
+                            now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            const newItem = {
+                wo: randomWoNum,
+                date: dateStr,
+                deskripsi: deskripsi,
+                gardu: gardu,
+                bay: bay,
+                jenisAsset: jenisAsset,
+                asset: asset || jenisAsset,
+                level: level,
+                formulir: formulir,
+                timestamp: Date.now()
+            };
+
+            // Save to localStorage
+            try {
+                const existing = JSON.parse(localStorage.getItem('pln_cbm_items') || '[]');
+                existing.unshift(newItem);
+                localStorage.setItem('pln_cbm_items', JSON.stringify(existing));
+            } catch(e) {
+                console.error(e);
+            }
+
+            // Show Toast & Redirect
+            const toast = document.getElementById('toastNotification');
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                window.location.href = 'list-cbm.html?added=' + randomWoNum;
+            }, 600);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 18px;
+        width: 42px;
+        height: 42px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-blue);
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        z-index: 40;
+        transition: all 0.2s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        border-color: var(--primary-blue);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 75px;
+        left: 18px;
+        width: 290px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 10px 0;
+        font-family: 'Inter', sans-serif;
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        font-weight: 800;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 11.5px;
+        color: var(--text-main);
+        line-height: 1.5;
+      }
+      .notes-panel li {
+        margin-bottom: 6px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')" title="Catatan & Panduan Form Tambah CBM">
+      <i class="fa-solid fa-clipboard-question" style="font-size: 17px;"></i>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <i class="fa-solid fa-clipboard-check"></i>
+        Notes & Validasi Tambah CBM
+      </h3>
+      <ul>
+        <li><strong>Desain Eye-catching:</strong> Header selaras dengan <code>list-cbm.html</code>, banner intro penugasan, pengelompokan card input terstruktur per kategori.</li>
+        <li><strong>Interaktivitas:</strong> Tombol reset cepat, validasi form, auto-matching formulir & bay saat pemilihan gardu/aset.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+
+</body>
+</html>

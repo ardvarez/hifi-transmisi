@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Power Inspect - Inspeksi CBM</title>
+    <title>Power Inspect - CBM Inspeksi Kondisional</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f4f6fb;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --primary-blue: #1a65d6;
             --primary-blue-hover: #134db0;
-            --primary-light: #eef4ff;
-            --text-main: #1e293b;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
+            --card-border: #e2e8f0;
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
-            --purple-color: #8b5cf6;
+            --purple-color: #7c3aed;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -74,9 +75,31 @@
             }
         }
 
+        /* Status Bar */
+        .status-bar {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 22px 6px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
         /* App Header */
         .app-header {
-            padding: 18px 20px 14px;
+            flex-shrink: 0;
+            padding: 12px 18px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -91,6 +114,27 @@
             gap: 12px;
         }
 
+        .back-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
         .header-title-group {
             display: flex;
             flex-direction: column;
@@ -98,16 +142,17 @@
         
         .header-name { 
             font-weight: 800; 
-            font-size: 15px; 
+            font-size: 17px; 
             color: var(--text-main); 
             line-height: 1.2;
+            letter-spacing: -0.3px;
         }
         
         .header-sub { 
-            font-size: 11px; 
+            font-size: 11.5px; 
             color: var(--purple-color); 
-            font-weight: 700; 
-            letter-spacing: 0.3px;
+            font-weight: 700;
+            margin-top: 1px;
         }
 
         .header-actions {
@@ -117,8 +162,8 @@
         }
         
         .action-btn {
-            width: 36px; 
-            height: 36px;
+            width: 38px; 
+            height: 38px;
             border-radius: 50%;
             background: #f8fafc;
             border: 1px solid var(--border-color);
@@ -133,174 +178,16 @@
             transition: all 0.2s;
         }
 
-        /* Content Scroll */
-        .content-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 18px 24px;
-            scrollbar-width: none;
-        }
-        .content-scroll::-webkit-scrollbar { display: none; }
-
-        /* CBM Action Banner */
-        .cbm-banner {
-            background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            border-radius: 20px;
-            padding: 18px;
-            color: white;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
-        }
-
-        .cbm-banner-title {
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .cbm-banner-desc {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 14px;
-            line-height: 1.4;
-        }
-
-        .btn-create-cbm {
-            padding: 10px 16px;
-            background: white;
-            color: #7c3aed;
-            border: none;
-            border-radius: 12px;
-            font-size: 12.5px;
-            font-weight: 800;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-create-cbm:active { transform: scale(0.98); }
-
-        /* Filter Chips */
-        .filter-chips-row {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-        .filter-chips-row::-webkit-scrollbar { display: none; }
-
-        .chip {
-            padding: 6px 14px;
+        .action-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
             background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 11.5px;
-            font-weight: 700;
-            color: var(--text-muted);
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
         }
 
-        .chip.active {
-            background: var(--purple-color);
-            color: white;
-            border-color: var(--purple-color);
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
-        }
-
-        /* CBM Task Cards */
-        .cbm-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .cbm-card {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 16px;
-            border: 1.5px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .cbm-card:hover {
-            border-color: var(--purple-color);
-            transform: translateY(-2px);
-        }
-
-        .cbm-card:active { transform: scale(0.98); }
-
-        .cbm-card-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-
-        .cbm-type-badge {
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            background: #faf5ff;
-            color: var(--purple-color);
-            border: 1px solid #ddd6fe;
-        }
-
-        .cbm-status-tag {
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 20px;
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .cbm-title {
-            font-size: 14.5px;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .cbm-sub {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .cbm-meta {
-            border-top: 1px solid #f1f5f9;
-            padding-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11.5px;
-            color: var(--text-muted);
-        }
-
-        .btn-start-cbm {
-            padding: 6px 12px;
-            background: var(--purple-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* Universal Sync Modal Styles */
         .sync-badge-count {
             position: absolute;
-            top: -4px;
-            right: -4px;
+            top: -3px;
+            right: -3px;
             background: #f59e0b;
             color: white;
             font-size: 9px;
@@ -311,1038 +198,526 @@
             line-height: 1;
         }
 
-        .sync-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 14px 16px 30px;
+            scrollbar-width: none;
             display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* CBM Action Hero Banner */
+        .cbm-banner {
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: white;
+            box-shadow: 0 6px 18px rgba(29, 78, 216, 0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cbm-banner::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            bottom: -20px;
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cbm-banner-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cbm-banner-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cbm-banner-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            line-height: 1.25;
+        }
+
+        .cbm-banner-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.88);
+            line-height: 1.35;
+        }
+
+        .banner-action-row {
+            display: flex;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .btn-create-cbm {
+            padding: 7px 13px;
+            background: #ffffff;
+            color: var(--primary-blue);
+            border: none;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .btn-create-cbm:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        /* Sticky Filter & Search Section below Hero Banner */
+        .sticky-filter-section {
+            position: sticky;
+            top: -14px;
+            background: var(--bg-color);
+            padding: 6px 0 10px;
+            margin-top: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        /* Search Section */
+        .search-box {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 9px 13px;
+            transition: all 0.2s;
+            min-height: 40px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+        }
+
+        .search-box:focus-within {
+            background: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 12.5px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .search-box input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+            font-size: 13.5px;
+            margin-left: 8px;
+        }
+
+        /* Filter Chips */
+        .filter-chips-row {
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 1px 0 2px;
+            min-height: 32px;
+        }
+        .filter-chips-row::-webkit-scrollbar { display: none; }
+
+        .chip {
+            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .chip:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 6px rgba(26, 101, 214, 0.22);
+        }
+
+        /* CBM Task Cards */
+        .cbm-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .cbm-card {
+            flex-shrink: 0;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .cbm-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .cbm-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cbm-type-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 9px;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border: 1px solid #dbeafe;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cbm-status-tag {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 1. Mulai (Baru buat / Belum Dikerjakan) - Biru */
+        .cbm-status-tag.mulai {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* 2. Sedang Inspeksi - Ungu/Indigo */
+        .cbm-status-tag.proses {
+            background: #f5f3ff;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+
+        /* 3. Selesai Lokal - Oranye */
+        .cbm-status-tag.selesai-lokal {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+
+        /* 4. Selesai Server - Hijau */
+        .cbm-status-tag.selesai-server {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .cbm-status-tag.pending {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+
+        .cbm-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cbm-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.2px;
+            line-height: 1.3;
+        }
+
+        .cbm-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Detailed Metadata Grid */
+        .card-details-grid {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            border: 1px solid #edf2f7;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 11.5px;
+            line-height: 1.35;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            flex-shrink: 0;
+            width: 80px;
+        }
+
+        .detail-val {
+            color: var(--text-main);
+            font-weight: 700;
+            text-align: right;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        /* Action Buttons inside Card (Identical to Inspeksi Rutin) */
+        .btn-card-action, .btn-start-cbm {
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 8px;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-        .sync-modal-overlay.show { opacity: 1; pointer-events: auto; }
-
-        .sync-modal-card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 22px;
-            width: 90%;
-            max-width: 360px;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
-            animation: slideUpModal 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 8px;
+            min-height: 42px;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
-        @keyframes slideUpModal {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .btn-card-action:active, .btn-start-cbm:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
-        .sync-modal-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
+        .btn-blue, .btn-start-cbm {
+            background: #1a65d6;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.2);
+        }
+        .btn-blue:hover, .btn-start-cbm:hover {
+            background: #134db0;
         }
 
-        .sync-modal-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: #eff6ff;
-            color: #1a65d6;
+        .btn-purple, .btn-start-cbm.purple {
+            background: #7c3aed;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+        }
+        .btn-purple:hover, .btn-start-cbm.purple:hover {
+            background: #6d28d9;
+        }
+
+        .btn-orange, .btn-start-cbm.orange {
+            background: #ea580c;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+        }
+        .btn-orange:hover, .btn-start-cbm.orange:hover {
+            background: #c2410c;
+        }
+
+        .btn-green, .btn-start-cbm.green {
+            background: #059669;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+        }
+        .btn-green:hover, .btn-start-cbm.green:hover {
+            background: #047857;
+        }
+
+        /* Floating Action Button (FAB) */
+        .fab-add-btn {
+            position: absolute;
+            bottom: 24px;
+            right: 18px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            border: 1px solid #bfdbfe;
-            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(26, 101, 214, 0.35);
+            cursor: pointer;
+            border: none;
+            z-index: 40;
+            text-decoration: none;
+            transition: transform 0.2s, background 0.2s;
         }
 
-        .sync-modal-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--text-main);
-            line-height: 1.2;
+        .fab-add-btn:hover {
+            background: var(--primary-blue-hover);
+            transform: scale(1.05);
         }
 
-        .sync-modal-sub {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            margin-top: 2px;
+        .fab-add-btn:active {
+            transform: scale(0.95);
         }
 
-        .sync-status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: #ecfdf5;
-            color: #059669;
-            margin-bottom: 12px;
-        }
-
-        .pulse-dot {
-            width: 6px;
-            height: 6px;
-            background: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
-        }
-
-        .sync-item-row {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
+        /* Toast Notification */
+        .toast-popup {
+            position: absolute;
+            top: 20px;
+            left: 18px;
+            right: 18px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 16px;
             border-radius: 12px;
-            padding: 10px 12px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .sync-item-info { display: flex; flex-direction: column; }
-        .item-title { font-size: 12px; font-weight: 700; color: var(--text-main); }
-        .item-time { font-size: 10px; color: var(--text-muted); }
-        .sync-item-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 6px;
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .sync-progress-bar-bg {
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 6px;
-        }
-
-        .sync-progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: #1a65d6;
-            border-radius: 6px;
-            transition: width 0.3s ease;
-        }
-
-        .sync-progress-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--primary-blue);
-            text-align: center;
-        }
-
-        .sync-modal-footer {
-            display: flex;
             gap: 10px;
-            margin-top: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 200;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .btn-cancel-sync {
-            flex: 1;
-            padding: 10px;
-            background: #f1f5f9;
-            color: #475569;
-            border: none;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
+        .toast-popup.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .btn-confirm-sync {
-            flex: 2;
-            padding: 10px;
-            background: #1a65d6;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
+        .toast-icon {
+            color: #10b981;
+            font-size: 15px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: none;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
         }
 
-    
-        
-        /* Power Inspect Deep Component Specifics */
-        body.dark-mode .app-header {
-            background: #0f172a !important;
-            border-bottom-color: #334155 !important;
+        .empty-state i {
+            font-size: 38px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
         }
 
-        body.dark-mode .search-box,
-        body.dark-mode .search-container,
-        body.dark-mode .search-bar-wrap {
-            background: #0f172a !important;
-            border-color: #334155 !important;
-        }
-
-        body.dark-mode .search-box input {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .filter-chip,
-        body.dark-mode .chip-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .filter-chip.active,
-        body.dark-mode .chip-item.active {
-            background: #0284c7 !important;
-            border-color: #0284c7 !important;
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .param-card,
-        body.dark-mode .parameter-card,
-        body.dark-mode .accordion-item,
-        body.dark-mode .photo-box,
-        body.dark-mode .upload-card,
-        body.dark-mode .rekap-card,
-        body.dark-mode .sync-item-card,
-        body.dark-mode .queue-item,
-        body.dark-mode .wo-list-card,
-        body.dark-mode .bay-item-card,
-        body.dark-mode .cbm-card,
-        body.dark-mode .survey-item-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .param-header,
-        body.dark-mode .accordion-header {
-            background: #0f172a !important;
-            border-bottom-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .action-btn {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #cbd5e1 !important;
-        }
-
-        
-        
-        
-        
-        
-        
-        /* ========================================================
-           ULTRA-COMPLETE PLN TRANSMISI MOBILE DARK / NIGHT MODE SYSTEM
-           ======================================================== */
-        html.dark-mode,
-        body.dark-mode {
-            background-color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .mobile-container,
+        /* Dark Mode */
         body.dark-mode .mobile-container {
             --bg-color: #0b1329 !important;
-            --bg-canvas: #0b1329 !important;
             --card-bg: #1e293b !important;
             --text-main: #f8fafc !important;
-            --text-dark: #f8fafc !important;
             --text-muted: #94a3b8 !important;
-            --text-sub: #94a3b8 !important;
             --border-color: #334155 !important;
-            --input-bg: #0f172a !important;
+            --card-border: #334155 !important;
             background-color: #0b1329 !important;
             color: #f8fafc !important;
         }
 
-        /* Status Bar & Headers */
+        body.dark-mode .status-bar,
         body.dark-mode .app-header,
-        body.dark-mode .header-section,
-        body.dark-mode .header-white,
-        body.dark-mode .page-header,
-        body.dark-mode .unified-header-container,
-        body.dark-mode .search-filter-section,
-        html.dark-mode .app-header,
-        html.dark-mode .header-section,
-        html.dark-mode .header-white,
-        html.dark-mode .page-header,
-        html.dark-mode .unified-header-container,
-        html.dark-mode .search-filter-section {
-            background: #0f172a !important;
-            border-bottom-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .status-bar:not([style*="background: var(--header-blue)"]):not([style*="background-color: var(--header-blue)"]):not([style*="background: #0b4884"]),
-        html.dark-mode .status-bar:not([style*="background: var(--header-blue)"]):not([style*="background-color: var(--header-blue)"]):not([style*="background: #0b4884"]) {
-            color: #f8fafc !important;
-        }
-
-        /* All 200+ Card, Section, Container, Modal & Panel Classes */
-        body.dark-mode .card,
-        body.dark-mode .card-body,
-        body.dark-mode .task-card,
-        body.dark-mode .gi-task-card,
-        body.dark-mode .schedule-card,
-        body.dark-mode .survey-modern-card,
-        body.dark-mode .sync-modal-card,
-        body.dark-mode .confirm-modal-card,
-        body.dark-mode .bottom-sheet-card,
-        body.dark-mode .notif-flag,
-        body.dark-mode .asset-card,
-        body.dark-mode .asset-detail-card,
-        body.dark-mode .asset-survey-card,
-        body.dark-mode .bay-card,
-        body.dark-mode .bay-asset-preview,
-        body.dark-mode .bay-summary-card,
-        body.dark-mode .book-card,
-        body.dark-mode .catalog-container-card,
-        body.dark-mode .catalog-item-card,
-        body.dark-mode .catalog-sheet-card,
-        body.dark-mode .cbm-card,
-        body.dark-mode .chart-card,
-        body.dark-mode .chart-card-wrapper,
-        body.dark-mode .detail-data-card,
-        body.dark-mode .detail-item-card,
-        body.dark-mode .detail-section-card,
-        body.dark-mode .empty-state-box,
-        body.dark-mode .empty-faq-box,
-        body.dark-mode .end-form-card,
-        body.dark-mode .ers-card,
-        body.dark-mode .ers-detail-card,
-        body.dark-mode .faq-item-card,
-        body.dark-mode .feature-card-item,
-        body.dark-mode .form-card,
-        body.dark-mode .form-section,
-        body.dark-mode .form-section-card,
-        body.dark-mode .form-group-card,
-        body.dark-mode .form-survey-card,
-        body.dark-mode .gi-bay-card,
-        body.dark-mode .group-header-card,
-        body.dark-mode .help-section,
-        body.dark-mode .help-item,
-        body.dark-mode .hero-card,
-        body.dark-mode .history-modern-card,
-        body.dark-mode .inspection-card,
-        body.dark-mode .item-card,
-        body.dark-mode .jadwal-card,
-        body.dark-mode .kpi-card,
-        body.dark-mode .kuota-card,
-        body.dark-mode .list-card,
-        body.dark-mode .location-item-card,
-        body.dark-mode .login-card,
-        body.dark-mode .map-view-card,
-        body.dark-mode .map-card-wrapper,
-        body.dark-mode .map-legend-box,
-        body.dark-mode .menu-card,
-        body.dark-mode .menu-grid-card,
-        body.dark-mode .mock-card,
-        body.dark-mode .modal-box,
-        body.dark-mode .modal-content,
-        body.dark-mode .modal-drawer,
-        body.dark-mode .notif-card,
-        body.dark-mode .notif-card-large,
-        body.dark-mode .notif-item,
-        body.dark-mode .notif-toggle-row,
-        body.dark-mode .param-card,
-        body.dark-mode .photo-box,
-        body.dark-mode .photo-recap-card,
-        body.dark-mode .photo-upload-box,
-        body.dark-mode .popup-card,
-        body.dark-mode .profile-user-card,
-        body.dark-mode .profile-row-item,
-        body.dark-mode .progress-overview-card,
-        body.dark-mode .quick-action-card,
-        body.dark-mode .readiness-card,
-        body.dark-mode .rekap-card,
-        body.dark-mode .result-card,
-        body.dark-mode .section-card,
-        body.dark-mode .simulation-controls,
-        body.dark-mode .spec-card,
-        body.dark-mode .step-card,
-        body.dark-mode .summary-card,
-        body.dark-mode .survey-card,
-        body.dark-mode .survey-header-card,
-        body.dark-mode .survey-sync-card,
-        body.dark-mode .sync-card,
-        body.dark-mode .sync-hero-card,
-        body.dark-mode .sync-item-row,
-        body.dark-mode .table-card,
-        body.dark-mode .table-container,
-        body.dark-mode .test-param-card,
-        body.dark-mode .tower-info-card,
-        body.dark-mode .upload-card,
-        body.dark-mode .wo-card,
-        body.dark-mode .bottom-sheet,
-        body.dark-mode .action-sheet,
-        body.dark-mode .filter-modal-content,
-        body.dark-mode .catalog-modal-content,
-        html.dark-mode .card,
-        html.dark-mode .card-body,
-        html.dark-mode .task-card,
-        html.dark-mode .gi-task-card,
-        html.dark-mode .schedule-card,
-        html.dark-mode .survey-modern-card,
-        html.dark-mode .sync-modal-card,
-        html.dark-mode .confirm-modal-card,
-        html.dark-mode .bottom-sheet-card,
-        html.dark-mode .notif-flag,
-        html.dark-mode .asset-card,
-        html.dark-mode .asset-detail-card,
-        html.dark-mode .asset-survey-card,
-        html.dark-mode .bay-card,
-        html.dark-mode .bay-asset-preview,
-        html.dark-mode .bay-summary-card,
-        html.dark-mode .book-card,
-        html.dark-mode .catalog-container-card,
-        html.dark-mode .catalog-item-card,
-        html.dark-mode .catalog-sheet-card,
-        html.dark-mode .cbm-card,
-        html.dark-mode .chart-card,
-        html.dark-mode .chart-card-wrapper,
-        html.dark-mode .detail-data-card,
-        html.dark-mode .detail-item-card,
-        html.dark-mode .detail-section-card,
-        html.dark-mode .empty-state-box,
-        html.dark-mode .empty-faq-box,
-        html.dark-mode .end-form-card,
-        html.dark-mode .ers-card,
-        html.dark-mode .ers-detail-card,
-        html.dark-mode .faq-item-card,
-        html.dark-mode .feature-card-item,
-        html.dark-mode .form-card,
-        html.dark-mode .form-section,
-        html.dark-mode .form-section-card,
-        html.dark-mode .form-group-card,
-        html.dark-mode .form-survey-card,
-        html.dark-mode .gi-bay-card,
-        html.dark-mode .group-header-card,
-        html.dark-mode .help-section,
-        html.dark-mode .help-item,
-        html.dark-mode .hero-card,
-        html.dark-mode .history-modern-card,
-        html.dark-mode .inspection-card,
-        html.dark-mode .item-card,
-        html.dark-mode .jadwal-card,
-        html.dark-mode .kpi-card,
-        html.dark-mode .kuota-card,
-        html.dark-mode .list-card,
-        html.dark-mode .location-item-card,
-        html.dark-mode .login-card,
-        html.dark-mode .map-view-card,
-        html.dark-mode .map-card-wrapper,
-        html.dark-mode .map-legend-box,
-        html.dark-mode .menu-card,
-        html.dark-mode .menu-grid-card,
-        html.dark-mode .mock-card,
-        html.dark-mode .modal-box,
-        html.dark-mode .modal-content,
-        html.dark-mode .modal-drawer,
-        html.dark-mode .notif-card,
-        html.dark-mode .notif-card-large,
-        html.dark-mode .notif-item,
-        html.dark-mode .notif-toggle-row,
-        html.dark-mode .param-card,
-        html.dark-mode .photo-box,
-        html.dark-mode .photo-recap-card,
-        html.dark-mode .photo-upload-box,
-        html.dark-mode .popup-card,
-        html.dark-mode .profile-user-card,
-        html.dark-mode .profile-row-item,
-        html.dark-mode .progress-overview-card,
-        html.dark-mode .quick-action-card,
-        html.dark-mode .readiness-card,
-        html.dark-mode .rekap-card,
-        html.dark-mode .result-card,
-        html.dark-mode .section-card,
-        html.dark-mode .simulation-controls,
-        html.dark-mode .spec-card,
-        html.dark-mode .step-card,
-        html.dark-mode .summary-card,
-        html.dark-mode .survey-card,
-        html.dark-mode .survey-header-card,
-        html.dark-mode .survey-sync-card,
-        html.dark-mode .sync-card,
-        html.dark-mode .sync-hero-card,
-        html.dark-mode .sync-item-row,
-        html.dark-mode .table-card,
-        html.dark-mode .table-container,
-        html.dark-mode .test-param-card,
-        html.dark-mode .tower-info-card,
-        html.dark-mode .upload-card,
-        html.dark-mode .wo-card,
-        html.dark-mode .bottom-sheet,
-        html.dark-mode .action-sheet,
-        html.dark-mode .filter-modal-content,
-        html.dark-mode .catalog-modal-content {
-            background: #1e293b !important;
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        /* Inspection Result Card Specifics */
-        body.dark-mode .result-card,
-        html.dark-mode .result-card {
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .result-card-title,
-        html.dark-mode .result-card-title {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .result-card-sub,
-        html.dark-mode .result-card-sub {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .meta-lbl,
-        html.dark-mode .meta-lbl {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .meta-val,
-        html.dark-mode .meta-val {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .dotted-divider,
-        html.dark-mode .dotted-divider {
-            border-top-color: #334155 !important;
-        }
-
-        body.dark-mode .thin-line-divider,
-        html.dark-mode .thin-line-divider {
-            background: #334155 !important;
-        }
-
-        body.dark-mode .btn-card-sync,
-        html.dark-mode .btn-card-sync {
-            background: #1e293b !important;
-            border-color: #ea580c !important;
-            color: #fb923c !important;
-        }
-
-        body.dark-mode .btn-card-synced,
-        html.dark-mode .btn-card-synced {
-            background: #064e3b !important;
-            border-color: #047857 !important;
-            color: #6ee7b7 !important;
-        }
-
-        /* Konfirmasi Asset & Modal Components */
-        body.dark-mode .confirm-modal-card,
-        html.dark-mode .confirm-modal-card {
-            background-color: #1e293b !important;
-            border: 1px solid #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .confirm-modal-title,
-        html.dark-mode .confirm-modal-title {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .confirm-detail-label,
-        html.dark-mode .confirm-detail-label {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .confirm-detail-list,
-        html.dark-mode .confirm-detail-list {
-            background-color: #0f172a !important;
-            border: 1px solid #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .confirm-key,
-        html.dark-mode .confirm-key {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .confirm-val,
-        html.dark-mode .confirm-val {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .confirm-note,
-        html.dark-mode .confirm-note {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .confirm-question,
-        html.dark-mode .confirm-question {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .btn-confirm-kembali,
-        html.dark-mode .btn-confirm-kembali {
-            background: #1e293b !important;
-            border: 1.5px solid #ef4444 !important;
-            color: #ef4444 !important;
-        }
-
-        /* Error Bottom Sheet Modal */
-        body.dark-mode .bottom-sheet-card,
-        html.dark-mode .bottom-sheet-card {
-            background-color: #1e293b !important;
-            border-top: 1px solid #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .sheet-title,
-        html.dark-mode .sheet-title {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .sheet-drag-handle,
-        html.dark-mode .sheet-drag-handle {
-            background: #475569 !important;
-        }
-
-        body.dark-mode .error-text-content,
-        html.dark-mode .error-text-content {
-            background-color: #0f172a !important;
-            border-color: #334155 !important;
-            color: #fca5a5 !important;
-        }
-
-        body.dark-mode .btn-copy-error,
-        html.dark-mode .btn-copy-error {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #cbd5e1 !important;
-        }
-
-        /* Arahan & Quote Desc Box */
-        body.dark-mode .arahan-desc-box,
-        html.dark-mode .arahan-desc-box {
+        body.dark-mode .frozen-header-section {
             background: #0f172a !important;
             border-color: #334155 !important;
-            border-left: 3.5px solid #38bdf8 !important;
-        }
-
-        body.dark-mode .arahan-text,
-        html.dark-mode .arahan-text {
-            color: #cbd5e1 !important;
-        }
-
-        body.dark-mode .arahan-author,
-        html.dark-mode .arahan-author {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .arahan-quote-icon,
-        html.dark-mode .arahan-quote-icon {
-            color: #38bdf8 !important;
-        }
-
-        /* Inner White / Neutral Background Elements */
-        body.dark-mode div[style*="background: #ffffff"],
-        body.dark-mode div[style*="background:#ffffff"],
-        body.dark-mode div[style*="background: white"],
-        body.dark-mode div[style*="background: #f8fafc"],
-        body.dark-mode div[style*="background:#f8fafc"],
-        body.dark-mode div[style*="background: #f1f5f9"],
-        body.dark-mode div[style*="background:#f1f5f9"],
-        html.dark-mode div[style*="background: #ffffff"],
-        html.dark-mode div[style*="background:#ffffff"],
-        html.dark-mode div[style*="background: white"],
-        html.dark-mode div[style*="background: #f8fafc"],
-        html.dark-mode div[style*="background:#f8fafc"],
-        html.dark-mode div[style*="background: #f1f5f9"],
-        html.dark-mode div[style*="background:#f1f5f9"] {
-            background: #1e293b !important;
-            border-color: #334155 !important;
             color: #f8fafc !important;
         }
 
-        /* Inner Accent Tinted Boxes */
-        body.dark-mode div[style*="background: #eff6ff"],
-        body.dark-mode div[style*="background:#eff6ff"],
-        html.dark-mode div[style*="background: #eff6ff"],
-        html.dark-mode div[style*="background:#eff6ff"] {
-            background: #172554 !important;
-            border-color: #1e40af !important;
-            color: #93c5fd !important;
-        }
-
-        body.dark-mode div[style*="background: #fef3c7"],
-        body.dark-mode div[style*="background:#fef3c7"],
-        html.dark-mode div[style*="background: #fef3c7"],
-        html.dark-mode div[style*="background:#fef3c7"] {
-            background: #451a03 !important;
-            border-color: #78350f !important;
-            color: #fde68a !important;
-        }
-
-        body.dark-mode div[style*="background: #ecfdf5"],
-        body.dark-mode div[style*="background:#ecfdf5"],
-        html.dark-mode div[style*="background: #ecfdf5"],
-        html.dark-mode div[style*="background:#ecfdf5"] {
-            background: #064e3b !important;
-            border-color: #047857 !important;
-            color: #6ee7b7 !important;
-        }
-
-        body.dark-mode div[style*="background: #fef2f2"],
-        body.dark-mode div[style*="background:#fef2f2"],
-        body.dark-mode div[style*="background: #fee2e2"],
-        body.dark-mode div[style*="background:#fee2e2"],
-        html.dark-mode div[style*="background: #fef2f2"],
-        html.dark-mode div[style*="background:#fef2f2"],
-        html.dark-mode div[style*="background: #fee2e2"],
-        html.dark-mode div[style*="background:#fee2e2"] {
-            background: #450a0a !important;
-            border-color: #991b1b !important;
-            color: #fca5a5 !important;
-        }
-
-        /* All Form Inputs, Textareas, Selects & Search Boxes */
-        body.dark-mode input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
-        body.dark-mode textarea,
-        body.dark-mode select,
-        body.dark-mode .form-control,
-        body.dark-mode .form-input,
-        body.dark-mode .form-input-text,
-        body.dark-mode .form-textarea,
-        body.dark-mode .form-textarea-box,
-        body.dark-mode .form-select,
-        body.dark-mode .form-select-custom,
-        body.dark-mode .input-box,
-        body.dark-mode .search-input,
-        body.dark-mode .filter-input-field,
-        body.dark-mode .filter-select,
-        body.dark-mode .sheet-input-field,
-        body.dark-mode .sheet-textarea,
-        body.dark-mode .custom-select,
         body.dark-mode .search-box,
-        html.dark-mode input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
-        html.dark-mode textarea,
-        html.dark-mode select,
-        html.dark-mode .form-control,
-        html.dark-mode .form-input,
-        html.dark-mode .form-input-text,
-        html.dark-mode .form-textarea,
-        html.dark-mode .form-textarea-box,
-        html.dark-mode .form-select,
-        html.dark-mode .form-select-custom,
-        html.dark-mode .input-box,
-        html.dark-mode .search-input,
-        html.dark-mode .filter-input-field,
-        html.dark-mode .filter-select,
-        html.dark-mode .sheet-input-field,
-        html.dark-mode .sheet-textarea,
-        html.dark-mode .custom-select,
-        html.dark-mode .search-box {
-            background: #0f172a !important;
-            background-color: #0f172a !important;
-            border-color: #334155 !important;
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode input::placeholder,
-        body.dark-mode textarea::placeholder,
-        body.dark-mode .search-box input::placeholder,
-        html.dark-mode input::placeholder,
-        html.dark-mode textarea::placeholder,
-        html.dark-mode .search-box input::placeholder {
-            color: #64748b !important;
-        }
-
-        /* Typography & Contrast */
-        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6,
-        body.dark-mode .main-title, body.dark-mode .card-title, body.dark-mode .section-title,
-        body.dark-mode .item-title, body.dark-mode .catalog-title, body.dark-mode .kpi-label,
-        body.dark-mode .form-label, body.dark-mode .field-label, body.dark-mode .label-text,
-        body.dark-mode .header-name, body.dark-mode .simulation-title, body.dark-mode .feature-title,
-        body.dark-mode .progress-card-title, body.dark-mode .sync-hero-title, body.dark-mode .task-title,
-        body.dark-mode .sync-modal-title, body.dark-mode .notif-title, body.dark-mode .book-title,
-        body.dark-mode .faq-question-btn, body.dark-mode .filter-drawer-title, body.dark-mode .hierarchy-title,
-        body.dark-mode .location-item-title, body.dark-mode .location-sheet-title, body.dark-mode .profile-item-title,
-        body.dark-mode .profile-name, body.dark-mode .sheet-title-center, body.dark-mode .success-title,
-        body.dark-mode .survey-type-name, body.dark-mode .confirm-question, body.dark-mode .confirm-val,
-        body.dark-mode label, body.dark-mode strong,
-        html.dark-mode h1, html.dark-mode h2, html.dark-mode h3, html.dark-mode h4, html.dark-mode h5, html.dark-mode h6,
-        html.dark-mode .main-title, html.dark-mode .card-title, html.dark-mode .section-title,
-        html.dark-mode .item-title, html.dark-mode .catalog-title, html.dark-mode .kpi-label,
-        html.dark-mode .form-label, html.dark-mode .field-label, html.dark-mode .label-text,
-        html.dark-mode .header-name, html.dark-mode .simulation-title, html.dark-mode .feature-title,
-        html.dark-mode .progress-card-title, html.dark-mode .sync-hero-title, html.dark-mode .task-title,
-        html.dark-mode .sync-modal-title, html.dark-mode .notif-title, html.dark-mode .book-title,
-        html.dark-mode .faq-question-btn, html.dark-mode .filter-drawer-title, html.dark-mode .hierarchy-title,
-        html.dark-mode .location-item-title, html.dark-mode .location-sheet-title, html.dark-mode .profile-item-title,
-        html.dark-mode .profile-name, html.dark-mode .sheet-title-center, html.dark-mode .success-title,
-        html.dark-mode .survey-type-name, html.dark-mode .confirm-question, html.dark-mode .confirm-val,
-        html.dark-mode label, html.dark-mode strong {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode p, body.dark-mode .sub-title, body.dark-mode .section-subtitle,
-        body.dark-mode .item-sub, body.dark-mode .kpi-subtext, body.dark-mode .card-desc,
-        body.dark-mode .text-muted, body.dark-mode .text-secondary, body.dark-mode .info-text,
-        body.dark-mode .drawer-desc, body.dark-mode .profile-role, body.dark-mode .profile-item-sub,
-        body.dark-mode .profile-group-label, body.dark-mode .radio-label, body.dark-mode .card-subtitle,
-        body.dark-mode .sync-hero-desc, body.dark-mode .item-meta, body.dark-mode .progress-legend-item,
-        body.dark-mode .notif-desc, body.dark-mode .sync-modal-sub, body.dark-mode .stat-row,
-        body.dark-mode .book-desc, body.dark-mode .faq-answer-body, body.dark-mode .filter-label,
-        body.dark-mode .filter-section-label, body.dark-mode .modal-form-label, body.dark-mode .param-field-label,
-        body.dark-mode .profile-form-label, body.dark-mode .program-banner-text, body.dark-mode .quick-action-label,
-        body.dark-mode .sync-detail-lbl, body.dark-mode .tag-merk,
-        html.dark-mode p, html.dark-mode .sub-title, html.dark-mode .section-subtitle,
-        html.dark-mode .item-sub, html.dark-mode .kpi-subtext, html.dark-mode .card-desc,
-        html.dark-mode .text-muted, html.dark-mode .text-secondary, html.dark-mode .info-text,
-        html.dark-mode .drawer-desc, html.dark-mode .profile-role, html.dark-mode .profile-item-sub,
-        html.dark-mode .profile-group-label, html.dark-mode .radio-label, html.dark-mode .card-subtitle,
-        html.dark-mode .sync-hero-desc, html.dark-mode .item-meta, html.dark-mode .progress-legend-item,
-        html.dark-mode .notif-desc, html.dark-mode .sync-modal-sub, html.dark-mode .stat-row,
-        html.dark-mode .book-desc, html.dark-mode .faq-answer-body, html.dark-mode .filter-label,
-        html.dark-mode .filter-section-label, html.dark-mode .modal-form-label, html.dark-mode .param-field-label,
-        html.dark-mode .profile-form-label, html.dark-mode .program-banner-text, html.dark-mode .quick-action-label,
-        html.dark-mode .sync-detail-lbl, html.dark-mode .tag-merk {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .stat-row span:last-child,
-        html.dark-mode .stat-row span:last-child {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode div[style*="color: #1e293b"],
-        body.dark-mode div[style*="color:#1e293b"],
-        body.dark-mode div[style*="color: #0f172a"],
-        body.dark-mode div[style*="color:#0f172a"],
-        body.dark-mode div[style*="color: #334155"],
-        body.dark-mode div[style*="color:#334155"],
-        body.dark-mode span[style*="color: #1e293b"],
-        body.dark-mode span[style*="color:#1e293b"],
-        body.dark-mode span[style*="color: #0f172a"],
-        body.dark-mode span[style*="color:#0f172a"],
-        body.dark-mode span[style*="color: #334155"],
-        body.dark-mode span[style*="color:#334155"],
-        html.dark-mode div[style*="color: #1e293b"],
-        html.dark-mode div[style*="color:#1e293b"],
-        html.dark-mode div[style*="color: #0f172a"],
-        html.dark-mode div[style*="color:#0f172a"],
-        html.dark-mode div[style*="color: #334155"],
-        html.dark-mode div[style*="color:#334155"],
-        html.dark-mode span[style*="color: #1e293b"],
-        html.dark-mode span[style*="color:#1e293b"],
-        html.dark-mode span[style*="color: #0f172a"],
-        html.dark-mode span[style*="color:#0f172a"],
-        html.dark-mode span[style*="color: #334155"],
-        html.dark-mode span[style*="color:#334155"] {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .kpi-value,
-        html.dark-mode .kpi-value {
-            color: #f8fafc !important;
-        }
-
-        body.dark-mode .grid-label,
-        html.dark-mode .grid-label {
-            color: #cbd5e1 !important;
-        }
-
-        /* Promo Banner & Welcome Banners in Dark Mode */
-        body.dark-mode .promo-banner,
-        body.dark-mode .welcome-card,
-        html.dark-mode .promo-banner,
-        html.dark-mode .welcome-card {
-            background: linear-gradient(105deg, #172554 0%, #1e3a8a 50%, #1e293b 100%) !important;
-            border: 1px solid #1e40af !important;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
-        }
-
-        body.dark-mode .banner-title,
-        body.dark-mode .welcome-title,
-        html.dark-mode .banner-title,
-        html.dark-mode .welcome-title {
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .banner-subtitle,
-        body.dark-mode .welcome-desc,
-        html.dark-mode .banner-subtitle,
-        html.dark-mode .welcome-desc {
-            color: #93c5fd !important;
-        }
-
-        body.dark-mode .banner-btn,
-        body.dark-mode .welcome-btn,
-        html.dark-mode .banner-btn,
-        html.dark-mode .welcome-btn {
-            background: #1d4ed8 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3) !important;
-        }
-
-        body.dark-mode .welcome-btn-outline,
-        html.dark-mode .welcome-btn-outline {
-            background: rgba(30, 41, 59, 0.8) !important;
-            border-color: #334155 !important;
-            color: #93c5fd !important;
-        }
-
-        /* Buttons & Badges */
-        body.dark-mode .back-nav-btn,
         body.dark-mode .back-btn,
-        body.dark-mode .back-home-btn,
-        body.dark-mode .header-icon-btn,
-        body.dark-mode .filter-btn,
-        body.dark-mode .btn-secondary,
-        body.dark-mode .btn-ghost,
         body.dark-mode .action-btn,
-        body.dark-mode .btn-cancel-sync,
-        body.dark-mode .btn-sheet-cancel,
-        body.dark-mode .btn-sheet-reset,
-        body.dark-mode .btn-outline,
-        html.dark-mode .back-nav-btn,
-        html.dark-mode .back-btn,
-        html.dark-mode .back-home-btn,
-        html.dark-mode .header-icon-btn,
-        html.dark-mode .filter-btn,
-        html.dark-mode .btn-secondary,
-        html.dark-mode .btn-ghost,
-        html.dark-mode .action-btn,
-        html.dark-mode .btn-cancel-sync,
-        html.dark-mode .btn-sheet-cancel,
-        html.dark-mode .btn-sheet-reset,
-        html.dark-mode .btn-outline {
+        body.dark-mode .chip {
             background: #1e293b !important;
             border-color: #334155 !important;
-            color: #cbd5e1 !important;
+            color: #f8fafc !important;
         }
 
-        body.dark-mode .item-arrow-icon,
-        body.dark-mode .kpi-arrow-icon,
-        body.dark-mode .arrow-icon,
-        body.dark-mode .chevron-circle,
-        html.dark-mode .item-arrow-icon,
-        html.dark-mode .kpi-arrow-icon,
-        html.dark-mode .arrow-icon,
-        html.dark-mode .chevron-circle {
-            color: #64748b !important;
-        }
-
-        body.dark-mode .filter-handle,
-        body.dark-mode .catalog-handle,
-        body.dark-mode .drawer-handle,
-        html.dark-mode .filter-handle,
-        html.dark-mode .catalog-handle,
-        html.dark-mode .drawer-handle {
-            background-color: #475569 !important;
-        }
-
-        body.dark-mode .progress-circle-box,
-        html.dark-mode .progress-circle-box {
-            background: #0f172a !important;
-            border-color: #334155 !important;
-            color: #38bdf8 !important;
-        }
-
-        /* Filter Chips & Tabs */
-        body.dark-mode .filter-chip,
-        body.dark-mode .chip-btn,
-        body.dark-mode .chip-item,
-        body.dark-mode .chip,
-        body.dark-mode .tab-btn,
-        body.dark-mode .tab-pill,
-        body.dark-mode .segment-tab-pill,
-        body.dark-mode .category-tab-pill,
-        body.dark-mode .app-tab-pill,
-        html.dark-mode .filter-chip,
-        html.dark-mode .chip-btn,
-        html.dark-mode .chip-item,
-        html.dark-mode .chip,
-        html.dark-mode .tab-btn,
-        html.dark-mode .tab-pill,
-        html.dark-mode .segment-tab-pill,
-        html.dark-mode .category-tab-pill,
-        html.dark-mode .app-tab-pill {
+        body.dark-mode .cbm-card,
+        body.dark-mode .card-details-grid {
             background: #1e293b !important;
             border-color: #334155 !important;
-            color: #94a3b8 !important;
+            color: #f8fafc !important;
         }
 
-        body.dark-mode .filter-chip.active,
-        body.dark-mode .chip-btn.active,
-        body.dark-mode .chip-item.active,
-        body.dark-mode .tab-btn.active,
-        body.dark-mode .tab-pill.active,
-        body.dark-mode .segment-tab-pill.active,
-        body.dark-mode .category-tab-pill.active,
-        body.dark-mode .app-tab-pill.active,
-        html.dark-mode .filter-chip.active,
-        html.dark-mode .chip-btn.active,
-        html.dark-mode .chip-item.active,
-        html.dark-mode .tab-btn.active,
-        html.dark-mode .tab-pill.active,
-        html.dark-mode .segment-tab-pill.active,
-        html.dark-mode .category-tab-pill.active,
-        html.dark-mode .app-tab-pill.active {
-            background: #0284c7 !important;
-            color: #ffffff !important;
-            border-color: #0284c7 !important;
+        body.dark-mode .cbm-meta {
+            border-color: #334155 !important;
         }
-
-        /* Bottom Sticky Bars & Navigation */
-        body.dark-mode .bottom-nav,
-        body.dark-mode .bottom-navbar,
-        body.dark-mode .nav-bar,
-        body.dark-mode .footer-nav,
-        body.dark-mode .bottom-bar-fixed,
-        body.dark-mode .bottom-action-bar,
-        body.dark-mode .bottom-sticky-bar,
-        body.dark-mode .sticky-footer-bar,
-        html.dark-mode .bottom-nav,
-        html.dark-mode .bottom-navbar,
-        html.dark-mode .nav-bar,
-        html.dark-mode .footer-nav,
-        html.dark-mode .bottom-bar-fixed,
-        html.dark-mode .bottom-action-bar,
-        html.dark-mode .bottom-sticky-bar,
-        html.dark-mode .sticky-footer-bar {
-            background: #1e293b !important;
-            border-top-color: #334155 !important;
-        }
-
-        body.dark-mode .bottom-nav .nav-item,
-        body.dark-mode .bottom-navbar .nav-item,
-        html.dark-mode .bottom-nav .nav-item,
-        html.dark-mode .bottom-navbar .nav-item {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .bottom-nav .nav-item.active,
-        body.dark-mode .bottom-navbar .nav-item.active,
-        html.dark-mode .bottom-nav .nav-item.active,
-        html.dark-mode .bottom-navbar .nav-item.active {
-            color: #38bdf8 !important;
-        }
-
-        body.dark-mode .ios-bar,
-        html.dark-mode .ios-bar {
-            background: #ffffff !important;
-        }
-
     </style>
 
     <script>
@@ -1387,16 +762,31 @@
 <body>
 
     <div class="mobile-container">
+        <!-- Toast Notification -->
+        <div class="toast-popup" id="toastNotification">
+            <i class="fa-solid fa-circle-check toast-icon"></i>
+            <span id="toastMessage">Inspeksi CBM berhasil diperbarui</span>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>14:17</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
         
         <!-- App Header -->
         <div class="app-header">
             <div class="header-left-group">
-                <button class="action-btn" onclick="goBack()" title="Kembali ke Dashboard">
+                <button class="back-btn" onclick="goBack()" title="Kembali ke Home">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div class="header-title-group">
-                    <div class="header-name">Inspeksi CBM</div>
-                    <div class="header-sub">4 JADWAL PENGUJIAN AKTIF</div>
+                    <div class="header-name">CBM</div>
+                    <div class="header-sub">Inspeksi Kondisional</div>
                 </div>
             </div>
             <div class="header-actions">
@@ -1404,94 +794,290 @@
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                     <span class="sync-badge-count">3</span>
                 </div>
-                <div class="action-btn" onclick="window.location.href='../notifikasi-mobile.html'" title="Notifikasi">
-                    <i class="fa-regular fa-bell"></i>
+                <div class="action-btn" onclick="refreshList()" title="Muat Ulang">
+                    <i class="fa-solid fa-rotate-right"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Content Scroll -->
-        <div class="content-scroll">
+        <!-- Content Scroll Area -->
+        <div class="content-scroll" id="contentScrollArea">
             
-            <!-- CBM Hero Banner -->
+            <!-- CBM Action Hero Banner -->
             <div class="cbm-banner">
-                <div class="cbm-banner-title">Pengujian Berbasis Kondisi (CBM)</div>
-                <div class="cbm-banner-desc">Analisis kesehatan peralatan gardu induk menggunakan metode DGA, Thermovisi, dan Partial Discharge.</div>
-                <button class="btn-create-cbm" onclick="alert('Membuka formulir pembuatan pengujian CBM baru')">
-                    <i class="fa-solid fa-plus"></i> Buat Pengujian CBM Baru
-                </button>
+                <div class="cbm-banner-top">
+                    <span class="cbm-banner-badge">
+                        <i class="fa-solid fa-bolt-lightning"></i> CBM Module
+                    </span>
+                </div>
+                <div class="cbm-banner-title">Pengujian Berbasis Kondisi</div>
+                <div class="cbm-banner-desc">Pemeliharaan prediktif & tindak lanjut investigasi kondisi peralatan gardu induk.</div>
+                <div class="banner-action-row">
+                    <a href="tambah-cbm.html" class="btn-create-cbm">
+                        <i class="fa-solid fa-plus"></i> Buat Inspeksi CBM Baru
+                    </a>
+                </div>
             </div>
 
-            <!-- Filter Chips -->
-            <div class="filter-chips-row">
-                <div class="chip active">Semua (4)</div>
-                <div class="chip">DGA Trafo</div>
-                <div class="chip">Thermovisi</div>
-                <div class="chip">Partial Discharge</div>
+            <!-- Sticky Search & Filter Section below Banner -->
+            <div class="sticky-filter-section">
+                <!-- Search Bar Component -->
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Cari nomor WO, gardu, atau bay ..." oninput="handleSearch()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+
+                <!-- Filter Chips -->
+                <div class="filter-chips-row">
+                    <div class="chip active" onclick="filterByChip('all', this)">Semua (4)</div>
+                    <div class="chip" onclick="filterByChip('mulai', this)">Mulai</div>
+                    <div class="chip" onclick="filterByChip('proses', this)">Sedang Inspeksi</div>
+                    <div class="chip" onclick="filterByChip('selesai-lokal', this)">Selesai Lokal</div>
+                    <div class="chip" onclick="filterByChip('selesai-server', this)">Selesai Server</div>
+                </div>
             </div>
 
-            <!-- CBM Tasks List -->
-            <div class="cbm-list">
+            <!-- CBM Tasks List Container -->
+            <div class="cbm-list" id="cbmListContainer">
                 
-                <!-- Task 1: Thermovisi Kalisari -->
-                <div class="cbm-card" onclick="alert('Membuka form CBM Thermovisi')">
+                <!-- Dynamic Items will be rendered here -->
+
+                <!-- Card 1: Status Mulai (Biru) -->
+                <div class="cbm-card" data-category="trafo" data-status="mulai" data-search="power transformer test cdt202600000020 gi 150kv mranggen trf#1 150/20kv mulai">
                     <div class="cbm-card-head">
-                        <span class="cbm-type-badge">Thermovisi Infrared</span>
-                        <span class="cbm-status-tag">Perlu Cek</span>
+                        <span class="cbm-type-badge">
+                            <i class="fa-solid fa-bolt"></i> Power Transformer
+                        </span>
+                        <span class="cbm-status-tag mulai">
+                            <i class="fa-solid fa-circle-play"></i> Mulai
+                        </span>
                     </div>
-                    <div class="cbm-title">Thermovisi Klem & Sambungan Bay Trafo 1</div>
-                    <div class="cbm-sub">GI 150kV Kalisari • Anomali Delta T > 15°C</div>
-                    <div class="cbm-meta">
-                        <span><i class="fa-regular fa-calendar"></i> Target: 21 Agu 2026</span>
-                        <button class="btn-start-cbm">Uji CBM</button>
+
+                    <div class="cbm-title-group">
+                        <div class="cbm-title">test</div>
+                        <div class="cbm-sub">
+                            <i class="fa-solid fa-location-dot"></i> GI 150KV MRANGGEN • TRF#1 150/20KV
+                        </div>
                     </div>
+
+                    <div class="card-details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Nomor WO</span>
+                            <span class="detail-val">CDT202600000020</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Dibuat pada</span>
+                            <span class="detail-val">23 Sep 2026, 02:17 PM</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Gardu</span>
+                            <span class="detail-val">GI 150KV MRANGGEN</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Bay</span>
+                            <span class="detail-val">TRF#1 150/20KV</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Aset</span>
+                            <span class="detail-val">TRF#1 150/20KV 60MVA</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Level</span>
+                            <span class="detail-val">Inspeksi Level 2</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Formulir</span>
+                            <span class="detail-val">[OPEN QA] Form Trafo Daya GIS - 6 Bulanan - IL2</span>
+                        </div>
+                    </div>
+
+                    <a href="../inspeksi-rutin/form-inspeksi.html?wo=CDT202600000020&name=TRF%231+150%2F20KV+60MVA&asset=TRF%231+150%2F20KV+60MVA&bay=TRF%231+150%2F20KV&gardu=GI+150KV+MRANGGEN&source=cbm&returnUrl=../inspeksi-cbm/list-cbm.html" class="btn-card-action btn-blue">
+                        <span>Mulai Inspeksi</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
 
-                <!-- Task 2: DGA Oil Trafo -->
-                <div class="cbm-card" onclick="alert('Membuka form CBM DGA')">
+                <!-- Card 2: Status Sedang Inspeksi (Ungu) -->
+                <div class="cbm-card" data-category="penghantar" data-status="proses" data-search="bay penghantar anomali suhu hotspot cdt202600000019 gi 150kv krapyak bay krapyak 1 sutt 150kv krapyak - weleri 1 sedang inspeksi">
                     <div class="cbm-card-head">
-                        <span class="cbm-type-badge">DGA (Dissolved Gas)</span>
-                        <span class="cbm-status-tag" style="background:#dbeafe; color:#1a65d6;">Siap Uji</span>
+                        <span class="cbm-type-badge">
+                            <i class="fa-solid fa-tower-broadcast"></i> Bay Penghantar
+                        </span>
+                        <span class="cbm-status-tag proses">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Sedang Inspeksi
+                        </span>
                     </div>
-                    <div class="cbm-title">Uji Gas Terlarut Trafo Daya 60 MVA</div>
-                    <div class="cbm-sub">GIS 150kV Wonokromo • Periode 6 Bulanan</div>
-                    <div class="cbm-meta">
-                        <span><i class="fa-regular fa-calendar"></i> Target: 22 Agu 2026</span>
-                        <button class="btn-start-cbm">Uji CBM</button>
+
+                    <div class="cbm-title-group">
+                        <div class="cbm-title">Anomali Suhu Hotspot Klem Saluran</div>
+                        <div class="cbm-sub">
+                            <i class="fa-solid fa-location-dot"></i> GI 150KV KRAPYAK • BAY KRAPYAK 1
+                        </div>
                     </div>
+
+                    <div class="card-details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Nomor WO</span>
+                            <span class="detail-val">CDT202600000019</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Dibuat pada</span>
+                            <span class="detail-val">23 Sep 2026, 11:45 AM</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Gardu</span>
+                            <span class="detail-val">GI 150KV KRAPYAK</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Bay</span>
+                            <span class="detail-val">BAY KRAPYAK 1</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Aset</span>
+                            <span class="detail-val">SUTT 150KV KRAPYAK - WELERI 1</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Level</span>
+                            <span class="detail-val">Inspeksi Level 2</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Formulir</span>
+                            <span class="detail-val">[OPEN QA] Form Bay Penghantar SUTT - IL2</span>
+                        </div>
+                    </div>
+
+                    <a href="../inspeksi-rutin/form-inspeksi.html?wo=CDT202600000019&name=SUTT+150KV+KRAPYAK+-+WELERI+1&asset=SUTT+150KV+KRAPYAK+-+WELERI+1&bay=BAY+KRAPYAK+1&gardu=GI+150KV+KRAPYAK&source=cbm&returnUrl=../inspeksi-cbm/list-cbm.html" class="btn-card-action btn-purple">
+                        <span>Lanjutkan</span>
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
                 </div>
 
-                <!-- Task 3: Partial Discharge -->
-                <div class="cbm-card" onclick="alert('Membuka form CBM PD')">
+                <!-- Card 3: Status Selesai Lokal (Oranye) -->
+                <div class="cbm-card" data-category="ct" data-status="selesai-lokal" data-search="current transformer indikasi rembes cdt202600000018 gi 150kv kalisari bay trafo 2 ct 150kv kalisari bay trafo 2 ph-r selesai lokal">
                     <div class="cbm-card-head">
-                        <span class="cbm-type-badge">Partial Discharge (PD)</span>
-                        <span class="cbm-status-tag" style="background:#dbeafe; color:#1a65d6;">Siap Uji</span>
+                        <span class="cbm-type-badge">
+                            <i class="fa-solid fa-microchip"></i> Current Transformer (CT)
+                        </span>
+                        <span class="cbm-status-tag selesai-lokal">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Selesai Lokal
+                        </span>
                     </div>
-                    <div class="cbm-title">Pengujian PD Kabel Tegangan Tinggi 150kV</div>
-                    <div class="cbm-sub">GI Surabaya Selatan • Bay Line 1</div>
-                    <div class="cbm-meta">
-                        <span><i class="fa-regular fa-calendar"></i> Target: 24 Agu 2026</span>
-                        <button class="btn-start-cbm">Uji CBM</button>
+
+                    <div class="cbm-title-group">
+                        <div class="cbm-title">Pemeriksaan Lanjutan Level Minyak CT Fasa R</div>
+                        <div class="cbm-sub">
+                            <i class="fa-solid fa-location-dot"></i> GI 150KV KALISARI • BAY TRAFO 2
+                        </div>
                     </div>
+
+                    <div class="card-details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Nomor WO</span>
+                            <span class="detail-val">CDT202600000018</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Dibuat pada</span>
+                            <span class="detail-val">22 Sep 2026, 04:30 PM</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Gardu</span>
+                            <span class="detail-val">GI 150KV KALISARI</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Bay</span>
+                            <span class="detail-val">BAY TRAFO 2</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Aset</span>
+                            <span class="detail-val">CT 150KV KALISARI BAY TRAFO 2 PH-R</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Level</span>
+                            <span class="detail-val">Inspeksi Level 3</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Formulir</span>
+                            <span class="detail-val">[OPEN QA] Form Current Transformer CT 150kV - IL3</span>
+                        </div>
+                    </div>
+
+                    <a href="../inspeksi-rutin/list-wo-sync.html?source=cbm&returnUrl=../inspeksi-cbm/list-cbm.html" class="btn-card-action btn-orange">
+                        <span>Sinkronkan</span>
+                        <i class="fa-solid fa-rotate"></i>
+                    </a>
                 </div>
 
-                <!-- Task 4: SF6 Purity -->
-                <div class="cbm-card" onclick="alert('Membuka form CBM SF6')">
+                <!-- Card 4: Status Selesai Server (Hijau) -->
+                <div class="cbm-card" data-category="trafo" data-status="selesai-server" data-search="power transformer trafo d1 cdt202600000017 gi 150kv bawen bay trafo 1 bawen trf#1 150/20kv 30mva bawen selesai server">
                     <div class="cbm-card-head">
-                        <span class="cbm-type-badge">Kemurnian Gas SF6</span>
-                        <span class="cbm-status-tag" style="background:#dbeafe; color:#1a65d6;">Siap Uji</span>
+                        <span class="cbm-type-badge">
+                            <i class="fa-solid fa-bolt"></i> Power Transformer
+                        </span>
+                        <span class="cbm-status-tag selesai-server">
+                            <i class="fa-solid fa-circle-check"></i> Selesai Server
+                        </span>
                     </div>
-                    <div class="cbm-title">Uji Kualitas & Kemurnian Gas PMT 150kV</div>
-                    <div class="cbm-sub">GI 150kV Rungkut • Kompartemen PMT</div>
-                    <div class="cbm-meta">
-                        <span><i class="fa-regular fa-calendar"></i> Target: 25 Agu 2026</span>
-                        <button class="btn-start-cbm">Uji CBM</button>
+
+                    <div class="cbm-title-group">
+                        <div class="cbm-title">Investigasi DGA & Gas Buchholz Trafo 1</div>
+                        <div class="cbm-sub">
+                            <i class="fa-solid fa-location-dot"></i> GI 150KV BAWEN • BAY TRAFO 1 BAWEN
+                        </div>
                     </div>
+
+                    <div class="card-details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Nomor WO</span>
+                            <span class="detail-val">CDT202600000017</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Dibuat pada</span>
+                            <span class="detail-val">21 Sep 2026, 09:15 AM</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Gardu</span>
+                            <span class="detail-val">GI 150KV BAWEN</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Bay</span>
+                            <span class="detail-val">BAY TRAFO 1 BAWEN</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Aset</span>
+                            <span class="detail-val">TRF#1 150/20KV 30MVA BAWEN</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Level</span>
+                            <span class="detail-val">Inspeksi Level 1</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Formulir</span>
+                            <span class="detail-val">Form Bay Trafo 150kV - IL1</span>
+                        </div>
+                    </div>
+
+                    <a href="../inspeksi-rutin/form-inspeksi.html?wo=CDT202600000017&name=TRF%231+150%2F20KV+30MVA+BAWEN&asset=TRF%231+150%2F20KV+30MVA+BAWEN&bay=BAY+TRAFO+1+BAWEN&gardu=GI+150KV+BAWEN&source=cbm&returnUrl=../inspeksi-cbm/list-cbm.html" class="btn-card-action btn-green">
+                        <span>Lihat Hasil</span>
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
                 </div>
 
+            </div>
+
+            <!-- Empty Search State -->
+            <div class="empty-state" id="emptyState">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <div style="font-size: 13.5px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Data CBM Tidak Ditemukan</div>
+                <div style="font-size: 11.5px;">Coba gunakan kata kunci pencarian nomor WO, Gardu, atau Bay lain</div>
             </div>
 
         </div>
+
+        <!-- Floating Action Button (+) -->
+        <a href="tambah-cbm.html" class="fab-add-btn" title="Tambah Inspeksi CBM">
+            <i class="fa-solid fa-plus"></i>
+        </a>
+
     </div>
 
     <script>
@@ -1502,6 +1088,154 @@
                 window.location.href = '../home-mobile.html';
             }, 300);
         }
+
+        function refreshList() {
+            const container = document.getElementById('cbmListContainer');
+            container.style.opacity = '0.5';
+            setTimeout(() => {
+                loadStoredCBM();
+                container.style.opacity = '1';
+                showToast('Daftar CBM berhasil diperbarui');
+            }, 400);
+        }
+
+        let currentChipCategory = 'all';
+
+        function filterByChip(category, el) {
+            currentChipCategory = category;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            handleSearch();
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.cbm-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const text = card.getAttribute('data-search') || card.innerText.toLowerCase();
+                const category = card.getAttribute('data-category') || '';
+                const status = card.getAttribute('data-status') || '';
+
+                const matchQuery = !query || text.includes(query);
+                const matchCategory = (currentChipCategory === 'all') || 
+                                      (category === currentChipCategory) || 
+                                      (status === currentChipCategory);
+
+                if (matchQuery && matchCategory) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const emptyState = document.getElementById('emptyState');
+            if (visibleCount === 0) {
+                emptyState.style.display = 'flex';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        function loadStoredCBM() {
+            try {
+                const items = JSON.parse(localStorage.getItem('pln_cbm_items') || '[]');
+                const container = document.getElementById('cbmListContainer');
+                
+                // Remove existing dynamic cards if any
+                const dynamicCards = container.querySelectorAll('.cbm-card[data-dynamic="true"]');
+                dynamicCards.forEach(c => c.remove());
+
+                // Prepend stored cards in reverse order so latest is on top
+                items.slice().reverse().forEach(item => {
+                    const newCard = document.createElement('div');
+                    newCard.className = 'cbm-card';
+                    newCard.setAttribute('data-dynamic', 'true');
+                    newCard.setAttribute('data-category', 'trafo');
+                    newCard.setAttribute('data-status', 'mulai');
+                    newCard.setAttribute('data-search', `${(item.asset || '').toLowerCase()} ${(item.jenisAsset || '').toLowerCase()} ${item.deskripsi.toLowerCase()} ${item.wo.toLowerCase()} ${item.gardu.toLowerCase()} ${item.bay.toLowerCase()} mulai`);
+                    newCard.innerHTML = `
+                        <div class="cbm-card-head">
+                            <span class="cbm-type-badge">
+                                <i class="fa-solid fa-bolt"></i> ${item.jenisAsset || item.asset || 'Asset'}
+                            </span>
+                            <span class="cbm-status-tag mulai">
+                                <i class="fa-solid fa-circle-play"></i> Mulai
+                            </span>
+                        </div>
+
+                        <div class="cbm-title-group">
+                            <div class="cbm-title">${item.deskripsi}</div>
+                            <div class="cbm-sub">
+                                <i class="fa-solid fa-location-dot"></i> ${item.gardu} • ${item.bay}
+                            </div>
+                        </div>
+
+                        <div class="card-details-grid">
+                            <div class="detail-row">
+                                <span class="detail-label">Nomor WO</span>
+                                <span class="detail-val">${item.wo}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Dibuat pada</span>
+                                <span class="detail-val">${item.date}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Gardu</span>
+                                <span class="detail-val">${item.gardu}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Bay</span>
+                                <span class="detail-val">${item.bay}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Aset</span>
+                                <span class="detail-val">${item.asset || item.jenisAsset || '-'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Level</span>
+                                <span class="detail-val">${item.level}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Formulir</span>
+                                <span class="detail-val">${item.formulir}</span>
+                            </div>
+                        </div>
+
+                        <a href="../inspeksi-rutin/form-inspeksi.html?wo=${item.wo}&name=${encodeURIComponent(item.asset || item.jenisAsset)}&asset=${encodeURIComponent(item.asset || item.jenisAsset)}&bay=${encodeURIComponent(item.bay)}&gardu=${encodeURIComponent(item.gardu)}&source=cbm&returnUrl=../inspeksi-cbm/list-cbm.html" class="btn-card-action btn-blue">
+                            <span>Mulai Inspeksi</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    `;
+                    container.insertBefore(newCard, container.firstChild);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // On Load check params & storage
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStoredCBM();
+            const urlParams = new URLSearchParams(window.location.search);
+            const addedWO = urlParams.get('added');
+            if (addedWO) {
+                showToast('Inspeksi CBM ' + addedWO + ' berhasil dibuat!');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
     </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
@@ -1509,35 +1243,36 @@
       .notes-fab {
         position: fixed;
         bottom: 24px;
-        left: 88px;
-        width: 56px;
-        height: 56px;
-        background: var(--pln-blue, #0A58CA);
+        left: 18px;
+        width: 42px;
+        height: 42px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: var(--primary-blue);
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
-        z-index: 9999;
-        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        z-index: 40;
+        transition: all 0.2s;
       }
       .notes-fab:hover {
         transform: scale(1.05);
-        background: var(--pln-blue-mid, #0d6efd);
+        border-color: var(--primary-blue);
       }
       .notes-panel {
         position: fixed;
-        bottom: 90px;
-        left: 88px;
-        width: 320px;
-        background: rgba(255, 255, 255, 0.85);
+        bottom: 75px;
+        left: 18px;
+        width: 290px;
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         z-index: 9998;
         transform: translateY(20px);
         opacity: 0;
@@ -1550,46 +1285,47 @@
         visibility: visible;
       }
       .notes-panel h3 {
-        margin: 0 0 12px 0;
-        font-family: 'Outfit', sans-serif;
-        color: var(--pln-blue, #0A58CA);
+        margin: 0 0 10px 0;
+        font-family: 'Inter', sans-serif;
+        color: var(--primary-blue);
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 16px;
+        font-size: 13.5px;
+        font-weight: 800;
       }
       .notes-panel ul {
         margin: 0;
-        padding-left: 20px;
-        font-size: 13px;
-        color: var(--text-secondary, #475569);
-        line-height: 1.6;
+        padding-left: 18px;
+        font-size: 11.5px;
+        color: var(--text-main);
+        line-height: 1.5;
       }
       .notes-panel li {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
     </style>
     
-    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="16" x2="12" y2="12"></line>
-        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-      </svg>
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')" title="Catatan & Panduan Modul CBM">
+      <i class="fa-solid fa-circle-info" style="font-size: 17px;"></i>
     </div>
     
     <div class="notes-panel" id="notesPanel">
       <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        Notes & Validasi
+        <i class="fa-solid fa-clipboard-check"></i>
+        Notes & Validasi CBM
       </h3>
       <ul>
-        <li><strong>Modul CBM:</strong> Menampilkan daftar pengujian berkala prediktif (Thermovisi, DGA, PD, SF6) dan pembuatan task CBM baru.</li>
+        <li><strong>Alur Status CBM:</strong>
+          <br>• <span style="color:#1d4ed8;font-weight:700;">Mulai (Biru):</span> Baru dibuat / belum dikerjakan.
+          <br>• <span style="color:#7c3aed;font-weight:700;">Sedang Inspeksi:</span> Dalam proses pengerjaan.
+          <br>• <span style="color:#ea580c;font-weight:700;">Selesai Lokal (Oranye):</span> Inspeksi selesai di perangkat (offline/pending sync).
+          <br>• <span style="color:#059669;font-weight:700;">Selesai Server (Hijau):</span> Data inspeksi sudah tersinkronisasi ke server.
+        </li>
+        <li><strong>Struktur UI:</strong> Header selaras, Banner CBM, Sticky Filter & Search, dan Dynamic Cards.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
-
-    
 
 </body>
 </html>
