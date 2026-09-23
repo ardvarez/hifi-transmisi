@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Swift ERS V2 - Mobile Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.92; transform: scale(0.995); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* App Header (Power Inspect Style) */
+        .app-header {
+            padding: 16px 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1a65d6 0%, #0284c7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 16px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+            letter-spacing: -0.3px;
+        }
+        
+        .header-sub { 
+            font-size: 11px; 
+            color: var(--primary-blue); 
+            font-weight: 700; 
+            letter-spacing: 0.3px;
+        }
+        
+        .header-actions { 
+            display: flex; 
+            gap: 8px; 
+        }
+        
+        .action-btn {
+            width: 38px; 
+            height: 38px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 15px;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Content Area */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            scrollbar-width: none;
+        }
+        .app-content::-webkit-scrollbar { display: none; }
+
+        /* Unit Hierarchy Filter Badge / Pill */
+        .unit-selector-bar {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .unit-selector-bar:active {
+            background: #f8fafc;
+            border-color: var(--primary-blue);
+        }
+
+        .unit-info-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .unit-icon-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .unit-text-main {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .unit-text-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Welcome Banner Card (Power Inspect Gradient) */
+        .welcome-card {
+            background: linear-gradient(115deg, #1a65d6 0%, #0284c7 60%, #0ea5e9 100%);
+            border-radius: 20px;
+            padding: 18px 20px;
+            color: #ffffff;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.28);
+        }
+
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .welcome-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .welcome-desc {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.45;
+            margin-bottom: 14px;
+            max-width: 85%;
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .kpi-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .kpi-num {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .kpi-label {
+            font-size: 10px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        /* Section Title */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.2px;
+        }
+
+        .section-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: var(--primary-light);
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        /* Module Grid (Power Inspect Card Style) */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .module-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            cursor: pointer;
+        }
+
+        .module-card:active {
+            transform: scale(0.98);
+            border-color: var(--primary-blue);
+            box-shadow: 0 6px 18px rgba(26, 101, 214, 0.15);
+        }
+
+        .module-icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .icon-pemasangan {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .icon-pembongkaran {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .icon-karantina {
+            background: #fdf2f8;
+            color: #db2777;
+        }
+
+        .icon-so {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .module-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.25;
+        }
+
+        .module-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            line-height: 1.35;
+        }
+
+        .module-badge-counter {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        /* Recent Activity List */
+        .recent-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+
+        .recent-card:active {
+            transform: scale(0.99);
+            background: #f8fafc;
+        }
+
+        .recent-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recent-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .recent-id {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .recent-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .status-pill {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .pill-blue { background: #eff6ff; color: #2563eb; }
+        .pill-amber { background: #fffbeb; color: #d97706; }
+        .pill-green { background: #ecfdf5; color: #059669; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 12px 14px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            transition: all 0.2s;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        /* iOS Bottom Bar */
+        .ios-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #000000;
+            border-radius: 2px;
+            z-index: 20;
+        }
+
+        /* Unit Hierarchy Modal Drawer */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 20px 22px 28px;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+            cursor: pointer;
+        }
+
+        .drawer-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 14px;
+        }
+
+        .unit-option-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .unit-option-item:hover, .unit-option-item.active {
+            background: #eff6ff;
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Dark Mode Styling */
+        html.dark-mode, body.dark-mode { background-color: #cbd5e1 !important; }
+        body.dark-mode .mobile-container, html.dark-mode .mobile-container {
+            --bg-color: #0b1329 !important;
+            --card-bg: #1e293b !important;
+            --text-main: #f8fafc !important;
+            --text-muted: #94a3b8 !important;
+            --border-color: #334155 !important;
+            background-color: #0b1329 !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .status-bar, html.dark-mode .status-bar,
+        body.dark-mode .app-header, html.dark-mode .app-header,
+        body.dark-mode .bottom-nav, html.dark-mode .bottom-nav,
+        body.dark-mode .modal-drawer, html.dark-mode .modal-drawer {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .unit-selector-bar, html.dark-mode .unit-selector-bar,
+        body.dark-mode .module-card, html.dark-mode .module-card,
+        body.dark-mode .recent-card, html.dark-mode .recent-card,
+        body.dark-mode .unit-option-item, html.dark-mode .unit-option-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .action-btn, html.dark-mode .action-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .module-badge-counter, html.dark-mode .module-badge-counter,
+        body.dark-mode .recent-icon, html.dark-mode .recent-icon {
+            background: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .ios-bar, html.dark-mode .ios-bar { background: #ffffff !important; }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <div class="header-avatar">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+                <div class="header-title-group">
+                    <span class="header-name">Power Swift ERS V2</span>
+                    <span class="header-sub">Tower Emergency Restoration</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="../ers/home-mobile.html" class="action-btn" title="Beralih ke Versi V1">
+                    <span style="font-size:10px; font-weight:800; color:var(--primary-blue);">V1</span>
+                </a>
+                <a href="./notifikasi-mobile.html" class="action-btn" title="Notifikasi ERS">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notif-dot" style="display:block;"></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="app-content">
+            <!-- Unit Hierarchy Selector Bar -->
+            <div class="unit-selector-bar" onclick="openUnitModal()">
+                <div class="unit-info-left">
+                    <div class="unit-icon-box">
+                        <i class="fa-solid fa-building-shield"></i>
+                    </div>
+                    <div>
+                        <div class="unit-text-main" id="selectedUnitName">UPT Semarang - ULTG Ungaran</div>
+                        <div class="unit-text-sub">Sistem Kelistrikan Jawa Tengah & DIY</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--text-muted);"></i>
+            </div>
+
+            <!-- Welcome & KPI Card -->
+            <div class="welcome-card">
+                <div class="welcome-title">Operasional Tower ERS</div>
+                <div class="welcome-desc">Kelola kesiapan, mobilisasi pemasangan, pembongkaran, hingga karantina tower darurat dengan cepat.</div>
+                <div class="kpi-row">
+                    <div class="kpi-item">
+                        <span class="kpi-num">12</span>
+                        <span class="kpi-label">Permit Aktif</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span class="kpi-num">8</span>
+                        <span class="kpi-label">Terpasang</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span class="kpi-num">98%</span>
+                        <span class="kpi-label">Ready Stok</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modules Section -->
+            <div class="section-header">
+                <span class="section-title">Modul Operasional V2</span>
+                <span class="section-badge">4 Modul</span>
+            </div>
+
+            <div class="module-grid">
+                <!-- Pemasangan -->
+                <a href="./Pemasangan/home-mobile.html" class="module-card">
+                    <span class="module-badge-counter">4 Permit</span>
+                    <div class="module-icon-wrap icon-pemasangan">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                    <div>
+                        <div class="module-name">Pemasangan</div>
+                        <div class="module-sub">Perizinan & instalasi tower ERS di lokasi</div>
+                    </div>
+                </a>
+
+                <!-- Pembongkaran -->
+                <a href="./Pembongkaran/home-mobile.html" class="module-card">
+                    <span class="module-badge-counter">4 Permit</span>
+                    <div class="module-icon-wrap icon-pembongkaran">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <div>
+                        <div class="module-name">Pembongkaran</div>
+                        <div class="module-sub">Dismantling tower darurat & verifikasi</div>
+                    </div>
+                </a>
+
+                <!-- Karantina & Pengembalian -->
+                <a href="./Karantina & Pengembalian/home-mobile.html" class="module-card">
+                    <span class="module-badge-counter">3 Permit</span>
+                    <div class="module-icon-wrap icon-karantina">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <div>
+                        <div class="module-name">Karantina & Retur</div>
+                        <div class="module-sub">Check sheet kelayakan & pengembalian</div>
+                    </div>
+                </a>
+
+                <!-- Stock Opname -->
+                <a href="./Stock Opname/home-mobile.html" class="module-card">
+                    <span class="module-badge-counter">2 WO</span>
+                    <div class="module-icon-wrap icon-so">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                    <div>
+                        <div class="module-name">Stock Opname</div>
+                        <div class="module-sub">Audit fisik inventori komponen ERS</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Recent Operations -->
+            <div class="section-header">
+                <span class="section-title">Aktivitas Terkini</span>
+                <span style="font-size:11px; color:var(--text-muted);">Real-time Update</span>
+            </div>
+
+            <a href="./Pemasangan/list-pemasangan.html?id=ASM20250000001" class="recent-card">
+                <div class="recent-left">
+                    <div class="recent-icon">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                    <div>
+                        <div class="recent-id">ASM20250000001</div>
+                        <div class="recent-desc">SUTT 150kV Ungaran-Weleri #0085</div>
+                    </div>
+                </div>
+                <span class="status-pill pill-blue">Siap Pasang</span>
+            </a>
+
+            <a href="./Pembongkaran/list-pembongkaran.html?id=DIS20250000001" class="recent-card">
+                <div class="recent-left">
+                    <div class="recent-icon">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <div>
+                        <div class="recent-id">DIS20250000001</div>
+                        <div class="recent-desc">SUTT 150kV Batang-Pekalongan</div>
+                    </div>
+                </div>
+                <span class="status-pill pill-amber">Sedang Dibongkar</span>
+            </a>
+
+            <a href="./Karantina & Pengembalian/list-karantina.html?id=RET20250000001" class="recent-card">
+                <div class="recent-left">
+                    <div class="recent-icon">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <div>
+                        <div class="recent-id">RET20250000001</div>
+                        <div class="recent-desc">Pengembalian Gudang Cawang</div>
+                    </div>
+                </div>
+                <span class="status-pill pill-green">Selesai Retur</span>
+            </a>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <a href="../../hifi-home/home.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="../new-pst/catalog-mobile-new-pst.html" class="nav-item">
+                <i class="fa-solid fa-cubes"></i>
+                <span>Asset</span>
+            </a>
+            <a href="../power-inspect/dashboard-mobile.html" class="nav-item">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>CBM</span>
+            </a>
+            <a href="./home-mobile.html" class="nav-item active">
+                <i class="fa-solid fa-tower-broadcast"></i>
+                <span>ERS V2</span>
+            </a>
+            <a href="../power-inspect/relogin-mobile.html" class="nav-item">
+                <i class="fa-regular fa-user"></i>
+                <span>Akun</span>
+            </a>
+        </div>
+
+        <div class="ios-bar"></div>
+
+        <!-- Unit Hierarchy Modal Drawer -->
+        <div class="modal-overlay" id="unitModal" onclick="closeUnitModal(event)">
+            <div class="modal-drawer" onclick="event.stopPropagation()">
+                <div class="drawer-handle" onclick="closeUnitModalDirect()"></div>
+                <h3 class="drawer-title">Pilih Unit Pengelola ERS</h3>
+                <div class="unit-option-item active" onclick="selectUnit('UPT Semarang - ULTG Ungaran')">
+                    <div>
+                        <div style="font-weight:700; font-size:13px;">UPT Semarang</div>
+                        <div style="font-size:11px; color:var(--text-muted);">ULTG Ungaran - Jawa Tengah</div>
+                    </div>
+                    <i class="fa-solid fa-check" style="color:var(--primary-blue);"></i>
+                </div>
+                <div class="unit-option-item" onclick="selectUnit('UPT Salatiga - ULTG Bawen')">
+                    <div>
+                        <div style="font-weight:700; font-size:13px;">UPT Salatiga</div>
+                        <div style="font-size:11px; color:var(--text-muted);">ULTG Bawen - Jawa Tengah</div>
+                    </div>
+                </div>
+                <div class="unit-option-item" onclick="selectUnit('UPT Purwokerto - ULTG Rawalo')">
+                    <div>
+                        <div style="font-weight:700; font-size:13px;">UPT Purwokerto</div>
+                        <div style="font-size:11px; color:var(--text-muted);">ULTG Rawalo - Jawa Tengah</div>
+                    </div>
+                </div>
+                <div class="unit-option-item" onclick="selectUnit('UPT Bandung - ULTG Cigereleng')">
+                    <div>
+                        <div style="font-weight:700; font-size:13px;">UPT Bandung</div>
+                        <div style="font-size:11px; color:var(--text-muted);">ULTG Cigereleng - Jawa Barat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Feature -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--primary-blue, #1a65d6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(26, 101, 214, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 10px 0;
+        font-family: 'Inter', sans-serif;
+        color: var(--primary-blue, #1a65d6);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 12px;
+        color: var(--text-muted, #64748b);
+        line-height: 1.6;
+      }
+      .notes-panel li { margin-bottom: 6px; }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes ERS Mobile V2
+      </h3>
+      <ul>
+        <li><strong>Arsitektur V2:</strong> Mengadopsi standar desain Mobile Power Inspect secara menyeluruh.</li>
+        <li><strong>Struktur Terpisah:</strong> V2 beroperasi independen dari V1 dengan navigasi antar-modul yang rapi.</li>
+        <li><strong>Modul Utama:</strong> Pemasangan, Pembongkaran, Karantina & Retur, serta Stock Opname.</li>
+      </ul>
+    </div>
+
+    <script>
+        function openUnitModal() {
+            document.getElementById('unitModal').classList.add('active');
+        }
+
+        function closeUnitModalDirect() {
+            document.getElementById('unitModal').classList.remove('active');
+        }
+
+        function closeUnitModal(e) {
+            if (e.target.id === 'unitModal') closeUnitModalDirect();
+        }
+
+        function selectUnit(unitName) {
+            document.getElementById('selectedUnitName').textContent = unitName;
+            const items = document.querySelectorAll('.unit-option-item');
+            items.forEach(item => {
+                item.classList.remove('active');
+                const check = item.querySelector('.fa-check');
+                if (check) check.remove();
+            });
+            event.currentTarget.classList.add('active');
+            event.currentTarget.insertAdjacentHTML('beforeend', '<i class="fa-solid fa-check" style="color:var(--primary-blue);"></i>');
+            closeUnitModalDirect();
+        }
+    </script>
+</body>
+</html>

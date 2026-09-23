@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Karantina & Pengembalian ERS V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.92; transform: scale(0.995); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Header */
+        .app-header {
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box h1 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+
+        .header-title-box p {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .icon-btn .badge-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            background: var(--danger-color);
+            border-radius: 50%;
+        }
+
+        /* Unit Hierarchy Filter Strip */
+        .unit-filter-strip {
+            background: #ffffff;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .unit-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 12px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .unit-selector i {
+            color: var(--primary-blue);
+            font-size: 13px;
+        }
+
+        .unit-selector span {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Toolbar */
+        .toolbar-section {
+            padding: 12px 16px 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-bar {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 12.5px;
+            color: var(--text-main);
+        }
+
+        .filter-trigger-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .filter-trigger-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--primary-light);
+        }
+
+        /* Filter Chips Bar */
+        .filter-chips-bar {
+            display: flex;
+            gap: 8px;
+            padding: 4px 16px 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filter-chips-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .chip-pill.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* Content List */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 16px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Card */
+        .karantina-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .karantina-card:active {
+            transform: scale(0.99);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .permit-code {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .permit-code i {
+            color: var(--primary-blue);
+            font-size: 13px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-siap-inspeksi {
+            background: #eff6ff;
+            color: #1a65d6;
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-dalam-karantina {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-selesai-karantina {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Metadata Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Card Footer */
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 6px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        .item-counter {
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 8px;
+            z-index: 50;
+        }
+
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 10.5px;
+            font-weight: 600;
+            transition: color 0.2s;
+            flex: 1;
+        }
+
+        .nav-link i {
+            font-size: 17px;
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* Drawer Filter Modal */
+        .drawer-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer-sheet {
+            width: 100%;
+            background: #ffffff;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .drawer-overlay.active .drawer-sheet {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 36px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .drawer-header h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .btn-close-drawer {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .filter-group {
+            margin-bottom: 16px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill-item {
+            padding: 7px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .pill-item.selected {
+            background: var(--primary-light);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .drawer-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-drawer-reset {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .btn-drawer-apply {
+            flex: 2;
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--primary-blue);
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <a href="../home-mobile.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1>Karantina & Logistik</h1>
+                    <p>Inspeksi & Pengembalian V2</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="../notifikasi-mobile.html" class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge-dot"></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Unit Hierarchy Filter Strip -->
+        <div class="unit-filter-strip">
+            <div class="unit-selector" onclick="alert('Pilih Gudang: Gudang Logistik ULTG Bandung Timur')">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Gudang Logistik ULTG Bandung Timur</span>
+            </div>
+            <i class="fa-solid fa-chevron-down" style="color: var(--text-muted); font-size: 11px;"></i>
+        </div>
+
+        <!-- Search & Filter Toolbar -->
+        <div class="toolbar-section">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
+                <input type="text" id="searchInput" placeholder="Cari nomor karantina / batch..." oninput="handleSearch()">
+            </div>
+            <button class="filter-trigger-btn" onclick="toggleDrawer(true)">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
+
+        <!-- Filter Chips Bar -->
+        <div class="filter-chips-bar">
+            <div class="chip-pill active" onclick="setChipFilter('all', this)">Semua (3)</div>
+            <div class="chip-pill" onclick="setChipFilter('siap', this)">Siap Inspeksi (1)</div>
+            <div class="chip-pill" onclick="setChipFilter('proses', this)">Dalam Karantina (1)</div>
+            <div class="chip-pill" onclick="setChipFilter('selesai', this)">Selesai (1)</div>
+        </div>
+
+        <!-- Content List -->
+        <div class="content-scroll" id="karantinaList">
+            <!-- Card 1 -->
+            <a href="list-karantina.html?id=QRN20250000001" class="karantina-card" data-status="siap" data-code="QRN20250000001" data-origin="Ex-Bongkar Cigereleng">
+                <div class="card-header-row">
+                    <div class="permit-code">
+                        <i class="fa-solid fa-boxes-packing"></i> QRN20250000001
+                    </div>
+                    <span class="status-badge badge-siap-inspeksi">
+                        <i class="fa-solid fa-circle" style="font-size: 6px;"></i> Siap Inspeksi
+                    </span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-row">
+                        <span class="meta-label">Asal Material</span>
+                        <span class="meta-val">Ex-Bongkar SUTT Cigereleng</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tanggal Masuk</span>
+                        <span class="meta-val">29 Okt 2025</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Penerima Logistik</span>
+                        <span class="meta-val">Aris Munandar</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Area Karantina</span>
+                        <span class="meta-val">Zone B (Outdoor Yard)</span>
+                    </div>
+                </div>
+
+                <div class="card-footer-row">
+                    <div class="item-counter">
+                        <i class="fa-solid fa-layer-group"></i> 24 Item Komponen
+                    </div>
+                    <span>Perlu QC Check Sheet <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i></span>
+                </div>
+            </a>
+
+            <!-- Card 2 -->
+            <a href="list-karantina.html?id=QRN20250000002" class="karantina-card" data-status="proses" data-code="QRN20250000002" data-origin="Ex-Bongkar Padalarang">
+                <div class="card-header-row">
+                    <div class="permit-code">
+                        <i class="fa-solid fa-boxes-packing"></i> QRN20250000002
+                    </div>
+                    <span class="status-badge badge-dalam-karantina">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 9px;"></i> Dalam Karantina
+                    </span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-row">
+                        <span class="meta-label">Asal Material</span>
+                        <span class="meta-val">Ex-Bongkar Padalarang</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tanggal Masuk</span>
+                        <span class="meta-val">26 Okt 2025</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Pemeriksa QC</span>
+                        <span class="meta-val">Rahmat Hidayat</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Status Temuan</span>
+                        <span class="meta-val" style="color: var(--warning-color);">3 Batang Bengkok</span>
+                    </div>
+                </div>
+
+                <div class="card-footer-row">
+                    <div class="item-counter">
+                        <i class="fa-solid fa-layer-group"></i> 18 Item Komponen
+                    </div>
+                    <span>Proses Reparasi Workshop <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i></span>
+                </div>
+            </a>
+
+            <!-- Card 3 -->
+            <a href="list-karantina.html?id=QRN20250000003" class="karantina-card" data-status="selesai" data-code="QRN20250000003" data-origin="Ex-Bongkar Ujungberung">
+                <div class="card-header-row">
+                    <div class="permit-code">
+                        <i class="fa-solid fa-boxes-packing"></i> QRN20250000003
+                    </div>
+                    <span class="status-badge badge-selesai-karantina">
+                        <i class="fa-solid fa-check"></i> Siap Masuk Gudang
+                    </span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-row">
+                        <span class="meta-label">Asal Material</span>
+                        <span class="meta-val">Ex-Bongkar Ujungberung</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tanggal Selesai QC</span>
+                        <span class="meta-val">24 Okt 2025</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">No. BAST Gudang</span>
+                        <span class="meta-val">BAST/LOG/2025/104</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Kondisi Bersih</span>
+                        <span class="meta-val" style="color: var(--success-color);">100% Layak Operasi</span>
+                    </div>
+                </div>
+
+                <div class="card-footer-row">
+                    <div class="item-counter">
+                        <i class="fa-solid fa-layer-group"></i> 32 Item Komponen
+                    </div>
+                    <span>Telah Masuk Rak Gudang <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i></span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="../home-mobile.html" class="nav-link">
+                <i class="fa-solid fa-house"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="../Pemasangan/home-mobile.html" class="nav-link">
+                <i class="fa-solid fa-wrench"></i>
+                <span>Pemasangan</span>
+            </a>
+            <a href="../Pembongkaran/home-mobile.html" class="nav-link">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                <span>Pembongkaran</span>
+            </a>
+            <a href="home-mobile.html" class="nav-link active">
+                <i class="fa-solid fa-boxes-packing"></i>
+                <span>Karantina</span>
+            </a>
+            <a href="../Stock Opname/home-mobile.html" class="nav-link">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Opname</span>
+            </a>
+        </div>
+
+        <!-- Filter Drawer Modal -->
+        <div class="drawer-overlay" id="filterDrawer" onclick="handleDrawerClick(event)">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <div class="drawer-header">
+                    <h3>Filter Batch Karantina</h3>
+                    <button class="btn-close-drawer" onclick="toggleDrawer(false)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="filter-group">
+                    <label>Status Karantina</label>
+                    <div class="pill-group" id="drawerStatusPills">
+                        <div class="pill-item selected" onclick="selectPill(this)">Semua Status</div>
+                        <div class="pill-item" onclick="selectPill(this)">Siap Inspeksi</div>
+                        <div class="pill-item" onclick="selectPill(this)">Dalam Karantina</div>
+                        <div class="pill-item" onclick="selectPill(this)">Siap Masuk Gudang</div>
+                    </div>
+                </div>
+
+                <div class="drawer-footer">
+                    <button class="btn-drawer-reset" onclick="resetFilters()">Reset</button>
+                    <button class="btn-drawer-apply" onclick="applyDrawerFilters()">Terapkan Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+
+        function setChipFilter(status, el) {
+            document.querySelectorAll('.chip-pill').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            currentFilter = status;
+            filterCards();
+        }
+
+        function handleSearch() {
+            filterCards();
+        }
+
+        function filterCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.karantina-card');
+
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const cardCode = card.getAttribute('data-code').toLowerCase();
+                const cardOrigin = card.getAttribute('data-origin').toLowerCase();
+
+                const matchStatus = (currentFilter === 'all') || (cardStatus === currentFilter);
+                const matchQuery = !query || cardCode.includes(query) || cardOrigin.includes(query);
+
+                if (matchStatus && matchQuery) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleDrawer(show) {
+            const drawer = document.getElementById('filterDrawer');
+            if (show) drawer.classList.add('active');
+            else drawer.classList.remove('active');
+        }
+
+        function handleDrawerClick(e) {
+            if (e.target === document.getElementById('filterDrawer')) toggleDrawer(false);
+        }
+
+        function selectPill(el) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.pill-item').forEach(p => p.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('#drawerStatusPills .pill-item').forEach((p, idx) => {
+                if (idx === 0) p.classList.add('selected');
+                else p.classList.remove('selected');
+            });
+            currentFilter = 'all';
+            document.querySelectorAll('.chip-pill').forEach((c, idx) => {
+                if (idx === 0) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+            document.getElementById('searchInput').value = '';
+            filterCards();
+            toggleDrawer(false);
+        }
+
+        function applyDrawerFilters() {
+            const selectedStatusPill = document.querySelector('#drawerStatusPills .pill-item.selected').innerText.trim();
+            if (selectedStatusPill === 'Semua Status') currentFilter = 'all';
+            else if (selectedStatusPill === 'Siap Inspeksi') currentFilter = 'siap';
+            else if (selectedStatusPill === 'Dalam Karantina') currentFilter = 'proses';
+            else if (selectedStatusPill === 'Siap Masuk Gudang') currentFilter = 'selesai';
+
+            document.querySelectorAll('.chip-pill').forEach(chip => {
+                chip.classList.remove('active');
+                if (currentFilter === 'all' && chip.innerText.includes('Semua')) chip.classList.add('active');
+                if (currentFilter === 'siap' && chip.innerText.includes('Siap')) chip.classList.add('active');
+                if (currentFilter === 'proses' && chip.innerText.includes('Karantina')) chip.classList.add('active');
+                if (currentFilter === 'selesai' && chip.innerText.includes('Selesai')) chip.classList.add('active');
+            });
+
+            filterCards();
+            toggleDrawer(false);
+        }
+    </script>
+</body>
+</html>

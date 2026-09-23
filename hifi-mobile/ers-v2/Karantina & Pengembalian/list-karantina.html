@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Karantina ERS V2 - List Item Logistik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.92; transform: scale(0.995); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Header */
+        .app-header {
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box h1 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .header-title-box p {
+            font-size: 11.5px;
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .icon-btn .badge-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            background: var(--danger-color);
+            border-radius: 50%;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: #ffffff;
+            margin: 14px 16px 8px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .summary-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .summary-pill {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .summary-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Toolbar Search & Filter */
+        .toolbar-section {
+            padding: 8px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-bar {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 12.5px;
+            color: var(--text-main);
+        }
+
+        .filter-trigger-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .filter-trigger-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--primary-light);
+        }
+
+        /* Filter Chips Bar */
+        .filter-chips-bar {
+            display: flex;
+            gap: 8px;
+            padding: 4px 16px 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filter-chips-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .chip-pill.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* Content List */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Item Card */
+        .item-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .item-header-text h3 {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .item-header-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-siap-qc {
+            background: #eff6ff;
+            color: #1a65d6;
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-repair {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-lolos-qc {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Metadata Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Action Buttons */
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action-primary {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 10px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 12.5px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-action-primary:hover {
+            background: var(--primary-blue-hover);
+        }
+
+        .btn-action-secondary {
+            padding: 9px 12px;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Drawer Filter Modal */
+        .drawer-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer-sheet {
+            width: 100%;
+            background: #ffffff;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .drawer-overlay.active .drawer-sheet {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 36px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .drawer-header h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .btn-close-drawer {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .filter-group {
+            margin-bottom: 16px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill-item {
+            padding: 7px 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .pill-item.selected {
+            background: var(--primary-light);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .drawer-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-drawer-reset {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .btn-drawer-apply {
+            flex: 2;
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--primary-blue);
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <a href="home-mobile.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1>Daftar Item Karantina</h1>
+                    <p>QRN20250000001</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="../notifikasi-mobile.html" class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge-dot"></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card">
+            <div class="summary-header">
+                <div class="summary-title">Batch Material Ex-Bongkar SUTT Cigereleng</div>
+                <span class="summary-pill">24 Item</span>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-label">No. Batch</span>
+                    <span class="summary-val">QRN20250000001</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Penerima</span>
+                    <span class="summary-val">Aris Munandar</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Tanggal Masuk</span>
+                    <span class="summary-val">29 Okt 2025</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Lokasi Simpan</span>
+                    <span class="summary-val">Zone B Karantina</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar Search & Filter -->
+        <div class="toolbar-section">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama modul / barcode..." oninput="handleSearch()">
+            </div>
+            <button class="filter-trigger-btn" onclick="toggleDrawer(true)">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
+
+        <!-- Filter Chips Bar -->
+        <div class="filter-chips-bar">
+            <div class="chip-pill active" onclick="setChipFilter('all', this)">Semua (3)</div>
+            <div class="chip-pill" onclick="setChipFilter('siap', this)">Siap QC (1)</div>
+            <div class="chip-pill" onclick="setChipFilter('repair', this)">Perlu Repair (1)</div>
+            <div class="chip-pill" onclick="setChipFilter('lolos', this)">Lolos QC (1)</div>
+        </div>
+
+        <!-- Content List -->
+        <div class="content-scroll" id="itemList">
+            <!-- Item 1 -->
+            <div class="item-card" data-status="siap" data-name="Modul Section A-1" data-sn="MOD-SEC-001">
+                <div class="card-top">
+                    <div class="item-info">
+                        <div class="item-icon-box">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <div class="item-header-text">
+                            <h3>Modul Section A-1 (Base)</h3>
+                            <p>SN: MOD-SEC-001 | 8m Heavy</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-siap-qc">
+                        <i class="fa-solid fa-circle" style="font-size: 6px;"></i> Siap QC
+                    </span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-row">
+                        <span class="meta-label">Visual Awal</span>
+                        <span class="meta-val">Cat Utuh / Bebas Karat</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Kelurusan Flange</span>
+                        <span class="meta-val">Belum Dicek</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Jumlah Baut</span>
+                        <span class="meta-val">32 Pcs Terlampir</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tindakan</span>
+                        <span class="meta-val" style="color: var(--primary-blue);">Isi Check Sheet</span>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a href="check-sheet.html?item=MOD-SEC-001" class="btn-action-primary">
+                        <i class="fa-solid fa-clipboard-check"></i> Isi Check Sheet QC
+                    </a>
+                </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="item-card" data-status="repair" data-name="Modul Section B-2" data-sn="MOD-SEC-002">
+                <div class="card-top">
+                    <div class="item-info">
+                        <div class="item-icon-box">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <div class="item-header-text">
+                            <h3>Modul Section B-2 (Mid)</h3>
+                            <p>SN: MOD-SEC-002 | 8m Standard</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-repair">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Perlu Repair
+                    </span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-row">
+                        <span class="meta-label">Hasil QC</span>
+                        <span class="meta-val" style="color: var(--warning-color);">Bressing Minor Bengkok</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Rekomendasi</span>
+                        <span class="meta-val">Perbaikan Cold Press</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Bengkel Tujuan</span>
+                        <span class="meta-val">Workshop UPT Cigereleng</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Target Repair</span>
+                        <span class="meta-val">02 Nov 2025</span>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a href="karantina-action.html?item=MOD-SEC-002&mode=repair" class="btn-action-primary">
+                        <i class="fa-solid fa-truck-ramp-box"></i> Serah Terima Bengkel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="item-card" data-status="lolos" data-name="Gin Pole Derrick & Rigging" data-sn="GIN-POL-003">
+                <div class="card-top">
+                    <div class="item-info">
+                        <div class="item-icon-box" style="background: #ecfdf5; color: #059669;">
+                            <i class="fa-solid fa-wrench"></i>
+                        </div>
+                        <div class="item-header-text">
+                            <h3>Gin Pole Derrick & Rigging</h3>
+                            <p>SN: GIN-POL-003 | Full Set</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-lolos-qc">
+                        <i class="fa-solid fa-check"></i> Lolos QC
+                    </span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-row">
+                        <span class="meta-label">Hasil QC</span>
+                        <span class="meta-val" style="color: var(--success-color);">100% Layak Operasi</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Tanggal Lolos</span>
+                        <span class="meta-val">30 Okt 2025</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Rak Gudang</span>
+                        <span class="meta-val">Rak ERS-Tool #04</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Status Siap</span>
+                        <span class="meta-val" style="color: var(--success-color);">Ready for Deploy</span>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a href="karantina-action.html?item=GIN-POL-003&mode=gudang" class="btn-action-primary">
+                        <i class="fa-solid fa-warehouse"></i> Masuk Rak Gudang
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Drawer Modal -->
+        <div class="drawer-overlay" id="filterDrawer" onclick="handleDrawerClick(event)">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <div class="drawer-header">
+                    <h3>Filter Item Karantina</h3>
+                    <button class="btn-close-drawer" onclick="toggleDrawer(false)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="filter-group">
+                    <label>Status QC</label>
+                    <div class="pill-group" id="drawerStatusPills">
+                        <div class="pill-item selected" onclick="selectPill(this)">Semua Status</div>
+                        <div class="pill-item" onclick="selectPill(this)">Siap QC</div>
+                        <div class="pill-item" onclick="selectPill(this)">Perlu Repair</div>
+                        <div class="pill-item" onclick="selectPill(this)">Lolos QC</div>
+                    </div>
+                </div>
+
+                <div class="drawer-footer">
+                    <button class="btn-drawer-reset" onclick="resetFilters()">Reset</button>
+                    <button class="btn-drawer-apply" onclick="applyDrawerFilters()">Terapkan Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+
+        function setChipFilter(status, el) {
+            document.querySelectorAll('.chip-pill').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            currentFilter = status;
+            filterCards();
+        }
+
+        function handleSearch() {
+            filterCards();
+        }
+
+        function filterCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.item-card');
+
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const cardName = card.getAttribute('data-name').toLowerCase();
+                const cardSn = card.getAttribute('data-sn').toLowerCase();
+
+                const matchStatus = (currentFilter === 'all') || (cardStatus === currentFilter);
+                const matchQuery = !query || cardName.includes(query) || cardSn.includes(query);
+
+                if (matchStatus && matchQuery) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleDrawer(show) {
+            const drawer = document.getElementById('filterDrawer');
+            if (show) drawer.classList.add('active');
+            else drawer.classList.remove('active');
+        }
+
+        function handleDrawerClick(e) {
+            if (e.target === document.getElementById('filterDrawer')) toggleDrawer(false);
+        }
+
+        function selectPill(el) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.pill-item').forEach(p => p.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('#drawerStatusPills .pill-item').forEach((p, idx) => {
+                if (idx === 0) p.classList.add('selected');
+                else p.classList.remove('selected');
+            });
+            currentFilter = 'all';
+            document.querySelectorAll('.chip-pill').forEach((c, idx) => {
+                if (idx === 0) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+            document.getElementById('searchInput').value = '';
+            filterCards();
+            toggleDrawer(false);
+        }
+
+        function applyDrawerFilters() {
+            const selectedStatusPill = document.querySelector('#drawerStatusPills .pill-item.selected').innerText.trim();
+            if (selectedStatusPill === 'Semua Status') currentFilter = 'all';
+            else if (selectedStatusPill === 'Siap QC') currentFilter = 'siap';
+            else if (selectedStatusPill === 'Perlu Repair') currentFilter = 'repair';
+            else if (selectedStatusPill === 'Lolos QC') currentFilter = 'lolos';
+
+            document.querySelectorAll('.chip-pill').forEach(chip => {
+                chip.classList.remove('active');
+                if (currentFilter === 'all' && chip.innerText.includes('Semua')) chip.classList.add('active');
+                if (currentFilter === 'siap' && chip.innerText.includes('Siap')) chip.classList.add('active');
+                if (currentFilter === 'repair' && chip.innerText.includes('Repair')) chip.classList.add('active');
+                if (currentFilter === 'lolos' && chip.innerText.includes('Lolos')) chip.classList.add('active');
+            });
+
+            filterCards();
+            toggleDrawer(false);
+        }
+    </script>
+</body>
+</html>

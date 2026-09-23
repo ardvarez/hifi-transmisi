@@ -82,6 +82,77 @@
             z-index: 10;
         }
 
+        /* ERS Sub-Navigation Category Tabs */
+        .category-tabs-container {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            gap: 24px;
+            flex-shrink: 0;
+        }
+
+        .category-tabs-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab-pill {
+            padding: 12px 0 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .category-tab-pill.active {
+            color: #2563eb;
+            font-weight: 700;
+            border-bottom-color: #2563eb;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 8px 10px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 4px;
+            text-decoration: none;
+            flex: 1;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-item i {
+            font-size: 19px;
+        }
+
         .status-icons {
             display: flex;
             align-items: center;
@@ -289,9 +360,9 @@
 
         /* Status Badge Variants */
         .badge-status {
-            padding: 5px 14px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
             font-weight: 700;
             display: inline-block;
         }
@@ -299,6 +370,24 @@
         .badge-mulai {
             background: #2563eb;
             color: #ffffff;
+        }
+
+        .badge-berlangsung {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-selesai-lokal {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-selesai {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
         .badge-dikirim {
@@ -314,15 +403,15 @@
         }
 
         .badge-pasang {
-            background: #e0f2fe;
-            color: #0284c7;
-            border: 1px solid #bae6fd;
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
         }
 
         .badge-server {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
         /* Card Details Rows */
@@ -1547,9 +1636,7 @@
     </script>
 
 </head>
-
 <body>
-
     <div class="mobile-container">
         <!-- iOS Status Bar -->
         <div class="status-bar">
@@ -1581,7 +1668,7 @@
         <!-- Search & Filter Bar -->
         <div class="search-filter-section">
             <div class="search-input-box">
-                <input type="text" id="ersSearchInput" placeholder="Cari data pembongkaran..." oninput="filterData(this.value)">
+                <input type="text" id="ersSearchInput" placeholder="Cari" oninput="filterData(this.value)">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <button class="filter-btn" onclick="openFilterModalDrawer()" title="Filter Data">
@@ -1594,16 +1681,13 @@
             <!-- Dynamic Cards -->
         </div>
 
-        <!-- Bottom Navigation Bar -->
-        
-
         <!-- iOS Bottom Indicator Line -->
         <div class="ios-bar"></div>
 
         <!-- Filter / Location Modal Drawer Component -->
         <div class="modal-overlay" id="filterModal" onclick="closeFilterModal(event)">
             <div class="modal-drawer" onclick="event.stopPropagation()">
-                <div class="drawer-handle"></div>
+                <div class="drawer-handle" onclick="closeFilterModalDirect()" style="cursor:pointer;" title="Klik/Tarik untuk tutup"></div>
                 <div id="drawerModalContent">
                     <!-- Injected dynamically via JavaScript -->
                 </div>
@@ -1611,297 +1695,7 @@
         </div>
     </div>
 
-    <script>
-        const pembongkaranData = [
-            {
-                id: 'DIS20250000001',
-                statusText: 'Mulai',
-                badgeClass: 'badge-mulai',
-                targetPembongkaran: '1 Februari 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Maret 2025',
-                jumlahTE: 2,
-                lokasi: '4'
-            },
-            {
-                id: 'DIS20250000002',
-                statusText: 'Sedang Berlangsung',
-                badgeClass: 'badge-pasang',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '5'
-            },
-            {
-                id: 'DIS20250000003',
-                statusText: 'Selesai Lokal',
-                badgeClass: 'badge-dikirim',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '3'
-            },
-            {
-                id: 'DIS20250000004',
-                statusText: 'Selesai',
-                badgeClass: 'badge-server',
-                targetPembongkaran: '1 Mei 2025',
-                slaPembongkaran: '30 Hari',
-                targetOperasi: '10 Juni 2025',
-                jumlahTE: 2,
-                lokasi: '4'
-            }
-        ];
-
-        let selectedStatusChips = [];
-        let filterState = {
-            targetPembongkaran: '',
-            targetOperasi: '',
-            lokasi: ''
-        };
-
-        function renderCards(filterQuery = '') {
-            const container = document.getElementById('ersContentArea');
-            const q = filterQuery.toLowerCase().trim();
-            
-            const filtered = pembongkaranData.filter(item => {
-                // Search Query
-                if (q && !(item.id.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q))) {
-                    return false;
-                }
-                // Status Chips
-                if (selectedStatusChips.length > 0 && !selectedStatusChips.includes(item.statusText)) {
-                    return false;
-                }
-                // Target Pembongkaran
-                if (filterState.targetPembongkaran && item.targetPembongkaran !== filterState.targetPembongkaran) {
-                    return false;
-                }
-                // Target Operasi
-                if (filterState.targetOperasi && item.targetOperasi !== filterState.targetOperasi) {
-                    return false;
-                }
-                // Lokasi
-                if (filterState.lokasi && item.lokasi !== filterState.lokasi) {
-                    return false;
-                }
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;">
-                        <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
-                        <p>Tidak ada data pembongkaran yang cocok dengan kriteria filter.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
-                <div class="ers-card">
-                    <div class="card-header">
-                        <span class="card-id">${item.id}</span>
-                        <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Target Pembongkaran</span>
-                            <span class="detail-val">${item.targetPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">SLA Pembongkaran</span>
-                            <span class="detail-val">${item.slaPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Target Operasi</span>
-                            <span class="detail-val">${item.targetOperasi}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Jumlah TE</span>
-                            <span class="detail-val">${item.jumlahTE}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Lokasi</span>
-                            <span class="detail-val">${item.lokasi}</span>
-                        </div>
-                    </div>
-                    <div class="card-actions" onclick="event.stopPropagation()">
-                        <button class="btn-action btn-outline" onclick="viewLocation('${item.id}', '${item.lokasi}')">View Lokasi</button>
-                        <button class="btn-action btn-primary" onclick="navigateSmooth('list-pembongkaran.html?id=${item.id}', event)">Lihat Detail</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function filterData(val) { 
-            renderCards(val); 
-        }
-
-        function openModal() {
-            document.getElementById('filterModal').classList.add('active');
-        }
-
-        function closeFilterModal(e) { 
-            if (e.target.id === 'filterModal') closeFilterModalDirect(); 
-        }
-
-        function closeFilterModalDirect() { 
-            document.getElementById('filterModal').classList.remove('active'); 
-        }
-
-        /* View Lokasi Drawer */
-        function viewLocation(id, countStr) {
-            const count = parseInt(countStr, 10) || 4;
-            const startNum = 85;
-            let itemsHtml = '';
-            
-            for (let i = 0; i < count; i++) {
-                const towerNum = String(startNum + i).padStart(4, '0');
-                itemsHtml += `
-                    <div class="location-item-card">
-                        <div class="location-icon-wrapper">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
-                        <div class="location-item-info">
-                            <div class="location-item-title" style="margin-bottom:0;">TOWER SUTT 150kV Ungaran-Weleri #${towerNum}</div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="location-bottom-sheet">
-                    <div class="location-sheet-header">
-                        <h2 class="location-sheet-title">Lokasi</h2>
-                        <span class="location-count-badge">${count} Lokasi Tower</span>
-                    </div>
-                    <div class="location-subtitle">Daftar lokasi pembongkaran ERS <strong>${id}</strong></div>
-                    
-                    <div class="location-items-list">
-                        ${itemsHtml}
-                    </div>
-
-                    <button type="button" class="btn-filter-submit" onclick="closeFilterModalDirect()">Tutup</button>
-                </div>
-            `;
-            openModal();
-        }
-
-        /* Filter Drawer */
-        function openFilterModalDrawer() {
-            renderFilterSheetContent();
-            openModal();
-        }
-
-        function renderFilterSheetContent() {
-            const allStatuses = ['Mulai', 'Sedang Berlangsung', 'Selesai Lokal', 'Selesai'];
-            
-            const chipsHtml = allStatuses.map(status => {
-                const isActive = selectedStatusChips.includes(status);
-                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleStatusChip(this, '${status}')">${status}</button>`;
-            }).join('');
-
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="filter-bottom-sheet">
-                    <h2 class="filter-drawer-title">Filter</h2>
-                    
-                    <div class="filter-section">
-                        <label class="filter-section-label">Status</label>
-                        <div class="chips-container">
-                            ${chipsHtml}
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">No. Permit</label>
-                        <input type="text" id="filterNoPermit" class="filter-input-field" placeholder="Masukkan No. Permit" value="${filterState.permit || ''}">
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Pembongkaran</label>
-                        <div class="input-with-icon">
-                            <input type="text" id="filterTargetBongkar" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetPembongkaran || '23 Januari 2026'}">
-                            <i class="fa-regular fa-calendar input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Operasi</label>
-                        <div class="input-with-icon">
-                            <input type="text" id="filterTargetOperasi" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetOperasi || '23 Januari 2026'}">
-                            <i class="fa-regular fa-calendar input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Lokasi</label>
-                        <div class="input-with-icon">
-                            <select id="filterLokasi" class="filter-input-field filter-select-field">
-                                <option value="" ${!filterState.lokasi ? 'selected' : ''}>Pilih Lokasi</option>
-                                <option value="3" ${filterState.lokasi === '3' ? 'selected' : ''}>3</option>
-                                <option value="4" ${filterState.lokasi === '4' ? 'selected' : ''}>4</option>
-                                <option value="5" ${filterState.lokasi === '5' ? 'selected' : ''}>5</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-filter-submit" onclick="applyFilterDrawer()">Filter</button>
-                </div>
-            `;
-        }
-
-        function toggleStatusChip(btn, status) {
-            btn.classList.toggle('active');
-            if (selectedStatusChips.includes(status)) {
-                selectedStatusChips = selectedStatusChips.filter(s => s !== status);
-            } else {
-                selectedStatusChips.push(status);
-            }
-        }
-
-        function applyFilterDrawer() {
-            filterState.targetPembongkaran = document.getElementById('filterTargetBongkar').value.trim();
-            filterState.targetOperasi = document.getElementById('filterTargetOperasi').value.trim();
-            filterState.lokasi = document.getElementById('filterLokasi').value;
-
-            renderCards(document.getElementById('ersSearchInput').value);
-            closeFilterModalDirect();
-        }
-
-        function resetFilterDrawer() {
-            selectedStatusChips = [];
-            filterState = {
-                targetPembongkaran: '',
-                targetOperasi: '',
-                lokasi: ''
-            };
-            renderFilterSheetContent();
-            renderCards(document.getElementById('ersSearchInput').value);
-        }
-
-        function navigateSmooth(url, event) {
-            if (event) event.preventDefault();
-            const container = document.querySelector('.mobile-container');
-            if (container) {
-                container.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
-                container.style.opacity = '0.9';
-                container.style.transform = 'scale(0.996)';
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 100);
-            } else {
-                window.location.href = url;
-            }
-        }
-
-        renderCards();
-    </script>
-
-    <!-- NOTES FEATURE (INJECTED) -->
+    <!-- NOTES FEATURE (FAB & Panel) -->
     <style>
       .notes-fab {
         position: fixed;
@@ -1981,15 +1775,229 @@
         Notes & Validasi
       </h3>
       <ul>
-        <!-- TODO: UPDATE NOTES HERE -->
         <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
         <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
-        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+        <li><strong>Info:</strong> Card pembongkaran menampilkan Target Pembongkaran, SLA Pembongkaran, Target Operasi, dan Jumlah TE.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
 
-    
+    <script>
+        const pembongkaranData = [
+            {
+                id: 'DIS20250000001',
+                statusText: 'Mulai',
+                badgeClass: 'badge-mulai',
+                targetPembongkaran: '1 Februari 2025',
+                slaPembongkaran: '30 Hari',
+                targetOperasi: '10 Maret 2025',
+                jumlahTE: 2
+            },
+            {
+                id: 'DIS20250000002',
+                statusText: 'Sedang Berlangsung',
+                badgeClass: 'badge-berlangsung',
+                targetPembongkaran: '1 Mei 2025',
+                slaPembongkaran: '30 Hari',
+                targetOperasi: '10 Juni 2025',
+                jumlahTE: 2
+            },
+            {
+                id: 'DIS20250000003',
+                statusText: 'Selesai Lokal',
+                badgeClass: 'badge-selesai-lokal',
+                targetPembongkaran: '1 Mei 2025',
+                slaPembongkaran: '30 Hari',
+                targetOperasi: '10 Juni 2025',
+                jumlahTE: 2
+            },
+            {
+                id: 'DIS20250000004',
+                statusText: 'Selesai',
+                badgeClass: 'badge-selesai',
+                targetPembongkaran: '1 Mei 2025',
+                slaPembongkaran: '30 Hari',
+                targetOperasi: '10 Juni 2025',
+                jumlahTE: 2
+            }
+        ];
 
+        let selectedStatusChips = [];
+        let filterState = {
+            targetPembongkaran: '',
+            targetOperasi: ''
+        };
+
+        function renderCards(filterQuery = '') {
+            const container = document.getElementById('ersContentArea');
+            const q = filterQuery.toLowerCase().trim();
+            
+            const filtered = pembongkaranData.filter(item => {
+                if (q && !(item.id.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q))) {
+                    return false;
+                }
+                if (selectedStatusChips.length > 0 && !selectedStatusChips.includes(item.statusText)) {
+                    return false;
+                }
+                if (filterState.targetPembongkaran && item.targetPembongkaran !== filterState.targetPembongkaran) {
+                    return false;
+                }
+                if (filterState.targetOperasi && item.targetOperasi !== filterState.targetOperasi) {
+                    return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
+                        <p>Tidak ada data pembongkaran yang cocok dengan kriteria filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="ers-card" onclick="navigateSmooth('list-pembongkaran.html?id=${item.id}', event)" style="cursor: pointer;">
+                    <div class="card-header">
+                        <span class="card-id">${item.id}</span>
+                        <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Target Pembongkaran</span>
+                            <span class="detail-val">${item.targetPembongkaran}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SLA Pembongkaran</span>
+                            <span class="detail-val">${item.slaPembongkaran}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Target Operasi</span>
+                            <span class="detail-val">${item.targetOperasi}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Jumlah TE</span>
+                            <span class="detail-val">${item.jumlahTE}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions" onclick="event.stopPropagation()">
+                        <button class="btn-action btn-primary" style="width: 100%;" onclick="navigateSmooth('list-pembongkaran.html?id=${item.id}', event)">Lihat Detail</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterData(val) { 
+            renderCards(val); 
+        }
+
+        function openModal() {
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function closeFilterModal(e) { 
+            if (e.target.id === 'filterModal') closeFilterModalDirect(); 
+        }
+
+        function closeFilterModalDirect() { 
+            document.getElementById('filterModal').classList.remove('active'); 
+        }
+
+        function openFilterModalDrawer() {
+            renderFilterSheetContent();
+            openModal();
+        }
+
+        function renderFilterSheetContent() {
+            const allStatuses = ['Mulai', 'Sedang Berlangsung', 'Selesai Lokal', 'Selesai'];
+            
+            const chipsHtml = allStatuses.map(status => {
+                const isActive = selectedStatusChips.includes(status);
+                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleStatusChip(this, '${status}')">${status}</button>`;
+            }).join('');
+
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div class="filter-bottom-sheet">
+                    <h2 class="filter-drawer-title">Filter</h2>
+                    
+                    <div class="filter-section">
+                        <label class="filter-section-label">Status</label>
+                        <div class="chips-container">
+                            ${chipsHtml}
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-section-label">No. Permit</label>
+                        <input type="text" id="filterNoPermit" class="filter-input-field" placeholder="Masukkan No. Permit" value="${filterState.permit || ''}">
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-section-label">Tanggal Target Pembongkaran</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="filterTargetBongkar" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetPembongkaran || '23 Januari 2026'}">
+                            <i class="fa-regular fa-calendar input-right-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-section-label">Tanggal Target Operasi</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="filterTargetOperasi" class="filter-input-field" placeholder="23 Januari 2026" value="${filterState.targetOperasi || '23 Januari 2026'}">
+                            <i class="fa-regular fa-calendar input-right-icon"></i>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-filter-submit" onclick="applyFilterDrawer()">Filter</button>
+                </div>
+            `;
+        }
+
+        function toggleStatusChip(btn, status) {
+            btn.classList.toggle('active');
+            if (selectedStatusChips.includes(status)) {
+                selectedStatusChips = selectedStatusChips.filter(s => s !== status);
+            } else {
+                selectedStatusChips.push(status);
+            }
+        }
+
+        function applyFilterDrawer() {
+            filterState.targetPembongkaran = document.getElementById('filterTargetBongkar').value.trim();
+            filterState.targetOperasi = document.getElementById('filterTargetOperasi').value.trim();
+
+            renderCards(document.getElementById('ersSearchInput').value);
+            closeFilterModalDirect();
+        }
+
+        function resetFilterDrawer() {
+            selectedStatusChips = [];
+            filterState = {
+                targetPembongkaran: '',
+                targetOperasi: ''
+            };
+            renderFilterSheetContent();
+            renderCards(document.getElementById('ersSearchInput').value);
+        }
+
+        function navigateSmooth(url, event) {
+            if (event) event.preventDefault();
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
+                container.style.opacity = '0.9';
+                container.style.transform = 'scale(0.996)';
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 100);
+            } else {
+                window.location.href = url;
+            }
+        }
+
+        renderCards();
+    </script>
 </body>
 </html>

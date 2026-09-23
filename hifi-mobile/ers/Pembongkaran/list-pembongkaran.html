@@ -328,28 +328,30 @@
             white-space: nowrap;
         }
 
-        .badge-siap {
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #dbeafe;
+        .badge-siap,
+        .badge-mulai {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border: none !important;
         }
 
-        .badge-sedang {
-            background: #e0f2fe;
-            color: #0284c7;
-            border: 1px solid #bae6fd;
+        .badge-sedang,
+        .badge-berlangsung {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
         }
 
         .badge-selesai-lokal {
-            background: #fff7ed;
-            color: #ea580c;
-            border: 1px solid #ffedd5;
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
         }
 
         .badge-selesai {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
         /* Card Details Rows */
@@ -1540,6 +1542,7 @@
                 <input type="text" id="detailSearchInput" placeholder="Cari" oninput="filterDetailCards(this.value)">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
+
             <button class="filter-btn" onclick="openFilterModalDrawer()" title="Filter Data">
                 <i class="fa-solid fa-filter"></i>
             </button>
@@ -1569,390 +1572,6 @@
         </div>
 
     </div>
-
-    <script>
-        // List detail components with Nomor Pembongkaran (DIS20250000001-0X)
-        const detailItemsData = [
-            {
-                id: 'DIS20250000001-01',
-                name: 'Tower Solution - Tension - 150kV',
-                statusText: 'Siap Bongkar',
-                badgeClass: 'badge-siap',
-                targetPembongkaran: '1 Februari 2025',
-                slaPembongkaran: '30 Hari',
-                targetSelesai: '10 Maret 2025',
-                lokasiCount: '4'
-            },
-            {
-                id: 'DIS20250000001-02',
-                name: 'SBB - Suspension - 150kV',
-                statusText: 'Sedang Dibongkar',
-                badgeClass: 'badge-sedang',
-                targetPembongkaran: '15 Maret 2025',
-                slaPembongkaran: '45 Hari',
-                targetSelesai: '1 Mei 2025',
-                lokasiCount: '5'
-            },
-            {
-                id: 'DIS20250000001-03',
-                name: 'Lindsey - Tension - 275kV',
-                statusText: 'Selesai Lokal',
-                badgeClass: 'badge-selesai-lokal',
-                targetPembongkaran: '20 Maret 2025',
-                slaPembongkaran: '14 Hari',
-                targetSelesai: '15 Mei 2025',
-                lokasiCount: '3'
-            },
-            {
-                id: 'DIS20250000001-04',
-                name: 'Tower Solution - Suspension - 500kV',
-                statusText: 'Selesai',
-                badgeClass: 'badge-selesai',
-                targetPembongkaran: '10 Januari 2025',
-                slaPembongkaran: '20 Hari',
-                targetSelesai: '1 Februari 2025',
-                lokasiCount: '4'
-            }
-        ];
-
-        let selectedDetailStatusChips = [];
-        let selectedDetailMerkChips = [];
-        let selectedDetailTipeChips = [];
-        let selectedDetailTeganganChips = [];
-        let detailFilterState = {
-            targetPembongkaran: '',
-            targetSelesai: '',
-            lokasi: ''
-        };
-
-        function renderDetailCards(filterQuery = '') {
-            const container = document.getElementById('detailCardsContainer');
-            const q = filterQuery.toLowerCase().trim();
-            
-            const filtered = detailItemsData.filter(item => {
-                // Search query
-                if (q && !(item.name.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q) || item.id.toLowerCase().includes(q))) {
-                    return false;
-                }
-                // Status chips
-                if (selectedDetailStatusChips.length > 0 && !selectedDetailStatusChips.includes(item.statusText)) {
-                    return false;
-                }
-                // Merk chips
-                if (selectedDetailMerkChips.length > 0) {
-                    const hasMerk = selectedDetailMerkChips.some(merk => item.name.toLowerCase().includes(merk.toLowerCase()));
-                    if (!hasMerk) return false;
-                }
-                // Tipe chips
-                if (selectedDetailTipeChips.length > 0) {
-                    const hasTipe = selectedDetailTipeChips.some(tipe => item.name.toLowerCase().includes(tipe.toLowerCase()));
-                    if (!hasTipe) return false;
-                }
-                // Tegangan chips
-                if (selectedDetailTeganganChips.length > 0) {
-                    const hasTegangan = selectedDetailTeganganChips.some(teg => item.name.toLowerCase().includes(teg.toLowerCase()));
-                    if (!hasTegangan) return false;
-                }
-                // Target Pembongkaran filter
-                if (detailFilterState.targetPembongkaran && item.targetPembongkaran !== detailFilterState.targetPembongkaran) {
-                    return false;
-                }
-                // Target Selesai filter
-                if (detailFilterState.targetSelesai && item.targetSelesai !== detailFilterState.targetSelesai) {
-                    return false;
-                }
-                // Lokasi filter
-                if (detailFilterState.lokasi && item.lokasiCount !== detailFilterState.lokasi) {
-                    return false;
-                }
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;">
-                        <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
-                        <p>Tidak ada data detail yang cocok dengan kriteria filter.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
-                <div class="detail-item-card" onclick="navigateSmooth('./pembongkaran-action.html?id=' + encodeURIComponent('${item.id}'))" style="cursor: pointer;" title="Klik untuk aksi pembongkaran">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 12px; font-weight: 800; color: #2563eb; letter-spacing: -0.2px;"><i class="fa-solid fa-hashtag" style="font-size: 10px; margin-right: 2px;"></i> ${item.id}</span>
-                    </div>
-                    <div class="card-header" style="margin-bottom: 12px; padding-bottom: 8px;">
-                        <span class="item-title">${item.name}</span>
-                        <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
-                    </div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Target Pembongkaran</span>
-                            <span class="detail-val">${item.targetPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">SLA Pembongkaran</span>
-                            <span class="detail-val">${item.slaPembongkaran}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Target Selesai</span>
-                            <span class="detail-val">${item.targetSelesai}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Lokasi</span>
-                            <span class="detail-val">${item.lokasiCount}</span>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" class="btn-outline-action" style="flex: 1;" onclick="event.stopPropagation(); viewLocation('${item.name}', '${item.lokasiCount}')">View Lokasi</button>
-                        <button type="button" class="btn-filter-submit" style="flex: 1; height: 38px; font-size: 12.5px; margin-top: 0;" onclick="event.stopPropagation(); navigateSmooth('./pembongkaran-action.html?id=' + encodeURIComponent('${item.id}'))">Pembongkaran</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function filterDetailCards(val) {
-            renderDetailCards(val);
-        }
-
-        function toggleDetailStatusChip(btn, status) {
-            btn.classList.toggle('active');
-            if (selectedDetailStatusChips.includes(status)) {
-                selectedDetailStatusChips = selectedDetailStatusChips.filter(s => s !== status);
-            } else {
-                selectedDetailStatusChips.push(status);
-            }
-        }
-
-        function toggleDetailMerkChip(btn, merk) {
-            btn.classList.toggle('active');
-            if (selectedDetailMerkChips.includes(merk)) {
-                selectedDetailMerkChips = selectedDetailMerkChips.filter(m => m !== merk);
-            } else {
-                selectedDetailMerkChips.push(merk);
-            }
-        }
-
-        function toggleDetailTipeChip(btn, tipe) {
-            btn.classList.toggle('active');
-            if (selectedDetailTipeChips.includes(tipe)) {
-                selectedDetailTipeChips = selectedDetailTipeChips.filter(t => t !== tipe);
-            } else {
-                selectedDetailTipeChips.push(tipe);
-            }
-        }
-
-        function toggleDetailTeganganChip(btn, tegangan) {
-            btn.classList.toggle('active');
-            if (selectedDetailTeganganChips.includes(tegangan)) {
-                selectedDetailTeganganChips = selectedDetailTeganganChips.filter(t => t !== tegangan);
-            } else {
-                selectedDetailTeganganChips.push(tegangan);
-            }
-        }
-
-        function viewLocation(towerName, countStr) {
-            const count = parseInt(countStr, 10) || 4;
-            const startNum = 85;
-            let itemsHtml = '';
-            for (let i = 0; i < count; i++) {
-                const towerNum = String(startNum + i).padStart(4, '0');
-                itemsHtml += `
-                    <div class="location-item-card">
-                        <div class="location-icon-wrapper">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
-                        <div class="location-item-info">
-                            <div class="location-item-title" style="margin-bottom:0;">TOWER SUTT 150kV Ungaran-Weleri #${towerNum}</div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="location-bottom-sheet">
-                    <div class="location-sheet-header">
-                        <h2 class="location-sheet-title">Lokasi</h2>
-                        <span class="location-count-badge">${count} Lokasi Tower</span>
-                    </div>
-                    <div class="location-subtitle">Daftar lokasi pembongkaran <strong>${towerName}</strong></div>
-
-                    <div class="location-items-list">
-                        ${itemsHtml}
-                    </div>
-
-                    <button type="button" class="btn-filter-submit" onclick="closeFilterModalDirect()">Tutup</button>
-                </div>
-            `;
-            openModal();
-        }
-
-        function renderFilterSheetContent() {
-            const allStatuses = ['Mulai', 'Sedang Dibongkar', 'Selesai Lokal', 'Selesai'];
-            const allMerks = ['Tower Solution', 'SBB', 'Lindsey'];
-            const allTipes = ['Tension', 'Suspension'];
-            const allTegangan = ['150kV', '275kV', '500kV'];
-
-            const statusChipsHtml = allStatuses.map(status => {
-                const isActive = selectedDetailStatusChips.includes(status);
-                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleDetailStatusChip(this, '${status}')">${status}</button>`;
-            }).join('');
-
-            const merkChipsHtml = allMerks.map(merk => {
-                const isActive = selectedDetailMerkChips.includes(merk);
-                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleDetailMerkChip(this, '${merk}')">${merk}</button>`;
-            }).join('');
-
-            const tipeChipsHtml = allTipes.map(tipe => {
-                const isActive = selectedDetailTipeChips.includes(tipe);
-                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleDetailTipeChip(this, '${tipe}')">${tipe}</button>`;
-            }).join('');
-
-            const teganganChipsHtml = allTegangan.map(tegangan => {
-                const isActive = selectedDetailTeganganChips.includes(tegangan);
-                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleDetailTeganganChip(this, '${tegangan}')">${tegangan}</button>`;
-            }).join('');
-
-            document.getElementById('drawerModalContent').innerHTML = `
-                <div class="filter-bottom-sheet">
-                    <h2 class="filter-drawer-title">Filter Detail Pembongkaran</h2>
-                    
-                    <div class="filter-section">
-                        <label class="filter-section-label">Status Component</label>
-                        <div class="chips-container">
-                            ${statusChipsHtml}
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Merk ERS</label>
-                        <div class="chips-container">
-                            ${merkChipsHtml}
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tipe Tower</label>
-                        <div class="chips-container">
-                            ${tipeChipsHtml}
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tegangan System</label>
-                        <div class="chips-container">
-                            ${teganganChipsHtml}
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Pembongkaran</label>
-                        <div class="input-with-icon">
-                            <input type="text" id="filterDetailTargetPem" class="filter-input-field" placeholder="1 Februari 2025" value="${detailFilterState.targetPembongkaran || ''}">
-                            <i class="fa-regular fa-calendar input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Tanggal Target Selesai</label>
-                        <div class="input-with-icon">
-                            <input type="text" id="filterDetailTargetOp" class="filter-input-field" placeholder="10 Maret 2025" value="${detailFilterState.targetSelesai || ''}">
-                            <i class="fa-regular fa-calendar input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <label class="filter-section-label">Jumlah Lokasi</label>
-                        <div class="input-with-icon">
-                            <select id="filterDetailLokasi" class="filter-input-field filter-select-field">
-                                <option value="" ${!detailFilterState.lokasi ? 'selected' : ''}>Pilih Lokasi</option>
-                                <option value="3" ${detailFilterState.lokasi === '3' ? 'selected' : ''}>3</option>
-                                <option value="4" ${detailFilterState.lokasi === '4' ? 'selected' : ''}>4</option>
-                                <option value="5" ${detailFilterState.lokasi === '5' ? 'selected' : ''}>5</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down input-right-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="sheet-actions-stack">
-                        <button type="button" class="btn-sheet-secondary" onclick="resetDetailFilter()">Reset</button>
-                        <button type="button" class="btn-filter-submit" style="margin-top:0;" onclick="applyDetailFilter()">Terapkan Filter</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function openModal() {
-            document.getElementById('filterModal').classList.add('active');
-        }
-
-        function openFilterModalDrawer() {
-            renderFilterSheetContent();
-            openModal();
-        }
-
-        function applyDetailFilter() {
-            const targetPemVal = document.getElementById('filterDetailTargetPem') ? document.getElementById('filterDetailTargetPem').value.trim() : '';
-            const targetOpVal = document.getElementById('filterDetailTargetOp') ? document.getElementById('filterDetailTargetOp').value.trim() : '';
-            const lokasiVal = document.getElementById('filterDetailLokasi') ? document.getElementById('filterDetailLokasi').value : '';
-
-            detailFilterState = {
-                targetPembongkaran: targetPemVal,
-                targetSelesai: targetOpVal,
-                lokasi: lokasiVal
-            };
-
-            closeFilterModalDirect();
-            renderDetailCards(document.getElementById('detailSearchInput').value);
-        }
-
-        function resetDetailFilter() {
-            selectedDetailStatusChips = [];
-            selectedDetailMerkChips = [];
-            selectedDetailTipeChips = [];
-            selectedDetailTeganganChips = [];
-            detailFilterState = { targetPembongkaran: '', targetSelesai: '', lokasi: '' };
-            renderFilterSheetContent();
-            renderDetailCards('');
-        }
-
-        function closeFilterModalDirect() {
-            const modal = document.getElementById('filterModal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        }
-
-        function navigateSmooth(url, e) {
-            const container = document.querySelector('.mobile-container');
-            if (container) {
-                container.style.opacity = '0.6';
-                container.style.transition = 'opacity 0.08s ease';
-            }
-            window.location.href = url;
-        }
-
-        function closeFilterModal(e) {
-            if (!e || e.target.id === 'filterModal' || e.target.classList.contains('modal-overlay')) {
-                closeFilterModalDirect();
-            }
-        }
-
-        // Init URL param for dynamic card ID
-        const urlParams = new URLSearchParams(window.location.search);
-        const cardId = urlParams.get('id') || 'DIS20250000001';
-        const titleEl = document.getElementById('pageMainTitle');
-        if (titleEl) {
-            titleEl.textContent = `ERS (${cardId})`;
-        }
-        document.title = `List Pembongkaran ERS - ${cardId}`;
-
-        // Initial render
-        renderDetailCards();
-    </script>
-
 
     <!-- NOTES FEATURE (INJECTED) -->
     <style>
@@ -2034,7 +1653,6 @@
         Notes & Validasi
       </h3>
       <ul>
-        <!-- TODO: UPDATE NOTES HERE -->
         <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
         <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
         <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
@@ -2042,7 +1660,230 @@
     </div>
     <!-- END NOTES FEATURE -->
 
-    
+    <script>
+        // List detail components for Pembongkaran
+        const detailItemsData = [
+            {
+                id: 'DIS20250000001-01',
+                name: 'Template Tower',
+                statusText: 'Siap Bongkar',
+                badgeClass: 'badge-siap',
+                targetPembongkaran: '1 Februari 2025',
+                slaPembongkaran: '30 Hari',
+                targetSelesai: '10 Maret 2025',
+                lokasi: '4.5783/110.004'
+            },
+            {
+                id: 'DIS20250000001-02',
+                name: 'Tower ERS',
+                statusText: 'Siap Bongkar',
+                badgeClass: 'badge-siap',
+                targetPembongkaran: '1 Februari 2025',
+                slaPembongkaran: '30 Hari',
+                targetSelesai: '10 Maret 2025',
+                lokasi: '5.5783/120.004'
+            }
+        ];
 
+        let selectedDetailStatusChips = [];
+        let detailFilterState = {
+            targetPembongkaran: '',
+            targetSelesai: '',
+            lokasi: ''
+        };
+
+        function renderDetailCards(filterQuery = '') {
+            const container = document.getElementById('detailCardsContainer');
+            const q = filterQuery.toLowerCase().trim();
+            
+            const filtered = detailItemsData.filter(item => {
+                // Search query
+                if (q && !(item.name.toLowerCase().includes(q) || item.statusText.toLowerCase().includes(q) || item.lokasi.toLowerCase().includes(q))) {
+                    return false;
+                }
+                // Status chips
+                if (selectedDetailStatusChips.length > 0 && !selectedDetailStatusChips.includes(item.statusText)) {
+                    return false;
+                }
+                // Target Pembongkaran filter
+                if (detailFilterState.targetPembongkaran && item.targetPembongkaran !== detailFilterState.targetPembongkaran) {
+                    return false;
+                }
+                // Target Selesai filter
+                if (detailFilterState.targetSelesai && item.targetSelesai !== detailFilterState.targetSelesai) {
+                    return false;
+                }
+                // Lokasi filter
+                if (detailFilterState.lokasi && !item.lokasi.includes(detailFilterState.lokasi)) {
+                    return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
+                        <p>Tidak ada data detail yang cocok dengan kriteria filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="detail-item-card" onclick="navigateSmooth('./pembongkaran-action.html?id=' + encodeURIComponent('${item.id}'), event)" style="cursor: pointer;" title="Klik untuk aksi pembongkaran">
+                    <div class="card-header">
+                        <span class="item-title">${item.name}</span>
+                        <span class="badge-status ${item.badgeClass}">${item.statusText}</span>
+                    </div>
+                    <div class="card-details" style="margin-bottom: 0;">
+                        <div class="detail-row">
+                            <span class="detail-label">Target Pembongkaran</span>
+                            <span class="detail-val">${item.targetPembongkaran}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SLA Pembongkaran</span>
+                            <span class="detail-val">${item.slaPembongkaran}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Target Selesai</span>
+                            <span class="detail-val">${item.targetSelesai}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Lokasi</span>
+                            <span class="detail-val">${item.lokasi}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterDetailCards(val) {
+            renderDetailCards(val);
+        }
+
+        function toggleDetailStatusChip(btn, status) {
+            btn.classList.toggle('active');
+            if (selectedDetailStatusChips.includes(status)) {
+                selectedDetailStatusChips = selectedDetailStatusChips.filter(s => s !== status);
+            } else {
+                selectedDetailStatusChips.push(status);
+            }
+        }
+
+        function renderFilterSheetContent() {
+            const allStatuses = ['Siap Bongkar', 'Sedang Dibongkar', 'Selesai Lokal', 'Selesai'];
+
+            const statusChipsHtml = allStatuses.map(status => {
+                const isActive = selectedDetailStatusChips.includes(status);
+                return `<button type="button" class="chip-item ${isActive ? 'active' : ''}" onclick="toggleDetailStatusChip(this, '${status}')">${status}</button>`;
+            }).join('');
+
+            document.getElementById('drawerModalContent').innerHTML = `
+                <div class="filter-bottom-sheet">
+                    <h2 class="filter-drawer-title">Filter Detail Pembongkaran</h2>
+                    
+                    <div class="filter-section">
+                        <label class="filter-section-label">Status Component</label>
+                        <div class="chips-container">
+                            ${statusChipsHtml}
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-section-label">Tanggal Target Pembongkaran</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="filterDetailTargetPem" class="filter-input-field" placeholder="1 Februari 2025" value="${detailFilterState.targetPembongkaran || ''}">
+                            <i class="fa-regular fa-calendar input-right-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-section-label">Tanggal Target Selesai</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="filterDetailTargetOp" class="filter-input-field" placeholder="10 Maret 2025" value="${detailFilterState.targetSelesai || ''}">
+                            <i class="fa-regular fa-calendar input-right-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-section-label">Lokasi</label>
+                        <input type="text" id="filterDetailLokasi" class="filter-input-field" placeholder="Contoh: 4.5783" value="${detailFilterState.lokasi || ''}">
+                    </div>
+
+                    <div class="sheet-actions-stack">
+                        <button type="button" class="btn-sheet-secondary" onclick="resetDetailFilter()">Reset</button>
+                        <button type="button" class="btn-filter-submit" style="margin-top:0;" onclick="applyDetailFilter()">Terapkan Filter</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openModal() {
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function openFilterModalDrawer() {
+            renderFilterSheetContent();
+            openModal();
+        }
+
+        function applyDetailFilter() {
+            const targetPemVal = document.getElementById('filterDetailTargetPem') ? document.getElementById('filterDetailTargetPem').value.trim() : '';
+            const targetOpVal = document.getElementById('filterDetailTargetOp') ? document.getElementById('filterDetailTargetOp').value.trim() : '';
+            const lokasiVal = document.getElementById('filterDetailLokasi') ? document.getElementById('filterDetailLokasi').value.trim() : '';
+
+            detailFilterState = {
+                targetPembongkaran: targetPemVal,
+                targetSelesai: targetOpVal,
+                lokasi: lokasiVal
+            };
+
+            closeFilterModalDirect();
+            renderDetailCards(document.getElementById('detailSearchInput').value);
+        }
+
+        function resetDetailFilter() {
+            selectedDetailStatusChips = [];
+            detailFilterState = { targetPembongkaran: '', targetSelesai: '', lokasi: '' };
+            renderFilterSheetContent();
+            renderDetailCards('');
+        }
+
+        function closeFilterModalDirect() {
+            const modal = document.getElementById('filterModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function navigateSmooth(url, e) {
+            if (e) e.preventDefault();
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.style.opacity = '0.6';
+                container.style.transition = 'opacity 0.08s ease';
+            }
+            window.location.href = url;
+        }
+
+        function closeFilterModal(e) {
+            if (!e || e.target.id === 'filterModal' || e.target.classList.contains('modal-overlay')) {
+                closeFilterModalDirect();
+            }
+        }
+
+        // Init URL param for dynamic card ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const cardId = urlParams.get('id') || 'DIS20250000001';
+        const titleEl = document.getElementById('pageMainTitle');
+        if (titleEl) {
+            titleEl.textContent = `ERS (${cardId})`;
+        }
+        document.title = `List Pembongkaran ERS - ${cardId}`;
+
+        // Initial render
+        renderDetailCards();
+    </script>
 </body>
 </html>

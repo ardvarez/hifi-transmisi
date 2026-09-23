@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pembongkaran Action - Tower #42</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet Map Integration -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.92; transform: scale(0.995); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Header */
+        .app-header {
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box h1 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .header-title-box p {
+            font-size: 11.5px;
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* Step Indicator */
+        .step-progress-bar {
+            background: #ffffff;
+            padding: 12px 20px 14px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .step-item.active .step-circle {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.2);
+        }
+
+        .step-item.completed .step-circle {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: #ffffff;
+        }
+
+        .step-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .step-item.active .step-label {
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .step-line-bg {
+            position: absolute;
+            top: 25px;
+            left: 40px;
+            right: 40px;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+
+        /* Scrollable Form Body */
+        .form-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scrollbar-width: none;
+        }
+
+        .form-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Section Card */
+        .form-section-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+        }
+
+        /* Form Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-label .req {
+            color: var(--danger-color);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            background: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
+        }
+
+        /* Segmented Pill Buttons */
+        .segmented-group {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+            gap: 4px;
+        }
+
+        .segment-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+        .segment-btn.active {
+            background: #ffffff;
+            color: var(--primary-blue);
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        /* Checklist Items */
+        .checklist-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .check-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        .check-item span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Map Box */
+        .map-preview-box {
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        #actionMap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gps-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 500;
+        }
+
+        /* Photo Upload Area */
+        .photo-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .photo-slot {
+            aspect-ratio: 1;
+            background: #f8fafc;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .photo-slot:hover {
+            border-color: var(--primary-blue);
+            background: var(--primary-light);
+        }
+
+        .photo-slot i {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
+        .photo-slot span {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        .photo-slot.filled img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-slot.filled .remove-photo {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.9);
+            color: #ffffff;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bottom Fixed Action Bar */
+        .bottom-action-bar {
+            background: #ffffff;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .btn-draft {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-submit {
+            flex: 2;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--primary-blue);
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
+        }
+
+        /* Modal Dialog */
+        .modal-popup-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal-popup-overlay.active {
+            display: flex;
+        }
+
+        .modal-popup-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: zoomIn 0.2s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .popup-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            color: var(--success-color);
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .modal-popup-card h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .modal-popup-card p {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .btn-modal-done {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-left-group">
+                <a href="list-pembongkaran.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1>Pembongkaran Tower #42</h1>
+                    <p>DIS20250000001 - SUTT 150kV Cigereleng</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-progress-bar">
+            <div class="step-line-bg"></div>
+            <div class="step-item completed" onclick="switchStep(1)">
+                <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+                <span class="step-label">Pelepasan</span>
+            </div>
+            <div class="step-item active" onclick="switchStep(2)">
+                <div class="step-circle">2</div>
+                <span class="step-label">De-erection</span>
+            </div>
+            <div class="step-item" onclick="switchStep(3)">
+                <div class="step-circle">3</div>
+                <span class="step-label">Pengepakan</span>
+            </div>
+            <div class="step-item" onclick="switchStep(4)">
+                <div class="step-circle">4</div>
+                <span class="step-label">Karantina</span>
+            </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="form-body">
+            <!-- Lokasi & Map Section -->
+            <div class="form-section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-location-dot"></i> Titik Koordinat Tower
+                    </div>
+                </div>
+
+                <div class="map-preview-box">
+                    <div id="actionMap"></div>
+                    <div class="gps-badge">
+                        <i class="fa-solid fa-satellite-dish"></i> -6.9382, 107.6254 (Akurasi: ±3m)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kondisi Keselamatan Area Kerja <span class="req">*</span></label>
+                    <div class="segmented-group">
+                        <button type="button" class="segment-btn active" onclick="selectSegment(this)">Aman Steril</button>
+                        <button type="button" class="segment-btn" onclick="selectSegment(this)">Dekat Jalur Aktif</button>
+                        <button type="button" class="segment-btn" onclick="selectSegment(this)">Perlu Barikade</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parameter Pembongkaran -->
+            <div class="form-section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> Detail De-erection Section
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tujuan Gudang Karantina <span class="req">*</span></label>
+                    <select class="form-select">
+                        <option value="gudang1" selected>Gudang Logistik ULTG Bandung Timur</option>
+                        <option value="gudang2">Gudang Workshop UPT Cigereleng</option>
+                        <option value="gudang3">Gudang Induk UIT JBB</option>
+                        <option value="gudang4">Area Transit Sementara Tapak</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Jumlah Section Terbongkar (Unit) <span class="req">*</span></label>
+                    <input type="number" class="form-input" value="4" min="1" max="6">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kondisi Keseluruhan Komponen ERS <span class="req">*</span></label>
+                    <div class="segmented-group">
+                        <button type="button" class="segment-btn active" onclick="selectSegment(this)">Baik / Utuh</button>
+                        <button type="button" class="segment-btn" onclick="selectSegment(this)">Perlu Repair</button>
+                        <button type="button" class="segment-btn" onclick="selectSegment(this)">Afkir / Rusak</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Estimasi Berat Material Turun (Kg)</label>
+                    <input type="number" class="form-input" value="4200" step="50">
+                </div>
+            </div>
+
+            <!-- Checklist K3 & Pembongkaran -->
+            <div class="form-section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-clipboard-check"></i> Checklist K3 & Pembongkaran
+                    </div>
+                </div>
+
+                <div class="checklist-container">
+                    <label class="check-item">
+                        <input type="checkbox" checked>
+                        <span>Konduktor transmisi telah dipindah & grounded</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" checked>
+                        <span>Guy wire ditiadakan bertahap dengan penahan gin pole</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" checked>
+                        <span>Semua baut & plat sambungan diinventarisir dalam box</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox">
+                        <span>Pondasi sementara / base plate diangkat tuntas</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Dokumentasi Foto Lapangan -->
+            <div class="form-section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-camera"></i> Dokumentasi Foto Pembongkaran
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">3/3 Wajib</span>
+                </div>
+
+                <div class="photo-upload-grid">
+                    <div class="photo-slot filled" onclick="mockPhoto(this, 'Pelepasan')">
+                        <img src="https://images.unsplash.com/photo-1541888946425-d0fbb180c5f2?w=300" alt="Foto Pelepasan">
+                        <div class="remove-photo" onclick="event.stopPropagation(); removePhoto(this);"><i class="fa-solid fa-xmark"></i></div>
+                    </div>
+                    <div class="photo-slot filled" onclick="mockPhoto(this, 'Section Turun')">
+                        <img src="https://images.unsplash.com/photo-1508873696983-2df5293cb395?w=300" alt="Foto Section Turun">
+                        <div class="remove-photo" onclick="event.stopPropagation(); removePhoto(this);"><i class="fa-solid fa-xmark"></i></div>
+                    </div>
+                    <div class="photo-slot" onclick="mockPhoto(this, 'Pengepakan')">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>+ Foto Pengepakan</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Catatan Lapangan -->
+            <div class="form-section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-note-sticky"></i> Catatan & Kerusakan Ditemukan
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <textarea class="form-input" rows="3" placeholder="Tuliskan jika terdapat bengkokan modul, baut berkarat, atau kondisi tanah tapak..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Bottom Action Bar -->
+        <div class="bottom-action-bar">
+            <button class="btn-draft" onclick="saveDraft()">Simpan Draft</button>
+            <button class="btn-submit" onclick="submitAction()">
+                <i class="fa-solid fa-paper-plane"></i> Selesaikan Bongkar
+            </button>
+        </div>
+
+        <!-- Success Modal Popup -->
+        <div class="modal-popup-overlay" id="successModal">
+            <div class="modal-popup-card">
+                <div class="popup-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3>Pembongkaran Selesai</h3>
+                <p>Material Tower #42 siap ditransfer ke modul Karantina Logistik untuk inspeksi check sheet.</p>
+                <a href="../Karantina & Pengembalian/home-mobile.html" class="btn-modal-done">Buka Karantina Logistik</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const map = L.map('actionMap', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([-6.9382, 107.6254], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18
+            }).addTo(map);
+
+            L.marker([-6.9382, 107.6254]).addTo(map);
+        });
+
+        function selectSegment(el) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function switchStep(stepNum) {
+            const steps = document.querySelectorAll('.step-item');
+            steps.forEach((s, idx) => {
+                s.classList.remove('active');
+                if (idx + 1 === stepNum) {
+                    s.classList.add('active');
+                }
+            });
+        }
+
+        function mockPhoto(el, label) {
+            if (el.classList.contains('filled')) return;
+            el.classList.add('filled');
+            el.innerHTML = `
+                <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=300" alt="Foto ${label}">
+                <div class="remove-photo" onclick="event.stopPropagation(); removePhoto(this);"><i class="fa-solid fa-xmark"></i></div>
+            `;
+        }
+
+        function removePhoto(btn) {
+            const slot = btn.parentElement;
+            slot.classList.remove('filled');
+            slot.innerHTML = `
+                <i class="fa-solid fa-camera"></i>
+                <span>+ Ambil Foto</span>
+            `;
+        }
+
+        function saveDraft() {
+            alert('Draft pembongkaran berhasil disimpan secara lokal.');
+        }
+
+        function submitAction() {
+            document.getElementById('successModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>
