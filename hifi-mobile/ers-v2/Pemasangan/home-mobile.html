@@ -165,91 +165,128 @@
             border-radius: 50%;
         }
 
-        /* Toolbar & Search Bar */
-        .toolbar-box {
+        /* Standalone Search & Filter Card */
+        .search-filter-card {
             background: #ffffff;
-            padding: 12px 18px;
-            border-bottom: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
             display: flex;
+            flex-direction: column;
             gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .search-filter-top-row {
+            display: flex;
+            gap: 8px;
             align-items: center;
         }
 
-        .search-box {
+        .search-input-box {
             flex: 1;
             background: #f1f5f9;
             border-radius: 12px;
-            padding: 10px 14px;
+            padding: 9px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
             border: 1px solid transparent;
             transition: all 0.2s;
         }
 
-        .search-box:focus-within {
-            background: #ffffff;
+        .search-input-box:focus-within {
             border-color: var(--primary-blue);
+            background: #ffffff;
             box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
         }
 
-        .search-box input {
+        .search-input-box input {
             border: none;
-            background: transparent;
             outline: none;
+            background: transparent;
             width: 100%;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12.5px;
             color: var(--text-main);
+            font-weight: 600;
         }
 
-        .filter-btn {
-            width: 40px;
-            height: 40px;
+        .search-input-box input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .search-input-box i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .filter-modal-btn {
+            height: 38px;
+            padding: 0 12px;
             border-radius: 12px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--primary-blue);
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-            transition: all 0.2s;
-        }
-
-        .filter-btn:active { background: #f8fafc; }
-
-        /* Filter Chips */
-        .chips-bar {
-            background: #ffffff;
-            padding: 4px 18px 12px;
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            border-bottom: 1px solid var(--border-color);
-            scrollbar-width: none;
-        }
-        .chips-bar::-webkit-scrollbar { display: none; }
-
-        .chip-pill {
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: #f1f5f9;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 11.5px;
+            gap: 6px;
+            color: #1d4ed8;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            white-space: nowrap;
+            flex-shrink: 0;
             transition: all 0.2s;
         }
 
-        .chip-pill.active {
+        .filter-modal-btn:hover {
+            background: #dbeafe;
+        }
+
+        /* Quick Filter Bar Scroll */
+        .quick-filter-scroll-wrapper {
+            margin: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .quick-filter-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .filter-scroll-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            width: max-content;
+        }
+
+        .quick-filter-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .quick-filter-pill:hover {
+            background: #f1f5f9;
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .quick-filter-pill.active {
             background: var(--primary-blue);
             color: #ffffff;
             border-color: var(--primary-blue);
-            box-shadow: 0 2px 8px rgba(26, 101, 214, 0.25);
+            box-shadow: 0 3px 10px rgba(26, 101, 214, 0.25);
         }
 
         /* Content Body */
@@ -258,6 +295,8 @@
             overflow-y: auto;
             padding: 16px;
             scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
         }
         .app-content::-webkit-scrollbar { display: none; }
 
@@ -471,30 +510,33 @@
         }
         body.dark-mode .status-bar, html.dark-mode .status-bar,
         body.dark-mode .app-header, html.dark-mode .app-header,
-        body.dark-mode .toolbar-box, html.dark-mode .toolbar-box,
-        body.dark-mode .chips-bar, html.dark-mode .chips-bar,
         body.dark-mode .modal-drawer, html.dark-mode .modal-drawer {
             background: #0f172a !important;
             border-color: #334155 !important;
         }
         body.dark-mode .ers-permit-card, html.dark-mode .ers-permit-card,
-        body.dark-mode .search-box, html.dark-mode .search-box,
+        body.dark-mode .search-filter-card, html.dark-mode .search-filter-card,
         body.dark-mode .form-input, html.dark-mode .form-input {
             background: #1e293b !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
         }
-        body.dark-mode .back-btn, html.dark-mode .back-btn,
-        body.dark-mode .notif-btn, html.dark-mode .notif-btn,
-        body.dark-mode .filter-btn, html.dark-mode .filter-btn,
-        body.dark-mode .chip-pill, html.dark-mode .chip-pill {
-            background: #1e293b !important;
+        body.dark-mode .search-input-box, html.dark-mode .search-input-box,
+        body.dark-mode .quick-filter-pill, html.dark-mode .quick-filter-pill {
+            background: #0f172a !important;
             border-color: #334155 !important;
             color: #94a3b8 !important;
         }
-        body.dark-mode .chip-pill.active, html.dark-mode .chip-pill.active {
-            background: #0284c7 !important;
+        body.dark-mode .quick-filter-pill.active, html.dark-mode .quick-filter-pill.active {
+            background: var(--primary-blue) !important;
             color: #ffffff !important;
+        }
+        body.dark-mode .back-btn, html.dark-mode .back-btn,
+        body.dark-mode .notif-btn, html.dark-mode .notif-btn,
+        body.dark-mode .filter-modal-btn, html.dark-mode .filter-modal-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
         }
         body.dark-mode .ios-bar, html.dark-mode .ios-bar { background: #ffffff !important; }
     </style>
@@ -528,29 +570,33 @@
             </a>
         </div>
 
-        <!-- Search and Filter Bar -->
-        <div class="toolbar-box">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted); font-size:13px;"></i>
-                <input type="text" id="searchInput" placeholder="Cari No. Permit / Lokasi" oninput="filterPermits(this.value)">
-            </div>
-            <button class="filter-btn" onclick="openFilterDrawer()" title="Filter Data">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
-        </div>
-
-        <!-- Filter Chips Bar -->
-        <div class="chips-bar">
-            <button class="chip-pill active" onclick="filterByChip('all', this)">Semua</button>
-            <button class="chip-pill" onclick="filterByChip('Siap Pasang', this)">Siap Pasang</button>
-            <button class="chip-pill" onclick="filterByChip('Sedang Dipasang', this)">Sedang Dipasang</button>
-            <button class="chip-pill" onclick="filterByChip('Sedang Dikirim', this)">Sedang Dikirim</button>
-            <button class="chip-pill" onclick="filterByChip('Selesai', this)">Selesai</button>
-        </div>
-
         <!-- Content Area -->
-        <div class="app-content" id="permitListContainer">
-            <!-- Dynamic Cards Injected via JS -->
+        <div class="app-content">
+            <!-- Standalone Search & Filter Card -->
+            <div class="search-filter-card">
+                <div class="search-filter-top-row">
+                    <div class="search-input-box">
+                        <input type="text" id="searchInput" placeholder="Cari No. Permit / Lokasi" oninput="filterPermits(this.value)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <button type="button" class="filter-modal-btn" onclick="openFilterDrawer()" title="Filter Data">
+                        <i class="fa-solid fa-sliders"></i> Filter
+                    </button>
+                </div>
+
+                <div class="quick-filter-scroll-wrapper">
+                    <div class="filter-scroll-row">
+                        <button type="button" class="quick-filter-pill active" onclick="filterByChip('all', this)">Semua</button>
+                        <button type="button" class="quick-filter-pill" onclick="filterByChip('Siap Pasang', this)">Siap Pasang</button>
+                        <button type="button" class="quick-filter-pill" onclick="filterByChip('Sedang Dipasang', this)">Sedang Dipasang</button>
+                        <button type="button" class="quick-filter-pill" onclick="filterByChip('Sedang Dikirim', this)">Sedang Dikirim</button>
+                        <button type="button" class="quick-filter-pill" onclick="filterByChip('Selesai', this)">Selesai</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Permit List Container -->
+            <div id="permitListContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
         </div>
 
         <div class="ios-bar"></div>

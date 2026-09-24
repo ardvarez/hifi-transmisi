@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Karantina & Pengembalian ERS V2</title>
+    <title>Logistik Retur & Karantina ERS V2</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -27,6 +28,11 @@
             padding: 0;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            scrollbar-width: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
         }
 
         body {
@@ -85,7 +91,7 @@
             font-size: 12px;
         }
 
-        /* Header */
+        /* Header (Power Inspect V2 Standard) */
         .app-header {
             padding: 14px 20px;
             display: flex;
@@ -122,17 +128,36 @@
             color: var(--primary-blue);
         }
 
-        .header-title-box h1 {
+        .header-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 17px;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.3px;
+            border: 1px solid #dbeafe;
         }
 
-        .header-title-box p {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            font-weight: 500;
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-name {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .header-sub {
+            font-size: 11px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            letter-spacing: 0.2px;
         }
 
         .header-actions {
@@ -154,6 +179,12 @@
             text-decoration: none;
             font-size: 14px;
             position: relative;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
         }
 
         .icon-btn .badge-dot {
@@ -166,233 +197,256 @@
             border-radius: 50%;
         }
 
-        /* Unit Hierarchy Filter Strip */
-        .unit-filter-strip {
-            background: #ffffff;
-            padding: 10px 16px;
-            border-bottom: 1px solid var(--border-color);
+        /* Scrollable Content */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px 24px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
             gap: 12px;
+            scrollbar-width: none;
         }
 
-        .unit-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 6px 12px;
-            flex: 1;
-            cursor: pointer;
-        }
-
-        .unit-selector i {
-            color: var(--primary-blue);
-            font-size: 13px;
-        }
-
-        .unit-selector span {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Toolbar */
-        .toolbar-section {
-            padding: 12px 16px 8px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .search-bar {
-            flex: 1;
+        /* Search & Filter Card */
+        .search-filter-card {
             background: #ffffff;
+            border-radius: 18px;
+            padding: 12px 14px;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 9px 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .search-bar input {
+        .search-filter-top-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-input-box {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            height: 40px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .search-input-box:focus-within {
+            background: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
+        }
+
+        .search-input-box input {
             border: none;
-            outline: none;
             background: transparent;
             width: 100%;
+            height: 100%;
+            outline: none;
             font-size: 12.5px;
             color: var(--text-main);
         }
 
-        .filter-trigger-btn {
-            width: 40px;
+        .search-input-box input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-input-box i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .filter-modal-btn {
             height: 40px;
+            padding: 0 14px;
             border-radius: 12px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
+            background: var(--primary-light);
+            border: 1px solid #bfdbfe;
+            color: var(--primary-blue);
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--text-main);
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
             flex-shrink: 0;
             transition: all 0.2s;
         }
 
-        .filter-trigger-btn:hover {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-            background: var(--primary-light);
+        .filter-modal-btn:hover {
+            background: #dbeafe;
         }
 
-        /* Filter Chips Bar */
-        .filter-chips-bar {
-            display: flex;
-            gap: 8px;
-            padding: 4px 16px 10px;
+        .quick-filter-scroll-wrapper {
+            margin: 0;
             overflow-x: auto;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .filter-chips-bar::-webkit-scrollbar {
-            display: none;
+        .filter-scroll-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            width: max-content;
         }
 
-        .chip-pill {
+        .quick-filter-pill {
             padding: 6px 14px;
             border-radius: 20px;
-            font-size: 11.5px;
-            font-weight: 600;
-            background: #ffffff;
+            background: #f8fafc;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
+            font-size: 11.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             cursor: pointer;
-            white-space: nowrap;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
-        .chip-pill.active {
+        .quick-filter-pill.active {
             background: var(--primary-blue);
             color: #ffffff;
             border-color: var(--primary-blue);
-            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(26, 101, 214, 0.25);
         }
 
-        /* Content List */
-        .content-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 4px 16px 80px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            scrollbar-width: none;
-        }
-
-        .content-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Card */
-        .karantina-card {
+        /* Retur / Karantina Modern Card (Power Inspect V2 Aesthetic) */
+        .retur-card {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
             display: flex;
             flex-direction: column;
             gap: 12px;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
         }
 
-        .karantina-card:active {
-            transform: scale(0.99);
+        .retur-card:hover {
+            border-color: #bfdbfe;
+            box-shadow: 0 8px 24px rgba(26, 101, 214, 0.08);
+        }
+
+        .retur-card:active {
+            transform: scale(0.985);
+            background: #fafcff;
         }
 
         .card-header-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .permit-code {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: var(--text-main);
+        .permit-code-box {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
         }
 
-        .permit-code i {
+        .permit-icon-bubble {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #eff6ff;
             color: var(--primary-blue);
-            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
-        /* Status Badge */
+        .permit-code-text h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.2px;
+        }
+
+        .permit-code-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
         .status-badge {
+            font-size: 11px;
+            font-weight: 700;
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 10.5px;
-            font-weight: 700;
-            white-space: nowrap;
             display: inline-flex;
             align-items: center;
             gap: 5px;
         }
 
-        .badge-siap-inspeksi {
+        .badge-mulai {
             background: #eff6ff;
-            color: #1a65d6;
+            color: var(--primary-blue);
             border: 1px solid #bfdbfe;
         }
 
-        .badge-dalam-karantina {
+        .badge-sedang-dikirim {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #ffedd5;
+        }
+
+        .badge-sedang-dikarantina {
             background: #fffbeb;
-            color: #d97706;
+            color: #b45309;
             border: 1px solid #fde68a;
         }
 
-        .badge-selesai-karantina {
-            background: #ecfdf5;
-            color: #059669;
-            border: 1px solid #a7f3d0;
-        }
-
-        /* Metadata Grid */
-        .meta-grid {
+        /* 2-Column Meta Grid */
+        .meta-grid-2col {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px 12px;
-            background: #f8fafc;
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: 1px solid #f1f5f9;
+            gap: 8px;
         }
 
-        .meta-row {
+        .meta-pill-cell {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 8px 10px;
             display: flex;
             flex-direction: column;
+            gap: 2px;
         }
 
-        .meta-label {
+        .meta-pill-label {
             font-size: 10.5px;
+            font-weight: 600;
             color: var(--text-muted);
-            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .meta-val {
+        .meta-pill-label i {
+            font-size: 10px;
+            color: var(--primary-blue);
+        }
+
+        .meta-pill-value {
             font-size: 12px;
             font-weight: 700;
             color: var(--text-main);
@@ -401,203 +455,355 @@
             text-overflow: ellipsis;
         }
 
-        /* Card Footer */
-        .card-footer-row {
+        /* Card Error / Kendala Container */
+        .card-error-container {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            border-radius: 12px;
+            padding: 8px 12px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            padding-top: 6px;
-            border-top: 1px dashed var(--border-color);
-            font-size: 11.5px;
-            color: var(--text-muted);
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .item-counter {
-            font-weight: 700;
-            color: var(--primary-blue);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .card-error-container:active {
+            transform: scale(0.99);
+            background: #ffe4e6;
         }
 
-        /* Bottom Nav */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 64px;
-            background: #ffffff;
-            border-top: 1px solid var(--border-color);
+        .card-error-left {
             display: flex;
             align-items: center;
-            justify-content: space-around;
-            padding: 0 8px;
-            z-index: 50;
-        }
-
-        .nav-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 10.5px;
-            font-weight: 600;
-            transition: color 0.2s;
+            gap: 8px;
+            min-width: 0;
             flex: 1;
         }
 
-        .nav-link i {
-            font-size: 17px;
+        .card-error-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            background: #ffe4e6;
+            color: #e11d48;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
         }
 
-        .nav-link.active {
-            color: var(--primary-blue);
+        .card-error-text-box {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .card-error-title {
+            font-size: 11.5px;
             font-weight: 700;
+            color: #9f1239;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
         }
 
-        /* Drawer Filter Modal */
+        .card-error-sub {
+            font-size: 10px;
+            color: #be123c;
+            margin-top: 1px;
+        }
+
+        .card-error-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #be123c;
+            background: #ffffff;
+            border: 1px solid #fecdd3;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Error Drawer Elements */
+        .error-log-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .error-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .error-tag-pill {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .error-log-desc {
+            font-size: 12px;
+            color: var(--text-main);
+            line-height: 1.4;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        /* Action Buttons */
+        .card-actions-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .btn-action-outline {
+            flex: 1;
+            height: 40px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 11px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-action-outline:hover {
+            background: #f8fafc;
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-action-solid {
+            flex: 1;
+            height: 40px;
+            background: var(--primary-blue);
+            border: none;
+            color: #ffffff;
+            border-radius: 11px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-action-solid:active {
+            transform: scale(0.99);
+        }
+
+        .btn-action-full {
+            width: 100%;
+            height: 42px;
+            background: var(--primary-blue);
+            border: none;
+            color: #ffffff;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(26, 101, 214, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-action-full:active {
+            transform: scale(0.99);
+        }
+
+        /* Drawer Modals */
         .drawer-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(4px);
             z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-            display: flex;
+            display: none;
             align-items: flex-end;
+            justify-content: center;
         }
 
         .drawer-overlay.active {
-            opacity: 1;
-            visibility: visible;
+            display: flex;
         }
 
         .drawer-sheet {
-            width: 100%;
             background: #ffffff;
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-            max-height: 80vh;
+            width: 100%;
+            border-radius: 24px 24px 0 0;
+            padding: 20px 20px 28px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.25s ease-out;
+            max-height: 85vh;
             overflow-y: auto;
         }
 
-        .drawer-overlay.active .drawer-sheet {
-            transform: translateY(0);
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         .drawer-handle {
-            width: 36px;
+            width: 40px;
             height: 4px;
             background: #cbd5e1;
             border-radius: 2px;
             margin: 0 auto 16px;
         }
 
-        .drawer-header {
+        .form-group {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
-        .drawer-header h3 {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .btn-close-drawer {
-            background: none;
-            border: none;
-            font-size: 16px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .filter-group {
-            margin-bottom: 16px;
-        }
-
-        .filter-group label {
-            display: block;
+        .form-label {
             font-size: 12px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 8px;
         }
 
-        .pill-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .pill-item {
-            padding: 7px 14px;
-            border-radius: 10px;
+        .form-input {
+            width: 100%;
+            height: 42px;
             background: #f8fafc;
             border: 1px solid var(--border-color);
-            font-size: 12px;
+            border-radius: 10px;
+            padding: 0 12px;
+            font-size: 12.5px;
             font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.15s;
+            color: var(--text-main);
+            outline: none;
         }
 
-        .pill-item.selected {
-            background: var(--primary-light);
+        .form-input:focus {
+            background: #ffffff;
             border-color: var(--primary-blue);
-            color: var(--primary-blue);
-            font-weight: 700;
         }
 
-        .drawer-footer {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .btn-drawer-reset {
-            flex: 1;
-            padding: 10px;
-            border-radius: 12px;
-            background: #f1f5f9;
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .btn-drawer-apply {
-            flex: 2;
-            padding: 10px;
-            border-radius: 12px;
-            background: var(--primary-blue);
-            border: none;
-            font-size: 13px;
-            font-weight: 700;
+        /* In-App Toast Notification */
+        .app-toast-box {
+            position: absolute;
+            top: 20px;
+            left: 16px;
+            right: 16px;
+            background: #1e293b;
             color: #ffffff;
-            cursor: pointer;
+            padding: 12px 14px;
+            border-radius: 14px;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            transform: translateY(-90px);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .app-toast-box.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .toast-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .toast-icon-wrap.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .toast-icon-wrap.info {
+            background: rgba(26, 101, 214, 0.2);
+            color: #60a5fa;
+        }
+
+        .toast-icon-wrap.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .toast-text-box {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title-text {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .toast-desc-text {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+            line-height: 1.4;
+            white-space: normal;
+            word-break: break-word;
         }
     </style>
 </head>
+
 <body>
     <div class="mobile-container">
+        <!-- In-App Floating Toast Notification -->
+        <div class="app-toast-box" id="appToast">
+            <div class="toast-icon-wrap success" id="toastIcon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="toast-text-box">
+                <div class="toast-title-text" id="toastTitle">Aksi Berhasil</div>
+                <div class="toast-desc-text" id="toastDesc">Data telah berhasil diperbarui.</div>
+            </div>
+        </div>
+
         <!-- Status Bar -->
         <div class="status-bar">
-            <span>09:41</span>
+            <span>9:41 AM</span>
             <div class="status-icons">
                 <i class="fa-solid fa-signal"></i>
                 <i class="fa-solid fa-wifi"></i>
@@ -605,306 +811,702 @@
             </div>
         </div>
 
-        <!-- Header -->
+        <!-- App Header (Power Inspect V2 Standard) -->
         <div class="app-header">
             <div class="header-left-group">
-                <a href="../home-mobile.html" class="back-btn">
+                <a href="../home-mobile.html" class="back-btn" title="Kembali ke Dashboard">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
-                <div class="header-title-box">
-                    <h1>Karantina & Logistik</h1>
-                    <p>Inspeksi & Pengembalian V2</p>
+                <div class="header-avatar">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <div class="header-title-group">
+                    <span class="header-name">ERS Retur & Karantina</span>
+                    <span class="header-sub">Logistik Pemulihan Tower Darurat</span>
                 </div>
             </div>
             <div class="header-actions">
-                <a href="../notifikasi-mobile.html" class="icon-btn">
+                <a href="../notifikasi-catalog-mobile.html?app=ers" class="icon-btn" title="Notifikasi">
                     <i class="fa-regular fa-bell"></i>
                     <span class="badge-dot"></span>
                 </a>
             </div>
         </div>
 
-        <!-- Unit Hierarchy Filter Strip -->
-        <div class="unit-filter-strip">
-            <div class="unit-selector" onclick="alert('Pilih Gudang: Gudang Logistik ULTG Bandung Timur')">
-                <i class="fa-solid fa-warehouse"></i>
-                <span>Gudang Logistik ULTG Bandung Timur</span>
-            </div>
-            <i class="fa-solid fa-chevron-down" style="color: var(--text-muted); font-size: 11px;"></i>
-        </div>
-
-        <!-- Search & Filter Toolbar -->
-        <div class="toolbar-section">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 13px;"></i>
-                <input type="text" id="searchInput" placeholder="Cari nomor karantina / batch..." oninput="handleSearch()">
-            </div>
-            <button class="filter-trigger-btn" onclick="toggleDrawer(true)">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
-        </div>
-
-        <!-- Filter Chips Bar -->
-        <div class="filter-chips-bar">
-            <div class="chip-pill active" onclick="setChipFilter('all', this)">Semua (3)</div>
-            <div class="chip-pill" onclick="setChipFilter('siap', this)">Siap Inspeksi (1)</div>
-            <div class="chip-pill" onclick="setChipFilter('proses', this)">Dalam Karantina (1)</div>
-            <div class="chip-pill" onclick="setChipFilter('selesai', this)">Selesai (1)</div>
-        </div>
-
         <!-- Content List -->
-        <div class="content-scroll" id="karantinaList">
-            <!-- Card 1 -->
-            <a href="list-karantina.html?id=QRN20250000001" class="karantina-card" data-status="siap" data-code="QRN20250000001" data-origin="Ex-Bongkar Cigereleng">
-                <div class="card-header-row">
-                    <div class="permit-code">
-                        <i class="fa-solid fa-boxes-packing"></i> QRN20250000001
+        <div class="content-scroll" id="returList">
+            <!-- Standalone Search & Filter Card -->
+            <div class="search-filter-card">
+                <div class="search-filter-top-row">
+                    <div class="search-input-box">
+                        <input type="text" id="searchInput" placeholder="Cari nomor permit / retur..." oninput="handleSearch()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
-                    <span class="status-badge badge-siap-inspeksi">
-                        <i class="fa-solid fa-circle" style="font-size: 6px;"></i> Siap Inspeksi
-                    </span>
-                </div>
-
-                <div class="meta-grid">
-                    <div class="meta-row">
-                        <span class="meta-label">Asal Material</span>
-                        <span class="meta-val">Ex-Bongkar SUTT Cigereleng</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Tanggal Masuk</span>
-                        <span class="meta-val">29 Okt 2025</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Penerima Logistik</span>
-                        <span class="meta-val">Aris Munandar</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Area Karantina</span>
-                        <span class="meta-val">Zone B (Outdoor Yard)</span>
-                    </div>
-                </div>
-
-                <div class="card-footer-row">
-                    <div class="item-counter">
-                        <i class="fa-solid fa-layer-group"></i> 24 Item Komponen
-                    </div>
-                    <span>Perlu QC Check Sheet <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i></span>
-                </div>
-            </a>
-
-            <!-- Card 2 -->
-            <a href="list-karantina.html?id=QRN20250000002" class="karantina-card" data-status="proses" data-code="QRN20250000002" data-origin="Ex-Bongkar Padalarang">
-                <div class="card-header-row">
-                    <div class="permit-code">
-                        <i class="fa-solid fa-boxes-packing"></i> QRN20250000002
-                    </div>
-                    <span class="status-badge badge-dalam-karantina">
-                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 9px;"></i> Dalam Karantina
-                    </span>
-                </div>
-
-                <div class="meta-grid">
-                    <div class="meta-row">
-                        <span class="meta-label">Asal Material</span>
-                        <span class="meta-val">Ex-Bongkar Padalarang</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Tanggal Masuk</span>
-                        <span class="meta-val">26 Okt 2025</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Pemeriksa QC</span>
-                        <span class="meta-val">Rahmat Hidayat</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Status Temuan</span>
-                        <span class="meta-val" style="color: var(--warning-color);">3 Batang Bengkok</span>
-                    </div>
-                </div>
-
-                <div class="card-footer-row">
-                    <div class="item-counter">
-                        <i class="fa-solid fa-layer-group"></i> 18 Item Komponen
-                    </div>
-                    <span>Proses Reparasi Workshop <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i></span>
-                </div>
-            </a>
-
-            <!-- Card 3 -->
-            <a href="list-karantina.html?id=QRN20250000003" class="karantina-card" data-status="selesai" data-code="QRN20250000003" data-origin="Ex-Bongkar Ujungberung">
-                <div class="card-header-row">
-                    <div class="permit-code">
-                        <i class="fa-solid fa-boxes-packing"></i> QRN20250000003
-                    </div>
-                    <span class="status-badge badge-selesai-karantina">
-                        <i class="fa-solid fa-check"></i> Siap Masuk Gudang
-                    </span>
-                </div>
-
-                <div class="meta-grid">
-                    <div class="meta-row">
-                        <span class="meta-label">Asal Material</span>
-                        <span class="meta-val">Ex-Bongkar Ujungberung</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Tanggal Selesai QC</span>
-                        <span class="meta-val">24 Okt 2025</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">No. BAST Gudang</span>
-                        <span class="meta-val">BAST/LOG/2025/104</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Kondisi Bersih</span>
-                        <span class="meta-val" style="color: var(--success-color);">100% Layak Operasi</span>
-                    </div>
-                </div>
-
-                <div class="card-footer-row">
-                    <div class="item-counter">
-                        <i class="fa-solid fa-layer-group"></i> 32 Item Komponen
-                    </div>
-                    <span>Telah Masuk Rak Gudang <i class="fa-solid fa-chevron-right" style="margin-left: 4px;"></i></span>
-                </div>
-            </a>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="../home-mobile.html" class="nav-link">
-                <i class="fa-solid fa-house"></i>
-                <span>Beranda</span>
-            </a>
-            <a href="../Pemasangan/home-mobile.html" class="nav-link">
-                <i class="fa-solid fa-wrench"></i>
-                <span>Pemasangan</span>
-            </a>
-            <a href="../Pembongkaran/home-mobile.html" class="nav-link">
-                <i class="fa-solid fa-screwdriver-wrench"></i>
-                <span>Pembongkaran</span>
-            </a>
-            <a href="home-mobile.html" class="nav-link active">
-                <i class="fa-solid fa-boxes-packing"></i>
-                <span>Karantina</span>
-            </a>
-            <a href="../Stock Opname/home-mobile.html" class="nav-link">
-                <i class="fa-solid fa-clipboard-list"></i>
-                <span>Opname</span>
-            </a>
-        </div>
-
-        <!-- Filter Drawer Modal -->
-        <div class="drawer-overlay" id="filterDrawer" onclick="handleDrawerClick(event)">
-            <div class="drawer-sheet" onclick="event.stopPropagation()">
-                <div class="drawer-handle"></div>
-                <div class="drawer-header">
-                    <h3>Filter Batch Karantina</h3>
-                    <button class="btn-close-drawer" onclick="toggleDrawer(false)">
-                        <i class="fa-solid fa-xmark"></i>
+                    <button type="button" class="filter-modal-btn" onclick="toggleFilterDrawer(true)" title="Filter Data">
+                        <i class="fa-solid fa-sliders"></i> Filter
                     </button>
                 </div>
 
-                <div class="filter-group">
-                    <label>Status Karantina</label>
-                    <div class="pill-group" id="drawerStatusPills">
-                        <div class="pill-item selected" onclick="selectPill(this)">Semua Status</div>
-                        <div class="pill-item" onclick="selectPill(this)">Siap Inspeksi</div>
-                        <div class="pill-item" onclick="selectPill(this)">Dalam Karantina</div>
-                        <div class="pill-item" onclick="selectPill(this)">Siap Masuk Gudang</div>
+                <div class="quick-filter-scroll-wrapper">
+                    <div class="filter-scroll-row">
+                        <button type="button" class="quick-filter-pill active" onclick="setChipFilter('all', this)">
+                            <i class="fa-solid fa-layer-group"></i> Semua (3)
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="setChipFilter('mulai', this)">
+                            Siap Dikirim (1)
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="setChipFilter('dikirim', this)">
+                            Sedang Dikirim (1)
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="setChipFilter('karantina', this)">
+                            Sedang Dikarantina (1)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 1: RTR20250000001 (Status: Mulai / Siap Dikirim) -->
+            <div class="retur-card" id="card_RTR001" data-status="mulai" data-code="RTR20250000001" onclick="handleCardClick(event, 'RTR20250000001', 'Siap Dikirim', 'SUTT 150kV Cigereleng')">
+                <div class="card-header-row">
+                    <div class="permit-code-box">
+                        <div class="permit-icon-bubble">
+                            <i class="fa-solid fa-truck-ramp-box"></i>
+                        </div>
+                        <div class="permit-code-text">
+                            <h3>RTR20250000001</h3>
+                            <p>Ex-Bongkar SUTT Cigereleng</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-mulai" id="badge_RTR001">
+                        <i class="fa-solid fa-circle" style="font-size: 6px;"></i> Mulai
+                    </span>
+                </div>
+
+                <div class="meta-grid-2col">
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-minus"></i> Est. Berangkat</span>
+                        <span class="meta-pill-value" id="berangkat_RTR001">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-check"></i> Est. Tiba</span>
+                        <span class="meta-pill-value">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-cubes-stacked"></i> Jumlah TE</span>
+                        <span class="meta-pill-value">2 Set Tower</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-tag"></i> Merk ERS</span>
+                        <span class="meta-pill-value">Lindsay, Tower Solution</span>
                     </div>
                 </div>
 
-                <div class="drawer-footer">
-                    <button class="btn-drawer-reset" onclick="resetFilters()">Reset</button>
-                    <button class="btn-drawer-apply" onclick="applyDrawerFilters()">Terapkan Filter</button>
+                <!-- Wadah Error / Log Kendala Card 1 -->
+                <div class="card-error-container" style="background: #f0fdf4; border-color: #bbf7d0;" onclick="event.stopPropagation(); openErrorLogDrawer('RTR20250000001', 'SUTT 150kV Cigereleng')">
+                    <div class="card-error-left">
+                        <div class="card-error-icon" style="background: #dcfce7; color: #16a34a;">
+                            <i class="fa-solid fa-shield-check"></i>
+                        </div>
+                        <div class="card-error-text-box">
+                            <div class="card-error-title" style="color: #15803d;">Belum Ada Kendala / Error Dilaporkan</div>
+                            <div class="card-error-sub" style="color: #16a34a;">Klik untuk melihat log atau tambah catatan kendala</div>
+                        </div>
+                    </div>
+                    <span class="card-error-badge" style="color: #15803d; border-color: #bbf7d0;">
+                        <i class="fa-solid fa-folder-open"></i> Log (0)
+                    </span>
                 </div>
+
+                <div class="card-actions-row" id="actions_RTR001">
+                    <button type="button" class="btn-action-outline" onclick="event.stopPropagation(); openDetailModal('RTR20250000001', 'Siap Dikirim', 'SUTT 150kV Cigereleng')">
+                        <i class="fa-regular fa-eye"></i> Lihat Detail
+                    </button>
+                    <button type="button" class="btn-action-solid" onclick="event.stopPropagation(); openKeberangkatanModal('RTR20250000001')">
+                        <i class="fa-solid fa-truck-fast"></i> Keberangkatan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: RTR20250000002 (Status: Sedang Dikirim) -->
+            <div class="retur-card" id="card_RTR002" data-status="dikirim" data-code="RTR20250000002" onclick="handleCardClick(event, 'RTR20250000002', 'Sedang Dikirim', 'Padalarang')">
+                <div class="card-header-row">
+                    <div class="permit-code-box">
+                        <div class="permit-icon-bubble" style="background: #fff7ed; color: #ea580c;">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <div class="permit-code-text">
+                            <h3>RTR20250000002</h3>
+                            <p>Ex-Bongkar Padalarang</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-sedang-dikirim" id="badge_RTR002">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 9px;"></i> Sedang Dikirim
+                    </span>
+                </div>
+
+                <div class="meta-grid-2col">
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-minus"></i> Est. Berangkat</span>
+                        <span class="meta-pill-value">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-check"></i> Est. Tiba</span>
+                        <span class="meta-pill-value">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-cubes-stacked"></i> Jumlah TE</span>
+                        <span class="meta-pill-value">2 Set Tower</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-tag"></i> Merk ERS</span>
+                        <span class="meta-pill-value">Lindsay, Tower Solution</span>
+                    </div>
+                </div>
+
+                <!-- Wadah Error / Log Kendala Card 2 -->
+                <div class="card-error-container" onclick="event.stopPropagation(); openErrorLogDrawer('RTR20250000002', 'Padalarang')">
+                    <div class="card-error-left">
+                        <div class="card-error-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="card-error-text-box">
+                            <div class="card-error-title">Kendala Pengiriman: 1 Flange Modul Bengkok & Tergores</div>
+                            <div class="card-error-sub">Dicatat saat muat truk di site pembongkaran</div>
+                        </div>
+                    </div>
+                    <span class="card-error-badge">
+                        <i class="fa-solid fa-folder-open"></i> Log (1)
+                    </span>
+                </div>
+
+                <div class="card-actions-row" id="actions_RTR002">
+                    <button type="button" class="btn-action-outline" onclick="event.stopPropagation(); openDetailModal('RTR20250000002', 'Sedang Dikirim', 'Padalarang')">
+                        <i class="fa-regular fa-eye"></i> Lihat Detail
+                    </button>
+                    <button type="button" class="btn-action-solid" onclick="event.stopPropagation(); openKedatanganModal('RTR20250000002')">
+                        <i class="fa-solid fa-truck-ramp-box"></i> Kedatangan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 3: RTR20250000003 (Status: Sedang Dikarantina) -->
+            <div class="retur-card" id="card_RTR003" data-status="karantina" data-code="RTR20250000003" onclick="handleCardClick(event, 'RTR20250000003', 'Sedang Dikarantina', 'Ujungberung')">
+                <div class="card-header-row">
+                    <div class="permit-code-box">
+                        <div class="permit-icon-bubble" style="background: #fffbeb; color: #d97706;">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <div class="permit-code-text">
+                            <h3>RTR20250000003</h3>
+                            <p>Ex-Bongkar Ujungberung</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-sedang-dikarantina">
+                        <i class="fa-solid fa-hourglass-half"></i> Sedang Dikarantina
+                    </span>
+                </div>
+
+                <div class="meta-grid-2col">
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-minus"></i> Est. Berangkat</span>
+                        <span class="meta-pill-value">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-check"></i> Est. Tiba</span>
+                        <span class="meta-pill-value">1 Februari 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-cubes-stacked"></i> Jumlah TE</span>
+                        <span class="meta-pill-value">2 Set Tower</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-tag"></i> Merk ERS</span>
+                        <span class="meta-pill-value">Lindsay, Tower Solution</span>
+                    </div>
+                </div>
+
+                <!-- Wadah Error / Log Kendala Card 3 -->
+                <div class="card-error-container" onclick="event.stopPropagation(); openErrorLogDrawer('RTR20250000003', 'Ujungberung')">
+                    <div class="card-error-left">
+                        <div class="card-error-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="card-error-text-box">
+                            <div class="card-error-title">2 Temuan QC: 1 Guy Wire Aus & Baut M20 Kurang 2 Pcs</div>
+                            <div class="card-error-sub">Menunggu berita acara perbaikan / penggantian</div>
+                        </div>
+                    </div>
+                    <span class="card-error-badge">
+                        <i class="fa-solid fa-folder-open"></i> Log (2)
+                    </span>
+                </div>
+
+                <div class="card-actions-row">
+                    <a href="karantina-action.html?id=RTR20250000003" class="btn-action-full" onclick="event.stopPropagation()">
+                        <i class="fa-solid fa-clipboard-list"></i> Lihat Detail & Verifikasi Karantina
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drawer Modal: Keberangkatan (Waktu Pengiriman Dimulai) -->
+        <div class="drawer-overlay" id="keberangkatanModal" onclick="closeDrawer(event, 'keberangkatanModal')">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary-light); color: var(--primary-blue); font-size: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-main);">Keberangkatan Material ERS</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Tentukan waktu pengiriman material dari site menuju gudang transit.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Waktu Keberangkatan (Mulai Kirim)</label>
+                    <input type="text" class="form-input" id="inputWaktuBerangkat" value="1 Februari 2025, 08:30 WIB">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nomor Polisi / Armada Truk</label>
+                    <input type="text" class="form-input" value="B 9842 UXT (Truk Tronton Logistik)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Driver / Penanggung Jawab Kirim</label>
+                    <input type="text" class="form-input" value="Hendro Wicaksono">
+                </div>
+
+                <button type="button" class="btn-action-full" style="height: 46px; margin-top: 8px;" onclick="confirmKeberangkatanSubmit()">
+                    <i class="fa-solid fa-paper-plane"></i> Konfirmasi Keberangkatan
+                </button>
+            </div>
+        </div>
+
+        <!-- Drawer Modal: Kedatangan (Sampai di Gudang Transit) -->
+        <div class="drawer-overlay" id="kedatanganModal" onclick="closeDrawer(event, 'kedatanganModal')">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: #ecfdf5; color: var(--success-color); font-size: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-main);">Kedatangan Material di Gudang</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Konfirmasi barang sudah sampai di gudang transit/karantina.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Waktu Kedatangan / Sampai</label>
+                    <input type="text" class="form-input" id="inputWaktuSampai" value="1 Februari 2025, 14:45 WIB">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Petugas Penerima Gudang</label>
+                    <input type="text" class="form-input" value="Aris Munandar (Koordinator QC)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Area Penempatan Transit</label>
+                    <input type="text" class="form-input" value="Zone B Karantina & Uji Mutu">
+                </div>
+
+                <button type="button" class="btn-action-full" style="height: 46px; margin-top: 8px;" onclick="confirmKedatanganSubmit()">
+                    <i class="fa-solid fa-check"></i> Konfirmasi Barang Tiba & Masuk Karantina
+                </button>
+            </div>
+        </div>
+
+        <!-- Drawer Modal: Detail Permit -->
+        <div class="drawer-overlay" id="detailModal" onclick="closeDrawer(event, 'detailModal')">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 12px;" id="detailModalTitle">Detail Permit Retur</h3>
+                
+                <div class="meta-grid-2col" style="margin-bottom: 16px;">
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label">Asal Site</span>
+                        <span class="meta-pill-value" id="detailModalSite">SUTT 150kV Cigereleng</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label">Gudang Tujuan</span>
+                        <span class="meta-pill-value">Gudang UPT Cigereleng</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label">Status Proses</span>
+                        <span class="meta-pill-value" id="detailModalStatus">Siap Dikirim</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label">Total Aksesoris</span>
+                        <span class="meta-pill-value">45 Item (3 Section)</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-action-outline" style="width: 100%; height: 42px; margin-bottom: 8px; border-color: #fecdd3; color: #be123c; background: #fff1f2;" onclick="openErrorLogFromDetail()">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Buka Wadah Error & Log Kendala
+                </button>
+
+                <button type="button" class="btn-action-outline" style="width: 100%; height: 42px;" onclick="closeDrawerDirect('detailModal')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        <!-- Drawer Modal: Wadah Error & Log Kendala (Bottom Sheet) -->
+        <div class="drawer-overlay" id="errorDetailDrawer" onclick="closeDrawer(event, 'errorDetailDrawer')">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #ffe4e6; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-main);">Wadah Error & Kendala</h3>
+                            <p style="font-size: 11px; color: var(--text-muted);" id="errorDrawerPermitCode">RTR20250000002</p>
+                        </div>
+                    </div>
+                    <span class="status-pill" id="errorDrawerCountBadge" style="background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px;">1 Kendala</span>
+                </div>
+
+                <!-- Daftar Log Kendala Tersimpan -->
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-list-check" style="color: var(--primary-blue);"></i> Riwayat Catatan Kendala & Error:
+                </div>
+
+                <div id="errorLogListContainer" style="max-height: 240px; overflow-y: auto; margin-bottom: 16px; padding-right: 2px;">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <!-- Form Tambah Catatan Kendala Baru -->
+                <div style="background: #f1f5f9; border-radius: 14px; padding: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+                    <div style="font-size: 11.5px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-circle-plus" style="color: #e11d48;"></i> Tambah Catatan Kendala / Error Baru:
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <select class="form-input" id="newErrorCategory" style="height: 38px; font-size: 12px;">
+                            <option value="Cacat Fisik Material">Cacat Fisik / Flange Bengkok</option>
+                            <option value="Aksesoris Kurang / Hilang">Aksesoris / Baut Kurang atau Hilang</option>
+                            <option value="Keterlambatan Armada">Keterlambatan Armada / Cuaca Buruk</option>
+                            <option value="Lainnya">Kendala Operasional Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <textarea class="form-input" id="newErrorText" placeholder="Tuliskan rincian kendala, kerusakan, atau error teknis..." style="height: 65px; padding: 8px 10px; font-size: 12px; resize: none;"></textarea>
+                    </div>
+
+                    <button type="button" class="btn-action-solid" style="width: 100%; height: 38px; background: #e11d48; font-size: 12px;" onclick="submitNewErrorLog()">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Catatan Kendala
+                    </button>
+                </div>
+
+                <button type="button" class="btn-action-outline" style="width: 100%; height: 40px;" onclick="closeDrawerDirect('errorDetailDrawer')">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        <!-- Drawer Modal: Filter -->
+        <div class="drawer-overlay" id="filterDrawer" onclick="closeDrawer(event, 'filterDrawer')">
+            <div class="drawer-sheet" onclick="event.stopPropagation()">
+                <div class="drawer-handle"></div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 14px;">Filter Data Karantina</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Status Retur</label>
+                    <select class="form-input">
+                        <option value="all" selected>Semua Status</option>
+                        <option value="mulai">Siap Dikirim / Mulai</option>
+                        <option value="dikirim">Sedang Dikirim</option>
+                        <option value="karantina">Sedang Dikarantina</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn-action-full" style="height: 44px; margin-top: 10px;" onclick="closeDrawerDirect('filterDrawer')">
+                    Terapkan Filter
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        let currentFilter = 'all';
+        let currentTargetId = '';
+        let toastTimeout = null;
+
+        function showToast(title, desc, type = 'success') {
+            const toast = document.getElementById('appToast');
+            const icon = document.getElementById('toastIcon');
+            const titleEl = document.getElementById('toastTitle');
+            const descEl = document.getElementById('toastDesc');
+
+            if (!toast) return;
+
+            titleEl.textContent = title;
+            descEl.textContent = desc;
+
+            icon.className = `toast-icon-wrap ${type}`;
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else if (type === 'warning') {
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            } else {
+                icon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+
+            toast.classList.add('show');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3200);
+        }
 
         function setChipFilter(status, el) {
-            document.querySelectorAll('.chip-pill').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.quick-filter-pill').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
-            currentFilter = status;
-            filterCards();
+
+            const cards = document.querySelectorAll('.retur-card');
+            let matchedCount = 0;
+            cards.forEach(card => {
+                if (status === 'all' || card.getAttribute('data-status') === status) {
+                    card.style.display = 'flex';
+                    matchedCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            showToast('Filter Diterapkan', `Menampilkan ${matchedCount} data sesuai filter.`, 'info');
         }
 
         function handleSearch() {
-            filterCards();
-        }
-
-        function filterCards() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.karantina-card');
-
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.retur-card');
+            let matchedCount = 0;
             cards.forEach(card => {
-                const cardStatus = card.getAttribute('data-status');
-                const cardCode = card.getAttribute('data-code').toLowerCase();
-                const cardOrigin = card.getAttribute('data-origin').toLowerCase();
-
-                const matchStatus = (currentFilter === 'all') || (cardStatus === currentFilter);
-                const matchQuery = !query || cardCode.includes(query) || cardOrigin.includes(query);
-
-                if (matchStatus && matchQuery) {
+                const code = card.getAttribute('data-code').toLowerCase();
+                if (code.includes(query)) {
                     card.style.display = 'flex';
+                    matchedCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
         }
 
-        function toggleDrawer(show) {
-            const drawer = document.getElementById('filterDrawer');
-            if (show) drawer.classList.add('active');
-            else drawer.classList.remove('active');
+        function openKeberangkatanModal(code) {
+            currentTargetId = code;
+            document.getElementById('keberangkatanModal').classList.add('active');
         }
 
-        function handleDrawerClick(e) {
-            if (e.target === document.getElementById('filterDrawer')) toggleDrawer(false);
+        function confirmKeberangkatanSubmit() {
+            const timeVal = document.getElementById('inputWaktuBerangkat').value;
+            
+            // Update Card 1 to Sedang Dikirim
+            const badge = document.getElementById('badge_RTR001');
+            if (badge) {
+                badge.className = 'status-badge badge-sedang-dikirim';
+                badge.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size: 9px;"></i> Sedang Dikirim';
+            }
+            const card = document.getElementById('card_RTR001');
+            if (card) card.setAttribute('data-status', 'dikirim');
+
+            const actions = document.getElementById('actions_RTR001');
+            if (actions) {
+                actions.innerHTML = `
+                    <button type="button" class="btn-action-outline" onclick="openDetailModal('RTR20250000001', 'Sedang Dikirim')">
+                        <i class="fa-regular fa-eye"></i> Lihat Detail
+                    </button>
+                    <button type="button" class="btn-action-solid" onclick="openKedatanganModal('RTR20250000001')">
+                        <i class="fa-solid fa-truck-ramp-box"></i> Kedatangan
+                    </button>
+                `;
+            }
+
+            closeDrawerDirect('keberangkatanModal');
+            showToast('Keberangkatan Dikonfirmasi', `${currentTargetId} dalam pengiriman (${timeVal}).`, 'success');
         }
 
-        function selectPill(el) {
-            const parent = el.parentElement;
-            parent.querySelectorAll('.pill-item').forEach(p => p.classList.remove('selected'));
-            el.classList.add('selected');
+        function openKedatanganModal(code) {
+            currentTargetId = code;
+            document.getElementById('kedatanganModal').classList.add('active');
         }
 
-        function resetFilters() {
-            document.querySelectorAll('#drawerStatusPills .pill-item').forEach((p, idx) => {
-                if (idx === 0) p.classList.add('selected');
-                else p.classList.remove('selected');
+        function confirmKedatanganSubmit() {
+            const timeVal = document.getElementById('inputWaktuSampai').value;
+
+            if (currentTargetId === 'RTR20250000002') {
+                const badge = document.getElementById('badge_RTR002');
+                if (badge) {
+                    badge.className = 'status-badge badge-sedang-dikarantina';
+                    badge.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Sedang Dikarantina';
+                }
+                const card = document.getElementById('card_RTR002');
+                if (card) card.setAttribute('data-status', 'karantina');
+
+                const actions = document.getElementById('actions_RTR002');
+                if (actions) {
+                    actions.innerHTML = `
+                        <a href="karantina-action.html?id=RTR20250000002" class="btn-action-full">
+                            <i class="fa-solid fa-clipboard-list"></i> Lihat Detail & Verifikasi Karantina
+                        </a>
+                    `;
+                }
+            }
+
+            closeDrawerDirect('kedatanganModal');
+            showToast('Barang Tiba di Gudang', `${currentTargetId} siap diverifikasi karantina (${timeVal}).`, 'success');
+        }
+
+        let activeDetailCode = 'RTR20250000001';
+
+        // Error Logs Data Store
+        const errorLogsData = {
+            'RTR20250000001': [],
+            'RTR20250000002': [
+                {
+                    id: 1,
+                    category: 'Cacat Fisik Material',
+                    desc: '1 unit modul flange bressing bengkok ~3mm pada sisi kanan dan lecet cat pelindung korosi saat pemindahan di site Padalarang.',
+                    time: '1 Feb 2025, 09:15 WIB',
+                    status: 'Dalam Investigasi'
+                }
+            ],
+            'RTR20250000003': [
+                {
+                    id: 1,
+                    category: 'Aksesoris Kurang / Hilang',
+                    desc: 'Baut M20 pengunci flange kurang 2 pcs pada box palet nomor #04.',
+                    time: '1 Feb 2025, 11:30 WIB',
+                    status: 'Menunggu Penggantian'
+                },
+                {
+                    id: 2,
+                    category: 'Cacat Fisik Material',
+                    desc: 'Guy Wire sling kawat baja nomor GW-03 terindikasi getas/aus pada lilitan luar.',
+                    time: '1 Feb 2025, 13:00 WIB',
+                    status: 'Karantina / Reject QC'
+                }
+            ]
+        };
+
+        function openErrorLogDrawer(code, siteName) {
+            currentTargetId = code;
+            activeDetailCode = code;
+            document.getElementById('errorDrawerPermitCode').textContent = `${code} (${siteName || 'Site Transmisi'})`;
+            renderErrorLogsList(code);
+            document.getElementById('errorDetailDrawer').classList.add('active');
+        }
+
+        function openErrorLogFromDetail() {
+            closeDrawerDirect('detailModal');
+            openErrorLogDrawer(activeDetailCode, document.getElementById('detailModalSite').textContent);
+        }
+
+        function renderErrorLogsList(code) {
+            const listContainer = document.getElementById('errorLogListContainer');
+            const badge = document.getElementById('errorDrawerCountBadge');
+            const logs = errorLogsData[code] || [];
+
+            badge.textContent = `${logs.length} Kendala`;
+            if (logs.length === 0) {
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#15803d';
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px 10px; color: var(--text-muted); background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                        <i class="fa-solid fa-circle-check" style="font-size: 24px; color: #10b981; margin-bottom: 6px;"></i>
+                        <p style="font-size: 12px; font-weight: 600; color: var(--text-main);">Tidak ada catatan error atau kendala</p>
+                        <p style="font-size: 11px; margin-top: 2px;">Semua komponen dan proses terpantau normal.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            badge.style.background = '#fee2e2';
+            badge.style.color = '#b91c1c';
+
+            let html = '';
+            logs.forEach((item, index) => {
+                html += `
+                    <div class="error-log-item">
+                        <div class="error-log-header">
+                            <span class="error-tag-pill">${item.category}</span>
+                            <span style="font-size: 10px; color: var(--text-muted); font-weight: 600;">${item.time}</span>
+                        </div>
+                        <div class="error-log-desc">${item.desc}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px dashed #e2e8f0; font-size: 10.5px;">
+                            <span style="color: var(--text-muted);">Status Penanganan:</span>
+                            <span style="font-weight: 700; color: #e11d48;"><i class="fa-solid fa-hourglass-half"></i> ${item.status}</span>
+                        </div>
+                    </div>
+                `;
             });
-            currentFilter = 'all';
-            document.querySelectorAll('.chip-pill').forEach((c, idx) => {
-                if (idx === 0) c.classList.add('active');
-                else c.classList.remove('active');
-            });
-            document.getElementById('searchInput').value = '';
-            filterCards();
-            toggleDrawer(false);
+            listContainer.innerHTML = html;
         }
 
-        function applyDrawerFilters() {
-            const selectedStatusPill = document.querySelector('#drawerStatusPills .pill-item.selected').innerText.trim();
-            if (selectedStatusPill === 'Semua Status') currentFilter = 'all';
-            else if (selectedStatusPill === 'Siap Inspeksi') currentFilter = 'siap';
-            else if (selectedStatusPill === 'Dalam Karantina') currentFilter = 'proses';
-            else if (selectedStatusPill === 'Siap Masuk Gudang') currentFilter = 'selesai';
+        function submitNewErrorLog() {
+            const cat = document.getElementById('newErrorCategory').value;
+            const text = document.getElementById('newErrorText').value.trim();
 
-            document.querySelectorAll('.chip-pill').forEach(chip => {
-                chip.classList.remove('active');
-                if (currentFilter === 'all' && chip.innerText.includes('Semua')) chip.classList.add('active');
-                if (currentFilter === 'siap' && chip.innerText.includes('Siap')) chip.classList.add('active');
-                if (currentFilter === 'proses' && chip.innerText.includes('Karantina')) chip.classList.add('active');
-                if (currentFilter === 'selesai' && chip.innerText.includes('Selesai')) chip.classList.add('active');
+            if (!text) {
+                showToast('Peringatan', 'Silakan masukkan rincian kendala terlebih dahulu.', 'warning');
+                return;
+            }
+
+            if (!errorLogsData[currentTargetId]) {
+                errorLogsData[currentTargetId] = [];
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()} WIB`;
+
+            errorLogsData[currentTargetId].unshift({
+                id: Date.now(),
+                category: cat,
+                desc: text,
+                time: `Hari ini, ${timeStr}`,
+                status: 'Menunggu Investigasi'
             });
 
-            filterCards();
-            toggleDrawer(false);
+            document.getElementById('newErrorText').value = '';
+            renderErrorLogsList(currentTargetId);
+            showToast('Kendala Dicatat', `Catatan kendala baru untuk ${currentTargetId} berhasil disimpan ke wadah log.`, 'success');
+        }
+
+        function handleCardClick(e, code, status, site) {
+            // If user clicked directly on the card surface
+            if (status === 'karantina' || status === 'Sedang Dikarantina') {
+                window.location.href = `karantina-action.html?id=${encodeURIComponent(code)}`;
+            } else {
+                openDetailModal(code, status, site);
+            }
+        }
+
+        function openDetailModal(code, status, site) {
+            activeDetailCode = code;
+            document.getElementById('detailModalTitle').textContent = `Detail Permit ${code}`;
+            document.getElementById('detailModalStatus').textContent = status;
+            if (site) {
+                const siteEl = document.getElementById('detailModalSite');
+                if (siteEl) siteEl.textContent = site;
+            }
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function toggleFilterDrawer(open) {
+            if (open) {
+                document.getElementById('filterDrawer').classList.add('active');
+            } else {
+                document.getElementById('filterDrawer').classList.remove('active');
+            }
+        }
+
+        function closeDrawerDirect(id) {
+            const drawer = document.getElementById(id);
+            if (drawer) drawer.classList.remove('active');
+        }
+
+        function closeDrawer(e, id) {
+            if (e.target.id === id || e.target.classList.contains('drawer-overlay')) {
+                closeDrawerDirect(id);
+            }
         }
     </script>
 </body>
+
 </html>

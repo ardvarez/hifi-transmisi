@@ -4,28 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Power Swift ERS V2 - Mobile Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome & RemixIcon for universal icon compatibility -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Chart.js & Leaflet JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         :root {
             --bg-color: #f4f6fb;
+            --bg-canvas: #f4f6fb;
             --card-bg: #ffffff;
             --primary-blue: #1a65d6;
             --primary-blue-hover: #134db0;
             --primary-light: #eef4ff;
             --text-main: #1e293b;
+            --text-dark: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+            --shadow-subtle: 0 2px 10px rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -36,6 +54,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 10px 0;
+            font-family: 'Inter', sans-serif;
         }
 
         .mobile-container {
@@ -87,7 +106,7 @@
 
         /* App Header (Power Inspect Style) */
         .app-header {
-            padding: 16px 20px 14px;
+            padding: 14px 18px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -99,19 +118,19 @@
         .header-left-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .header-avatar {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 12px;
             background: linear-gradient(135deg, #1a65d6 0%, #0284c7 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
-            font-size: 18px;
+            font-size: 17px;
             box-shadow: 0 4px 12px rgba(26, 101, 214, 0.25);
         }
 
@@ -122,14 +141,14 @@
         
         .header-name { 
             font-weight: 800; 
-            font-size: 16px; 
+            font-size: 15px; 
             color: var(--text-main); 
             line-height: 1.2;
             letter-spacing: -0.3px;
         }
         
         .header-sub { 
-            font-size: 11px; 
+            font-size: 10.5px; 
             color: var(--primary-blue); 
             font-weight: 700; 
             letter-spacing: 0.3px;
@@ -141,8 +160,8 @@
         }
         
         .action-btn {
-            width: 38px; 
-            height: 38px;
+            width: 36px; 
+            height: 36px;
             border-radius: 50%;
             background: #f8fafc;
             border: 1px solid var(--border-color);
@@ -150,7 +169,7 @@
             align-items: center; 
             justify-content: center;
             color: var(--text-main);
-            font-size: 15px;
+            font-size: 14px;
             position: relative;
             cursor: pointer;
             text-decoration: none;
@@ -165,10 +184,10 @@
 
         .notif-dot {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
             background-color: var(--danger-color);
             border-radius: 50%;
             border: 2px solid white;
@@ -178,135 +197,246 @@
         .app-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 18px 24px;
+            padding: 16px 16px 40px;
             scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
         .app-content::-webkit-scrollbar { display: none; }
 
-        /* Unit Hierarchy Filter Badge / Pill */
-        .unit-selector-bar {
+        /* Standalone Search & Filter Card */
+        .search-filter-card {
             background: #ffffff;
+            border-radius: 18px;
+            padding: 12px 14px;
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 10px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-        }
-
-        .unit-selector-bar:active {
-            background: #f8fafc;
-            border-color: var(--primary-blue);
-        }
-
-        .unit-info-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .unit-icon-box {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            background: var(--primary-light);
-            color: var(--primary-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-        }
-
-        .unit-text-main {
-            font-size: 12.5px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .unit-text-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Welcome Banner Card (Power Inspect Gradient) */
-        .welcome-card {
-            background: linear-gradient(115deg, #1a65d6 0%, #0284c7 60%, #0ea5e9 100%);
-            border-radius: 20px;
-            padding: 18px 20px;
-            color: #ffffff;
-            margin-bottom: 18px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.28);
-        }
-
-        .welcome-card::after {
-            content: '';
-            position: absolute;
-            right: -20px;
-            bottom: -20px;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .welcome-title {
-            font-size: 17px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: -0.2px;
-        }
-
-        .welcome-desc {
-            font-size: 12px;
-            opacity: 0.9;
-            line-height: 1.45;
-            margin-bottom: 14px;
-            max-width: 85%;
-        }
-
-        .kpi-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-        }
-
-        .kpi-item {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
             display: flex;
             flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-filter-top-row {
+            display: flex;
+            gap: 8px;
             align-items: center;
-            text-align: center;
         }
 
-        .kpi-num {
-            font-size: 16px;
-            font-weight: 800;
-            color: #ffffff;
+        .search-input-box {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
 
-        .kpi-label {
-            font-size: 10px;
-            opacity: 0.9;
+        .search-input-box:focus-within {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
+        }
+
+        .search-input-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 12px;
+            color: var(--text-dark);
             font-weight: 600;
         }
 
-        /* Section Title */
-        .section-header {
+        .search-input-box input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .search-input-box i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .filter-modal-btn {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 12px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .filter-modal-btn:hover {
+            background: #dbeafe;
+        }
+
+        /* Quick Filter Bar Scroll */
+        .quick-filter-scroll-wrapper {
+            margin: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .quick-filter-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .filter-scroll-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            width: max-content;
+        }
+
+        .quick-filter-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .quick-filter-pill:hover {
+            background: #f1f5f9;
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .quick-filter-pill.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+            box-shadow: 0 3px 10px rgba(26, 101, 214, 0.25);
+        }
+
+        /* Welcome Banner Card (Power Inspect V2 Standard) */
+        .welcome-card {
+            background: linear-gradient(105deg, #dcf0fc 0%, #c4e9fc 45%, #b2defb 100%);
+            border-radius: 22px;
+            padding: 18px 18px 18px 20px;
+            color: #0c4e8e;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(3, 105, 161, 0.12);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(186, 230, 253, 0.7);
+            min-height: 148px;
+        }
+
+        .welcome-info {
+            max-width: 60%;
+            z-index: 2;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(3, 105, 161, 0.12);
+            color: #0369a1;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .welcome-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0c4e8e;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+            line-height: 1.25;
+        }
+
+        .welcome-desc {
+            font-size: 11px;
+            color: #0369a1;
+            font-weight: 600;
             margin-bottom: 12px;
+            line-height: 1.35;
+        }
+
+        .welcome-action-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .welcome-btn {
+            background: #bce0fd;
+            color: #0369a1;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            transition: background 0.2s;
+            box-shadow: 0 2px 6px rgba(3, 105, 161, 0.15);
+        }
+        .welcome-btn:hover { background: #90caf9; }
+
+        .welcome-btn-outline {
+            background: rgba(255, 255, 255, 0.7);
+            color: #0369a1;
+            border: 1px solid rgba(3, 105, 161, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .welcome-illustration-img {
+            width: 145px;
+            height: 135px;
+            position: absolute;
+            right: -2px;
+            bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+            object-fit: cover;
+            object-position: top center;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.7) 12%, black 28%);
+            mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.7) 12%, black 28%);
+        }
+
+        /* Section Title Header */
+        .section-header-block {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
             padding: 0 2px;
         }
 
@@ -315,6 +445,15 @@
             font-weight: 800;
             color: var(--text-main);
             letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.35;
         }
 
         .section-badge {
@@ -331,7 +470,6 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            margin-bottom: 20px;
         }
 
         .module-card {
@@ -342,7 +480,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 140px;
+            min-height: 135px;
             text-decoration: none;
             color: var(--text-main);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -359,46 +497,31 @@
         }
 
         .module-icon-wrap {
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            margin-bottom: 12px;
+            font-size: 19px;
+            margin-bottom: 10px;
         }
 
-        .icon-pemasangan {
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .icon-pembongkaran {
-            background: #fff7ed;
-            color: #ea580c;
-        }
-
-        .icon-karantina {
-            background: #fdf2f8;
-            color: #db2777;
-        }
-
-        .icon-so {
-            background: #ecfdf5;
-            color: #059669;
-        }
+        .icon-pemasangan { background: #eff6ff; color: #2563eb; }
+        .icon-pembongkaran { background: #fff7ed; color: #ea580c; }
+        .icon-karantina { background: #fdf2f8; color: #db2777; }
+        .icon-so { background: #ecfdf5; color: #059669; }
 
         .module-name {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             line-height: 1.25;
         }
 
         .module-sub {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
             font-weight: 500;
             line-height: 1.35;
@@ -406,9 +529,9 @@
 
         .module-badge-counter {
             position: absolute;
-            top: 14px;
-            right: 14px;
-            font-size: 11px;
+            top: 12px;
+            right: 12px;
+            font-size: 10.5px;
             font-weight: 700;
             padding: 3px 8px;
             border-radius: 10px;
@@ -421,8 +544,7 @@
             background: #ffffff;
             border-radius: 16px;
             border: 1px solid var(--border-color);
-            padding: 14px 16px;
-            margin-bottom: 10px;
+            padding: 12px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -480,52 +602,489 @@
         .pill-amber { background: #fffbeb; color: #d97706; }
         .pill-green { background: #ecfdf5; color: #059669; }
 
-        /* Bottom Nav */
-        .bottom-nav {
-            background: #ffffff;
-            border-top: 1px solid var(--border-color);
-            padding: 8px 12px 14px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .nav-item {
+        /* V1 Dashboard KPIs Section */
+        .kpi-container {
             display: flex;
             flex-direction: column;
+            gap: 10px;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            padding: 13px 16px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 4px;
-            text-decoration: none;
-            color: #94a3b8;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .kpi-card:active {
+            transform: scale(0.98);
+            border-color: var(--primary-blue);
+        }
+
+        .kpi-card-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kpi-icon-bubble {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon-bubble.blue {
+            background: rgba(26, 101, 214, 0.08);
+            color: var(--primary-blue);
+            border: 1px solid rgba(26, 101, 214, 0.15);
+        }
+
+        .kpi-icon-bubble.green {
+            background: rgba(16, 185, 129, 0.08);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .kpi-icon-bubble.red {
+            background: rgba(239, 68, 68, 0.08);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .kpi-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-label {
             font-size: 11px;
             font-weight: 600;
-            padding: 4px 12px;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        .kpi-subtext {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-top: 1px;
+        }
+
+        .kpi-card-right {
+            text-align: right;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-arrow-icon {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+
+        /* Map Card Wrapper */
+        .map-card-wrapper {
+            background: #ffffff;
+            border-radius: var(--radius-xl);
+            padding: 14px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .map-tab-group {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 11px;
+            gap: 3px;
+        }
+
+        .map-tab-btn {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .map-tab-btn.active {
+            background: #ffffff;
+            color: var(--primary-blue);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .map-action-btn {
+            padding: 5px 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .map-view-box {
+            width: 100%;
+            height: 220px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            position: relative;
+            background-color: #d0e4f2;
+        }
+
+        #indonesiaMap {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .map-legend-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: #f8fafc;
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .legend-badge {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26, 101, 214, 0.2);
+        }
+
+        .ers-marker-pin {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1a65d6;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+        }
+
+        .ers-marker-pin.tower {
+            background: #059669;
+        }
+
+        /* Charts Containers */
+        .chart-card-wrapper {
+            background: #ffffff;
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .chart-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 210px;
+        }
+
+        .donut-chart-container {
+            position: relative;
+            width: 100%;
+            height: 190px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .donut-center-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .donut-center-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .donut-center-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Detail ERS List */
+        .detail-section-card {
+            background: #ffffff;
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-and-filter-box {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-input-field {
+            flex: 1;
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
             transition: all 0.2s;
         }
 
-        .nav-item i {
-            font-size: 18px;
+        .search-input-field:focus-within {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
         }
 
-        .nav-item.active {
+        .search-input-field input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 12.5px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .search-input-field input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .search-input-field i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .btn-filter-icon {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
             color: var(--primary-blue);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
-        /* iOS Bottom Bar */
-        .ios-bar {
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 4px;
-            background: #000000;
-            border-radius: 2px;
-            z-index: 20;
+        .detail-item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        /* Unit Hierarchy Modal Drawer */
+        .detail-data-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+
+        .detail-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-unit-badge {
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .detail-pelaksana-tag {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .detail-grid-row {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 8px;
+            background: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 10px;
+        }
+
+        .detail-grid-cell {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cell-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .cell-value {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            padding-top: 4px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .status-badge-chip {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 800;
+        }
+
+        .status-badge-chip.lengkap {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .status-badge-chip.tidak-lengkap {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            padding-top: 4px;
+        }
+
+        .pagination-pages {
+            display: flex;
+            gap: 4px;
+        }
+
+        .page-num-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-dark);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-num-btn.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+        }
+
+        /* Modals & Drawers */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -555,7 +1114,7 @@
             box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
         }
 
@@ -579,61 +1138,132 @@
             margin-bottom: 14px;
         }
 
-        .unit-option-item {
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 8px;
+        .filter-drawer-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 16px;
         }
 
-        .unit-option-item:hover, .unit-option-item.active {
-            background: #eff6ff;
-            border-color: var(--primary-blue);
+        .filter-reset-link {
+            font-size: 12px;
             color: var(--primary-blue);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .filter-group {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .filter-select {
+            width: 100%;
+            height: 44px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 14px;
+            font-size: 13px;
+            color: var(--text-dark);
+            background: #ffffff;
+            outline: none;
+        }
+
+        .btn-apply-filter {
+            width: 100%;
+            height: 46px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 14.5px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.3);
         }
 
         /* Dark Mode Styling */
         html.dark-mode, body.dark-mode { background-color: #cbd5e1 !important; }
         body.dark-mode .mobile-container, html.dark-mode .mobile-container {
             --bg-color: #0b1329 !important;
+            --bg-canvas: #0b1329 !important;
             --card-bg: #1e293b !important;
             --text-main: #f8fafc !important;
+            --text-dark: #f8fafc !important;
             --text-muted: #94a3b8 !important;
             --border-color: #334155 !important;
+            --input-bg: #0f172a !important;
             background-color: #0b1329 !important;
             color: #f8fafc !important;
         }
         body.dark-mode .status-bar, html.dark-mode .status-bar,
         body.dark-mode .app-header, html.dark-mode .app-header,
-        body.dark-mode .bottom-nav, html.dark-mode .bottom-nav,
         body.dark-mode .modal-drawer, html.dark-mode .modal-drawer {
             background: #0f172a !important;
             border-color: #334155 !important;
         }
-        body.dark-mode .unit-selector-bar, html.dark-mode .unit-selector-bar,
         body.dark-mode .module-card, html.dark-mode .module-card,
         body.dark-mode .recent-card, html.dark-mode .recent-card,
-        body.dark-mode .unit-option-item, html.dark-mode .unit-option-item {
+        body.dark-mode .kpi-card, html.dark-mode .kpi-card,
+        body.dark-mode .map-card-wrapper, html.dark-mode .map-card-wrapper,
+        body.dark-mode .chart-card-wrapper, html.dark-mode .chart-card-wrapper,
+        body.dark-mode .detail-section-card, html.dark-mode .detail-section-card,
+        body.dark-mode .detail-data-card, html.dark-mode .detail-data-card,
+        body.dark-mode .search-filter-card, html.dark-mode .search-filter-card {
             background: #1e293b !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
         }
-        body.dark-mode .action-btn, html.dark-mode .action-btn {
+        body.dark-mode .action-btn, html.dark-mode .action-btn,
+        body.dark-mode .btn-filter-icon, html.dark-mode .btn-filter-icon,
+        body.dark-mode .filter-modal-btn, html.dark-mode .filter-modal-btn,
+        body.dark-mode .map-action-btn, html.dark-mode .map-action-btn,
+        body.dark-mode .page-num-btn, html.dark-mode .page-num-btn {
             background: #1e293b !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
+        }
+        body.dark-mode .search-input-box, html.dark-mode .search-input-box,
+        body.dark-mode .quick-filter-pill, html.dark-mode .quick-filter-pill {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .quick-filter-pill.active, html.dark-mode .quick-filter-pill.active {
+            background: var(--primary-blue) !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode .map-tab-group, html.dark-mode .map-tab-group,
+        body.dark-mode .map-legend-box, html.dark-mode .map-legend-box,
+        body.dark-mode .detail-grid-row, html.dark-mode .detail-grid-row {
+            background: #0f172a !important;
+        }
+        body.dark-mode .map-tab-btn.active, html.dark-mode .map-tab-btn.active {
+            background: #1e293b !important;
+            color: #38bdf8 !important;
         }
         body.dark-mode .module-badge-counter, html.dark-mode .module-badge-counter,
         body.dark-mode .recent-icon, html.dark-mode .recent-icon {
             background: #0f172a !important;
             color: #94a3b8 !important;
         }
-        body.dark-mode .ios-bar, html.dark-mode .ios-bar { background: #ffffff !important; }
+        body.dark-mode .filter-select, html.dark-mode .filter-select {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
     </style>
 </head>
 <body>
@@ -651,6 +1281,9 @@
         <!-- App Header -->
         <div class="app-header">
             <div class="header-left-group">
+                <a href="../catalog-mobile.html" class="action-btn" style="margin-right: 2px;" title="Kembali ke Katalog Utama">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
                 <div class="header-avatar">
                     <i class="fa-solid fa-tower-broadcast"></i>
                 </div>
@@ -663,7 +1296,7 @@
                 <a href="../ers/home-mobile.html" class="action-btn" title="Beralih ke Versi V1">
                     <span style="font-size:10px; font-weight:800; color:var(--primary-blue);">V1</span>
                 </a>
-                <a href="./notifikasi-mobile.html" class="action-btn" title="Notifikasi ERS">
+                <a href="../notifikasi-catalog-mobile.html?app=ers&back=ers-v2/home-mobile.html" class="action-btn" title="Pusat Notifikasi Katalog">
                     <i class="fa-regular fa-bell"></i>
                     <span class="notif-dot" style="display:block;"></span>
                 </a>
@@ -672,44 +1305,71 @@
 
         <!-- Main Content -->
         <div class="app-content">
-            <!-- Unit Hierarchy Selector Bar -->
-            <div class="unit-selector-bar" onclick="openUnitModal()">
-                <div class="unit-info-left">
-                    <div class="unit-icon-box">
-                        <i class="fa-solid fa-building-shield"></i>
+            <!-- Standalone Search & Filter Card -->
+            <div class="search-filter-card">
+                <div class="search-filter-top-row">
+                    <div class="search-input-box">
+                        <input type="text" id="searchInputTop" placeholder="Cari data ERS, unit, penghantar..." oninput="handleSearch(this.value)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
-                    <div>
-                        <div class="unit-text-main" id="selectedUnitName">UPT Semarang - ULTG Ungaran</div>
-                        <div class="unit-text-sub">Sistem Kelistrikan Jawa Tengah & DIY</div>
+                    <button type="button" class="filter-modal-btn" onclick="openFilterModal()" title="Filter Data">
+                        <i class="fa-solid fa-sliders"></i> Filter
+                    </button>
+                </div>
+
+                <div class="quick-filter-scroll-wrapper">
+                    <div class="filter-scroll-row">
+                        <button type="button" class="quick-filter-pill active" onclick="quickFilterUnit('ALL', this)">
+                            <i class="fa-solid fa-layer-group"></i> Semua Unit
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="quickFilterUnit('NTB', this)">
+                            UIW NTB
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="quickFilterUnit('P3BS', this)">
+                            UIP3B Sumatera
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="quickFilterUnit('UITJBM', this)">
+                            UIT JBM
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="quickFilterUnit('UITJBT', this)">
+                            UIT JBT
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="quickFilterUnit('UITJBB', this)">
+                            UIT JBB
+                        </button>
                     </div>
                 </div>
-                <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--text-muted);"></i>
             </div>
 
-            <!-- Welcome & KPI Card -->
+            <!-- Welcome Banner Card (Power Inspect V2 Standard) -->
             <div class="welcome-card">
-                <div class="welcome-title">Operasional Tower ERS</div>
-                <div class="welcome-desc">Kelola kesiapan, mobilisasi pemasangan, pembongkaran, hingga karantina tower darurat dengan cepat.</div>
-                <div class="kpi-row">
-                    <div class="kpi-item">
-                        <span class="kpi-num">12</span>
-                        <span class="kpi-label">Permit Aktif</span>
+                <div class="welcome-info">
+                    <div class="welcome-badge">
+                        <i class="fa-solid fa-tower-broadcast"></i> POWER SWIFT V2
                     </div>
-                    <div class="kpi-item">
-                        <span class="kpi-num">8</span>
-                        <span class="kpi-label">Terpasang</span>
-                    </div>
-                    <div class="kpi-item">
-                        <span class="kpi-num">98%</span>
-                        <span class="kpi-label">Ready Stok</span>
+                    <div class="welcome-title">Operasional Tower ERS</div>
+                    <div class="welcome-desc">Kesiapan, mobilisasi pemasangan & monitoring tower darurat regional.</div>
+                    <div class="welcome-action-row">
+                        <button type="button" onclick="scrollToMap()" class="welcome-btn">
+                            <i class="fa-solid fa-map-location-dot"></i> Peta ERS
+                        </button>
+                        <a href="./Pemasangan/home-mobile.html" class="welcome-btn-outline">
+                            <i class="fa-solid fa-wrench"></i> 4 Permit
+                        </a>
                     </div>
                 </div>
+
+                <!-- Clean 3D Vector Engineer Illustration -->
+                <img src="../assets/engineer_3d_clean.png" class="welcome-illustration-img" alt="Power Swift ERS V2">
             </div>
 
-            <!-- Modules Section -->
-            <div class="section-header">
-                <span class="section-title">Modul Operasional V2</span>
-                <span class="section-badge">4 Modul</span>
+            <!-- 1. Modul Operasional V2 Grid -->
+            <div class="section-header-block">
+                <div class="section-title">
+                    <span>Modul Operasional V2</span>
+                    <span class="section-badge">4 Modul</span>
+                </div>
+                <span class="section-subtitle">Akses cepat transaksi & administrasi lapangan</span>
             </div>
 
             <div class="module-grid">
@@ -762,10 +1422,12 @@
                 </a>
             </div>
 
-            <!-- Recent Operations -->
-            <div class="section-header">
-                <span class="section-title">Aktivitas Terkini</span>
-                <span style="font-size:11px; color:var(--text-muted);">Real-time Update</span>
+            <!-- 2. Aktivitas Terkini (Recent Operations) -->
+            <div class="section-header-block">
+                <div class="section-title">
+                    <span>Aktivitas Terkini</span>
+                    <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Real-time Update</span>
+                </div>
             </div>
 
             <a href="./Pemasangan/list-pemasangan.html?id=ASM20250000001" class="recent-card">
@@ -806,64 +1468,200 @@
                 </div>
                 <span class="status-pill pill-green">Selesai Retur</span>
             </a>
+
+            <!-- 3. SECTION HEADER: DATA KETERSEDIAAN & PEMASANGAN -->
+            <div class="section-header-block" style="margin-top: 4px;">
+                <h2 class="section-title">Data Ketersediaan & Pemasangan</h2>
+                <p class="section-subtitle">Statistik ketersediaan set ERS dan status terpasang nasional</p>
+            </div>
+
+            <!-- 4. KPI SUMMARY CARDS -->
+            <div class="kpi-container">
+                <!-- Card 1: Total ERS Terpasang -->
+                <div class="kpi-card" onclick="scrollToDetail()">
+                    <div class="kpi-card-left">
+                        <div class="kpi-icon-bubble blue">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total ERS</span>
+                            <span class="kpi-subtext">Terpasang (Set)</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card-right">
+                        <i class="fa-solid fa-arrow-right kpi-arrow-icon"></i>
+                        <div class="kpi-value" id="kpiTerpasangVal">35</div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total ERS Set ERS Lengkap -->
+                <div class="kpi-card" onclick="filterByStatus('Lengkap')">
+                    <div class="kpi-card-left">
+                        <div class="kpi-icon-bubble green">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total ERS</span>
+                            <span class="kpi-subtext">Set ERS Lengkap</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card-right">
+                        <i class="fa-solid fa-arrow-right kpi-arrow-icon"></i>
+                        <div class="kpi-value" id="kpiLengkapVal" style="color: #059669;">39</div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total ERS Set ERS Tidak Lengkap -->
+                <div class="kpi-card" onclick="filterByStatus('Tidak Lengkap')">
+                    <div class="kpi-card-left">
+                        <div class="kpi-icon-bubble red">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total ERS</span>
+                            <span class="kpi-subtext">Set ERS Tidak Lengkap</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card-right">
+                        <i class="fa-solid fa-arrow-right kpi-arrow-icon"></i>
+                        <div class="kpi-value" id="kpiTidakLengkapVal" style="color: #dc2626;">2945</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. MAP CARD WRAPPER -->
+            <div class="map-card-wrapper" id="mapSection">
+                <div class="map-controls-row">
+                    <div class="map-tab-group">
+                        <button class="map-tab-btn active" id="tabSetERS" onclick="switchMapMode('set')">
+                            <i class="fa-solid fa-layer-group"></i> Set ERS
+                        </button>
+                        <button class="map-tab-btn" id="tabTowerOperasi" onclick="switchMapMode('tower')">
+                            <i class="fa-solid fa-tower-observation"></i> Tower Operasi
+                        </button>
+                    </div>
+                    <button class="map-action-btn" onclick="resetMapZoom()" title="Reset Tampilan Peta">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Reset
+                    </button>
+                </div>
+
+                <div class="map-view-box">
+                    <div id="indonesiaMap"></div>
+                </div>
+
+                <div class="map-legend-box">
+                    <div class="legend-item">
+                        <div class="legend-badge"></div>
+                        <span>Titik Sebaran Unit Induk</span>
+                    </div>
+                    <span style="font-weight: 700; color: var(--primary-blue);" id="mapMarkerCountText">5 Titik Aktif</span>
+                </div>
+            </div>
+
+            <!-- 6. CHART 1: ERS OPERASI PER UNIT -->
+            <div class="chart-card-wrapper">
+                <div class="chart-card-header">
+                    <h3 class="chart-title">ERS Operasi Per Unit</h3>
+                    <i class="fa-solid fa-chart-simple" style="color: #94a3b8; font-size: 13px;"></i>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="chartOperasiUnit"></canvas>
+                </div>
+            </div>
+
+            <!-- 7. CHART 2: SET ERS LENGKAP & TIDAK LENGKAP -->
+            <div class="chart-card-wrapper">
+                <div class="chart-card-header">
+                    <h3 class="chart-title">Set ERS Lengkap & Tidak Lengkap</h3>
+                    <i class="fa-solid fa-chart-column" style="color: #94a3b8; font-size: 13px;"></i>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="chartLengkapStatus"></canvas>
+                </div>
+            </div>
+
+            <!-- 8. CHART 3: DURASI ERS OPERASI (DONUT) -->
+            <div class="chart-card-wrapper">
+                <div class="chart-card-header">
+                    <h3 class="chart-title">Durasi ERS Operasi</h3>
+                    <i class="fa-solid fa-chart-pie" style="color: #94a3b8; font-size: 13px;"></i>
+                </div>
+                <div class="donut-chart-container">
+                    <canvas id="chartDurasiOperasi"></canvas>
+                    <div class="donut-center-label">
+                        <div class="donut-center-val">27</div>
+                        <div class="donut-center-sub">Total Data</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. DETAIL ERS TABLE / CARDS -->
+            <div class="detail-section-card" id="detailSection">
+                <div class="section-header-block">
+                    <h2 class="section-title">Detail ERS Terpasang</h2>
+                    <p class="section-subtitle">Daftar lokasi & status operasional ERS terpasang</p>
+                </div>
+
+                <div class="search-and-filter-box">
+                    <div class="search-input-field">
+                        <input type="text" id="searchInput" placeholder="Cari unit, penghantar, merk..."
+                            oninput="handleSearch(this.value)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <button class="btn-filter-icon" onclick="openFilterModal()">
+                        <i class="fa-solid fa-filter"></i> Filter
+                    </button>
+                </div>
+
+                <div class="detail-item-list" id="detailDataList"></div>
+
+                <div class="pagination-container">
+                    <span id="paginationInfo">Menampilkan 3 dari 5 Data</span>
+                    <div class="pagination-pages" id="paginationControls"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- Bottom Navigation Bar -->
-        <div class="bottom-nav">
-            <a href="../../hifi-home/home.html" class="nav-item">
-                <i class="fa-solid fa-house"></i>
-                <span>Home</span>
-            </a>
-            <a href="../new-pst/catalog-mobile-new-pst.html" class="nav-item">
-                <i class="fa-solid fa-cubes"></i>
-                <span>Asset</span>
-            </a>
-            <a href="../power-inspect/home-mobile.html" class="nav-item">
-                <i class="fa-solid fa-clipboard-check"></i>
-                <span>CBM</span>
-            </a>
-            <a href="./home-mobile.html" class="nav-item active">
-                <i class="fa-solid fa-tower-broadcast"></i>
-                <span>ERS V2</span>
-            </a>
-            <a href="../power-inspect/relogin-mobile.html" class="nav-item">
-                <i class="fa-regular fa-user"></i>
-                <span>Akun</span>
-            </a>
-        </div>
-
-        <div class="ios-bar"></div>
-
-        <!-- Unit Hierarchy Modal Drawer -->
-        <div class="modal-overlay" id="unitModal" onclick="closeUnitModal(event)">
+        <!-- FILTER DRAWER MODAL -->
+        <div class="modal-overlay" id="filterModal" onclick="closeFilterModal(event)">
             <div class="modal-drawer" onclick="event.stopPropagation()">
-                <div class="drawer-handle" onclick="closeUnitModalDirect()"></div>
-                <h3 class="drawer-title">Pilih Unit Pengelola ERS</h3>
-                <div class="unit-option-item active" onclick="selectUnit('UPT Semarang - ULTG Ungaran')">
-                    <div>
-                        <div style="font-weight:700; font-size:13px;">UPT Semarang</div>
-                        <div style="font-size:11px; color:var(--text-muted);">ULTG Ungaran - Jawa Tengah</div>
-                    </div>
-                    <i class="fa-solid fa-check" style="color:var(--primary-blue);"></i>
+                <div class="drawer-handle" onclick="closeFilterModalDirect()"></div>
+
+                <div class="filter-drawer-title">
+                    <span>Filter Data ERS</span>
+                    <span class="filter-reset-link" onclick="resetFilters()">Reset</span>
                 </div>
-                <div class="unit-option-item" onclick="selectUnit('UPT Salatiga - ULTG Bawen')">
-                    <div>
-                        <div style="font-weight:700; font-size:13px;">UPT Salatiga</div>
-                        <div style="font-size:11px; color:var(--text-muted);">ULTG Bawen - Jawa Tengah</div>
-                    </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Kantor Pusat</label>
+                    <select class="filter-select" id="filterKantorPusat">
+                        <option value="ALL">Semua Kantor Pusat</option>
+                        <option value="PLN_PUSAT" selected>PT PLN (Persero) Kantor Pusat</option>
+                    </select>
                 </div>
-                <div class="unit-option-item" onclick="selectUnit('UPT Purwokerto - ULTG Rawalo')">
-                    <div>
-                        <div style="font-weight:700; font-size:13px;">UPT Purwokerto</div>
-                        <div style="font-size:11px; color:var(--text-muted);">ULTG Rawalo - Jawa Tengah</div>
-                    </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Unit Induk (UIT / UIW)</label>
+                    <select class="filter-select" id="filterUnitInduk">
+                        <option value="ALL">Semua Unit Induk</option>
+                        <option value="NTB">NTB (UIW NTB)</option>
+                        <option value="P3BS">P3BS (UIP3B Sumatera)</option>
+                        <option value="UITJBM">UITJBM (UIT Jawa Bagian Madura)</option>
+                        <option value="UITJBT">UITJBT (UIT Jawa Bagian Tengah)</option>
+                        <option value="UITJBB">UITJBB (UIT Jawa Bagian Barat)</option>
+                    </select>
                 </div>
-                <div class="unit-option-item" onclick="selectUnit('UPT Bandung - ULTG Cigereleng')">
-                    <div>
-                        <div style="font-weight:700; font-size:13px;">UPT Bandung</div>
-                        <div style="font-size:11px; color:var(--text-muted);">ULTG Cigereleng - Jawa Barat</div>
-                    </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Status Kelengkapan</label>
+                    <select class="filter-select" id="filterStatusSet">
+                        <option value="ALL">Semua Status</option>
+                        <option value="Lengkap">Set ERS Lengkap</option>
+                        <option value="Tidak Lengkap">Set ERS Tidak Lengkap</option>
+                    </select>
                 </div>
+
+                <button class="btn-apply-filter" onclick="applyFilterDrawer()">Terapkan Filter</button>
             </div>
         </div>
     </div>
@@ -946,37 +1744,373 @@
         Notes ERS Mobile V2
       </h3>
       <ul>
-        <li><strong>Arsitektur V2:</strong> Mengadopsi standar desain Mobile Power Inspect secara menyeluruh.</li>
-        <li><strong>Struktur Terpisah:</strong> V2 beroperasi independen dari V1 dengan navigasi antar-modul yang rapi.</li>
-        <li><strong>Modul Utama:</strong> Pemasangan, Pembongkaran, Karantina & Retur, serta Stock Opname.</li>
+        <li><strong>Arsitektur V2:</strong> Mengadopsi standar desain Mobile Power Inspect & integrasi modul analitik V1.</li>
+        <li><strong>Peta & Visualisasi:</strong> Dilengkapi Peta Interaktif Leaflet GIS dan grafik Chart.js analitik sebaran.</li>
+        <li><strong>Modul Transaksi:</strong> Pemasangan, Pembongkaran, Karantina & Retur, serta Stock Opname.</li>
       </ul>
     </div>
 
+    <!-- Data & Controller Scripts -->
     <script>
-        function openUnitModal() {
-            document.getElementById('unitModal').classList.add('active');
+        const ersMasterData = [
+            {
+                no: 1,
+                unitInduk: 'NTB',
+                unitPelaksana: 'UPT MATARAM',
+                penghantar: 'SUTT 70 KV WOHA-DOMPU',
+                tower: 'T.42',
+                lat: -8.580437,
+                lng: 118.627106,
+                jumlahSet: 2,
+                merk: 'SBB',
+                penyebab: 'Longsor akibat pergerakan tanah',
+                tanggal: '24 Oktober 2023',
+                statusSet: 'Lengkap'
+            },
+            {
+                no: 2,
+                unitInduk: 'NTB',
+                unitPelaksana: 'UPT TANJUNG KARANG',
+                penghantar: 'SUTT 150 kV Pagelaran - ULUBELU',
+                tower: 'T.118',
+                lat: -5.3139244,
+                lng: 104.76185,
+                jumlahSet: 1,
+                merk: 'LINDSEY',
+                penyebab: 'Tanah Longsor lereng bukit',
+                tanggal: '07 Juni 2024',
+                statusSet: 'Lengkap'
+            },
+            {
+                no: 3,
+                unitInduk: 'P3BS',
+                unitPelaksana: 'UPT BANDA ACEH',
+                penghantar: 'SUTT 150 kV Nagan - Sigli',
+                tower: 'T.85',
+                lat: 4.422167,
+                lng: 96.189583,
+                jumlahSet: 1,
+                merk: 'SBB',
+                penyebab: 'Pondasi tower amblas tergerus banjir',
+                tanggal: '03 Desember 2023',
+                statusSet: 'Tidak Lengkap'
+            },
+            {
+                no: 4,
+                unitInduk: 'UITJBM',
+                unitPelaksana: 'UPT SURABAYA',
+                penghantar: 'SUTT 150 kV Waru - Rungkut # 1-2',
+                tower: 'T.12',
+                lat: -7.34585831,
+                lng: 112.7383091,
+                jumlahSet: 2,
+                merk: 'TOWER SOLUTION',
+                penyebab: 'Tower Kritis dampak proyek jalan tol',
+                tanggal: '01 Desember 2023',
+                statusSet: 'Lengkap'
+            },
+            {
+                no: 5,
+                unitInduk: 'P3BS',
+                unitPelaksana: 'UPT PEMATANG SIANTAR',
+                penghantar: 'SUTET 275 kV Simangkuk - Sarulla',
+                tower: 'T.204',
+                lat: 1.93541493,
+                lng: 99.02995866,
+                jumlahSet: 2,
+                merk: 'SBB',
+                penyebab: 'Pending item UIP SBU proses drawing pondasi',
+                tanggal: '19 Juni 2025',
+                statusSet: 'Tidak Lengkap'
+            }
+        ];
+
+        let filteredData = [...ersMasterData];
+        let currentPage = 1;
+        const itemsPerPage = 3;
+
+        let map, markersLayer;
+
+        function initMap() {
+            const mapEl = document.getElementById('indonesiaMap');
+            if (!mapEl) return;
+            map = L.map('indonesiaMap', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView([-2.548926, 118.0148634], 4.2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+            renderMapMarkers('set');
         }
 
-        function closeUnitModalDirect() {
-            document.getElementById('unitModal').classList.remove('active');
-        }
+        function renderMapMarkers(mode = 'set') {
+            if (!markersLayer) return;
+            markersLayer.clearLayers();
+            ersMasterData.forEach(item => {
+                const iconHtml = `<div class="ers-marker-pin ${mode === 'tower' ? 'tower' : ''}"><i class="fa-solid ${mode === 'tower' ? 'fa-tower-observation' : 'fa-truck'}"></i></div>`;
+                const customIcon = L.divIcon({
+                    html: iconHtml,
+                    className: 'custom-leaflet-pin',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 28],
+                    popupAnchor: [0, -28]
+                });
 
-        function closeUnitModal(e) {
-            if (e.target.id === 'unitModal') closeUnitModalDirect();
-        }
-
-        function selectUnit(unitName) {
-            document.getElementById('selectedUnitName').textContent = unitName;
-            const items = document.querySelectorAll('.unit-option-item');
-            items.forEach(item => {
-                item.classList.remove('active');
-                const check = item.querySelector('.fa-check');
-                if (check) check.remove();
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+                marker.bindPopup(`
+                    <div style="font-family: 'Inter', sans-serif;">
+                        <strong style="color:#1a65d6;">${item.unitInduk} - ${item.unitPelaksana}</strong><br>
+                        <span style="font-size:11px; color:#475569;">${item.penghantar} (${item.jumlahSet} Set)</span>
+                    </div>
+                `);
+                markersLayer.addLayer(marker);
             });
-            event.currentTarget.classList.add('active');
-            event.currentTarget.insertAdjacentHTML('beforeend', '<i class="fa-solid fa-check" style="color:var(--primary-blue);"></i>');
-            closeUnitModalDirect();
+            const textEl = document.getElementById('mapMarkerCountText');
+            if (textEl) textEl.innerText = `${ersMasterData.length} Titik ${mode === 'tower' ? 'Tower' : 'Set ERS'}`;
         }
+
+        function switchMapMode(mode) {
+            document.getElementById('tabSetERS').classList.toggle('active', mode === 'set');
+            document.getElementById('tabTowerOperasi').classList.toggle('active', mode === 'tower');
+            renderMapMarkers(mode);
+        }
+
+        function resetMapZoom() {
+            if (map) {
+                map.setView([-2.548926, 118.0148634], 4.2);
+            }
+        }
+
+        function scrollToMap() {
+            const el = document.getElementById('mapSection');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToDetail() {
+            const el = document.getElementById('detailSection');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function initCharts() {
+            const elOperasi = document.getElementById('chartOperasiUnit');
+            if (elOperasi) {
+                const ctxOperasi = elOperasi.getContext('2d');
+                new Chart(ctxOperasi, {
+                    type: 'bar',
+                    data: {
+                        labels: ['BABEL', 'MMU', 'NTB', 'P2B', 'P3BS', 'PLN BATAM', 'UIT JBB', 'UIT JBM', 'UIT JBT'],
+                        datasets: [
+                            { label: 'Terpasang', data: [0, 0, 4, 0, 18, 0, 1, 1, 3], backgroundColor: '#1a65d6', borderRadius: 4, barThickness: 6 },
+                            { label: 'Selesai', data: [2, 0, 2, 3, 6, 0, 1, 1, 2], backgroundColor: '#0ea5e9', borderRadius: 4, barThickness: 6 }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+                        scales: { x: { grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+                    }
+                });
+            }
+
+            const elLengkap = document.getElementById('chartLengkapStatus');
+            if (elLengkap) {
+                const ctxLengkap = elLengkap.getContext('2d');
+                new Chart(ctxLengkap, {
+                    type: 'bar',
+                    data: {
+                        labels: ['P3B', 'PLN BATAM', 'NTB', 'P3BSUL', 'UIP KALBAGTIM', 'UIT JBB'],
+                        datasets: [
+                            { label: 'Lengkap', data: [0, 0, 2, 12, 5, 0], backgroundColor: '#10b981', borderRadius: 4, barThickness: 6 },
+                            { label: 'Tidak Lengkap', data: [0, 0, 0, 15, 0, 0], backgroundColor: '#f59e0b', borderRadius: 4, barThickness: 6 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+                        scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' } } }
+                    }
+                });
+            }
+
+            const elDurasi = document.getElementById('chartDurasiOperasi');
+            if (elDurasi) {
+                const ctxDurasi = elDurasi.getContext('2d');
+                new Chart(ctxDurasi, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['< 1 Tahun', '1 - 3 Tahun', '> 3 Tahun'],
+                        datasets: [{ data: [4, 21, 2], backgroundColor: ['#1a65d6', '#f59e0b', '#ef4444'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { position: 'bottom' } } }
+                });
+            }
+        }
+
+        function renderDetailList() {
+            const container = document.getElementById('detailDataList');
+            if (!container) return;
+            const totalItems = filteredData.length;
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const pageItems = filteredData.slice(startIdx, startIdx + itemsPerPage);
+
+            const infoEl = document.getElementById('paginationInfo');
+            if (infoEl) infoEl.innerText = `Menampilkan ${Math.min(pageItems.length, itemsPerPage)} dari ${totalItems} Data`;
+
+            if (pageItems.length === 0) {
+                container.innerHTML = `<div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 12px;">Tidak ada data yang cocok.</div>`;
+                renderPaginationControls(0);
+                return;
+            }
+
+            container.innerHTML = pageItems.map(item => `
+                <div class="detail-data-card">
+                    <div class="detail-card-top">
+                        <span class="detail-unit-badge">${item.unitInduk}</span>
+                        <span class="detail-pelaksana-tag">${item.unitPelaksana}</span>
+                    </div>
+
+                    <div class="detail-grid-row">
+                        <div class="detail-grid-cell">
+                            <span class="cell-label">Penghantar</span>
+                            <span class="cell-value" title="${item.penghantar}">${item.penghantar}</span>
+                        </div>
+                        <div class="detail-grid-cell">
+                            <span class="cell-label">Tower / Set</span>
+                            <span class="cell-value">${item.tower} • <strong>${item.jumlahSet} Set</strong></span>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 11px; color: var(--text-muted); line-height: 1.35;">
+                        <span style="font-weight: 600;">Merk:</span> ${item.merk} • <span style="font-weight: 600;">Penyebab:</span> ${item.penyebab}
+                    </div>
+
+                    <div class="detail-card-footer">
+                        <span style="color: var(--text-muted);"><i class="fa-regular fa-calendar"></i> ${item.tanggal}</span>
+                        <span class="status-badge-chip ${item.statusSet === 'Lengkap' ? 'lengkap' : 'tidak-lengkap'}">
+                            ${item.statusSet === 'Lengkap' ? '<i class="fa-solid fa-check"></i> Lengkap' : '<i class="fa-solid fa-triangle-exclamation"></i> Tidak Lengkap'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            renderPaginationControls(Math.ceil(totalItems / itemsPerPage));
+        }
+
+        function renderPaginationControls(totalPages) {
+            const controls = document.getElementById('paginationControls');
+            if (!controls) return;
+            if (totalPages <= 1) {
+                controls.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-num-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            controls.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderDetailList();
+        }
+
+        function handleSearch(query) {
+            const q = query.toLowerCase();
+            const topInput = document.getElementById('searchInputTop');
+            const bottomInput = document.getElementById('searchInput');
+            if (topInput && topInput.value !== query) topInput.value = query;
+            if (bottomInput && bottomInput.value !== query) bottomInput.value = query;
+
+            filteredData = ersMasterData.filter(item => 
+                item.unitInduk.toLowerCase().includes(q) ||
+                item.unitPelaksana.toLowerCase().includes(q) ||
+                item.penghantar.toLowerCase().includes(q) ||
+                item.tower.toLowerCase().includes(q) ||
+                item.merk.toLowerCase().includes(q)
+            );
+            currentPage = 1;
+            renderDetailList();
+        }
+
+        function filterByStatus(status) {
+            document.getElementById('filterStatusSet').value = status;
+            applyFilterDrawer();
+            scrollToDetail();
+        }
+
+        function quickFilterUnit(unitCode, btn) {
+            document.querySelectorAll('.quick-filter-pill').forEach(p => p.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const selectEl = document.getElementById('filterUnitInduk');
+            if (selectEl) selectEl.value = unitCode;
+
+            const status = document.getElementById('filterStatusSet') ? document.getElementById('filterStatusSet').value : 'ALL';
+            filteredData = ersMasterData.filter(item => {
+                let matchUnit = (unitCode === 'ALL' || item.unitInduk === unitCode);
+                let matchStatus = (status === 'ALL' || item.statusSet === status);
+                return matchUnit && matchStatus;
+            });
+
+            currentPage = 1;
+            renderDetailList();
+        }
+
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function closeFilterModalDirect() {
+            document.getElementById('filterModal').classList.remove('active');
+        }
+
+        function closeFilterModal(e) {
+            if (e.target.id === 'filterModal') closeFilterModalDirect();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterUnitInduk').value = 'ALL';
+            document.getElementById('filterStatusSet').value = 'ALL';
+            document.getElementById('filterKantorPusat').value = 'ALL';
+            const topInput = document.getElementById('searchInputTop');
+            const bottomInput = document.getElementById('searchInput');
+            if (topInput) topInput.value = '';
+            if (bottomInput) bottomInput.value = '';
+            document.querySelectorAll('.quick-filter-pill').forEach((p, idx) => {
+                p.classList.toggle('active', idx === 0);
+            });
+            filteredData = [...ersMasterData];
+            currentPage = 1;
+            renderDetailList();
+            closeFilterModalDirect();
+        }
+
+        function applyFilterDrawer() {
+            const unit = document.getElementById('filterUnitInduk').value;
+            const status = document.getElementById('filterStatusSet').value;
+
+            filteredData = ersMasterData.filter(item => {
+                let matchUnit = (unit === 'ALL' || item.unitInduk === unit);
+                let matchStatus = (status === 'ALL' || item.statusSet === status);
+                return matchUnit && matchStatus;
+            });
+
+            currentPage = 1;
+            renderDetailList();
+            closeFilterModalDirect();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            initCharts();
+            renderDetailList();
+        });
     </script>
 </body>
 </html>
