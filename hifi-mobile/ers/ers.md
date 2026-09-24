@@ -58,9 +58,9 @@ Halaman utama dashboard ERS memberikan visibilitas komprehensif terkait inventar
 
 ---
 
-## 3. Pusat Notifikasi (`notifikasi-mobile.html`)
+## 3. Pusat Notifikasi Terpadu (`notifikasi-catalog-mobile.html?module=power_swift`)
 
-Pusat notifikasi mengelola pemberitahuan darurat, perubahan status permit, instruksi pembongkaran, pengingat jadwal, dan hasil inspeksi karantina.
+Pusat notifikasi terpadu mengelola pemberitahuan darurat, perubahan status permit, instruksi pembongkaran, pengingat jadwal, dan hasil inspeksi karantina.
 
 ### 3.1 Kategori Filter Notifikasi (Chips Filter)
 - **Semua**: Seluruh histori pemberitahuan.
@@ -118,31 +118,42 @@ Modul ini memfasilitasi teknisi lapangan dan supervisor dalam proses survei, pen
 
 ## 5. Modul Pembongkaran ERS (`/Pembongkaran/`)
 
-Digunakan saat jalur transmisi permanen telah pulih dan tower darurat ERS harus dibongkar secara aman untuk pengembalian komponen.
+Digunakan saat jalur transmisi permanen telah pulih dan tower darurat ERS harus dibongkar secara aman untuk pengembalian komponen menuju gudang unit.
 
-### 5.1 Struktur Halaman
+### 5.1 Struktur Halaman & Komponen
 | File | Deskripsi |
 | :--- | :--- |
-| `home-mobile.html` | Daftar permit pembongkaran dengan status *Siap Bongkar*, *Sedang Dibongkar*, dan *Selesai*. |
-| `list-pembongkaran.html` | Daftar tower dalam permit yang siap diturunkan. |
-| `pembongkaran-action.html` | Lembar kendali pembongkaran, verifikasi *mixed komponen*, upload bukti pelepasan, dan monitoring durasi dismantling. |
+| `home-mobile.html` | Daftar permit pembongkaran (`DIS...`) dengan status: *Mulai / Siap Bongkar*, *Sedang Berlangsung / Sedang Dibongkar*, *Selesai Lokal*, dan *Selesai*. Dilengkapi kartu permit 2 kolom (Target Pembongkaran, SLA, Target Operasi, Jumlah TE), filter drawer, filter chips cepat, dan wadah error trace BE. |
+| `list-pembongkaran.html` | Daftar tower dalam permit pembongkaran (`Template Tower`, `Tower ERS`, `Template Tower A/B`) dengan metadata 2 kolom (Target Pembongkaran, SLA, Target Selesai, Lokasi), status badge, serta tombol aksi *Bongkar Tower* / *Lihat Detail*. |
+| `pembongkaran-action.html` | Lembar kendali eksekusi pembongkaran tower ERS, verifikasi spesifikasi komponen & konfigurasi pengganti, peta interaktif titik rencana vs aktual, histori pemasangan & pembongkaran, serta drawer submit aksi *Mulai* dan *Selesai Pembongkaran*. |
 
-### 5.2 Alur Kerja Pembongkaran
-1. **Pemeriksaan Spesifikasi Tower**:
-   - Memeriksa apakah tower menggunakan komponen campuran (*Mixed Component: Ya/Tidak*).
-   - Verifikasi data permit, tanggal mulai operasi, dan batas waktu dismantling.
-2. **Tahap 1: Mulai Pembongkaran**:
-   - Tekan tombol **Mulai Pembongkaran**.
-   - Form modal: Waktu mulai pelepasan + Foto evidence awal pembongkaran.
-   - Status berubah menjadi **Sedang Dibongkar**.
-3. **Pelepasan Komponen Bertahap**:
-   - Penurunan konduktor & travers.
-   - Pelepasan guy wire dan pemilahan baut/jointing.
-   - Pembongkaran kolom mast dan fondasi darurat.
-4. **Tahap 2: Selesai Pembongkaran**:
-   - Unggah foto evidence material rilis yang sudah ditata di atas truk/palet.
-   - Submit laporan selesai pembongkaran.
-   - Material otomatis dialihkan statusnya ke batch **Karantina & Pengembalian**.
+### 5.2 Fitur Detail Halaman Eksekusi (`pembongkaran-action.html`)
+1. **Header & File Rencana**:
+   - Menampilkan kode tower ERS (contoh: `E-202500001` atau `DIS20250000001`).
+   - Tombol **File Rencana** membuka modal drawer berisi dokumen teknis PDF skema pembongkaran (`Rencana_Pembongkaran_SUTT150kV.pdf`) beserta tombol download.
+2. **Alert Sisa Hari**:
+   - Banner penanda sisa durasi SLA pembongkaran (contoh: *Sisa Hari Pembongkaran 30 Hari*).
+3. **Kartu Lokasi & Metadata Tower**:
+   - Nama Tower (contoh: `TOWER SUTT 150kV UNGARAN-WELERI#0085`) dan koordinat presisi.
+   - Status badge (*Siap Bongkar*, *Sedang Dibongkar*, *Selesai Pembongkaran*).
+   - Tombol **View Lokasi** untuk menampilkan detail kondisi medan tapak tower.
+   - Metadata: Target Pembongkaran, SLA Pembongkaran, dan Target Selesai.
+4. **Segmented Tabs**:
+   - **Tab Aksesoris**:
+     - *Spesifikasi Umum*: Tegangan (150kV), Merk (Lindsay), Tipe Tower (Suspension), Mixed Komponen (*Ya/Tidak*).
+     - *Sub-Tab Daftar Komponen*: 16 kategori section material lengkap (*Foundation Section, Work Accessories, Working Tools, Anchor Construction, Work Aids, Ground Anchor Assembly, Universal Attachment, Accessories Earth Wire/OPGW, Erection Tools, Metric Bolts, Insulator Assembly, Helix Anchor Set, Accessories Anchor, Universal Attachment Connection, Earth Wire Mounting, Insulator Set*).
+     - *Sub-Tab Daftar Konfigurasi*: Rincian konfigurasi modul pengganti (*Diganti Komponen Lain* seperti Yoke Plate Type A vs Type B, dan *Diganti Komponen Merk Lain* seperti Lindsay vs Tower Solution TS Column Module).
+   - **Tab Peta**:
+     - Peta interaktif Leaflet memuat **Titik Rencana Tower** (Pin Biru) dan **Titik Pemasangan Actual** (Pin Hijau) dengan garis putus-putus selisih offset (~45m).
+     - Tombol integrasi rute navigasi **Buka Maps** (Google Maps).
+   - **Tab Informasi**:
+     - *Section Pembongkaran*: Data waktu mulai, PIC pelaksana, waktu selesai, koordinat, dan galeri 4+ foto bukti pelepasan di lapangan.
+     - *Section Pemasangan (Histori)*: Data rekaman awal saat tower pertama kali didirikan beserta foto arsip pemasangan.
+5. **Alur Aksi (Bottom Sticky Action Bar)**:
+   - **Tahap 1 (Mulai Pembongkaran)**: User menekan *Mulai Pembongkaran* -> Membuka bottom sheet drawer untuk verifikasi waktu mulai, upload bukti foto lapangan, dan catatan awal -> Status beralih ke *Sedang Dibongkar*.
+   - **Tahap 2 (Selesai Pembongkaran)**: User menekan *Selesai Pembongkaran* -> Membuka bottom sheet drawer untuk verifikasi waktu selesai, upload foto penyelesaian material, dan catatan akhir -> Status beralih ke *Selesai Pembongkaran* -> Material tower dialihkan ke batch **Karantina & Pengembalian**.
+6. **Wadah Trace Error**:
+   - Terintegrasi drawer error trace log backend untuk menangkap dan memeriksa kegagalan sinkronisasi atau request server secara kondisional.
 
 ---
 
@@ -226,11 +237,28 @@ Berfungsi untuk audit inventaris fisik berkala di gudang unit penyimpanan ERS.
 
 ---
 
-## 8. Ringkasan Status & Navigasi Antar Halaman
+## 8. Standar Logging Error & Trace Response Backend
+
+Dirancang untuk merekam dan menampilkan respon error API backend atau exception runtime mobile secara bersih dan informatif:
+
+### 8.1 Tampilan Ringkas di Kartu (Card Error Container)
+- Menampilkan kode status HTTP dan nama error sederhana (contoh: **Error 500: Server Exception**, **Error 403: Forbidden Access**, **Error 404: Endpoint Not Found**, **Error 422: Validation Error**, **Error 408: Request Timeout**, **Error 502: Bad Gateway**).
+- Sub-teks informatif: *Klik untuk melihat detail respon*.
+- Badge ringkas penanda status/jumlah error (*Error 500*, *2 Error*, dll.).
+
+### 8.2 Drawer Rincian Respon Error (Bottom Sheet)
+- **Murni Respon Error**: Tanpa form input tambah manual, hanya memuat log respon API yang terjadi.
+- **Header Item**: Badge status code dan tag endpoint API (contoh: `POST /api/v1/ers/...`).
+- **Respon Trace Box**: Menampilkan payload error JSON, trace exception, atau pesan SQL secara lengkap dalam monospace box.
+- **Action Salin**: Tombol *Salin Respon Error* untuk memudahkan trace debugging ke clipboard.
+
+---
+
+## 9. Ringkasan Status & Navigasi Antar Halaman
 
 ```
 [ Dashboard Utama: ers/home-mobile.html ]
-   ├──> Notifikasi: ers/notifikasi-mobile.html
+   ├──> Notifikasi: notifikasi-catalog-mobile.html?module=power_swift
    │
    ├──> [Pemasangan]
    │     ├── home-mobile.html (List Permit Pasang)

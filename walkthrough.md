@@ -17,9 +17,10 @@
    - Total stock live counter dan simpan hasil pengecekan.
 5. **In-App Alert & Toast Feedback**:
    - Seluruh `alert()` browser digantikan oleh **In-App Toast Notification Banner** (animasi slide-down, status icon, dark theme floating badge, auto-wrap text) dan **Interactive Feedback Modals** (konfirmasi pengiriman, kedatangan, penyimpanan check sheet, penerbitan Berita Acara Karantina).
-6. **Wadah Error & Log Kendala Material**:
-   - Setiap card memiliki kontainer interaktif (*Wadah Error / Kendala Terdeteksi* dan *Badge Log*) serta tombol di dalam detail modal.
-   - Mengklik kontainer membuka **Bottom Sheet Drawer (`#errorDetailDrawer`)** yang menampilkan riwayat error (kategori cacat fisik, baut kurang, sling aus), waktu pencatatan, status penanganan (*Dalam Investigasi / Menunggu Penggantian*), dan form interaktif untuk menambah catatan kendala baru secara langsung.
+6. **Wadah Log Error & Exception Backend (BE) / Mobile Hit**:
+   - Khusus menyimpan jejak error teknis saat hit API ke backend atau runtime mobile (misal: `500 Server Error - Deadlock Detected`, `422 Payload Mismatch`, `408 Request Timeout`, `502 Bad Gateway`).
+   - Card yang **memiliki error hit BE/mobile** akan menampilkan badge & kotak error merah untuk bahan trace dan debugging. Card yang **bersih (0 error)** otomatis disembunyikan.
+   - Mengklik kotak error membuka **Bottom Sheet Drawer (`#errorDetailDrawer`)** dengan jejak monospace trace error, endpoint API, status code, tombol `Salin Text` ke clipboard, serta form simulasi pencatatan error baru.
 7. **Actionable Cards Interaction**:
    - Seluruh area card kini dapat diklik langsung (`cursor: pointer`, micro-interaction active scale).
    - Mengklik card pada status *Mulai / Dikirim* otomatis membuka **Modal Detail Permit**, sedangkan pada status *Sedang Dikarantina* langsung membuka halaman verifikasi `karantina-action.html`.
