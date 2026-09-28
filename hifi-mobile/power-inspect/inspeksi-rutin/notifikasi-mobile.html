@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Power Inspect - Notifikasi Inspeksi Rutin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-blue: #0b4884;
+            --primary-blue-hover: #072a54;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #334155;
+            --border-color: #e2e8f0;
+            --pln-gold: #f59e0b;
+            --pln-red: #dc2626;
+            --pln-green: #10b981;
+            --danger-bg: #fef2f2;
+            --warning-bg: #fffbeb;
+            --info-bg: #eff6ff;
+        }
+
+        body.dark-mode, html.dark-mode {
+            --bg-color: #0b132b;
+            --card-bg: #1c2541;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+            --primary-light: #172554;
+            --danger-bg: rgba(220, 38, 38, 0.2);
+            --warning-bg: rgba(245, 158, 11, 0.2);
+            --info-bg: rgba(37, 99, 235, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(30%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .page-slide-out {
+            animation: slideOutRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(30%);
+                opacity: 0;
+            }
+        }
+
+        @media (min-width: 481px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 92vh;
+                border-radius: 36px;
+                box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+                border: 8px solid #0f172a;
+            }
+        }
+
+        /* Activity Header */
+        .activity-header {
+            padding: 16px 20px 14px;
+            background: linear-gradient(135deg, #0b4884 0%, #0369a1 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 15px rgba(11, 72, 132, 0.2);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .back-icon-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-main-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+
+        .header-sub-title {
+            font-size: 11px;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-chip-btn {
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .action-chip-btn:active {
+            transform: scale(0.94);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Filter Chips Row */
+        .filter-bar {
+            padding: 12px 18px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        body.dark-mode .filter-pill {
+            background: #1e293b;
+            color: #94a3b8;
+        }
+
+        .filter-pill.active {
+            background: #0b4884;
+            color: #ffffff;
+            border-color: #0b4884;
+            box-shadow: 0 2px 8px rgba(11, 72, 132, 0.25);
+        }
+
+        .pill-count {
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.08);
+            font-size: 10px;
+        }
+
+        .filter-pill.active .pill-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        /* Notification List Feed */
+        .notif-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .date-section-header {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        /* Notif Card */
+        .notif-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            position: relative;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notif-card:active {
+            transform: scale(0.985);
+        }
+
+        .notif-card.unread {
+            border-color: #93c5fd;
+            background: #fbfdff;
+            box-shadow: 0 4px 16px rgba(11, 72, 132, 0.06);
+        }
+
+        body.dark-mode .notif-card.unread {
+            background: #1e293b;
+            border-color: #3b82f6;
+        }
+
+        .unread-indicator {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .notif-card-header {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .notif-icon-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notif-icon-circle.danger {
+            background: var(--danger-bg);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .notif-icon-circle.warning {
+            background: var(--warning-bg);
+            color: #d97706;
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .notif-icon-circle.info {
+            background: var(--info-bg);
+            color: #2563eb;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .notif-header-content {
+            flex: 1;
+            padding-right: 14px;
+        }
+
+        .notif-badge-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .category-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .urgency-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .urgency-badge.high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .urgency-badge.warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .urgency-badge.normal {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .notif-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.35;
+        }
+
+        .notif-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-top: 3px;
+        }
+
+        /* Param Metadata Box */
+        .meta-param-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        body.dark-mode .meta-param-box {
+            background: #0f172a;
+        }
+
+        .meta-param-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-param-label {
+            font-size: 9.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .meta-param-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Card Footer */
+        .notif-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 4px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .notif-time {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn-link {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 11.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn-link.btn-danger {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .action-btn-link.btn-primary {
+            background: #0b4884;
+            color: #ffffff;
+        }
+
+        .action-btn-link.btn-outline {
+            background: #f1f5f9;
+            color: #0b4884;
+            border: 1px solid #bfdbfe;
+        }
+
+        body.dark-mode .action-btn-link.btn-outline {
+            background: #1e293b;
+            color: #60a5fa;
+            border-color: #3b82f6;
+        }
+
+        .action-btn-link:active {
+            transform: scale(0.95);
+        }
+
+        /* Toast */
+        .mobile-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 24px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9999;
+        }
+
+        .mobile-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- Activity Header -->
+        <div class="activity-header">
+            <div class="header-left">
+                <a href="javascript:void(0)" onclick="handleBack()" class="back-icon-btn" title="Kembali">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <div class="header-main-title">Notifikasi Power Inspect</div>
+                    <div class="header-sub-title">Inspeksi Rutin & Sinkronisasi</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-chip-btn" onclick="markAllAsRead()">
+                    <i class="fa-solid fa-check-double"></i> Baca Semua
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Chips Row -->
+        <div class="filter-bar" id="filterBar">
+            <div class="filter-pill active" onclick="setFilter('all', this)">
+                <span>Semua</span>
+                <span class="pill-count" id="countAll">0</span>
+            </div>
+            <div class="filter-pill" onclick="setFilter('unread', this)">
+                <span>Belum Dibaca</span>
+                <span class="pill-count" id="countUnread">0</span>
+            </div>
+            <div class="filter-pill" onclick="setFilter('gagal_sync', this)">
+                <span>Gagal Sinkron</span>
+                <span class="pill-count" id="countSync">0</span>
+            </div>
+            <div class="filter-pill" onclick="setFilter('anomali', this)">
+                <span>Anomali</span>
+                <span class="pill-count" id="countAnomali">0</span>
+            </div>
+            <div class="filter-pill" onclick="setFilter('jadwal', this)">
+                <span>Jadwal WO</span>
+                <span class="pill-count" id="countJadwal">0</span>
+            </div>
+        </div>
+
+        <!-- Notification List Feed -->
+        <div class="notif-feed" id="notifFeed">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="mobileToast" class="mobile-toast">
+        <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+        <span id="toastMsg">Semua notifikasi ditandai telah dibaca</span>
+    </div>
+
+    <script>
+        const powerInspectNotifications = [
+            {
+                id: 'pi-notif-sync-1',
+                category: 'Gagal Sinkron',
+                categoryKey: 'gagal_sync',
+                title: 'Gagal Sinkron: Jadwal Inspeksi 3 Bulanan',
+                desc: 'Jadwal inspeksi periode 3 Bulanan gagal tersinkronisasi dari server pusat. Segera lakukan sinkron ulang.',
+                icon: 'fa-triangle-exclamation',
+                iconType: 'danger',
+                priority: 'high',
+                priorityLabel: 'Perlu Sinkron',
+                time: 'Baru saja',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Modul', val: 'Inspeksi Rutin' },
+                    { label: 'Periode', val: '3 Bulanan' }
+                ],
+                actionText: 'Sinkron Ulang',
+                actionClass: 'btn-danger',
+                actionUrl: './sync-jadwal.html?action=retry'
+            },
+            {
+                id: 'pi-notif-sync-2',
+                category: 'Gagal Sinkron',
+                categoryKey: 'gagal_sync',
+                title: 'Gagal Sinkron: Jadwal Inspeksi Tahunan',
+                desc: 'Paket inspeksi komprehensif Tahunan Bay Trafo gagal terunduh. Hubungkan koneksi data dan ulangi proses.',
+                icon: 'fa-rotate',
+                iconType: 'danger',
+                priority: 'high',
+                priorityLabel: 'Gagal Unduh',
+                time: '15 menit yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Modul', val: 'Inspeksi Rutin' },
+                    { label: 'Periode', val: 'Tahunan' }
+                ],
+                actionText: 'Sinkron Ulang',
+                actionClass: 'btn-danger',
+                actionUrl: './sync-jadwal.html?action=retry'
+            },
+            {
+                id: 'pi-notif-wo-1',
+                category: 'Inspeksi Ulang WO',
+                categoryKey: 'jadwal',
+                title: 'Inspeksi Ulang WO #INS202600987503 (4 Aset)',
+                desc: 'Terdapat instruksi inspeksi ulang untuk 4 peralatan pada Bay TRF#4 150/20kV berdasarkan catatan evaluasi supervisor.',
+                icon: 'fa-rotate-right',
+                iconType: 'warning',
+                priority: 'warning',
+                priorityLabel: 'Re-Inspeksi 4 Aset',
+                time: '35 menit yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: true,
+                params: [
+                    { label: 'Nomor WO', val: 'INS202600987503' },
+                    { label: 'Bay', val: 'TRF#4 150/20kV' }
+                ],
+                actionText: 'Buka Daftar Aset',
+                actionClass: 'btn-outline',
+                actionUrl: './list-aset.html'
+            },
+            {
+                id: 'pi-notif-wo-2',
+                category: 'WO Tindak Lanjut',
+                categoryKey: 'jadwal',
+                title: 'WO Baru dari Tindak Lanjut #WO-TL-2026-0045',
+                desc: 'Work Order baru diterbitkan otomatis berdasarkan tindak lanjut temuan anomali level 1 pada Bay Line Kalisari - Kenjeran.',
+                icon: 'fa-wrench',
+                iconType: 'info',
+                priority: 'normal',
+                priorityLabel: 'Tindak Lanjut',
+                time: '1 jam yang lalu',
+                dateGroup: 'Hari Ini',
+                isUnread: false,
+                params: [
+                    { label: 'No. WO', val: 'WO-TL-2026-0045' },
+                    { label: 'Pemicu', val: 'Thermovisi' }
+                ],
+                actionText: 'Buka List WO',
+                actionClass: 'btn-outline',
+                actionUrl: './list-wo.html'
+            },
+            {
+                id: 'pi-notif-wo-3',
+                category: 'Jadwal Rutin',
+                categoryKey: 'jadwal',
+                title: 'Jadwal Inspeksi Rutin Bay GI Mampang',
+                desc: '14 Bay transmisi dan 4 Trafo 150/20kV terdaftar dalam jadwal inspeksi level 1 hari ini. Pastikan mengunduh form offline.',
+                icon: 'fa-clipboard-check',
+                iconType: 'info',
+                priority: 'normal',
+                priorityLabel: '14 Bay Terdaftar',
+                time: 'Kemarin, 08:30',
+                dateGroup: 'Kemarin',
+                isUnread: false,
+                params: [
+                    { label: 'Gardu Induk', val: 'GI 150kV Mampang' },
+                    { label: 'Total Bay', val: '14 Bay Transmisi' }
+                ],
+                actionText: 'Buka List Bay',
+                actionClass: 'btn-primary',
+                actionUrl: './list-bay.html'
+            },
+            {
+                id: 'pi-notif-anomali-1',
+                category: 'Anomali Kritis',
+                categoryKey: 'anomali',
+                title: 'Temuan Anomali Thermovisi Delta T > 15°C',
+                desc: 'Terdeteksi kenaikan temperatur abnormal pada Klem Sambungan Busbar Bay Trafo 2 (TBT 18.4°C). Membutuhkan tindakan korektif segera.',
+                icon: 'fa-fire-flame-curved',
+                iconType: 'danger',
+                priority: 'high',
+                priorityLabel: 'Delta T 18.4°C',
+                time: 'Kemarin, 14:15',
+                dateGroup: 'Kemarin',
+                isUnread: false,
+                params: [
+                    { label: 'Peralatan', val: 'Klem Busbar Trafo 2' },
+                    { label: 'Kondisi', val: 'Hotspot Kritis' }
+                ],
+                actionText: 'Cek Detail Anomali',
+                actionClass: 'btn-danger',
+                actionUrl: './list-aset.html'
+            }
+        ];
+
+        let activeFilter = 'all';
+
+        function handleBack() {
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                if (document.referrer && window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = './home-mobile.html';
+                }
+            }, 300);
+        }
+
+        function setFilter(key, elem) {
+            activeFilter = key;
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            if (elem) elem.classList.add('active');
+            renderNotifications();
+        }
+
+        function updateCounts() {
+            document.getElementById('countAll').textContent = powerInspectNotifications.length;
+            document.getElementById('countUnread').textContent = powerInspectNotifications.filter(n => n.isUnread).length;
+            document.getElementById('countSync').textContent = powerInspectNotifications.filter(n => n.categoryKey === 'gagal_sync').length;
+            document.getElementById('countAnomali').textContent = powerInspectNotifications.filter(n => n.categoryKey === 'anomali').length;
+            document.getElementById('countJadwal').textContent = powerInspectNotifications.filter(n => n.categoryKey === 'jadwal').length;
+        }
+
+        function renderNotifications() {
+            const feed = document.getElementById('notifFeed');
+            if (!feed) return;
+
+            let filtered = powerInspectNotifications.filter(item => {
+                if (activeFilter === 'unread') return item.isUnread;
+                if (activeFilter === 'gagal_sync') return item.categoryKey === 'gagal_sync';
+                if (activeFilter === 'anomali') return item.categoryKey === 'anomali';
+                if (activeFilter === 'jadwal') return item.categoryKey === 'jadwal';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                feed.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px; text-align: center; color: var(--text-muted);">
+                        <div style="width: 64px; height: 64px; border-radius: 20px; background: #eff6ff; color: #0b4884; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;"><i class="fa-solid fa-bell-slash"></i></div>
+                        <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Tidak Ada Notifikasi</div>
+                        <div style="font-size: 11.5px;">Tidak ada notifikasi pada kategori yang dipilih.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const groups = {};
+            filtered.forEach(item => {
+                if (!groups[item.dateGroup]) groups[item.dateGroup] = [];
+                groups[item.dateGroup].push(item);
+            });
+
+            let html = '';
+            for (const [groupName, items] of Object.entries(groups)) {
+                html += `<div class="date-section-header">${groupName} • ${items.length} Notifikasi</div>`;
+                items.forEach(item => {
+                    const paramsHtml = item.params.map(p => `
+                        <div class="meta-param-item">
+                            <span class="meta-param-label">${p.label}</span>
+                            <span class="meta-param-val">${p.val}</span>
+                        </div>
+                    `).join('');
+
+                    html += `
+                        <div class="notif-card ${item.isUnread ? 'unread' : ''}" onclick="openNotifAction('${item.actionUrl}', '${item.id}')">
+                            ${item.isUnread ? '<span class="unread-indicator"></span>' : ''}
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle ${item.iconType}">
+                                    <i class="fa-solid ${item.icon}"></i>
+                                </div>
+                                <div class="notif-header-content">
+                                    <div class="notif-badge-group">
+                                        <span class="category-badge">${item.category}</span>
+                                        <span class="urgency-badge ${item.priority}">${item.priorityLabel}</span>
+                                    </div>
+                                    <div class="notif-title">${item.title}</div>
+                                    <div class="notif-desc">${item.desc}</div>
+                                </div>
+                            </div>
+                            <div class="meta-param-box">
+                                ${paramsHtml}
+                            </div>
+                            <div class="notif-card-footer">
+                                <div class="notif-time">
+                                    <i class="fa-regular fa-clock"></i> ${item.time}
+                                </div>
+                                <a href="${item.actionUrl}" class="action-btn-link ${item.actionClass}" onclick="event.stopPropagation(); markItemRead('${item.id}');">
+                                    ${item.actionText} <i class="fa-solid fa-arrow-right" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            feed.innerHTML = html;
+        }
+
+        function markItemRead(id) {
+            const item = powerInspectNotifications.find(n => n.id === id);
+            if (item) {
+                item.isUnread = false;
+                updateCounts();
+            }
+        }
+
+        function openNotifAction(url, id) {
+            markItemRead(id);
+            const container = document.querySelector('.mobile-container');
+            container.classList.add('page-slide-out');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 250);
+        }
+
+        function markAllAsRead() {
+            powerInspectNotifications.forEach(n => n.isUnread = false);
+            updateCounts();
+            renderNotifications();
+            showToast('Semua notifikasi Power Inspect telah dibaca');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('mobileToast');
+            const toastMsg = document.getElementById('toastMsg');
+            if (toast && toastMsg) {
+                toastMsg.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2500);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts();
+            renderNotifications();
+        });
+    </script>
+</body>
+
+</html>
