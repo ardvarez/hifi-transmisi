@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Simulasi Notifikasi - Power Inspect</title>
+    <!-- Fonts: Outfit (Heading) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6.5.1 SVG Engine + CSS (Immune to CORS / iframe font blocking) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js for Dashboard Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --pln-blue: #0A58CA;
+            --pln-blue-mid: #0D6EFD;
+            --pln-blue-dark: #003B8E;
+            --pln-blue-light: #E7F1FF;
+            --pln-yellow: #F7A800;
+            --pln-yellow-light: #FEF3C7;
+            
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --card: #FFFFFF;
+            --border: #E2E8F0;
+            --border-hover: #CBD5E1;
+            
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            
+            --danger: #DC2626;
+            --danger-light: #FEE2E2;
+            --warning: #D97706;
+            --warning-light: #FEF3C7;
+            --success: #16A34A;
+            --success-light: #DCFCE7;
+            --info: #0284C7;
+            --info-light: #E0F2FE;
+
+            --sidebar-w: 64px;
+            --topbar-h: 52px;
+            --control-h: 46px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, .page-title, .stat-num, .drawer-title {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Simulation Control Bar */
+        .sim-control-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--control-h);
+            background: #0f172a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sim-control-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sim-tag-badge {
+            background: #f59e0b;
+            color: #000000;
+            font-weight: 800;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .sim-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-sim {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-sim:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-sim.critical { background: rgba(220, 38, 38, 0.85); border-color: #ef4444; }
+        .btn-sim.critical:hover { background: #dc2626; }
+        .btn-sim.warning { background: rgba(217, 119, 6, 0.85); border-color: #f59e0b; }
+        .btn-sim.warning:hover { background: #d97706; }
+        .btn-sim.info { background: rgba(10, 88, 202, 0.85); border-color: #3b82f6; }
+        .btn-sim.info:hover { background: #0a58ca; }
+
+        .btn-auto-toggle {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: #003B8E;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: calc(var(--control-h) + 12px);
+            padding-bottom: 16px;
+            z-index: 900;
+            height: 100%;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--pln-yellow);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 18px;
+            text-decoration: none;
+        }
+
+        .menu-item {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.65);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .menu-item.active {
+            background: rgba(247, 168, 0, 0.25);
+            color: var(--pln-yellow);
+        }
+
+        .sidebar-notif-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: var(--danger);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 2px #003B8E;
+            animation: pulseBadge 2s infinite;
+        }
+
+        @keyframes pulseBadge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Main Content Layout */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--control-h);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Topbar Header */
+        .page-topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .breadcrumb-row a {
+            color: var(--pln-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-bell-topbar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-bell-topbar:hover {
+            border-color: var(--pln-blue);
+            color: var(--pln-blue);
+            background: var(--pln-blue-light);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 12px 5px 6px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+        }
+
+        .user-avatar-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--pln-blue);
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dashboard Content Area */
+        .content-container {
+            padding: 24px 28px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Simulation Instruction Banner */
+        .sim-intro-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-lg);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .sim-intro-text h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sim-intro-text p {
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.45;
+        }
+
+        /* KPI Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .stat-num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-top: 4px;
+        }
+
+        .stat-icon-box {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Main Grid: Charts & Monitoring List */
+        .dashboard-main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .card-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .activity-item {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.15s;
+        }
+
+        .activity-item:hover {
+            border-color: var(--pln-blue);
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* ========================================================
+           PUSH NOTIFICATION BANNER (SLIDE-IN TOAST SYSTEM)
+           ======================================================== */
+        .push-banner-container {
+            position: fixed;
+            top: calc(var(--control-h) + 16px);
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: 470px;
+            width: calc(100vw - 32px);
+        }
+
+        .push-banner-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--pln-blue);
+            border-radius: 12px;
+            padding: 13px 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            pointer-events: auto;
+            cursor: pointer;
+            animation: slideInPush 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .push-banner-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.22);
+        }
+
+        .push-banner-card.critical {
+            border-left-color: var(--danger);
+            background: #fffafa;
+        }
+
+        .push-banner-card.warning {
+            border-left-color: var(--warning);
+            background: #fffdfa;
+        }
+
+        @keyframes slideInPush {
+            from {
+                opacity: 0;
+                transform: translateX(110%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .push-banner-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .push-banner-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .push-banner-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .push-tag {
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 1.5px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .push-tag.critical { background: var(--danger-light); color: var(--danger); }
+        .push-tag.warning { background: var(--warning-light); color: var(--warning); }
+        .push-tag.info { background: var(--pln-blue-light); color: var(--pln-blue); }
+
+        .push-banner-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+            line-height: 1.35;
+        }
+
+        .push-banner-desc {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin-bottom: 6px;
+        }
+
+        .push-banner-hint {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--pln-blue);
+        }
+
+        .btn-dismiss-push {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 3px;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .btn-dismiss-push:hover {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* Progress Bar on Toast */
+        .push-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--pln-blue);
+            width: 100%;
+            animation: pushProgress 6s linear forwards;
+        }
+
+        .push-banner-card.critical .push-progress-bar { background: var(--danger); }
+        .push-banner-card.warning .push-progress-bar { background: var(--warning); }
+
+        @keyframes pushProgress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        /* ========================================================
+           NOTIFICATION OVERLAY DRAWER
+           ======================================================== */
+        .notif-overlay-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .notif-overlay-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notif-slide-drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 480px;
+            max-width: 92vw;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -8px 0 35px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2001;
+        }
+
+        .notif-overlay-backdrop.active .notif-slide-drawer {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+        }
+
+        .drawer-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .drawer-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: var(--pln-blue-light);
+            color: var(--pln-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .drawer-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .btn-close-drawer {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .btn-close-drawer:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
+
+        .drawer-filters-row {
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 6px;
+            background: #ffffff;
+            overflow-x: auto;
+        }
+
+        .drawer-filter-pill {
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .drawer-filter-pill.active {
+            background: var(--pln-blue-light);
+            border-color: var(--pln-blue);
+            color: var(--pln-blue);
+            font-weight: 700;
+        }
+
+        .drawer-list-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--bg);
+        }
+
+        .drawer-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 13px 15px;
+            display: flex;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .drawer-item-card:hover {
+            border-color: var(--pln-blue);
+            box-shadow: 0 4px 12px rgba(10, 88, 202, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .drawer-item-card.unread {
+            background: var(--pln-blue-light);
+            border-left: 4px solid var(--pln-blue);
+        }
+
+        .drawer-item-card.critical {
+            border-left: 4px solid var(--danger);
+        }
+
+        .drawer-item-card.flash-highlight {
+            animation: flashNew 1.5s ease-out;
+        }
+
+        @keyframes flashNew {
+            0% { background: #fef08a; transform: scale(1.01); }
+            100% { background: #ffffff; transform: scale(1); }
+        }
+
+        .drawer-card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .drawer-item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+            line-height: 1.35;
+        }
+
+        .drawer-item-body {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin-bottom: 6px;
+        }
+
+        .drawer-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .drawer-footer-actions {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-full-center {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background: var(--pln-blue);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-full-center:hover {
+            background: var(--pln-blue-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP SIMULATION CONTROL BAR -->
+    <header class="sim-control-bar">
+        <div class="sim-control-left">
+            <span class="sim-tag-badge"><i class="fa-solid fa-flask"></i> Simulator Notifikasi</span>
+            <span>Uji Banner Push Notifikasi Power Inspect:</span>
+        </div>
+        <div class="sim-btn-group">
+            <button class="btn-sim warning" onclick="triggerPushSimulation('INSPEKSI_ULANG')" title="Inspeksi Ulang WO + Jumlah Aset">
+                <i class="fa-solid fa-arrows-rotate"></i> 1. Inspeksi Ulang
+            </button>
+            <button class="btn-sim warning" onclick="triggerPushSimulation('WO_TINDAK_LANJUT')" title="WO Baru dari Tindak Lanjut">
+                <i class="fa-solid fa-clipboard-check"></i> 2. WO Tindak Lanjut
+            </button>
+            <button class="btn-sim info" onclick="triggerPushSimulation('WO_TERJADWAL')" title="WO Baru dari Perencanaan Jadwal">
+                <i class="fa-solid fa-calendar-days"></i> 3. WO Terjadwal
+            </button>
+            <button class="btn-sim critical" onclick="triggerPushSimulation('WO_KONDISIONAL')" title="WO Baru Kondisional">
+                <i class="fa-solid fa-bolt"></i> 4. WO Kondisional
+            </button>
+            <button class="btn-sim critical" onclick="triggerPushSimulation('ASET_ANOMALI')" title="Aset Anomali dari Inspeksi Terbaru">
+                <i class="fa-solid fa-triangle-exclamation"></i> 5. Aset Anomali
+            </button>
+            <button class="btn-auto-toggle" id="btnAutoSim" onclick="toggleAutoSimulation()">
+                <i class="fa-solid fa-play"></i> Auto Demo (10s)
+            </button>
+        </div>
+    </header>
+
+    <!-- SIDEBAR (PLN Blue Theme) -->
+    <aside class="sidebar">
+        <a href="../hifi-home/home.html" class="sidebar-logo" title="Kembali ke HiFi Portal">
+            PLN
+        </a>
+        <a href="../hifi-power-inspect/dashboard-utama-pi/dashboard-peta.html" class="menu-item active" title="Dashboard Utama">
+            <i class="fa-solid fa-gauge-high"></i>
+        </a>
+        <div class="menu-item" title="Notifikasi (Buka Overlay)" onclick="toggleDrawerOverlay()" id="sidebarBellBtn">
+            <i class="fa-solid fa-bell"></i>
+            <span class="sidebar-notif-badge" id="sidebarBadgeCount">4</span>
+        </div>
+        <a href="../hifi-power-inspect/dashboard-trend/trend-enhancement.html" class="menu-item" title="Grafik Trend">
+            <i class="fa-solid fa-chart-line"></i>
+        </a>
+        <a href="../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html" class="menu-item" title="Validasi Inspeksi">
+            <i class="fa-solid fa-shield-halved"></i>
+        </a>
+        <a href="../hifi-power-inspect/Master/critical-gi.html" class="menu-item" title="Master GI">
+            <i class="fa-solid fa-database"></i>
+        </a>
+
+        <div class="sidebar-bottom">
+            <a href="notifikasi-center.html" class="menu-item" title="Pusat Notifikasi Lengkap">
+                <i class="fa-solid fa-sliders"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-wrapper">
+        <!-- Page Header Topbar -->
+        <div class="page-topbar">
+            <div>
+                <div class="breadcrumb-row">
+                    <a href="../hifi-home/home.html">HiFi Portal</a>
+                    <span>/</span>
+                    <a href="../hifi-power-inspect/dashboard-utama-pi/dashboard-peta.html">Power Inspect</a>
+                    <span>/</span>
+                    <span style="color:var(--text-primary); font-weight:700;">Simulasi Push Notifikasi</span>
+                </div>
+                <h1 class="page-title">Dashboard Operasi & Push Alert</h1>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn-bell-topbar" onclick="toggleDrawerOverlay()" title="Buka Overlay Notifikasi">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="sidebar-notif-badge" id="topbarBadgeCount" style="top:2px; right:2px;">4</span>
+                </button>
+                <div class="user-pill">
+                    <div class="user-avatar-circle">BP</div>
+                    <div>
+                        <div style="font-size:12px; font-weight:700; color:var(--text-primary);">Bambang Pratama</div>
+                        <div style="font-size:10.5px; color:var(--text-muted);">Spv. Pemeliharaan Transmisi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content Body -->
+        <div class="content-container">
+            
+            <!-- Simulation Instruction Card -->
+            <div class="sim-intro-card">
+                <div class="sim-intro-text">
+                    <h3><i class="fa-solid fa-circle-info"></i> Panduan Uji Coba Push Notifikasi</h3>
+                    <p>Pilih salah satu skenario notifikasi di bilah atas untuk melihat simulasi pesan masuk. Klik <b>Banner Push Notifikasi</b> yang muncul di pojok kanan atas untuk langsung membuka <b>Panel Rincian Notifikasi</b>.</p>
+                </div>
+                <button class="btn-sim warning" onclick="triggerPushSimulation('INSPEKSI_ULANG')" style="padding: 10px 18px; font-size: 13px; font-weight:700;">
+                    <i class="fa-solid fa-paper-plane"></i> Kirim Contoh Notifikasi
+                </button>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-card-label">Total Gardu Induk</div>
+                        <div class="stat-num">128 <span style="font-size:13px; font-weight:500; color:var(--text-muted);">GI</span></div>
+                    </div>
+                    <div class="stat-icon-box" style="background:var(--info-light); color:var(--info);">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-card-label">Anomali Kritis (AHI)</div>
+                        <div class="stat-num" style="color:var(--danger);" id="kpiCritical">4 <span style="font-size:13px; font-weight:500; color:var(--danger);">Temuan</span></div>
+                    </div>
+                    <div class="stat-icon-box" style="background:var(--danger-light); color:var(--danger);">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-card-label">WO Inspeksi Berjalan</div>
+                        <div class="stat-num">32 <span style="font-size:13px; font-weight:500; color:var(--text-muted);">WO</span></div>
+                    </div>
+                    <div class="stat-icon-box" style="background:var(--warning-light); color:var(--warning);">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-card-label">Kesehatan Aset Rata-Rata</div>
+                        <div class="stat-num" style="color:var(--success);">94.8%</div>
+                    </div>
+                    <div class="stat-icon-box" style="background:var(--success-light); color:var(--success);">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Charts & Activity Grid -->
+            <div class="dashboard-main-grid">
+                <!-- Trend Chart Box -->
+                <div class="card-box">
+                    <div class="card-header-row">
+                        <div class="card-title">
+                            <i class="fa-solid fa-chart-line" style="color:var(--pln-blue);"></i> Tren Work Order & Kepatuhan Inspeksi
+                        </div>
+                        <span style="font-size:12px; color:var(--text-muted);">Periode Q3-Q4 2026</span>
+                    </div>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="inspectionTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Real-time Activity Feeds -->
+                <div class="card-box">
+                    <div class="card-header-row">
+                        <div class="card-title">
+                            <i class="fa-solid fa-clock-rotate-left" style="color:var(--pln-yellow);"></i> Aktivitas Sistem
+                        </div>
+                        <button class="btn-bell-topbar" style="width:28px; height:28px; font-size:12px;" onclick="toggleDrawerOverlay()" title="Buka Detail">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="activity-list" id="activityListFeeds">
+                        <div class="activity-item">
+                            <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i>
+                            <div style="flex:1;">
+                                <div style="font-size:12px; font-weight:700; color:var(--text-primary);">Hotspot CT Bay Trafo 1</div>
+                                <div style="font-size:11px; color:var(--text-muted);">GI Bandung Selatan • 2 jam lalu</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fa-solid fa-bolt" style="color:var(--warning);"></i>
+                            <div style="flex:1;">
+                                <div style="font-size:12px; font-weight:700; color:var(--text-primary);">WO Darurat Petir SUTET #120</div>
+                                <div style="font-size:11px; color:var(--text-muted);">Ungaran-Mandirancan • 35 mnt lalu</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fa-solid fa-check-circle" style="color:var(--success);"></i>
+                            <div style="flex:1;">
+                                <div style="font-size:12px; font-weight:700; color:var(--text-primary);">Sinkronisasi Inspeksi Rutin</div>
+                                <div style="font-size:11px; color:var(--text-muted);">GI Kalisari Bay Trafo 4 • Selesai</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ========================================================
+         FLOATING PUSH NOTIFICATION BANNER CONTAINER
+         ======================================================== -->
+    <div class="push-banner-container" id="pushBannerContainer">
+        <!-- Push Banner Toast Cards will be injected dynamically -->
+    </div>
+
+    <!-- ========================================================
+         NOTIFICATION OVERLAY DRAWER (SIDE-PANEL)
+         ======================================================== -->
+    <div id="notifOverlayBackdrop" class="notif-overlay-backdrop" onclick="closeDrawerOverlay(event)">
+        <div class="notif-slide-drawer" onclick="event.stopPropagation()">
+            <div class="drawer-header">
+                <div class="drawer-header-left">
+                    <div class="drawer-icon-box">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <div>
+                        <h2 class="drawer-title">Notifikasi Power Inspect</h2>
+                        <div style="font-size:11.5px; color:var(--text-muted);" id="drawerSubtitleText">4 notifikasi belum dibaca</div>
+                    </div>
+                </div>
+                <button class="btn-close-drawer" onclick="closeDrawerOverlay()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Drawer Filters -->
+            <div class="drawer-filters-row">
+                <button class="drawer-filter-pill active" onclick="filterDrawer('ALL', this)">Semua (<span id="countPillAll">4</span>)</button>
+                <button class="drawer-filter-pill" onclick="filterDrawer('UNREAD', this)">Belum Dibaca (<span id="countPillUnread">4</span>)</button>
+                <button class="drawer-filter-pill" onclick="filterDrawer('CRITICAL', this)">Kritis & Darurat</button>
+            </div>
+
+            <!-- Notification Items Scrollable List -->
+            <div class="drawer-list-scroll" id="drawerListContainer">
+                <!-- Injected dynamically via JS -->
+            </div>
+
+            <!-- Drawer Bottom CTA -->
+            <div class="drawer-footer-actions">
+                <a href="notifikasi-center.html?module=power_inspect" class="btn-full-center">
+                    <span>Buka Pusat Notifikasi Terpadu</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <button onclick="markAllDrawerRead()" style="background:none; border:none; color:var(--pln-blue); font-size:12px; font-weight:700; cursor:pointer; padding:6px;">
+                    <i class="fa-solid fa-check-double"></i> Tandai Semua Sudah Dibaca
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real-time Notification Dataset for Simulation (5 Standard Templates - Prefix Standar)
+        let notificationsList = [
+            {
+                id: 'NTF-PI-001',
+                title: 'Inspeksi Ulang INS202601875357',
+                body: 'Yth. Petugas, WO INS202601875357 dengan 5 aset memerlukan inspeksi ulang oleh Spv. Pemeliharaan (Budi Santoso). Mohon segera lakukan verifikasi dan tindak lanjut melalui aplikasi mobile. Terima kasih.',
+                priority: 'WARNING',
+                tag: 'INSPEKSI ULANG',
+                tagClass: 'warning',
+                icon: 'fa-arrows-rotate',
+                iconColor: '#d97706',
+                iconBg: '#fef3c7',
+                time: '15 menit lalu',
+                isRead: false,
+                url: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            {
+                id: 'NTF-PI-002',
+                title: 'Penugasan WO Baru: TLI202601875357 (Tindak Lanjut)',
+                body: 'Yth. Petugas, WO tindak lanjut TLI202601875357 telah diterbitkan berdasarkan temuan pada WO TL202601875312. Silakan cek rincian pekerjaan dan jadwalkan penanganan pada aplikasi mobile. Terima kasih.',
+                priority: 'WARNING',
+                tag: 'TINDAK LANJUT',
+                tagClass: 'warning',
+                icon: 'fa-clipboard-check',
+                iconColor: '#d97706',
+                iconBg: '#fef3c7',
+                time: '30 menit lalu',
+                isRead: false,
+                url: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            {
+                id: 'NTF-PI-003',
+                title: 'Penugasan WO Terjadwal: INS202601875389',
+                body: 'Yth. Petugas, WO rutin INS202601875389 untuk periode Triwulan IV 2026 di lokasi Bay Trafo GI Ungaran telah ditugaskan kepada Anda. Mohon laksanakan inspeksi sesuai jadwal yang ditentukan. Terima kasih.',
+                priority: 'INFO',
+                tag: 'JADWAL RUTIN',
+                tagClass: 'info',
+                icon: 'fa-calendar-days',
+                iconColor: '#0a58ca',
+                iconBg: '#eff6ff',
+                time: '2 jam lalu',
+                isRead: true,
+                url: '../hifi-power-inspect/perencanaan-jadwal/tambah-data-pji.html'
+            },
+            {
+                id: 'NTF-PI-004',
+                title: 'Penugasan WO Kondisional: CDT202601875357',
+                body: 'Yth. Petugas, WO kondisional CDT202601875357 diterbitkan atas trigger Sambaran Petir & Anomali Suhu pada aset Tower #120 SUTET 500kV Ungaran-Mandirancan. Mohon segera lakukan pengecekan kondisi lapangan melalui aplikasi mobile. Terima kasih.',
+                priority: 'CRITICAL',
+                tag: 'KONDISIONAL',
+                tagClass: 'critical',
+                icon: 'fa-bolt',
+                iconColor: '#dc2626',
+                iconBg: '#fee2e2',
+                time: '45 menit lalu',
+                isRead: false,
+                url: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            {
+                id: 'NTF-PI-005',
+                title: 'Peringatan Aset Anomali: INS202601875390 T1-CT-GI-BDS-01',
+                body: 'Perhatian: Ditemukan 1 aset berstatus anomali pada WO INS202601875390 di lokasi Bay Trafo 1 GI Bandung Selatan. Segera tinjau hasil inspeksi untuk mitigasi risiko lebih lanjut. Terima kasih.',
+                priority: 'CRITICAL',
+                tag: 'ANOMALI ASET',
+                tagClass: 'critical',
+                icon: 'fa-triangle-exclamation',
+                iconColor: '#dc2626',
+                iconBg: '#fee2e2',
+                time: '1 jam lalu',
+                isRead: false,
+                url: '../hifi-power-inspect/dashboard-trend/trend-enhancement.html'
+            }
+        ];
+
+        let currentFilter = 'ALL';
+        let autoSimInterval = null;
+
+        // ==========================================
+        // PUSH NOTIFICATION SIMULATION GENERATOR (5 PRESET TEMPLATES - PREFIX STANDAR)
+        // ==========================================
+        const presetSamples = {
+            INSPEKSI_ULANG: {
+                title: 'Inspeksi Ulang INS202601875357',
+                body: 'Yth. Petugas, WO INS202601875357 dengan 5 aset memerlukan inspeksi ulang oleh Spv. Pemeliharaan (Budi Santoso). Mohon segera lakukan verifikasi dan tindak lanjut melalui aplikasi mobile. Terima kasih.',
+                priority: 'WARNING',
+                tag: 'INSPEKSI ULANG',
+                tagClass: 'warning',
+                icon: 'fa-arrows-rotate',
+                iconColor: '#d97706',
+                iconBg: '#fef3c7',
+                url: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            WO_TINDAK_LANJUT: {
+                title: 'Penugasan WO Baru: TLI202601875357 (Tindak Lanjut)',
+                body: 'Yth. Petugas, WO tindak lanjut TLI202601875357 telah diterbitkan berdasarkan temuan pada WO TL202601875312. Silakan cek rincian pekerjaan dan jadwalkan penanganan pada aplikasi mobile. Terima kasih.',
+                priority: 'WARNING',
+                tag: 'TINDAK LANJUT',
+                tagClass: 'warning',
+                icon: 'fa-clipboard-check',
+                iconColor: '#d97706',
+                iconBg: '#fef3c7',
+                url: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            WO_TERJADWAL: {
+                title: 'Penugasan WO Terjadwal: INS202601875389',
+                body: 'Yth. Petugas, WO rutin INS202601875389 untuk periode Triwulan IV 2026 di lokasi Bay Trafo GI Ungaran telah ditugaskan kepada Anda. Mohon laksanakan inspeksi sesuai jadwal yang ditentukan. Terima kasih.',
+                priority: 'INFO',
+                tag: 'JADWAL RUTIN',
+                tagClass: 'info',
+                icon: 'fa-calendar-days',
+                iconColor: '#0a58ca',
+                iconBg: '#eff6ff',
+                url: '../hifi-power-inspect/perencanaan-jadwal/tambah-data-pji.html'
+            },
+            WO_KONDISIONAL: {
+                title: 'Penugasan WO Kondisional: CDT202601875357',
+                body: 'Yth. Petugas, WO kondisional CDT202601875357 diterbitkan atas trigger Sambaran Petir & Anomali Suhu pada aset Tower #120 SUTET 500kV Ungaran-Mandirancan. Mohon segera lakukan pengecekan kondisi lapangan melalui aplikasi mobile. Terima kasih.',
+                priority: 'CRITICAL',
+                tag: 'KONDISIONAL',
+                tagClass: 'critical',
+                icon: 'fa-bolt',
+                iconColor: '#dc2626',
+                iconBg: '#fee2e2',
+                url: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            ASET_ANOMALI: {
+                title: 'Peringatan Aset Anomali: INS202601875390 T1-CT-GI-BDS-01',
+                body: 'Perhatian: Ditemukan 1 aset berstatus anomali pada WO INS202601875390 di lokasi Bay Trafo 1 GI Bandung Selatan. Segera tinjau hasil inspeksi untuk mitigasi risiko lebih lanjut. Terima kasih.',
+                priority: 'CRITICAL',
+                tag: 'ANOMALI ASET',
+                tagClass: 'critical',
+                icon: 'fa-triangle-exclamation',
+                iconColor: '#dc2626',
+                iconBg: '#fee2e2',
+                url: '../hifi-power-inspect/dashboard-trend/trend-enhancement.html'
+            }
+        };
+
+        function triggerPushSimulation(presetKey) {
+            const preset = presetSamples[presetKey] || presetSamples.HOTSPOT_CRITICAL;
+            const newId = 'NTF-SIM-' + Math.floor(100 + Math.random() * 900);
+            
+            const newNotifItem = {
+                id: newId,
+                title: preset.title,
+                body: preset.body,
+                priority: preset.priority,
+                tag: preset.tag,
+                tagClass: preset.tagClass,
+                icon: preset.icon,
+                iconColor: preset.iconColor,
+                iconBg: preset.iconBg,
+                time: 'Baru saja',
+                isRead: false,
+                url: preset.url
+            };
+
+            // Add to dataset
+            notificationsList.unshift(newNotifItem);
+            updateBadgeCounts();
+
+            // Render Push Banner Card
+            renderPushBannerToast(newNotifItem);
+        }
+
+        function renderPushBannerToast(item) {
+            const container = document.getElementById('pushBannerContainer');
+            const banner = document.createElement('div');
+            banner.className = `push-banner-card ${item.priority.toLowerCase()}`;
+            banner.id = `banner-${item.id}`;
+
+            banner.innerHTML = `
+                <div class="push-banner-icon" style="background:${item.iconBg}; color:${item.iconColor};">
+                    <i class="fa-solid ${item.icon}"></i>
+                </div>
+                <div class="push-banner-main" onclick="handlePushBannerClick('${item.id}')">
+                    <div class="push-banner-top">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="font-size:11px; font-weight:700; color:var(--pln-blue); display:flex; align-items:center; gap:4px;">
+                                <i class="fa-solid fa-bolt-lightning"></i> Power Inspect
+                            </span>
+                            <span style="color:var(--text-hint); font-size:10px;">•</span>
+                            <span class="push-tag ${item.tagClass}">${item.tag}</span>
+                        </div>
+                        <span style="font-size:10.5px; color:var(--text-muted); display:flex; align-items:center; gap:3px;">
+                            <i class="fa-regular fa-clock" style="font-size:10px;"></i> Baru saja
+                        </span>
+                    </div>
+                    <div class="push-banner-title">${item.title}</div>
+                    <div class="push-banner-desc">${item.body}</div>
+                    <div class="push-banner-hint">
+                        <span><i class="fa-solid fa-arrow-pointer" style="font-size:10.5px;"></i> Klik notifikasi untuk melihat detail & tindak lanjut</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                    </div>
+                </div>
+                <button class="btn-dismiss-push" onclick="event.stopPropagation(); dismissPushBanner('banner-${item.id}')" title="Tutup Notifikasi">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="push-progress-bar"></div>
+            `;
+
+            container.prepend(banner);
+
+            // Auto dismiss after 6 seconds if not clicked
+            setTimeout(() => {
+                dismissPushBanner(`banner-${item.id}`);
+            }, 6000);
+        }
+
+        function dismissPushBanner(bannerId) {
+            const el = document.getElementById(bannerId);
+            if (el) {
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(110%)';
+                el.style.transition = 'all 0.3s ease';
+                setTimeout(() => { if (el.parentElement) el.remove(); }, 300);
+            }
+        }
+
+        // ==========================================
+        // OVERLAY DRAWER LOGIC
+        // ==========================================
+        function handlePushBannerClick(itemId) {
+            dismissPushBanner(`banner-${itemId}`);
+            openDrawerOverlay(itemId);
+        }
+
+        function toggleDrawerOverlay() {
+            const backdrop = document.getElementById('notifOverlayBackdrop');
+            if (backdrop.classList.contains('active')) {
+                closeDrawerOverlay();
+            } else {
+                openDrawerOverlay();
+            }
+        }
+
+        function openDrawerOverlay(highlightId = null) {
+            const backdrop = document.getElementById('notifOverlayBackdrop');
+            backdrop.classList.add('active');
+            renderDrawerList(highlightId);
+        }
+
+        function closeDrawerOverlay(e) {
+            if (!e || e.target.id === 'notifOverlayBackdrop' || e.type === 'click') {
+                const backdrop = document.getElementById('notifOverlayBackdrop');
+                backdrop.classList.remove('active');
+            }
+        }
+
+        function filterDrawer(filterType, btn) {
+            currentFilter = filterType;
+            document.querySelectorAll('.drawer-filter-pill').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderDrawerList();
+        }
+
+        function updateBadgeCounts() {
+            const unread = notificationsList.filter(n => !n.isRead).length;
+            const sidebarBadge = document.getElementById('sidebarBadgeCount');
+            const topbarBadge = document.getElementById('topbarBadgeCount');
+            const pillUnread = document.getElementById('countPillUnread');
+            const pillAll = document.getElementById('countPillAll');
+            const subTitle = document.getElementById('drawerSubtitleText');
+
+            if (sidebarBadge) {
+                sidebarBadge.textContent = unread;
+                sidebarBadge.style.display = unread > 0 ? 'flex' : 'none';
+            }
+            if (topbarBadge) {
+                topbarBadge.textContent = unread;
+                topbarBadge.style.display = unread > 0 ? 'flex' : 'none';
+            }
+            if (pillUnread) pillUnread.textContent = unread;
+            if (pillAll) pillAll.textContent = notificationsList.length;
+            if (subTitle) subTitle.textContent = `${unread} notifikasi belum dibaca`;
+        }
+
+        function markDrawerItemRead(id, url) {
+            const item = notificationsList.find(n => n.id === id);
+            if (item) item.isRead = true;
+            updateBadgeCounts();
+            renderDrawerList();
+            if (url && url !== '#' && url !== 'dashboard-peta.html') {
+                setTimeout(() => { window.location.href = url; }, 150);
+            }
+        }
+
+        function markAllDrawerRead() {
+            notificationsList.forEach(n => n.isRead = true);
+            updateBadgeCounts();
+            renderDrawerList();
+        }
+
+        function renderDrawerList(highlightId = null) {
+            const container = document.getElementById('drawerListContainer');
+            updateBadgeCounts();
+
+            const filtered = notificationsList.filter(item => {
+                if (currentFilter === 'UNREAD') return !item.isRead;
+                if (currentFilter === 'CRITICAL') return item.priority === 'CRITICAL' || item.priority === 'WARNING';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:48px 16px; color:var(--text-muted);">
+                        <i class="fa-regular fa-bell-slash" style="font-size:36px; margin-bottom:12px; opacity:0.4;"></i>
+                        <p style="font-size:13.5px; font-weight:600;">Tidak ada notifikasi untuk filter ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const isHighlighted = highlightId === item.id;
+                return `
+                    <div class="drawer-item-card ${item.isRead ? '' : 'unread'} ${item.priority === 'CRITICAL' ? 'critical' : ''} ${isHighlighted ? 'flash-highlight' : ''}" 
+                         id="item-${item.id}" 
+                         onclick="markDrawerItemRead('${item.id}', '${item.url}')">
+                        <div class="drawer-card-icon" style="background:${item.iconBg}; color:${item.iconColor};">
+                            <i class="fa-solid ${item.icon}"></i>
+                        </div>
+                        <div style="flex:1; min-width:0;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                                <span class="push-tag ${item.tagClass}">${item.tag}</span>
+                                <span style="font-size:10.5px; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${item.time}</span>
+                            </div>
+                            <div class="drawer-item-title">${item.title}</div>
+                            <div class="drawer-item-body">${item.body}</div>
+                            <div class="drawer-item-footer">
+                                <span style="font-weight:700; color:var(--pln-blue);"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px; margin-right:4px;"></i>Buka Rincian Pekerjaan</span>
+                                ${!item.isRead ? '<span style="width:7px; height:7px; border-radius:50%; background:var(--danger); display:inline-block;" title="Belum Dibaca"></span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Scroll to highlighted item if present
+            if (highlightId) {
+                setTimeout(() => {
+                    const el = document.getElementById(`item-${highlightId}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+
+        function toggleAutoSimulation() {
+            const btn = document.getElementById('btnAutoSim');
+            if (autoSimInterval) {
+                clearInterval(autoSimInterval);
+                autoSimInterval = null;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> Auto Demo (10s)';
+                btn.style.background = '#10b981';
+            } else {
+                const keys = Object.keys(presetSamples);
+                let idx = 0;
+                triggerPushSimulation(keys[idx % keys.length]);
+                idx++;
+                autoSimInterval = setInterval(() => {
+                    triggerPushSimulation(keys[idx % keys.length]);
+                    idx++;
+                }, 10000);
+                btn.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Auto Demo';
+                btn.style.background = '#ef4444';
+            }
+        }
+
+        // Initialize Chart
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDrawerList();
+
+            const ctx = document.getElementById('inspectionTrendChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt'],
+                        datasets: [
+                            {
+                                label: 'WO Selesai Tepat Waktu',
+                                data: [120, 142, 135, 160, 178, 192],
+                                borderColor: '#0A58CA',
+                                backgroundColor: 'rgba(10, 88, 202, 0.08)',
+                                fill: true,
+                                tension: 0.35,
+                                borderWidth: 2.5
+                            },
+                            {
+                                label: 'Anomali Terdeteksi',
+                                data: [14, 18, 12, 16, 9, 4],
+                                borderColor: '#DC2626',
+                                backgroundColor: 'transparent',
+                                borderDash: [4, 4],
+                                tension: 0.35,
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { font: { family: 'Inter', size: 11 } }
+                            }
+                        },
+                        scales: {
+                            y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 10 } } },
+                            x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

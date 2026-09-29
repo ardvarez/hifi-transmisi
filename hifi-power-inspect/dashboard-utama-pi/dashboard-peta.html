@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Icons (Remix Icons) -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- FontAwesome 6.5.1 SVG & CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <!-- Leaflet CSS & JS for Interactive Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -848,6 +851,248 @@
             font-size: 12px;
             color: var(--text-muted);
         }
+    
+        /* Notification Overlay & Slide-out Drawer */
+        .notif-badge-pill {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
+        }
+
+        .notif-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .notif-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notif-drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 420px;
+            max-width: 90vw;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2001;
+        }
+
+        .notif-overlay.active .notif-drawer {
+            transform: translateX(0);
+        }
+
+        .notif-drawer-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+        }
+
+        .notif-icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .btn-close-notif {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .btn-close-notif:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+        }
+
+        .notif-filter-chips {
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            background: #ffffff;
+        }
+
+        .chip-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .chip-btn.active, .chip-btn:hover {
+            background: #eff6ff;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .notif-drawer-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .drawer-notif-item {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .drawer-notif-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .drawer-notif-item.unread {
+            background: #eff6ff;
+            border-left: 3.5px solid var(--primary);
+        }
+
+        .drawer-notif-item.critical {
+            border-left: 3.5px solid #ef4444;
+        }
+
+        .drawer-item-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .drawer-item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.35;
+        }
+
+        .drawer-item-body {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .drawer-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        .notif-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .notif-tag.critical { background: #fee2e2; color: #dc2626; }
+        .notif-tag.warning { background: #fef3c7; color: #d97706; }
+        .notif-tag.info { background: #eff6ff; color: #2563eb; }
+
+        .notif-drawer-footer {
+            padding: 16px 22px;
+            border-top: 1px solid var(--border-color);
+            background: #ffffff;
+        }
+
+        .btn-view-all-notif {
+            width: 100%;
+            padding: 11px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-view-all-notif:hover {
+            background: var(--primary-hover);
+        }
+
     </style>
 </head>
 <body>
@@ -867,7 +1112,11 @@
             <i class="ri-flashlight-fill"></i>
             <span>PLN</span>
         </div>
-        <div class="menu-item active" title="Dashboard"><i class="ri-dashboard-line"></i></div>
+        <div class="menu-item active" title="Dashboard"><i class="fa-solid fa-gauge-high"></i></div>
+        <div class="menu-item" title="Pusat Notifikasi" onclick="toggleNotificationOverlay()" id="sidebarNotifItem" style="position:relative;">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-badge-pill" id="sidebarNotifBadge">4</span>
+        </div>
         <div class="menu-item" title="Grafik Trend"><i class="ri-line-chart-line"></i></div>
         <div class="menu-item" title="Pengaturan"><i class="ri-settings-4-line"></i></div>
         <div class="menu-item" title="Tabel Master"><i class="ri-table-alt-line"></i></div>
@@ -1876,5 +2125,199 @@
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
+
+    <!-- Power Inspect Quick Notification Overlay Drawer -->
+    <div id="notifOverlay" class="notif-overlay" onclick="closeNotificationOverlay(event)">
+        <div class="notif-drawer" onclick="event.stopPropagation()">
+            <div class="notif-drawer-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="notif-icon-circle">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-main);">Notifikasi Power Inspect</div>
+                        <div style="font-size:11.5px; color:var(--text-muted);" id="drawerSubtitle">4 notifikasi terbaru butuh evaluasi</div>
+                    </div>
+                </div>
+                <button class="btn-close-notif" onclick="closeNotificationOverlay()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="notif-filter-chips">
+                <button class="chip-btn active" onclick="filterDrawerNotifs('ALL', this)">Semua</button>
+                <button class="chip-btn" onclick="filterDrawerNotifs('UNREAD', this)">Belum Dibaca</button>
+                <button class="chip-btn" onclick="filterDrawerNotifs('CRITICAL', this)">Kritis / Anomali</button>
+            </div>
+
+            <div class="notif-drawer-list" id="drawerNotifListContainer">
+                <!-- Cards Injected dynamically via JS -->
+            </div>
+
+            <div class="notif-drawer-footer">
+                <a href="../../hifi-notifikasi-web/notifikasi-center.html?module=power_inspect" class="btn-view-all-notif">
+                    <span>Buka Pusat Notifikasi Lengkap</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Power Inspect Notification Dataset
+        let piNotifications = [
+            {
+                id: 'NTF-PI-001',
+                title: 'Inspeksi Ulang WO #WO-PI-2026-882',
+                body: 'Terdeteksi 5 aset peralatan di jalur SUTT 150kV Cawang - Bekasi memerlukan inspeksi ulang hasil evaluasi Quality Control Base AHI.',
+                priority: 'WARNING',
+                tag: 'INSPEKSI ULANG',
+                tagClass: 'warning',
+                iconBg: '#fef3c7',
+                iconColor: '#d97706',
+                icon: 'fa-triangle-exclamation',
+                time: '25 menit lalu',
+                isRead: false,
+                url: '../validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            {
+                id: 'NTF-PI-002',
+                title: 'WO Kondisional Segera #WO-EMG-2026-009',
+                body: 'Perintah kerja inspeksi darurat cuaca ekstrim & sambaran petir di SUTET 500kV Ungaran-Mandirancan Tower #120 (SLA 4 Jam).',
+                priority: 'CRITICAL',
+                tag: 'DARURAT',
+                tagClass: 'critical',
+                iconBg: '#fee2e2',
+                iconColor: '#dc2626',
+                icon: 'fa-bolt',
+                time: '35 menit lalu',
+                isRead: false,
+                url: '../validasi-inspeksi/validasi-inspeksi-mainpage.html'
+            },
+            {
+                id: 'NTF-PI-003',
+                title: 'Aset Anomali dari Inspeksi Terbaru #ANM-PI-993',
+                body: 'Ditemukan deviasi kenaikan suhu hotspot 78°C pada Current Transformer Bay Trafo 1 GI Bandung Selatan (Skor AHI 32% - Kritis).',
+                priority: 'CRITICAL',
+                tag: 'HOTSPOT 78°C',
+                tagClass: 'critical',
+                iconBg: '#fee2e2',
+                iconColor: '#dc2626',
+                icon: 'fa-temperature-high',
+                time: '2 jam lalu',
+                isRead: false,
+                url: '../dashboard-trend/trend-enhancement.html'
+            },
+            {
+                id: 'NTF-PI-004',
+                title: 'WO Baru dari Perencanaan Jadwal #WO-SCH-2026-102',
+                body: 'Jadwal inspeksi rutin Triwulan IV telah diterbitkan untuk seluruh Bay GI Ungaran dengan target selesai 15 Oktober 2026.',
+                priority: 'INFO',
+                tag: 'JADWAL BARU',
+                tagClass: 'info',
+                iconBg: '#eff6ff',
+                iconColor: '#2563eb',
+                icon: 'fa-calendar-check',
+                time: '3 jam lalu',
+                isRead: true,
+                url: '../perencanaan-jadwal/tambah-data-pji.html'
+            }
+        ];
+
+        let currentDrawerFilter = 'ALL';
+
+        function toggleNotificationOverlay() {
+            const overlay = document.getElementById('notifOverlay');
+            if (overlay) {
+                overlay.classList.toggle('active');
+                if (overlay.classList.contains('active')) {
+                    renderDrawerNotifs();
+                }
+            }
+        }
+
+        function closeNotificationOverlay(e) {
+            if (!e || e.target.id === 'notifOverlay' || e.type === 'click') {
+                const overlay = document.getElementById('notifOverlay');
+                if (overlay) overlay.classList.remove('active');
+            }
+        }
+
+        function filterDrawerNotifs(filter, btn) {
+            currentDrawerFilter = filter;
+            document.querySelectorAll('.notif-filter-chips .chip-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderDrawerNotifs();
+        }
+
+        function markDrawerItemRead(id, url) {
+            const item = piNotifications.find(n => n.id === id);
+            if (item) item.isRead = true;
+            renderDrawerNotifs();
+            if (url && url !== '#') {
+                setTimeout(() => { window.location.href = url; }, 150);
+            }
+        }
+
+        function renderDrawerNotifs() {
+            const container = document.getElementById('drawerNotifListContainer');
+            if (!container) return;
+
+            const filtered = piNotifications.filter(item => {
+                if (currentDrawerFilter === 'UNREAD') return !item.isRead;
+                if (currentDrawerFilter === 'CRITICAL') return item.priority === 'CRITICAL' || item.priority === 'WARNING';
+                return true;
+            });
+
+            const unreadCount = piNotifications.filter(n => !n.isRead).length;
+            const badgeEl = document.getElementById('sidebarNotifBadge');
+            if (badgeEl) {
+                badgeEl.textContent = unreadCount;
+                badgeEl.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+
+            const subEl = document.getElementById('drawerSubtitle');
+            if (subEl) {
+                subEl.textContent = `${unreadCount} notifikasi belum dibaca butuh perhatian`;
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px 16px; color:var(--text-muted);">
+                        <i class="fa-regular fa-bell-slash" style="font-size:32px; margin-bottom:10px; opacity:0.5;"></i>
+                        <p style="font-size:13px; font-weight:600;">Tidak ada notifikasi dalam filter ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="drawer-notif-item ${item.isRead ? '' : 'unread'} ${item.priority === 'CRITICAL' ? 'critical' : ''}" onclick="markDrawerItemRead('${item.id}', '${item.url}')">
+                    <div class="drawer-item-icon" style="background:${item.iconBg}; color:${item.iconColor};">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2px;">
+                            <span class="notif-tag ${item.tagClass}">${item.tag}</span>
+                            <span style="font-size:10.5px; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${item.time}</span>
+                        </div>
+                        <h4 class="drawer-item-title">${item.title}</h4>
+                        <p class="drawer-item-body">${item.body}</p>
+                        <div class="drawer-item-footer">
+                            <span style="font-weight:700; color:var(--primary); font-size:11px;">Tindak Lanjut &rarr;</span>
+                            ${!item.isRead ? '<span style="width:7px; height:7px; border-radius:50%; background:#ef4444; display:inline-block;"></span>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDrawerNotifs();
+        });
+    </script>
+
 </body>
 </html>

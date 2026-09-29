@@ -819,13 +819,18 @@
         }
 
         .meta-label {
-            color: #94a3b8;
+            color: #64748b;
             font-size: 11.5px;
+        }
+
+        .meta-label b {
+            font-weight: 800;
+            color: var(--text-main, #0f172a);
         }
 
         .meta-val-bold {
             font-weight: 800;
-            color: var(--text-main);
+            color: var(--text-main, #0f172a);
             font-size: 12px;
         }
 
@@ -1909,6 +1914,11 @@
                 <div class="confirm-detail-label">Detail Asset :</div>
                 <div class="confirm-detail-list">
                     <div class="confirm-detail-row">
+                        <span class="confirm-key">Techidentno</span>
+                        <span>:</span>
+                        <span class="confirm-val" id="confirmTechidentno">1002938472</span>
+                    </div>
+                    <div class="confirm-detail-row">
                         <span class="confirm-key">Phasa</span>
                         <span>:</span>
                         <span class="confirm-val" id="confirmPhasa">RST</span>
@@ -2184,6 +2194,9 @@
 
                     <div class="asset-meta-grid">
                         <div class="meta-row">
+                            <span class="meta-label">Techidentno: <b>1002938472</b></span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 4px;">
                             <span class="meta-label">Type: <b>N-RANGE</b></span>
                             <span class="meta-label">Merk: <b>UNINDO</b></span>
                         </div>
@@ -2197,7 +2210,7 @@
                         </div>
                     </div>
 
-                    <button class="btn-card-action btn-blue" onclick="requestInspectionConfirmation('TRF-150-KLS-01', 'Power Transformer 150/20kV', 'RST', 'UNINDO', '36163288/08/22', 'N-RANGE')">
+                    <button class="btn-card-action btn-blue" onclick="requestInspectionConfirmation('TRF-150-KLS-01', 'Power Transformer 150/20kV', 'RST', 'UNINDO', '36163288/08/22', 'N-RANGE', '1002938472')">
                         Mulai Inspeksi
                     </button>
                 </div>
@@ -2214,6 +2227,9 @@
 
                     <div class="asset-meta-grid">
                         <div class="meta-row">
+                            <span class="meta-label">Techidentno: <b>1002938473</b></span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 4px;">
                             <span class="meta-label">Type: <b>N-RANGE</b></span>
                             <span class="meta-label">Merk: <b>UNINDO</b></span>
                         </div>
@@ -2241,6 +2257,9 @@
 
                     <div class="asset-meta-grid">
                         <div class="meta-row">
+                            <span class="meta-label">Techidentno: <b>1002938474</b></span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 4px;">
                             <span class="meta-label">Type: <b>N-RANGE</b></span>
                             <span class="meta-label">Merk: <b>UNINDO</b></span>
                         </div>
@@ -2276,6 +2295,9 @@
 
                     <div class="asset-meta-grid">
                         <div class="meta-row">
+                            <span class="meta-label">Techidentno: <b>1002938475</b></span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 4px;">
                             <span class="meta-label">Type: <b>N-RANGE</b></span>
                             <span class="meta-label">Merk: <b>UNINDO</b></span>
                         </div>
@@ -2310,6 +2332,9 @@
 
                     <div class="asset-meta-grid">
                         <div class="meta-row">
+                            <span class="meta-label">Techidentno: <b>1002938476</b></span>
+                        </div>
+                        <div class="meta-row" style="margin-top: 4px;">
                             <span class="meta-label">Type: <b>N-RANGE</b></span>
                             <span class="meta-label">Merk: <b>UNINDO</b></span>
                         </div>
@@ -2354,18 +2379,21 @@
             }, 300);
         }
 
-        function openInspectionForm(assetCode, assetName) {
+        function openInspectionForm(assetCode, assetName, techidentno) {
             const container = document.querySelector('.mobile-container');
             container.classList.add('page-slide-out');
             setTimeout(() => {
-                window.location.href = `form-inspeksi.html?asset=${encodeURIComponent(assetCode)}&name=${encodeURIComponent(assetName)}&bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}`;
+                const techParam = techidentno || (pendingAssetData ? pendingAssetData.techidentno : '1002938472');
+                window.location.href = `form-inspeksi.html?asset=${encodeURIComponent(assetCode)}&name=${encodeURIComponent(assetName)}&bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}&techidentno=${encodeURIComponent(techParam)}`;
             }, 300);
         }
 
         let pendingAssetData = null;
 
-        function requestInspectionConfirmation(assetCode, assetName, phasa, merk, serial, tipe) {
-            pendingAssetData = { assetCode, assetName, phasa, merk, serial, tipe };
+        function requestInspectionConfirmation(assetCode, assetName, phasa, merk, serial, tipe, techidentno) {
+            techidentno = techidentno || '1002938472';
+            pendingAssetData = { assetCode, assetName, phasa, merk, serial, tipe, techidentno };
+            document.getElementById('confirmTechidentno').textContent = techidentno;
             document.getElementById('confirmPhasa').textContent = phasa || 'RST';
             document.getElementById('confirmMerk').textContent = merk || 'UNINDO';
             document.getElementById('confirmSerial').textContent = serial || '36163288/08/22';
@@ -2380,7 +2408,7 @@
         function handleSesuai() {
             closeConfirmModal();
             if (pendingAssetData) {
-                openInspectionForm(pendingAssetData.assetCode, pendingAssetData.assetName);
+                openInspectionForm(pendingAssetData.assetCode, pendingAssetData.assetName, pendingAssetData.techidentno);
             }
         }
 
@@ -2395,8 +2423,9 @@
                 const merk = pendingAssetData ? pendingAssetData.merk : 'UNINDO';
                 const serial = pendingAssetData ? pendingAssetData.serial : '36163288/08/22';
                 const tipe = pendingAssetData ? pendingAssetData.tipe : 'N-RANGE';
+                const techidentno = pendingAssetData ? pendingAssetData.techidentno : '1002938472';
                 
-                window.location.href = `form-ketidaksesuaian.html?asset=${encodeURIComponent(assetCode)}&name=${encodeURIComponent(assetName)}&bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}&phasa=${encodeURIComponent(phasa)}&merk=${encodeURIComponent(merk)}&serial=${encodeURIComponent(serial)}&tipe=${encodeURIComponent(tipe)}`;
+                window.location.href = `form-ketidaksesuaian.html?asset=${encodeURIComponent(assetCode)}&name=${encodeURIComponent(assetName)}&bay=${encodeURIComponent(bayParam)}&wo=${encodeURIComponent(woParam)}&gi=${encodeURIComponent(giParam)}&phasa=${encodeURIComponent(phasa)}&merk=${encodeURIComponent(merk)}&serial=${encodeURIComponent(serial)}&tipe=${encodeURIComponent(tipe)}&techidentno=${encodeURIComponent(techidentno)}`;
             }, 300);
         }
 

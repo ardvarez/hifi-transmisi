@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Notifikasi Terpadu – PLN HiFi</title>
+    <!-- Fonts: Outfit for headings, Inter for body (PLN Standard) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6.5.1 SVG JS (Bypasses CORS woff2 font blocks on file:// and iframe) + CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <style>
+        /* ===== PLN DESIGN TOKENS (Seragam dengan ERS, PST & Power Inspect) ===== */
+        :root {
+            --pln-blue:        #0A58CA;
+            --pln-blue-mid:    #0D6EFD;
+            --pln-blue-dark:   #003B8E;
+            --pln-blue-light:  #E7F1FF;
+            --pln-yellow:      #F7A800;
+            --pln-yellow-light:#FEF3C7;
+            --sidebar-w:       60px;
+
+            --bg:              #F8FAFC;
+            --surface:         #F1F5F9;
+            --card:            #FFFFFF;
+            --border:          #E2E8F0;
+            --border-focus:    #0A58CA;
+
+            --text-primary:    #0F172A;
+            --text-secondary:  #475569;
+            --text-hint:       #94A3B8;
+
+            --danger:          #DC2626;
+            --danger-light:    #FEE2E2;
+            --warning:         #D97706;
+            --warning-light:   #FEF3C7;
+            --success:         #16A34A;
+            --success-light:   #DCFCE7;
+            --info:            #0284C7;
+            --info-light:      #E0F2FE;
+            --purple:          #7C3AED;
+            --purple-light:    #EDE9FE;
+
+            --radius-sm:       6px;
+            --radius-md:       10px;
+            --radius-lg:       14px;
+
+            --shadow-sm:       0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md:       0 4px 14px rgba(15, 23, 42, 0.08);
+            --shadow-lg:       0 10px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        [data-theme="dark"], .dark-mode {
+            --bg:              #0B1120;
+            --surface:         #1E293B;
+            --card:            #1E293B;
+            --border:          #334155;
+            --border-focus:    #38BDF8;
+
+            --text-primary:    #F8FAFC;
+            --text-secondary:  #94A3B8;
+            --text-hint:       #64748B;
+
+            --pln-blue-light:  rgba(10, 88, 202, 0.2);
+            --pln-yellow-light:rgba(247, 168, 0, 0.18);
+            --danger-light:    rgba(220, 38, 38, 0.2);
+            --warning-light:   rgba(217, 119, 6, 0.2);
+            --success-light:   rgba(22, 163, 74, 0.2);
+            --info-light:      rgba(2, 132, 199, 0.2);
+            --purple-light:    rgba(124, 58, 237, 0.2);
+
+            --shadow-sm:       0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md:       0 4px 14px rgba(0,0,0,0.4);
+            --shadow-lg:       0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* ===== RESET ===== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, .outfit-font {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--pln-blue-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px 0;
+            gap: 6px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar .logo {
+            width: 38px;
+            height: 38px;
+            background: var(--pln-yellow);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 10px rgba(247, 168, 0, 0.35);
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .sidebar .logo:hover {
+            transform: scale(1.06);
+        }
+
+        .sidebar .logo span {
+            color: var(--pln-blue-dark);
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .nav-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .15s, color .15s;
+            position: relative;
+            font-size: 18px;
+        }
+
+        .nav-icon svg, .nav-icon i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        .nav-icon.active {
+            background: rgba(247, 168, 0, 0.22);
+            color: var(--pln-yellow);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-layout {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 28px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo-img {
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-hint);
+        }
+
+        .breadcrumb a {
+            color: var(--pln-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--pln-blue);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Bell Button & Flyout */
+        .bell-btn-wrap {
+            position: relative;
+        }
+
+        .btn-bell {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .btn-bell:hover {
+            border-color: var(--pln-blue);
+            color: var(--pln-blue);
+        }
+
+        .badge-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 10px;
+            border: 2px solid var(--card);
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Dropdown Flyout */
+        .dropdown-flyout {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 390px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        .dropdown-flyout.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flyout-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+        }
+
+        .flyout-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .flyout-list {
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .flyout-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .flyout-item:hover {
+            background: var(--surface);
+        }
+
+        .flyout-item.unread {
+            background: var(--pln-blue-light);
+            border-left: 3px solid var(--pln-blue);
+        }
+
+        .flyout-footer {
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            text-align: center;
+        }
+
+        .flyout-footer a {
+            color: var(--pln-blue);
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* ===== CONTENT BODY ===== */
+        .content-body {
+            padding: 24px 32px 80px;
+            flex: 1;
+        }
+
+        .page-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-desc {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        /* Scope Bar (Level 1 Scope Modul) */
+        .scope-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            padding-bottom: 2px;
+        }
+
+        .scope-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .scope-btn:hover {
+            border-color: var(--pln-blue);
+            color: var(--pln-blue);
+        }
+
+        .scope-btn.active {
+            background: #eff6ff;
+            border-color: var(--pln-blue);
+            color: var(--pln-blue);
+            box-shadow: 0 2px 8px rgba(10, 88, 202, 0.15);
+            font-weight: 700;
+        }
+
+        .scope-btn img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .scope-count {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.06);
+            font-weight: 700;
+        }
+
+        .scope-btn.active .scope-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .stat-num {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 4px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        /* Main Content Card */
+        .main-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Filter Row */
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+            max-width: 380px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-hint);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            outline: none;
+            font-size: 13.5px;
+            transition: border-color 0.15s;
+        }
+
+        .search-input:focus {
+            border-color: var(--border-focus);
+            background: var(--card);
+        }
+
+        /* Segmented Buttons (<=3 Options) */
+        .segmented-wrap {
+            display: inline-flex;
+            background: var(--surface);
+            padding: 3px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            gap: 2px;
+        }
+
+        .segmented-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .segmented-btn.active {
+            background: var(--card);
+            color: var(--pln-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Combobox (>3 Options) */
+        .custom-select {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-select:focus {
+            border-color: var(--border-focus);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--pln-blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--pln-blue-dark);
+            box-shadow: 0 3px 10px rgba(10, 88, 202, 0.3);
+        }
+
+        .btn-outline {
+            background: var(--card);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface);
+            border-color: var(--pln-blue);
+            color: var(--pln-blue);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Notification List & Clean Title + Body Card Anatomy */
+        .notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notif-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            position: relative;
+            transition: all 0.15s ease;
+        }
+
+        .notif-card:hover {
+            border-color: var(--pln-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .notif-card.unread {
+            background: var(--pln-blue-light);
+            border-color: var(--pln-blue);
+        }
+
+        .module-logo-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .module-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .notif-main {
+            flex: 1;
+        }
+
+        .notif-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+
+        .notif-chips-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .pill-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .pill-critical { background: var(--danger-light); color: var(--danger); }
+        .pill-warning { background: var(--warning-light); color: var(--warning); }
+        .pill-info { background: var(--info-light); color: var(--info); }
+        .pill-success { background: var(--success-light); color: var(--success); }
+        .pill-module { background: var(--pln-blue-light); color: var(--pln-blue); }
+
+        .notif-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.35;
+        }
+
+        .notif-body {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .notif-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .notif-time {
+            font-size: 12px;
+            color: var(--text-hint);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .notif-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            width: 360px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--pln-blue);
+            width: 100%;
+            animation: toastTimer 5s linear forwards;
+        }
+
+        @keyframes toastTimer {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 30, 60, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 520px;
+            box-shadow: var(--shadow-lg);
+            padding: 24px;
+        }
+
+        .pref-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pref-info h4 {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .pref-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: var(--border);
+            transition: .2s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--pln-blue); }
+        input:checked + .slider:before { transform: translateX(18px); }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR (Standard PLN Blue) -->
+    <aside class="sidebar">
+        <a href="../hifi-home/home.html" class="logo" title="HiFi Portal Home">
+            <span>PLN</span>
+        </a>
+        <a href="../hifi-home/home.html" class="nav-icon" title="Dashboard Utama">
+            <i class="fa-solid fa-gauge-high"></i>
+        </a>
+        <a href="../hifi-new-pst/Asset-Register/Mainpage.html" class="nav-icon" title="NEW PST">
+            <i class="fa-solid fa-database"></i>
+        </a>
+        <a href="../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html" class="nav-icon" title="Power Inspect">
+            <i class="fa-solid fa-shield-halved"></i>
+        </a>
+        <a href="../hifi-ers/Perencanaan/Karantina & Tindak Lanjut/tindak-lanjut-karantina-main.html" class="nav-icon" title="Power Swift (ERS)">
+            <i class="fa-solid fa-bolt"></i>
+        </a>
+        <a href="notifikasi-center.html" class="nav-icon active" title="Pusat Notifikasi">
+            <i class="fa-solid fa-bell"></i>
+        </a>
+
+        <div class="sidebar-bottom">
+            <div class="nav-icon" onclick="openPrefModal()" title="Pengaturan Notifikasi">
+                <i class="fa-solid fa-gear"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <img src="../assets/logo-pln.svg" alt="PLN Logo" class="brand-logo-img">
+                <div class="breadcrumb">
+                    <a href="../hifi-home/home.html">Portal Transmisi</a>
+                    <span>/</span>
+                    <span style="color:var(--text-primary); font-weight:700;">Pusat Notifikasi</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <button class="btn btn-outline btn-sm" onclick="simulateNewNotification()">
+                    <i class="fa-solid fa-bell"></i> Trigger Demo Toast
+                </button>
+
+                <!-- Bell Dropdown Trigger -->
+                <div class="bell-btn-wrap">
+                    <button class="btn-bell" id="bellBtn" onclick="toggleBellDropdown()" title="Notifikasi Cepat">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="badge-count" id="headerBadge">5</span>
+                    </button>
+
+                    <!-- Flyout Dropdown -->
+                    <div class="dropdown-flyout" id="bellFlyout">
+                        <div class="flyout-header">
+                            <h3>Notifikasi Terbaru</h3>
+                            <button class="btn btn-outline btn-sm" onclick="markAllAsRead()">Tandai Dibaca</button>
+                        </div>
+                        <div class="flyout-list" id="flyoutList">
+                            <!-- Injected via JS -->
+                        </div>
+                        <div class="flyout-footer">
+                            <a href="#fullList" onclick="toggleBellDropdown()">Lihat Semua Notifikasi &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Badge -->
+                <div class="user-badge">
+                    <div class="user-avatar">BP</div>
+                    <div style="text-align:left;">
+                        <div style="font-weight:700; font-size:12px; line-height:1.2; color:var(--text-primary);">Bambang Pratama</div>
+                        <div style="font-size:10px; color:var(--text-secondary);">MSB Fashar UIT JBB</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT BODY -->
+        <main class="content-body" id="fullList">
+            <!-- Page Header Row -->
+            <div class="page-header-row">
+                <div>
+                    <h1 class="page-title" id="pageMainTitle">
+                        <i class="fa-solid fa-bell" style="color:var(--pln-blue);"></i> Pusat Notifikasi Transmisi
+                    </h1>
+                    <p class="page-desc" id="pageSubTitle">Sistem Pemantauan & Peringatan Terpadu Multi-Modul (NEW PST, Power Inspect, Power Swift / ERS)</p>
+                </div>
+                <button class="btn btn-outline" onclick="openPrefModal()">
+                    <i class="fa-solid fa-gear"></i> Preferensi Notifikasi
+                </button>
+            </div>
+
+            <!-- Scope Bar (Level 1 Scope Modul) -->
+            <div class="scope-bar" id="scopeTabsBar">
+                <button class="scope-btn active" data-module="ALL" onclick="setScopeModule('ALL')">
+                    <i class="fa-solid fa-cubes"></i>
+                    <span>Semua Modul</span>
+                    <span class="scope-count" id="countAll">0</span>
+                </button>
+                <button class="scope-btn" data-module="PST" onclick="setScopeModule('PST')">
+                    <img src="../assets/logo-new-pst.png" alt="New PST">
+                    <span>NEW PST</span>
+                    <span class="scope-count" id="countPst">0</span>
+                </button>
+                <button class="scope-btn" data-module="POWER_INSPECT" onclick="setScopeModule('POWER_INSPECT')">
+                    <img src="../assets/logo-power-inspect.png" alt="Power Inspect">
+                    <span>Power Inspect</span>
+                    <span class="scope-count" id="countPi">0</span>
+                </button>
+                <button class="scope-btn" data-module="ERS" onclick="setScopeModule('ERS')">
+                    <img src="../assets/logo-power-swift.png" alt="Power Swift ERS">
+                    <span>Power Swift (ERS)</span>
+                    <span class="scope-count" id="countErs">0</span>
+                </button>
+                <button class="scope-btn" data-module="FFE" onclick="setScopeModule('FFE')">
+                    <img src="../assets/logo-ffe.png" alt="FFE">
+                    <span>FFE</span>
+                    <span class="scope-count" id="countFfe">0</span>
+                </button>
+                <button class="scope-btn" data-module="MANTAPS" onclick="setScopeModule('MANTAPS')">
+                    <img src="../assets/logo-mantaps.png" alt="Mantaps">
+                    <span>Mantaps</span>
+                    <span class="scope-count" id="countMantaps">0</span>
+                </button>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Total Notifikasi</div>
+                        <div class="stat-num" id="statTotal">0</div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                        <i class="fa-solid fa-inbox"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Belum Dibaca</div>
+                        <div class="stat-num" id="statUnread" style="color: var(--danger);">0</div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--danger-light); color: var(--danger);">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Perlu Persetujuan</div>
+                        <div class="stat-num" id="statApproval" style="color: var(--warning);">0</div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Kritis / Anomali</div>
+                        <div class="stat-num" id="statCritical" style="color: var(--danger);">0</div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--danger-light); color: var(--danger);">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Main Card -->
+            <div class="main-card">
+                <!-- Filter Row (Level 2 Status & Category) -->
+                <div class="filter-row">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Cari nomor WO, Permit, GI, atau nama aset..." oninput="filterNotifications()">
+                    </div>
+
+                    <!-- Status Segmented (<=3 Options) -->
+                    <div class="segmented-wrap">
+                        <button class="segmented-btn active" onclick="setStatusFilter('ALL', this)">Semua</button>
+                        <button class="segmented-btn" onclick="setStatusFilter('UNREAD', this)">Belum Dibaca</button>
+                        <button class="segmented-btn" onclick="setStatusFilter('READ', this)">Sudah Dibaca</button>
+                    </div>
+
+                    <!-- Priority Combobox (>3 Options) -->
+                    <select class="custom-select" id="prioritySelect" onchange="filterNotifications()">
+                        <option value="ALL">Semua Urgensi</option>
+                        <option value="CRITICAL">Kritis / Urgent</option>
+                        <option value="WARNING">Peringatan / Anomali</option>
+                        <option value="APPROVAL">Perlu Persetujuan</option>
+                        <option value="INFO">Informasi</option>
+                        <option value="SUCCESS">Sukses</option>
+                    </select>
+
+                    <!-- Category Combobox (>3 Options) -->
+                    <select class="custom-select" id="categorySelect" onchange="filterNotifications()">
+                        <option value="ALL">Semua Kategori</option>
+                        <option value="MUTASI">Mutasi & Master Aset</option>
+                        <option value="INSPECTION">Inspeksi & WO</option>
+                        <option value="PERMIT">Permit ERS</option>
+                        <option value="STOCK_OPNAME">Stock Opname & Karantina</option>
+                        <option value="MAINTENANCE">Pemeliharaan FFE</option>
+                        <option value="SYSTEM">Sistem & Log</option>
+                    </select>
+
+                    <button class="btn btn-outline" onclick="markAllAsRead()">
+                        <i class="fa-solid fa-check-double"></i> Tandai Semua Dibaca
+                    </button>
+                </div>
+
+                <!-- Notification List Container (Title + Body Only) -->
+                <div class="notif-list" id="notificationList">
+                    <!-- Cards injected by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Alert Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Preferences Modal -->
+    <div class="modal-overlay" id="prefModal" onclick="closePrefModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:17px; font-weight:700; color:var(--text-primary);">Preferensi Notifikasi Terpadu</h3>
+                <button class="btn-bell" style="width:30px; height:30px;" onclick="closePrefModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:16px;">Atur jenis notifikasi in-app dan push alert yang ingin Anda terima.</p>
+            
+            <div class="pref-row">
+                <div class="pref-info">
+                    <h4>NEW PST (Approval & Mutasi Aset)</h4>
+                    <p>Notifikasi permohonan registrasi Level 5 & mutasi antar unit</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+
+            <div class="pref-row">
+                <div class="pref-info">
+                    <h4>Power Inspect (Inspeksi, WO & Anomali)</h4>
+                    <p>Alert inspeksi ulang, WO tindak lanjut, WO kondisional & anomali AHI</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+
+            <div class="pref-row">
+                <div class="pref-info">
+                    <h4>Power Swift / ERS (Permit & Logistik)</h4>
+                    <p>Permit pemasangan/pembongkaran, karantina & stock opname</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+
+            <div class="pref-row">
+                <div class="pref-info">
+                    <h4>Toast Banner Melayang</h4>
+                    <p>Tampilkan alert melayang saat ada event baru masuk secara instan</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button class="btn btn-outline" onclick="closePrefModal()">Batal</button>
+                <button class="btn btn-primary" onclick="savePrefs()">Simpan Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Clean Title & Body Dataset
+        let notifications = [
+            // --- NEW PST ---
+            {
+                id: 'NTF-PST-001',
+                title: 'Permintaan Persetujuan Mutasi Aset #MUT-PST-9021',
+                body: 'Permohonan mutasi Trafo 150/20kV 60MVA dari UPT Cawang ke UPT Bandung membutuhkan otorisasi Manager.',
+                module: 'PST',
+                moduleLabel: 'NEW PST',
+                icon: '../assets/logo-new-pst.png',
+                priority: 'APPROVAL',
+                priorityLabel: 'PERSETUJUAN',
+                category: 'MUTASI',
+                isRead: false,
+                time: '15 menit lalu',
+                actionUrl: '../hifi-new-pst/Asset-Register/Mainpage.html',
+                actionLabel: 'Otorisasi Mutasi'
+            },
+            {
+                id: 'NTF-PST-002',
+                title: 'Permintaan Persetujuan Penambahan Aset #REQ-ADD-2026-089',
+                body: 'Registrasi aset baru Bay Trafo 2 GI Gandul telah diajukan oleh Spv. Pemeliharaan dan menunggu persetujuan otorisasi.',
+                module: 'PST',
+                moduleLabel: 'NEW PST',
+                icon: '../assets/logo-new-pst.png',
+                priority: 'APPROVAL',
+                priorityLabel: 'PERSETUJUAN',
+                category: 'MUTASI',
+                isRead: false,
+                time: '1 jam lalu',
+                actionUrl: '../hifi-new-pst/Asset-Register/Mainpage.html',
+                actionLabel: 'Review & Setujui'
+            },
+            {
+                id: 'NTF-PST-003',
+                title: 'Penambahan Aset Baru Selesai Diproses',
+                body: 'Aset PMT 150kV ABB Bay Trafo 1 GI Cawang telah berhasil didaftarkan dalam Master Asset Register Level 5.',
+                module: 'PST',
+                moduleLabel: 'NEW PST',
+                icon: '../assets/logo-new-pst.png',
+                priority: 'INFO',
+                priorityLabel: 'INFO',
+                category: 'MUTASI',
+                isRead: true,
+                time: 'Kemarin',
+                actionUrl: '../hifi-new-pst/Asset-Register/Mainpage.html',
+                actionLabel: 'Lihat Aset'
+            },
+
+            // --- POWER INSPECT (5 Standar Template Prefix Baru) ---
+            {
+                id: 'NTF-PI-001',
+                title: 'Inspeksi Ulang INS202601875357',
+                body: 'Yth. Petugas, WO INS202601875357 dengan 5 aset memerlukan inspeksi ulang oleh Spv. Pemeliharaan (Budi Santoso). Mohon segera lakukan verifikasi dan tindak lanjut melalui aplikasi mobile. Terima kasih.',
+                module: 'POWER_INSPECT',
+                moduleLabel: 'Power Inspect',
+                icon: '../assets/logo-power-inspect.png',
+                priority: 'WARNING',
+                priorityLabel: 'INSPEKSI ULANG',
+                category: 'INSPECTION',
+                isRead: false,
+                time: '15 menit lalu',
+                actionUrl: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html',
+                actionLabel: 'Verifikasi Inspeksi'
+            },
+            {
+                id: 'NTF-PI-002',
+                title: 'Penugasan WO Baru: TLI202601875357 (Tindak Lanjut)',
+                body: 'Yth. Petugas, WO tindak lanjut TLI202601875357 telah diterbitkan berdasarkan temuan pada WO TL202601875312. Silakan cek rincian pekerjaan dan jadwalkan penanganan pada aplikasi mobile. Terima kasih.',
+                module: 'POWER_INSPECT',
+                moduleLabel: 'Power Inspect',
+                icon: '../assets/logo-power-inspect.png',
+                priority: 'WARNING',
+                priorityLabel: 'TINDAK LANJUT',
+                category: 'INSPECTION',
+                isRead: false,
+                time: '30 menit lalu',
+                actionUrl: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html',
+                actionLabel: 'Buka Work Order'
+            },
+            {
+                id: 'NTF-PI-003',
+                title: 'Penugasan WO Terjadwal: INS202601875389',
+                body: 'Yth. Petugas, WO rutin INS202601875389 untuk periode Triwulan IV 2026 di lokasi Bay Trafo GI Ungaran telah ditugaskan kepada Anda. Mohon laksanakan inspeksi sesuai jadwal yang ditentukan. Terima kasih.',
+                module: 'POWER_INSPECT',
+                moduleLabel: 'Power Inspect',
+                icon: '../assets/logo-power-inspect.png',
+                priority: 'INFO',
+                priorityLabel: 'JADWAL',
+                category: 'INSPECTION',
+                isRead: true,
+                time: '2 jam lalu',
+                actionUrl: '../hifi-power-inspect/perencanaan-jadwal/tambah-data-pji.html',
+                actionLabel: 'Buka Jadwal'
+            },
+            {
+                id: 'NTF-PI-004',
+                title: 'Penugasan WO Kondisional: CDT202601875357',
+                body: 'Yth. Petugas, WO kondisional CDT202601875357 diterbitkan atas trigger Sambaran Petir & Anomali Suhu pada aset Tower #120 SUTET 500kV Ungaran-Mandirancan. Mohon segera lakukan pengecekan kondisi lapangan melalui aplikasi mobile. Terima kasih.',
+                module: 'POWER_INSPECT',
+                moduleLabel: 'Power Inspect',
+                icon: '../assets/logo-power-inspect.png',
+                priority: 'CRITICAL',
+                priorityLabel: 'KONDISIONAL',
+                category: 'INSPECTION',
+                isRead: false,
+                time: '45 menit lalu',
+                actionUrl: '../hifi-power-inspect/validasi-inspeksi/validasi-inspeksi-mainpage.html',
+                actionLabel: 'Tindak Lanjut Cepat'
+            },
+            {
+                id: 'NTF-PI-005',
+                title: 'Peringatan Aset Anomali: INS202601875390 T1-CT-GI-BDS-01',
+                body: 'Perhatian: Ditemukan 1 aset berstatus anomali pada WO INS202601875390 di lokasi Bay Trafo 1 GI Bandung Selatan. Segera tinjau hasil inspeksi untuk mitigasi risiko lebih lanjut. Terima kasih.',
+                module: 'POWER_INSPECT',
+                moduleLabel: 'Power Inspect',
+                icon: '../assets/logo-power-inspect.png',
+                priority: 'CRITICAL',
+                priorityLabel: 'ANOMALI',
+                category: 'INSPECTION',
+                isRead: false,
+                time: '1 jam lalu',
+                actionUrl: '../hifi-power-inspect/dashboard-trend/trend-enhancement.html',
+                actionLabel: 'Cek Detail Anomali'
+            },
+
+            // --- POWER SWIFT / ERS ---
+            {
+                id: 'NTF-ERS-001',
+                title: 'Permit Baru Pemasangan Tower ERS #PMT-INS-2026-01',
+                body: 'Pengajuan permit pemasangan tower darurat ERS di SUTET 500kV Ungaran-Mandirancan butuh persetujuan Manager UPT.',
+                module: 'ERS',
+                moduleLabel: 'Power Swift (ERS)',
+                icon: '../assets/logo-power-swift.png',
+                priority: 'APPROVAL',
+                priorityLabel: 'PERSETUJUAN',
+                category: 'PERMIT',
+                isRead: false,
+                time: '40 menit lalu',
+                actionUrl: '../hifi-ers/Mutasi/Peminjaman/approval-request-improved(Manager-UPT).html',
+                actionLabel: 'Review & Setujui'
+            },
+            {
+                id: 'NTF-ERS-002',
+                title: 'Peralatan Masuk Karantina ERS #RET-ERS-880',
+                body: 'Pengembalian material tower ERS darurat memiliki 3 unit komponen abnormal (Guy Wire & Insulator) dan perlu karantina teknis.',
+                module: 'ERS',
+                moduleLabel: 'Power Swift (ERS)',
+                icon: '../assets/logo-power-swift.png',
+                priority: 'WARNING',
+                priorityLabel: 'KARANTINA',
+                category: 'STOCK_OPNAME',
+                isRead: false,
+                time: '3 jam lalu',
+                actionUrl: '../hifi-ers/Perencanaan/Karantina & Tindak Lanjut/tindak-lanjut-karantina-detail.html',
+                actionLabel: 'Verifikasi Karantina'
+            },
+            {
+                id: 'NTF-ERS-003',
+                title: 'Stock Opname Ulang Basecamp Cawang #SO-ERS-Q3-REV',
+                body: 'Verifikasi selisih stock opname material Guy Grip Dead End (-2 Unit) memerlukan pencocokan fisik ulang.',
+                module: 'ERS',
+                moduleLabel: 'Power Swift (ERS)',
+                icon: '../assets/logo-power-swift.png',
+                priority: 'WARNING',
+                priorityLabel: 'AUDIT',
+                category: 'STOCK_OPNAME',
+                isRead: true,
+                time: 'Kemarin',
+                actionUrl: '../hifi-ers/Perencanaan/Karantina & Tindak Lanjut/tindak-lanjut-karantina-main.html',
+                actionLabel: 'Verifikasi Ulang'
+            },
+
+            // --- FFE & MANTAPS ---
+            {
+                id: 'NTF-FFE-001',
+                title: 'Inspeksi Berkala FFE Hydrant & APAR',
+                body: 'Pengecekan 12 unit APAR & 2 Hydrant UPT Bandung telah selesai dengan status 100% laik operasi.',
+                module: 'FFE',
+                moduleLabel: 'FFE',
+                icon: '../assets/logo-ffe.png',
+                priority: 'SUCCESS',
+                priorityLabel: 'SUKSES',
+                category: 'MAINTENANCE',
+                isRead: true,
+                time: 'Kemarin',
+                actionUrl: '#',
+                actionLabel: 'Buka Laporan'
+            },
+            {
+                id: 'NTF-MAN-001',
+                title: 'Arsip Otomatis Log Parameter Mantaps',
+                body: 'Sinkronisasi 14.280 baris data parameter operasi dan telemetri transmisi bulanan telah berhasil diarsipkan di cloud.',
+                module: 'MANTAPS',
+                moduleLabel: 'Mantaps',
+                icon: '../assets/logo-mantaps.png',
+                priority: 'INFO',
+                priorityLabel: 'SISTEM',
+                category: 'SYSTEM',
+                isRead: true,
+                time: '2 hari lalu',
+                actionUrl: '#',
+                actionLabel: 'Arsip Log'
+            }
+        ];
+
+        let currentScopeModule = 'ALL';
+        let currentStatusFilter = 'ALL';
+
+        function checkUrlModuleParam() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modParam = urlParams.get('module');
+            if (modParam) {
+                const map = {
+                    'new_pst': 'PST',
+                    'pst': 'PST',
+                    'power_inspect': 'POWER_INSPECT',
+                    'pi': 'POWER_INSPECT',
+                    'ers': 'ERS',
+                    'power_swift': 'ERS',
+                    'ffe': 'FFE',
+                    'mantaps': 'MANTAPS'
+                };
+                if (map[modParam.toLowerCase()]) {
+                    setScopeModule(map[modParam.toLowerCase()]);
+                }
+            }
+        }
+
+        function setScopeModule(mod) {
+            currentScopeModule = mod;
+            document.querySelectorAll('.scope-btn').forEach(btn => {
+                if (btn.getAttribute('data-module') === mod) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            const titleEl = document.getElementById('pageMainTitle');
+            const subEl = document.getElementById('pageSubTitle');
+            if (mod === 'PST') {
+                titleEl.innerHTML = '<img src="../assets/logo-new-pst.png" style="height:24px; vertical-align:middle; margin-right:8px;"> Notifikasi NEW PST';
+                subEl.innerText = 'Master Data, Registrasi Level 5, Persetujuan & Mutasi Aset Antar Unit';
+            } else if (mod === 'POWER_INSPECT') {
+                titleEl.innerHTML = '<img src="../assets/logo-power-inspect.png" style="height:24px; vertical-align:middle; margin-right:8px;"> Notifikasi Power Inspect';
+                subEl.innerText = 'Inspeksi Ulang WO, Work Order Tindak Lanjut, Jadwal & Anomali Base AHI';
+            } else if (mod === 'ERS') {
+                titleEl.innerHTML = '<img src="../assets/logo-power-swift.png" style="height:24px; vertical-align:middle; margin-right:8px;"> Notifikasi Power Swift (ERS)';
+                subEl.innerText = 'Permit Pemasangan/Pembongkaran Tower Darurat, Karantina & Stock Opname';
+            } else if (mod === 'FFE') {
+                titleEl.innerHTML = '<img src="../assets/logo-ffe.png" style="height:24px; vertical-align:middle; margin-right:8px;"> Notifikasi FFE';
+                subEl.innerText = 'Inspeksi & Pemeliharaan Fire Fighting Equipment Transmisi';
+            } else if (mod === 'MANTAPS') {
+                titleEl.innerHTML = '<img src="../assets/logo-mantaps.png" style="height:24px; vertical-align:middle; margin-right:8px;"> Notifikasi Mantaps';
+                subEl.innerText = 'Monitoring Parameter Transmisi & Sinkronisasi Log Operasional';
+            } else {
+                titleEl.innerHTML = '<i class="fa-solid fa-bell" style="color:var(--pln-blue);"></i> Pusat Notifikasi Transmisi';
+                subEl.innerText = 'Sistem Pemantauan & Peringatan Terpadu Multi-Modul (NEW PST, Power Inspect, Power Swift / ERS)';
+            }
+
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            try {
+                const listEl = document.getElementById('notificationList');
+                const flyoutListEl = document.getElementById('flyoutList');
+                const searchInput = document.getElementById('searchInput');
+                const prioritySelect = document.getElementById('prioritySelect');
+                const categorySelect = document.getElementById('categorySelect');
+
+                const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
+                const priorityVal = prioritySelect ? prioritySelect.value : 'ALL';
+                const categoryVal = categorySelect ? categorySelect.value : 'ALL';
+
+                // Scope counts (safe update)
+                const setCount = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+                setCount('countAll', notifications.length);
+                setCount('countPst', notifications.filter(n => n.module === 'PST').length);
+                setCount('countPi', notifications.filter(n => n.module === 'POWER_INSPECT').length);
+                setCount('countErs', notifications.filter(n => n.module === 'ERS').length);
+                setCount('countFfe', notifications.filter(n => n.module === 'FFE').length);
+                setCount('countMantaps', notifications.filter(n => n.module === 'MANTAPS').length);
+
+                // Filter logic
+                const filtered = notifications.filter(n => {
+                    const matchScope = currentScopeModule === 'ALL' || n.module === currentScopeModule;
+                    const matchSearch = n.title.toLowerCase().includes(searchVal) || n.body.toLowerCase().includes(searchVal) || n.id.toLowerCase().includes(searchVal);
+                    const matchStatus = currentStatusFilter === 'ALL' || (currentStatusFilter === 'UNREAD' && !n.isRead) || (currentStatusFilter === 'READ' && n.isRead);
+                    const matchPriority = priorityVal === 'ALL' || n.priority === priorityVal;
+                    const matchCategory = categoryVal === 'ALL' || n.category === categoryVal;
+                    return matchScope && matchSearch && matchStatus && matchPriority && matchCategory;
+                });
+
+                // Update stats safely
+                const scopeDataset = currentScopeModule === 'ALL' ? notifications : notifications.filter(n => n.module === currentScopeModule);
+                const unreadCount = scopeDataset.filter(n => !n.isRead).length;
+                const approvalCount = scopeDataset.filter(n => (n.priority === 'APPROVAL' || n.category === 'PERMIT' || n.category === 'MUTASI') && !n.isRead).length;
+                const criticalCount = scopeDataset.filter(n => (n.priority === 'CRITICAL' || n.priority === 'WARNING') && !n.isRead).length;
+
+                setCount('statTotal', scopeDataset.length);
+                setCount('statUnread', unreadCount);
+                setCount('statApproval', approvalCount);
+                setCount('statCritical', criticalCount);
+                
+                const totalUnreadGlobal = notifications.filter(n => !n.isRead).length;
+                const headerBadge = document.getElementById('headerBadge');
+                if (headerBadge) {
+                    headerBadge.innerText = totalUnreadGlobal;
+                    headerBadge.style.display = totalUnreadGlobal > 0 ? 'block' : 'none';
+                }
+
+            // Render Clean List (Title + Body Only)
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align:center; padding: 48px 16px; color: var(--text-hint);">
+                        <i class="fa-regular fa-bell-slash" style="font-size:42px; margin-bottom:10px; display:inline-block;"></i>
+                        <p style="font-size:14.5px; font-weight:600;">Tidak ada notifikasi yang sesuai dengan kriteria filter.</p>
+                    </div>
+                `;
+            } else {
+                listEl.innerHTML = filtered.map(item => {
+                    let pillClass = 'pill-info';
+                    if (item.priority === 'CRITICAL') { pillClass = 'pill-critical'; }
+                    else if (item.priority === 'WARNING') { pillClass = 'pill-warning'; }
+                    else if (item.priority === 'APPROVAL') { pillClass = 'pill-warning'; }
+                    else if (item.priority === 'SUCCESS') { pillClass = 'pill-success'; }
+
+                    return `
+                        <div class="notif-card ${item.isRead ? '' : 'unread'}" id="card-${item.id}">
+                            <div class="module-logo-box" title="${item.moduleLabel}">
+                                <img src="${item.icon}" alt="${item.module}">
+                            </div>
+                            <div class="notif-main">
+                                <div class="notif-header-row">
+                                    <div class="notif-chips-row">
+                                        <span class="pill-badge pill-module">${item.moduleLabel}</span>
+                                        <span class="pill-badge ${pillClass}">${item.priorityLabel || item.priority}</span>
+                                    </div>
+                                    <div class="notif-time">
+                                        <i class="fa-regular fa-clock"></i> ${item.time}
+                                        ${!item.isRead ? '<span style="width:7px; height:7px; border-radius:50%; background:var(--danger); display:inline-block;"></span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <!-- Title -->
+                                <h3 class="notif-title">${item.title}</h3>
+                                
+                                <!-- Body -->
+                                <p class="notif-body">${item.body}</p>
+
+                                <div class="notif-footer-row">
+                                    <span style="font-size:11px; color:var(--text-hint); font-weight:600;">Ref: ${item.id}</span>
+                                    <div class="notif-actions">
+                                        ${item.actionUrl !== '#' ? `<a href="${item.actionUrl}" class="btn btn-primary btn-sm" onclick="markRead('${item.id}')">${item.actionLabel} &rarr;</a>` : ''}
+                                        <button class="btn btn-outline btn-sm" onclick="toggleReadState('${item.id}')">
+                                            <i class="${item.isRead ? 'fa-solid fa-envelope' : 'fa-solid fa-check'}"></i>
+                                            ${item.isRead ? 'Belum Dibaca' : 'Tandai Dibaca'}
+                                        </button>
+                                        <button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteNotification('${item.id}')" title="Hapus">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render Bell Flyout
+            if (flyoutListEl) {
+                const recent = notifications.slice(0, 6);
+                flyoutListEl.innerHTML = recent.map(item => `
+                    <div class="flyout-item ${item.isRead ? '' : 'unread'}" onclick="markRead('${item.id}'); if('${item.actionUrl}' !== '#') window.location.href='${item.actionUrl}';">
+                        <img src="${item.icon}" alt="" style="width:22px; height:22px; object-fit:contain; flex-shrink:0; margin-top:2px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                                <span style="font-size:10px; font-weight:700; color:var(--pln-blue); text-transform:uppercase;">${item.moduleLabel}</span>
+                                <span style="font-size:10px; color:var(--text-hint);">${item.time}</span>
+                            </div>
+                            <h5 style="font-size:12.5px; font-weight:600; margin-bottom:2px; line-height:1.3;">${item.title}</h5>
+                            <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.4;">${item.body.substring(0, 60)}...</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (err) {
+            console.error('Error rendering notifications:', err);
+        }
+    }
+
+        function setStatusFilter(status, btn) {
+            currentStatusFilter = status;
+            document.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderNotifications();
+        }
+
+        function filterNotifications() {
+            renderNotifications();
+        }
+
+        function markRead(id) {
+            const item = notifications.find(n => n.id === id);
+            if (item) {
+                item.isRead = true;
+                renderNotifications();
+            }
+        }
+
+        function toggleReadState(id) {
+            const item = notifications.find(n => n.id === id);
+            if (item) {
+                item.isRead = !item.isRead;
+                renderNotifications();
+            }
+        }
+
+        function deleteNotification(id) {
+            notifications = notifications.filter(n => n.id !== id);
+            renderNotifications();
+            showToast('Notifikasi telah dihapus', 'INFO');
+        }
+
+        function markAllAsRead() {
+            if (currentScopeModule === 'ALL') {
+                notifications.forEach(n => n.isRead = true);
+            } else {
+                notifications.filter(n => n.module === currentScopeModule).forEach(n => n.isRead = true);
+            }
+            renderNotifications();
+            showToast('Seluruh notifikasi telah ditandai dibaca', 'SUCCESS');
+        }
+
+        function toggleBellDropdown() {
+            const flyout = document.getElementById('bellFlyout');
+            flyout.classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const wrap = document.querySelector('.bell-btn-wrap');
+            if (wrap && !wrap.contains(e.target)) {
+                document.getElementById('bellFlyout').classList.remove('active');
+            }
+        });
+
+        function showToast(message, type = 'INFO', actionUrl = null, actionText = null) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+
+            let iconHtml = '<i class="fa-solid fa-circle-info" style="color:var(--info); font-size:20px;"></i>';
+            if (type === 'CRITICAL') iconHtml = '<i class="fa-solid fa-circle-exclamation" style="color:var(--danger); font-size:20px;"></i>';
+            if (type === 'SUCCESS') iconHtml = '<i class="fa-solid fa-circle-check" style="color:var(--success); font-size:20px;"></i>';
+            if (type === 'WARNING') iconHtml = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--warning); font-size:20px;"></i>';
+
+            toast.innerHTML = `
+                ${iconHtml}
+                <div style="flex:1;">
+                    <h5 style="font-size:12.5px; font-weight:700; margin-bottom:2px;">Pemberitahuan Sistem</h5>
+                    <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">${message}</p>
+                    ${actionUrl ? `<a href="${actionUrl}" style="font-size:11.5px; font-weight:700; color:var(--pln-blue); text-decoration:none; margin-top:5px; display:inline-block;">${actionText || 'Lihat Aksi &rarr;'}</a>` : ''}
+                </div>
+                <button onclick="this.parentElement.remove()" style="background:none; border:none; color:var(--text-hint); cursor:pointer; font-size:15px;"><i class="fa-solid fa-xmark"></i></button>
+                <div class="toast-progress"></div>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 5000);
+        }
+
+        function simulateNewNotification() {
+            const sampleId = 'NTF-DEMO-' + Math.floor(100 + Math.random() * 900);
+            const newNotif = {
+                id: sampleId,
+                title: 'Permit Baru Pembongkaran ERS #PMT-DIS-2026-19',
+                body: 'Pekerjaan perbaikan darurat selesai, pengajuan pembongkaran Tower ERS di GI Ungaran siap diverifikasi.',
+                module: 'ERS',
+                moduleLabel: 'Power Swift (ERS)',
+                icon: '../assets/logo-power-swift.png',
+                priority: 'APPROVAL',
+                priorityLabel: 'PERSETUJUAN',
+                category: 'PERMIT',
+                isRead: false,
+                time: 'Baru saja',
+                actionUrl: '../hifi-ers/Mutasi/Pengembalian/pengajuan-pengembalian-peminjaman.html',
+                actionLabel: 'Setujui Pembongkaran'
+            };
+
+            notifications.unshift(newNotif);
+            renderNotifications();
+            showToast('Notifikasi Baru: ' + newNotif.title, 'WARNING', newNotif.actionUrl, 'Setujui Sekarang');
+        }
+
+        function openPrefModal() {
+            document.getElementById('prefModal').classList.add('active');
+        }
+
+        function closePrefModal(e) {
+            if (!e || e.target.id === 'prefModal' || e.type === 'click') {
+                document.getElementById('prefModal').classList.remove('active');
+            }
+        }
+
+        function savePrefs() {
+            closePrefModal();
+            showToast('Preferensi notifikasi berhasil disimpan', 'SUCCESS');
+        }
+
+        // Theme sync listener
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'THEME_CHANGE') {
+                const theme = event.data.theme;
+                document.documentElement.setAttribute('data-theme', theme);
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+        });
+
+        try {
+            const savedTheme = localStorage.getItem('hifi-portal-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+                document.body.classList.add('dark-mode');
+            }
+        } catch (e) {
+            console.warn('LocalStorage not accessible:', e);
+        }
+
+        checkUrlModuleParam();
+        renderNotifications();
+    </script>
+</body>
+
+</html>
