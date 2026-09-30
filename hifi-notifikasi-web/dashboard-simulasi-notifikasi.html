@@ -619,102 +619,142 @@
         }
 
         /* ========================================================
-           NOTIFICATION OVERLAY DRAWER
+           OVERLAY BENTUK AWAN (CLOUD POPOVER / DROPDOWN FLYOUT)
            ======================================================== */
-        .notif-overlay-backdrop {
+        .bell-btn-wrap {
+            position: relative;
+        }
+
+        .cloud-backdrop {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
+            background: rgba(15, 23, 42, 0.18);
+            backdrop-filter: blur(2px);
+            z-index: 2400;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
-        .notif-overlay-backdrop.active {
+        .cloud-backdrop.active {
             opacity: 1;
             visibility: visible;
         }
 
-        .notif-slide-drawer {
+        .cloud-popover {
             position: absolute;
-            top: 0;
+            top: calc(100% + 14px);
             right: 0;
-            width: 480px;
-            max-width: 92vw;
-            height: 100%;
+            width: 440px;
+            max-width: calc(100vw - 32px);
             background: #ffffff;
-            box-shadow: -8px 0 35px rgba(0, 0, 0, 0.2);
-            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 16px 45px rgba(15, 23, 42, 0.2), 0 4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 2500;
+            display: none;
             flex-direction: column;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 2001;
+            overflow: hidden;
+            transform-origin: top right;
+            animation: cloudPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .notif-overlay-backdrop.active .notif-slide-drawer {
-            transform: translateX(0);
+        .cloud-popover.active {
+            display: flex;
         }
 
-        .drawer-header {
-            padding: 16px 20px;
+        /* Top arrow caret pointing to bell (Bentuk Awan) */
+        .cloud-popover::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 18px;
+            width: 12px;
+            height: 12px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            transform: rotate(45deg);
+            z-index: 10;
+        }
+
+        @keyframes cloudPopIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .cloud-header {
+            padding: 13px 18px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #f8fafc;
+            position: relative;
+            z-index: 5;
         }
 
-        .drawer-header-left {
+        .cloud-header-left {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .drawer-icon-box {
-            width: 38px;
-            height: 38px;
+        .cloud-icon-box {
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
             background: var(--pln-blue-light);
             color: var(--pln-blue);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
         }
 
-        .drawer-title {
-            font-size: 15px;
+        .cloud-title {
+            font-size: 13.5px;
             font-weight: 700;
             color: var(--text-primary);
         }
 
-        .btn-close-drawer {
+        .cloud-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .btn-close-cloud {
             background: #ffffff;
             border: 1px solid var(--border);
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             cursor: pointer;
             color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 12px;
             transition: all 0.15s;
         }
 
-        .btn-close-drawer:hover {
+        .btn-close-cloud:hover {
             background: var(--danger-light);
             color: var(--danger);
             border-color: #fca5a5;
         }
 
-        .drawer-filters-row {
-            padding: 10px 20px;
+        .cloud-filters-row {
+            padding: 8px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             gap: 6px;
@@ -722,10 +762,10 @@
             overflow-x: auto;
         }
 
-        .drawer-filter-pill {
-            padding: 5px 11px;
+        .cloud-filter-pill {
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             border: 1px solid var(--border);
             background: var(--bg);
@@ -735,28 +775,28 @@
             transition: all 0.15s;
         }
 
-        .drawer-filter-pill.active {
+        .cloud-filter-pill.active {
             background: var(--pln-blue-light);
             border-color: var(--pln-blue);
             color: var(--pln-blue);
             font-weight: 700;
         }
 
-        .drawer-list-scroll {
-            flex: 1;
+        .cloud-list-scroll {
+            max-height: 360px;
             overflow-y: auto;
-            padding: 14px 18px;
+            padding: 10px 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             background: var(--bg);
         }
 
-        .drawer-item-card {
+        .cloud-item-card {
             background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 13px 15px;
+            padding: 11px 13px;
             display: flex;
             gap: 10px;
             cursor: pointer;
@@ -764,22 +804,22 @@
             position: relative;
         }
 
-        .drawer-item-card:hover {
+        .cloud-item-card:hover {
             border-color: var(--pln-blue);
             box-shadow: 0 4px 12px rgba(10, 88, 202, 0.08);
             transform: translateY(-1px);
         }
 
-        .drawer-item-card.unread {
+        .cloud-item-card.unread {
             background: var(--pln-blue-light);
             border-left: 4px solid var(--pln-blue);
         }
 
-        .drawer-item-card.critical {
+        .cloud-item-card.critical {
             border-left: 4px solid var(--danger);
         }
 
-        .drawer-item-card.flash-highlight {
+        .cloud-item-card.flash-highlight {
             animation: flashNew 1.5s ease-out;
         }
 
@@ -788,70 +828,85 @@
             100% { background: #ffffff; transform: scale(1); }
         }
 
-        .drawer-card-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 7px;
+        .cloud-card-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
             flex-shrink: 0;
             margin-top: 1px;
         }
 
-        .drawer-item-title {
-            font-size: 13px;
+        .cloud-item-title {
+            font-size: 12.5px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             line-height: 1.35;
         }
 
-        .drawer-item-body {
+        .cloud-item-body {
             font-size: 11.5px;
             color: var(--text-secondary);
             line-height: 1.45;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
-        .drawer-item-footer {
+        .cloud-item-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
         }
 
-        .drawer-footer-actions {
-            padding: 16px 24px;
+        .cloud-footer {
+            padding: 10px 16px;
             border-top: 1px solid var(--border);
             background: #ffffff;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
         }
 
-        .btn-full-center {
+        .btn-cloud-center {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
             background: var(--pln-blue);
             color: #ffffff;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
             cursor: pointer;
             transition: background 0.15s;
         }
 
-        .btn-full-center:hover {
+        .btn-cloud-center:hover {
             background: var(--pln-blue-dark);
+        }
+
+        .btn-mark-all-cloud {
+            background: none;
+            border: none;
+            color: var(--pln-blue);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 3px;
+            text-align: center;
+        }
+
+        .btn-mark-all-cloud:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -893,7 +948,7 @@
         <a href="../hifi-power-inspect/dashboard-utama-pi/dashboard-peta.html" class="menu-item active" title="Dashboard Utama">
             <i class="fa-solid fa-gauge-high"></i>
         </a>
-        <div class="menu-item" title="Notifikasi (Buka Overlay)" onclick="toggleDrawerOverlay()" id="sidebarBellBtn">
+        <div class="menu-item" title="Notifikasi (Buka Overlay)" onclick="toggleCloudOverlay()" id="sidebarBellBtn">
             <i class="fa-solid fa-bell"></i>
             <span class="sidebar-notif-badge" id="sidebarBadgeCount">4</span>
         </div>
@@ -929,10 +984,55 @@
                 <h1 class="page-title">Dashboard Operasi & Push Alert</h1>
             </div>
             <div class="topbar-actions">
-                <button class="btn-bell-topbar" onclick="toggleDrawerOverlay()" title="Buka Overlay Notifikasi">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="sidebar-notif-badge" id="topbarBadgeCount" style="top:2px; right:2px;">4</span>
-                </button>
+                <!-- Bell Button Wrap & Overlay Bentuk Awan (Cloud Popover) -->
+                <div class="bell-btn-wrap">
+                    <button class="btn-bell-topbar" id="topbarBellBtn" onclick="toggleCloudOverlay()" title="Notifikasi Cepat">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="sidebar-notif-badge" id="topbarBadgeCount" style="top:2px; right:2px;">4</span>
+                    </button>
+
+                    <!-- Overlay Bentuk Awan (Dropdown Flyout Popover) -->
+                    <div class="cloud-popover" id="cloudPopover" onclick="event.stopPropagation()">
+                        <div class="cloud-header">
+                            <div class="cloud-header-left">
+                                <div class="cloud-icon-box">
+                                    <i class="fa-solid fa-bell"></i>
+                                </div>
+                                <div>
+                                    <h3 class="cloud-title">Notifikasi Power Inspect</h3>
+                                    <div class="cloud-subtitle" id="drawerSubtitleText">4 notifikasi belum dibaca</div>
+                                </div>
+                            </div>
+                            <button class="btn-close-cloud" onclick="closeCloudOverlay()" title="Tutup">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <!-- Filter Tabs -->
+                        <div class="cloud-filters-row">
+                            <button class="cloud-filter-pill active" onclick="filterDrawer('ALL', this)">Semua (<span id="countPillAll">5</span>)</button>
+                            <button class="cloud-filter-pill" onclick="filterDrawer('UNREAD', this)">Belum Dibaca (<span id="countPillUnread">4</span>)</button>
+                            <button class="cloud-filter-pill" onclick="filterDrawer('CRITICAL', this)">Kritis & Darurat</button>
+                        </div>
+
+                        <!-- Scrollable Notification List -->
+                        <div class="cloud-list-scroll" id="drawerListContainer">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="cloud-footer">
+                            <a href="notifikasi-center.html?module=power_inspect" class="btn-cloud-center">
+                                <span>Buka Notification Center Terpadu</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                            <button onclick="markAllDrawerRead()" class="btn-mark-all-cloud">
+                                <i class="fa-solid fa-check-double"></i> Tandai Semua Sudah Dibaca
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="user-pill">
                     <div class="user-avatar-circle">BP</div>
                     <div>
@@ -1021,7 +1121,7 @@
                         <div class="card-title">
                             <i class="fa-solid fa-clock-rotate-left" style="color:var(--pln-yellow);"></i> Aktivitas Sistem
                         </div>
-                        <button class="btn-bell-topbar" style="width:28px; height:28px; font-size:12px;" onclick="toggleDrawerOverlay()" title="Buka Detail">
+                        <button class="btn-bell-topbar" style="width:28px; height:28px; font-size:12px;" onclick="toggleCloudOverlay()" title="Buka Detail">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
                     </div>
@@ -1061,50 +1161,8 @@
         <!-- Push Banner Toast Cards will be injected dynamically -->
     </div>
 
-    <!-- ========================================================
-         NOTIFICATION OVERLAY DRAWER (SIDE-PANEL)
-         ======================================================== -->
-    <div id="notifOverlayBackdrop" class="notif-overlay-backdrop" onclick="closeDrawerOverlay(event)">
-        <div class="notif-slide-drawer" onclick="event.stopPropagation()">
-            <div class="drawer-header">
-                <div class="drawer-header-left">
-                    <div class="drawer-icon-box">
-                        <i class="fa-solid fa-bell"></i>
-                    </div>
-                    <div>
-                        <h2 class="drawer-title">Notifikasi Power Inspect</h2>
-                        <div style="font-size:11.5px; color:var(--text-muted);" id="drawerSubtitleText">4 notifikasi belum dibaca</div>
-                    </div>
-                </div>
-                <button class="btn-close-drawer" onclick="closeDrawerOverlay()">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Drawer Filters -->
-            <div class="drawer-filters-row">
-                <button class="drawer-filter-pill active" onclick="filterDrawer('ALL', this)">Semua (<span id="countPillAll">4</span>)</button>
-                <button class="drawer-filter-pill" onclick="filterDrawer('UNREAD', this)">Belum Dibaca (<span id="countPillUnread">4</span>)</button>
-                <button class="drawer-filter-pill" onclick="filterDrawer('CRITICAL', this)">Kritis & Darurat</button>
-            </div>
-
-            <!-- Notification Items Scrollable List -->
-            <div class="drawer-list-scroll" id="drawerListContainer">
-                <!-- Injected dynamically via JS -->
-            </div>
-
-            <!-- Drawer Bottom CTA -->
-            <div class="drawer-footer-actions">
-                <a href="notifikasi-center.html?module=power_inspect" class="btn-full-center">
-                    <span>Buka Pusat Notifikasi Terpadu</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-                <button onclick="markAllDrawerRead()" style="background:none; border:none; color:var(--pln-blue); font-size:12px; font-weight:700; cursor:pointer; padding:6px;">
-                    <i class="fa-solid fa-check-double"></i> Tandai Semua Sudah Dibaca
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Backdrop for Cloud Popover -->
+    <div id="notifOverlayBackdrop" class="cloud-backdrop" onclick="closeCloudOverlay()"></div>
 
     <script>
         // Real-time Notification Dataset for Simulation (5 Standard Templates - Prefix Standar)
@@ -1327,38 +1385,41 @@
         }
 
         // ==========================================
-        // OVERLAY DRAWER LOGIC
+        // OVERLAY BENTUK AWAN (CLOUD POPOVER LOGIC)
         // ==========================================
         function handlePushBannerClick(itemId) {
             dismissPushBanner(`banner-${itemId}`);
-            openDrawerOverlay(itemId);
+            openCloudOverlay(itemId);
         }
 
-        function toggleDrawerOverlay() {
+        function toggleCloudOverlay() {
+            const popover = document.getElementById('cloudPopover');
             const backdrop = document.getElementById('notifOverlayBackdrop');
-            if (backdrop.classList.contains('active')) {
-                closeDrawerOverlay();
+            if (popover && popover.classList.contains('active')) {
+                closeCloudOverlay();
             } else {
-                openDrawerOverlay();
+                openCloudOverlay();
             }
         }
 
-        function openDrawerOverlay(highlightId = null) {
+        function openCloudOverlay(highlightId = null) {
+            const popover = document.getElementById('cloudPopover');
             const backdrop = document.getElementById('notifOverlayBackdrop');
-            backdrop.classList.add('active');
+            if (popover) popover.classList.add('active');
+            if (backdrop) backdrop.classList.add('active');
             renderDrawerList(highlightId);
         }
 
-        function closeDrawerOverlay(e) {
-            if (!e || e.target.id === 'notifOverlayBackdrop' || e.type === 'click') {
-                const backdrop = document.getElementById('notifOverlayBackdrop');
-                backdrop.classList.remove('active');
-            }
+        function closeCloudOverlay(e) {
+            const popover = document.getElementById('cloudPopover');
+            const backdrop = document.getElementById('notifOverlayBackdrop');
+            if (popover) popover.classList.remove('active');
+            if (backdrop) backdrop.classList.remove('active');
         }
 
         function filterDrawer(filterType, btn) {
             currentFilter = filterType;
-            document.querySelectorAll('.drawer-filter-pill').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.cloud-filter-pill').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             renderDrawerList();
         }
@@ -1412,9 +1473,9 @@
 
             if (filtered.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align:center; padding:48px 16px; color:var(--text-muted);">
-                        <i class="fa-regular fa-bell-slash" style="font-size:36px; margin-bottom:12px; opacity:0.4;"></i>
-                        <p style="font-size:13.5px; font-weight:600;">Tidak ada notifikasi untuk filter ini.</p>
+                    <div style="text-align:center; padding:36px 16px; color:var(--text-muted);">
+                        <i class="fa-regular fa-bell-slash" style="font-size:30px; margin-bottom:10px; opacity:0.4;"></i>
+                        <p style="font-size:12.5px; font-weight:600;">Tidak ada notifikasi untuk filter ini.</p>
                     </div>
                 `;
                 return;
@@ -1423,22 +1484,22 @@
             container.innerHTML = filtered.map(item => {
                 const isHighlighted = highlightId === item.id;
                 return `
-                    <div class="drawer-item-card ${item.isRead ? '' : 'unread'} ${item.priority === 'CRITICAL' ? 'critical' : ''} ${isHighlighted ? 'flash-highlight' : ''}" 
+                    <div class="cloud-item-card ${item.isRead ? '' : 'unread'} ${item.priority === 'CRITICAL' ? 'critical' : ''} ${isHighlighted ? 'flash-highlight' : ''}" 
                          id="item-${item.id}" 
                          onclick="markDrawerItemRead('${item.id}', '${item.url}')">
-                        <div class="drawer-card-icon" style="background:${item.iconBg}; color:${item.iconColor};">
+                        <div class="cloud-card-icon" style="background:${item.iconBg}; color:${item.iconColor};">
                             <i class="fa-solid ${item.icon}"></i>
                         </div>
                         <div style="flex:1; min-width:0;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
                                 <span class="push-tag ${item.tagClass}">${item.tag}</span>
-                                <span style="font-size:10.5px; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${item.time}</span>
+                                <span style="font-size:10px; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${item.time}</span>
                             </div>
-                            <div class="drawer-item-title">${item.title}</div>
-                            <div class="drawer-item-body">${item.body}</div>
-                            <div class="drawer-item-footer">
-                                <span style="font-weight:700; color:var(--pln-blue);"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px; margin-right:4px;"></i>Buka Rincian Pekerjaan</span>
-                                ${!item.isRead ? '<span style="width:7px; height:7px; border-radius:50%; background:var(--danger); display:inline-block;" title="Belum Dibaca"></span>' : ''}
+                            <div class="cloud-item-title">${item.title}</div>
+                            <div class="cloud-item-body">${item.body}</div>
+                            <div class="cloud-item-footer">
+                                <span style="font-weight:700; color:var(--pln-blue);"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9.5px; margin-right:4px;"></i>Buka Rincian Pekerjaan</span>
+                                ${!item.isRead ? '<span style="width:6px; height:6px; border-radius:50%; background:var(--danger); display:inline-block;" title="Belum Dibaca"></span>' : ''}
                             </div>
                         </div>
                     </div>
