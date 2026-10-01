@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamifikasi & Leaderboard - PLN Power Inspect</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Remix Icons & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --purple: #7c3aed;
+            --purple-light: #f5f3ff;
+            
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --sidebar-width: 64px;
+            --topbar-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Topbar Utilities (Existing PLN Pattern) */
+        .system-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background: #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .system-topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .system-topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Sidebar (Existing PLN Pattern) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: var(--topbar-height);
+            z-index: 900;
+            height: 100%;
+        }
+
+        .sidebar-logo {
+            padding: 16px 0;
+            margin-bottom: 16px;
+            color: #fbbf24;
+            font-size: 24px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-top: 4px;
+        }
+
+        .menu-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+            text-decoration: none;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Main Content Wrapper */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--topbar-height);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            padding: 24px 32px 16px 32px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--primary); color: #ffffff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: #ffffff; border-color: var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-warning { background: #f59e0b; color: #ffffff; }
+        .btn-warning:hover { background: #d97706; }
+
+        /* Content Container */
+        .page-body {
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Filter Section (Rule: Segmented <= 3 options, Combobox > 3 options) */
+        .filter-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .filter-left, .filter-right {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .form-select {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary);
+        }
+
+        .segmented-pills {
+            display: inline-flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pill-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pill-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Stats Grid 4 Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .stat-desc {
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 2 Column Main Layout */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1080px) {
+            .grid-2col { grid-template-columns: 1fr; }
+        }
+
+        .card-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .card-container-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-container-title {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            padding: 12px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 14px 18px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .rank-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+
+        .rank-gold { background: #fef3c7; color: #b45309; border: 1px solid #f59e0b; }
+        .rank-silver { background: #f1f5f9; color: #475569; border: 1px solid #94a3b8; }
+        .rank-bronze { background: #ffedd5; color: #9a3412; border: 1px solid #ea580c; }
+
+        .inspector-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        /* Grade Pill */
+        .grade-tag {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .grade-a { background: #ecfeff; color: #0891b2; border: 1px solid #a5f3fc; }
+        .grade-b { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .grade-c { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        .grade-d { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .grade-e { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+
+        .level-chip {
+            background: #eff6ff;
+            color: #1a65d6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* 4 Pillars Progress Cards */
+        .pillar-row {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pillar-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .progress-bar-track {
+            height: 7px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-val {
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        /* Detail Modal */
+        .modal-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-wrap.active { display: flex; }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 640px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .modal-box-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-box-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Topbar (Existing PLN Pattern) -->
+    <div class="system-topbar">
+        <div class="left">
+            <i class="ri-flashlight-fill" style="color: #f59e0b;"></i>
+            <strong>PLN Transmisi Jawa Bagian Madura</strong> / Power Inspect / Gamifikasi & Leaderboard
+        </div>
+        <div class="right">
+            <span><i class="ri-time-line"></i> Server Sync: 09:41 WIB</span>
+            <span><i class="ri-shield-check-line" style="color: #10b981;"></i> Status: Online</span>
+        </div>
+    </div>
+
+    <!-- Sidebar (Existing PLN Pattern) -->
+    <aside class="sidebar">
+        <a href="../hifi-home/home.html" class="sidebar-logo" title="HiFi Portal Home">
+            <i class="ri-flashlight-fill"></i>
+            <span>POWER</span>
+        </a>
+        <a href="gamifikasi-web.html" class="menu-item active" title="Leaderboard Web">
+            <i class="ri-trophy-line"></i>
+        </a>
+        <a href="gamifikasi-mobile.html" class="menu-item" title="Tampilan Mobile">
+            <i class="ri-smartphone-line"></i>
+        </a>
+        <a href="gamifikasi-simulasi.html" class="menu-item" title="Simulasi Playground">
+            <i class="ri-gamepad-line"></i>
+        </a>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Page Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <i class="ri-trophy-fill" style="color: #f59e0b;"></i>
+                    <span>Leaderboard & Gamifikasi Power Inspect</span>
+                </h1>
+                <p class="page-subtitle">Pusat monitoring klasemen inspektur lapangan, matriks kualifikasi 4 pilar, dan pencapaian level.</p>
+            </div>
+            <div class="header-actions">
+                <a href="gamifikasi-mobile.html" class="btn btn-outline">
+                    <i class="ri-smartphone-line"></i> View Mobile App
+                </a>
+                <a href="gamifikasi-simulasi.html" class="btn btn-warning">
+                    <i class="ri-play-circle-line"></i> Buka Playground Simulasi
+                </a>
+            </div>
+        </header>
+
+        <!-- Page Body -->
+        <main class="page-body">
+            <!-- Filter Bar -->
+            <section class="filter-card">
+                <div class="filter-left">
+                    <span class="filter-label">Hirarki Unit:</span>
+                    <select class="form-select">
+                        <option value="all">Semua Unit (UIT JBM)</option>
+                        <option value="upt_surabaya">UPT Surabaya</option>
+                        <option value="upt_malang">UPT Malang</option>
+                        <option value="upt_madiun">UPT Madiun</option>
+                        <option value="upt_probolinggo">UPT Probolinggo</option>
+                        <option value="upt_bali">UPT Bali</option>
+                    </select>
+                    <select class="form-select">
+                        <option value="all">Semua ULTG</option>
+                        <option value="ultg_surabaya_barat">ULTG Surabaya Barat</option>
+                        <option value="ultg_surabaya_timur">ULTG Surabaya Timur</option>
+                        <option value="ultg_sidoarjo">ULTG Sidoarjo</option>
+                        <option value="ultg_gresik">ULTG Gresik</option>
+                    </select>
+                </div>
+                <div class="filter-right">
+                    <span class="filter-label">Periode:</span>
+                    <div class="segmented-pills">
+                        <button class="pill-btn active" onclick="setPill(this)">Mingguan</button>
+                        <button class="pill-btn" onclick="setPill(this)">Bulanan</button>
+                        <button class="pill-btn" onclick="setPill(this)">All-Time</button>
+                    </div>
+                    <button class="btn btn-outline" onclick="alert('Mengunduh Laporan KPI Gamifikasi (.xlsx)...')">
+                        <i class="ri-download-2-line"></i> Export KPI
+                    </button>
+                </div>
+            </section>
+
+            <!-- Stats Overview -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span>Total iEXP Terkumpul</span>
+                        <i class="ri-copper-coin-line" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="stat-number">248,520</div>
+                    <div class="stat-desc">
+                        <i class="ri-arrow-up-line"></i> +14.2% dari minggu lalu
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span>Kepatuhan Jadwal</span>
+                        <i class="ri-time-line" style="color: var(--warning);"></i>
+                    </div>
+                    <div class="stat-number">96.8%</div>
+                    <div class="stat-desc">
+                        <i class="ri-checkbox-circle-line"></i> Kepatuhan subuh & beban puncak
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span>Anomali Tervalidasi</span>
+                        <i class="ri-search-eye-line" style="color: var(--success);"></i>
+                    </div>
+                    <div class="stat-number">184 Temuan</div>
+                    <div class="stat-desc" style="color: var(--text-muted);">
+                        100% foto tajam & geotag presisi
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span>Inspektur Grade A/B</span>
+                        <i class="ri-medal-line" style="color: var(--purple);"></i>
+                    </div>
+                    <div class="stat-number">28 Personel</div>
+                    <div class="stat-desc" style="color: var(--purple);">
+                        Master & Lead Specialist
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2-Column Main Layout -->
+            <div class="grid-2col">
+                <!-- Left: Leaderboard Table -->
+                <section class="card-container">
+                    <div class="card-container-header">
+                        <div class="card-container-title">
+                            <i class="ri-medal-line" style="color: #f59e0b;"></i>
+                            <span>Klasemen Top Inspector Lapangan</span>
+                        </div>
+                        <span style="font-size: 12px; color: var(--text-muted);">Data tersinkron otomatis</span>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">Rank</th>
+                                    <th>Inspektur & Unit</th>
+                                    <th>Grade Kualifikasi</th>
+                                    <th>Level</th>
+                                    <th>Akurasi Inspeksi</th>
+                                    <th>Total iEXP</th>
+                                    <th style="text-align: center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr onclick="showInspector('TECH-8821', 'Budi Santoso', 'ULTG Surabaya Barat', 'Grade C (Specialist)', 'Lv. 18', 6240, 142, 28, 9)" style="cursor: pointer;">
+                                    <td><div class="rank-circle rank-gold">1</div></td>
+                                    <td>
+                                        <div class="inspector-meta">
+                                            <div class="avatar-circle">BS</div>
+                                            <div>
+                                                <div style="font-weight: 700;">Budi Santoso</div>
+                                                <div style="font-size: 11px; color: var(--text-muted);">ULTG Surabaya Barat</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="grade-tag grade-c">Grade C (Specialist)</span></td>
+                                    <td><span class="level-chip">Lv. 18</span></td>
+                                    <td><span style="color: var(--success); font-weight: 700;">99.4% (0 Reject)</span></td>
+                                    <td><strong style="color: var(--primary); font-size: 14px;">6,240</strong></td>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;">Detail</button>
+                                    </td>
+                                </tr>
+                                <tr onclick="showInspector('TECH-9102', 'Dimas Prasetyo', 'ULTG Sidoarjo', 'Grade B (Expert)', 'Lv. 34', 14850, 210, 45, 14)" style="cursor: pointer;">
+                                    <td><div class="rank-circle rank-silver">2</div></td>
+                                    <td>
+                                        <div class="inspector-meta">
+                                            <div class="avatar-circle" style="background: #fef3c7; color: #b45309;">DP</div>
+                                            <div>
+                                                <div style="font-weight: 700;">Dimas Prasetyo</div>
+                                                <div style="font-size: 11px; color: var(--text-muted);">ULTG Sidoarjo</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="grade-tag grade-b">Grade B (Expert)</span></td>
+                                    <td><span class="level-chip">Lv. 34</span></td>
+                                    <td><span style="color: var(--success); font-weight: 700;">98.8%</span></td>
+                                    <td><strong style="color: var(--primary); font-size: 14px;">14,850</strong></td>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;">Detail</button>
+                                    </td>
+                                </tr>
+                                <tr onclick="showInspector('TECH-7740', 'Ahmad Fauzi', 'ULTG Gresik', 'Grade A (Master)', 'Lv. 52', 26400, 390, 82, 19)" style="cursor: pointer;">
+                                    <td><div class="rank-circle rank-bronze">3</div></td>
+                                    <td>
+                                        <div class="inspector-meta">
+                                            <div class="avatar-circle" style="background: #ecfeff; color: #0891b2;">AF</div>
+                                            <div>
+                                                <div style="font-weight: 700;">Ahmad Fauzi</div>
+                                                <div style="font-size: 11px; color: var(--text-muted);">ULTG Gresik</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="grade-tag grade-a">Grade A (Master)</span></td>
+                                    <td><span class="level-chip">Lv. 52</span></td>
+                                    <td><span style="color: var(--success); font-weight: 700;">99.8%</span></td>
+                                    <td><strong style="color: var(--primary); font-size: 14px;">26,400</strong></td>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;">Detail</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Right: Competency Radar (4 Pillars) -->
+                <section class="card-container">
+                    <div class="card-container-header">
+                        <div class="card-container-title">
+                            <i class="ri-radar-line" style="color: var(--primary);"></i>
+                            <span>Matriks 4 Pilar Regu</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="pillar-row">
+                            <div class="pillar-top">
+                                <span>Completeness (Cakupan Bay)</span>
+                                <strong style="color: var(--primary);">92%</strong>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-val" style="width: 92%; background: var(--primary);"></div>
+                            </div>
+                            <span style="font-size: 11px; color: var(--text-muted);">8 dari 8 grup aset lengkap diinspeksi.</span>
+                        </div>
+
+                        <div class="pillar-row">
+                            <div class="pillar-top">
+                                <span>Timeliness (Disiplin Jadwal)</span>
+                                <strong style="color: var(--success);">88%</strong>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-val" style="width: 88%; background: var(--success);"></div>
+                            </div>
+                            <span style="font-size: 11px; color: var(--text-muted);">Patroli subuh & jam beban puncak terjaga.</span>
+                        </div>
+
+                        <div class="pillar-row">
+                            <div class="pillar-top">
+                                <span>Awareness (Deteksi Anomali)</span>
+                                <strong style="color: var(--warning);">95%</strong>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-val" style="width: 95%; background: var(--warning);"></div>
+                            </div>
+                            <span style="font-size: 11px; color: var(--text-muted);">Kejelian temuan hotspot & anomali mekanik.</span>
+                        </div>
+
+                        <div class="pillar-row">
+                            <div class="pillar-top">
+                                <span>Readyness (Kesiapan Energize)</span>
+                                <strong style="color: var(--purple);">84%</strong>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-val" style="width: 84%; background: var(--purple);"></div>
+                            </div>
+                            <span style="font-size: 11px; color: var(--text-muted);">Responsif penanganan darurat & commissioning.</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Dispatch Filter Box -->
+                    <div style="padding: 16px 20px; background: #f8fafc; border-top: 1px solid var(--border-color);">
+                        <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">
+                            <i class="ri-user-search-line"></i> Quick Dispatch Personel Bersertifikasi
+                        </div>
+                        <select class="form-select" style="width: 100%;" onchange="alert('Filter aktif untuk lencana: ' + this.value)">
+                            <option value="">Pilih Sertifikasi Badge Khusus...</option>
+                            <option value="Detektif Inspektur">Badge: Detektif Inspektur (Anomali > 100)</option>
+                            <option value="Prajurit Energizer">Badge: Prajurit Energizer (Commissioning Aset)</option>
+                            <option value="Mata Elang">Badge: Mata Elang (Foto Evidence Sempurna)</option>
+                            <option value="Kilat Respons">Badge: Kilat Respons (Siaga Darurat &le; 30 Menit)</option>
+                        </select>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Inspector Modal -->
+    <div class="modal-wrap" id="inspectorModal" onclick="if(event.target===this) closeModal()">
+        <div class="modal-box">
+            <div class="modal-box-header">
+                <h3 style="font-size: 16px; font-weight: 800;" id="mTitle">Detail Profil Inspektur</h3>
+                <button onclick="closeModal()" style="border: none; background: transparent; font-size: 20px; cursor: pointer;">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-box-body">
+                <div style="display: flex; align-items: center; gap: 14px; background: #f8fafc; padding: 16px; border-radius: 12px;">
+                    <div class="avatar-circle" style="width: 48px; height: 48px; font-size: 18px;" id="mAvatar">BS</div>
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 16px; font-weight: 800;" id="mName">Budi Santoso</h4>
+                        <div style="font-size: 12px; color: var(--text-muted);" id="mUnit">ULTG Surabaya Barat</div>
+                        <div style="margin-top: 6px; display: flex; gap: 6px;">
+                            <span class="grade-tag grade-c" id="mGrade">Grade C</span>
+                            <span class="level-chip" id="mLevel">Lv. 18</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11px; color: var(--text-muted);">Total iEXP</div>
+                        <div style="font-size: 20px; font-weight: 800; color: var(--primary);" id="mExp">6,240</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; text-align: center;">
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 11px; color: var(--text-muted);">Inspeksi Form</div>
+                        <div style="font-size: 18px; font-weight: 800;" id="mInsp">142</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 11px; color: var(--text-muted);">Anomali Valid</div>
+                        <div style="font-size: 18px; font-weight: 800; color: var(--danger);" id="mAnom">28</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 11px; color: var(--text-muted);">Lencana Terbuka</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #f59e0b;" id="mBadges">9 / 12</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setPill(btn) {
+            document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function showInspector(id, name, unit, grade, level, exp, insp, anom, badges) {
+            document.getElementById('mTitle').innerText = `Detail Profil – ${id}`;
+            document.getElementById('mAvatar').innerText = name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            document.getElementById('mName').innerText = name;
+            document.getElementById('mUnit').innerText = unit;
+            document.getElementById('mGrade').innerText = grade;
+            document.getElementById('mLevel').innerText = level;
+            document.getElementById('mExp').innerText = exp.toLocaleString();
+            document.getElementById('mInsp').innerText = insp;
+            document.getElementById('mAnom').innerText = anom;
+            document.getElementById('mBadges').innerText = `${badges} / 12`;
+            document.getElementById('inspectorModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('inspectorModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

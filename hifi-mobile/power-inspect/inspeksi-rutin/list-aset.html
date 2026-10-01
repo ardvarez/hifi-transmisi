@@ -2699,12 +2699,39 @@
                     clearInterval(interval);
                     setTimeout(() => {
                         document.querySelectorAll('.sync-badge-count').forEach(b => b.style.display = 'none');
+                        
+                        // Update Card 3 (Local -> Selesai Server)
+                        const card3 = document.querySelector('.asset-card[data-nama="Power Transformer OLTC"]');
+                        if (card3) {
+                            card3.setAttribute('data-status', 'sudah');
+                            const pills = card3.querySelector('.asset-pills-row');
+                            if (pills) {
+                                pills.innerHTML = '<span class="asset-pill pill-green">Sudah Inspeksi</span> <span class="asset-pill pill-blue-gray">Selesai Server</span>';
+                            }
+                            const syncBtn = card3.querySelector('.btn-orange');
+                            if (syncBtn) syncBtn.remove();
+                        }
+
+                        // Update Card 4 (Gagal -> Selesai Server)
+                        const card4 = document.querySelector('.asset-card[data-nama="Power Transformer Bushing"]');
+                        if (card4) {
+                            card4.setAttribute('data-status', 'sudah');
+                            const pills = card4.querySelector('.asset-pills-row');
+                            if (pills) {
+                                pills.innerHTML = '<span class="asset-pill pill-green">Sudah Inspeksi</span> <span class="asset-pill pill-blue-gray">Selesai Server</span>';
+                            }
+                            const errBox = card4.querySelector('.error-alert-box');
+                            if (errBox) errBox.remove();
+                            card4.querySelectorAll('.btn-card-action').forEach(b => b.remove());
+                        }
+
                         alert('2 Hasil inspeksi offline berhasil diunggah dan tersinkronisasi ke server pusat PLN!');
                         closeUniversalSync();
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Upload Sekarang';
                         pBox.style.display = 'none';
                         pBar.style.width = '0%';
+                        applyAssetFilters();
                     }, 400);
                 }
             }, 350);

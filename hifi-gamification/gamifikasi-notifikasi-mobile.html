@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Inspect - Simulasi In-App Flag Notification Mobile</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1a65d6;
+            --primary-hover: #134db0;
+            --primary-light: #eff6ff;
+            --secondary: #0284c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --gold: #f59e0b;
+
+            --bg-workspace: #0f172a;
+            --panel-bg: #1e293b;
+            --panel-border: #334155;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+
+            /* Mobile Frame Tokens */
+            --mobile-bg: #f8fafc;
+            --mobile-card: #ffffff;
+            --mobile-border: #e2e8f0;
+            --mobile-text: #0f172a;
+            --mobile-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-workspace);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Simulation Nav */
+        .workspace-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .brand-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1a65d6, #0284c7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.4);
+        }
+
+        .brand-badge h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .brand-badge p {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-portal {
+            background: #334155;
+            color: #fff;
+            border: 1px solid #475569;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-portal:hover {
+            background: #475569;
+            border-color: #64748b;
+        }
+
+        /* Main Workspace Split */
+        .workspace-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 65px);
+            overflow: hidden;
+        }
+
+        /* Left Simulator Control Panel */
+        .control-panel {
+            width: 440px;
+            min-width: 380px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--panel-border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #38bdf8;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .panel-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .feature-bullets {
+            font-size: 12px;
+            color: #cbd5e1;
+            line-height: 1.5;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feature-bullets li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .feature-bullets li i {
+            color: #10b981;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        /* Preset Buttons Grid */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: #f8fafc;
+            text-align: left;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .preset-btn:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .preset-btn:active {
+            transform: translateY(0);
+        }
+
+        .preset-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .preset-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preset-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .preset-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .preset-action-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #38bdf8;
+        }
+
+        /* Custom Trigger Form */
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-trigger-custom {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb, #0284c7);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-trigger-custom:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-trigger-custom:active {
+            transform: translateY(0);
+        }
+
+        /* Right Mobile Preview Container */
+        .preview-area {
+            flex: 1;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-notice {
+            position: absolute;
+            bottom: 16px;
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Device Frame */
+        .mobile-device-frame {
+            width: 390px;
+            height: 780px;
+            background: #ffffff;
+            border-radius: 46px;
+            border: 10px solid #1e293b;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dynamic Island / Top Notch */
+        .device-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 24px;
+            background: #0f172a;
+            border-radius: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        .notch-camera {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        .notch-sensor {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #1e293b;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            padding: 12px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+            background: transparent;
+            z-index: 900;
+        }
+
+        .status-bar-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* IN-APP FLAG NOTIFICATION BANNER (NON-INTRUSIVE) */
+        .inapp-flag-container {
+            position: absolute;
+            top: 48px;
+            left: 14px;
+            right: 14px;
+            z-index: 999;
+            pointer-events: none; /* Allows click-through outside banner */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .inapp-flag-card {
+            pointer-events: auto; /* Banner itself is interactive */
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(-120%);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            user-select: none;
+        }
+
+        .inapp-flag-card.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .inapp-flag-card.swiping-up {
+            transform: translateY(-120%);
+            opacity: 0;
+            transition: all 0.25s ease-in;
+        }
+
+        .flag-icon-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .flag-icon-badge .pulse-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            animation: pulseWave 1.8s infinite;
+        }
+
+        @keyframes pulseWave {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        .flag-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .flag-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .flag-title-tag {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .flag-time {
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
+        .flag-headline {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.25;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .flag-subtitle {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .flag-action-pill {
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 11px;
+            font-weight: 700;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .flag-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            width: 100%;
+            transform-origin: left;
+            animation: flagTimer 4.5s linear forwards;
+        }
+
+        @keyframes flagTimer {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+
+        /* Swipe hint indicator */
+        .flag-dismiss-handle {
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        /* IN-APP SCREEN CONTENT (ACTIVE INSPECTOR UI) */
+        .mobile-app-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        /* Mobile Header */
+        .mobile-top-header {
+            padding: 8px 16px 12px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--mobile-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a65d6, #0284c7);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .mobile-user-meta h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .mobile-user-meta p {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .mobile-exp-chip {
+            background: #eef4ff;
+            border: 1px solid #bfdbfe;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Mobile Body Scrollable */
+        .mobile-body-scroll {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Active Inspection Task Card */
+        .active-task-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .task-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .status-pill-active {
+            background: #ecfdf5;
+            color: #059669;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .task-sub {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        /* Interactive Checklist (User can interact while notification pops up) */
+        .form-check-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #334155;
+            padding: 6px 8px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .check-item:hover {
+            border-color: #93c5fd;
+        }
+
+        .check-item.done {
+            background: #f0fdf4;
+            border-color: #86efac;
+            color: #166534;
+            text-decoration: line-through;
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 2px solid #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 11px;
+        }
+
+        .check-item.done .custom-checkbox {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        /* Interactive Input Inside Mobile */
+        .mobile-input-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+            color: #1e293b;
+            width: 100%;
+            outline: none;
+        }
+
+        .mobile-input-box:focus {
+            border-color: #2563eb;
+        }
+
+        .btn-mobile-action {
+            width: 100%;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .btn-mobile-action:hover {
+            background: #1d4ed8;
+        }
+
+        /* Streak & Ranking Widget in Mobile */
+        .mobile-stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-mini-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-mini-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .stat-mini-meta h5 {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .stat-mini-meta p {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        /* Mobile Bottom Nav */
+        .mobile-bottom-nav {
+            height: 60px;
+            background: #ffffff;
+            border-top: 1px solid var(--mobile-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+            z-index: 20;
+        }
+
+        .mobile-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+
+        .mobile-nav-btn i {
+            font-size: 18px;
+        }
+
+        .mobile-nav-btn.active {
+            color: #2563eb;
+        }
+
+        /* Detail Modal / Sheet when tapping banner */
+        .flag-detail-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1050;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .flag-detail-modal.show {
+            display: flex;
+        }
+
+        .detail-sheet-card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Toast History Log */
+        .history-log-list {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-item {
+            font-size: 11px;
+            padding: 6px 8px;
+            background: rgba(15, 23, 42, 0.4);
+            border-left: 3px solid #38bdf8;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            color: #cbd5e1;
+        }
+
+        .history-item span.time {
+            color: #64748b;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Workspace Header -->
+    <header class="workspace-header">
+        <div class="brand-badge">
+            <div class="logo-icon">
+                <i class="ri-notification-badge-line"></i>
+            </div>
+            <div>
+                <h1>Simulator In-App Flag Notification (Mobile)</h1>
+                <p>Simulasi notifikasi mengambang di atas layar tanpa mengganggu aktivitas inspeksi user</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="../hifi-gamification/gamifikasi-mobile.html" class="btn-portal">
+                <i class="ri-smartphone-line"></i> Profil Mobile
+            </a>
+            <a href="../hifi-gamification/gamifikasi-web.html" class="btn-portal">
+                <i class="ri-dashboard-line"></i> Dashboard Web
+            </a>
+            <a href="../hifi-home/home.html" class="btn-portal">
+                <i class="ri-home-4-line"></i> Kembali ke Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="workspace-container">
+        <!-- Control Panel (Left) -->
+        <aside class="control-panel">
+            <div>
+                <div class="section-title">
+                    <i class="ri-information-line"></i> Karakteristik Flag In-App
+                </div>
+                <div class="panel-card">
+                    <ul class="feature-bullets">
+                        <li>
+                            <i class="ri-check-line"></i>
+                            <span><strong>Non-Intrusive:</strong> Muncul sebagai floating card di atas status bar tanpa menutup form atau blok input.</span>
+                        </li>
+                        <li>
+                            <i class="ri-check-line"></i>
+                            <span><strong>Interaktif & Mandiri:</strong> User tetap bisa tap tombol/checklist di bawah sambil notifikasi aktif.</span>
+                        </li>
+                        <li>
+                            <i class="ri-check-line"></i>
+                            <span><strong>Gesture Dismiss:</strong> Dapat di-swipe ke atas untuk menutup seketika atau di-tap untuk detail.</span>
+                        </li>
+                        <li>
+                            <i class="ri-check-line"></i>
+                            <span><strong>Auto-Dismiss Timer:</strong> Progress bar 4.5 detik untuk menghilang otomatis.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Trigger Presets -->
+            <div>
+                <div class="section-title">
+                    <i class="ri-flashlight-line"></i> Trigger Skenario Notifikasi
+                </div>
+                <div class="preset-grid">
+                    <!-- Preset 1: EXP & Task -->
+                    <button class="preset-btn" onclick="triggerNotification('exp')">
+                        <div class="preset-icon-box" style="background: rgba(37, 99, 235, 0.2); color: #38bdf8;">
+                            <i class="ri-flashlight-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">+150 EXP • Bay Gardu Selesai</div>
+                            <div class="preset-desc">Reward menyelesaikan item inspeksi bay</div>
+                        </div>
+                        <div class="preset-action-tag">+150 XP</div>
+                    </button>
+
+                    <!-- Preset 2: Badge Unlocked -->
+                    <button class="preset-btn" onclick="triggerNotification('badge')">
+                        <div class="preset-icon-box" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                            <i class="ri-medal-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Lencana Baru Terbuka!</div>
+                            <div class="preset-desc">🏅 Detektif Korosi (Level 1) didapatkan</div>
+                        </div>
+                        <div class="preset-action-tag" style="color: #fbbf24;">Badge</div>
+                    </button>
+
+                    <!-- Preset 3: Streak Multiplier -->
+                    <button class="preset-btn" onclick="triggerNotification('streak')">
+                        <div class="preset-icon-box" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">
+                            <i class="ri-fire-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Streak 7 Hari Terjaga!</div>
+                            <div class="preset-desc">🔥 Bonus Multiplier EXP 1.2x aktif hari ini</div>
+                        </div>
+                        <div class="preset-action-tag" style="color: #f87171;">7 Hari</div>
+                    </button>
+
+                    <!-- Preset 4: Validation Approved -->
+                    <button class="preset-btn" onclick="triggerNotification('validation')">
+                        <div class="preset-icon-box" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">
+                            <i class="ri-checkbox-circle-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Inspeksi Disetujui Supervisor</div>
+                            <div class="preset-desc">Laporan T.45 UPT Bandung telah divalidasi</div>
+                        </div>
+                        <div class="preset-action-tag" style="color: #34d399;">Valid</div>
+                    </button>
+
+                    <!-- Preset 5: Rank Shift -->
+                    <button class="preset-btn" onclick="triggerNotification('rank')">
+                        <div class="preset-icon-box" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa;">
+                            <i class="ri-trophy-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Naik Peringkat Leaderboard!</div>
+                            <div class="preset-desc">⚡ Kamu naik ke Rank #3 di Unit Pelaksana</div>
+                        </div>
+                        <div class="preset-action-tag" style="color: #a78bfa;">Rank 3</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Notification Generator -->
+            <div>
+                <div class="section-title">
+                    <i class="ri-settings-3-line"></i> Notifikasi Kustom
+                </div>
+                <div class="panel-card">
+                    <div class="form-group">
+                        <label class="form-label">Kategori / Event</label>
+                        <select id="customCategory" class="form-select">
+                            <option value="exp">Perolehan EXP (Blue)</option>
+                            <option value="badge">Pencapaian Lencana (Gold)</option>
+                            <option value="streak">Streak & Combo (Orange)</option>
+                            <option value="validation">Validasi & Approval (Green)</option>
+                            <option value="rank">Leaderboard (Purple)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Judul Notifikasi</label>
+                        <input type="text" id="customTitle" class="form-input" value="Tugas Inspeksi Mendadak Ditugaskan" placeholder="Contoh: Judul Notifikasi">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pesan Singkat</label>
+                        <input type="text" id="customMessage" class="form-input" value="Selesaikan anomali suhu hot spot pada Bay Mandirancan 150kV" placeholder="Contoh: Detail pesan">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tag / Nilai Highlight</label>
+                        <input type="text" id="customTag" class="form-input" value="Prioritas Tinggi" placeholder="Contoh: +100 XP / Baru">
+                    </div>
+                    <button class="btn-trigger-custom" onclick="triggerCustomNotification()">
+                        <i class="ri-send-plane-fill"></i> Kirim Notifikasi ke Mobile
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification History Log -->
+            <div>
+                <div class="section-title">
+                    <i class="ri-history-line"></i> Log Notifikasi Terkirim
+                </div>
+                <div class="history-log-list" id="notificationHistory">
+                    <div class="history-item">
+                        <span>Simulator siap digunakan</span>
+                        <span class="time">12:30</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Preview Area (Right) -->
+        <main class="preview-area">
+            <!-- Mobile Phone Frame -->
+            <div class="mobile-device-frame" id="mobileDevice">
+                <!-- Device Top Notch -->
+                <div class="device-notch">
+                    <div class="notch-camera"></div>
+                    <div class="notch-sensor"></div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="liveClock">12:34</span>
+                    <div class="status-bar-icons">
+                        <i class="ri-signal-tower-fill"></i>
+                        <i class="ri-wifi-fill"></i>
+                        <i class="ri-battery-2-charge-fill" style="color: #10b981;"></i>
+                    </div>
+                </div>
+
+                <!-- IN-APP FLAG NOTIFICATION BANNER CONTAINER -->
+                <div class="inapp-flag-container" id="flagContainer">
+                    <!-- Dynamic notification card will be injected / animated here -->
+                </div>
+
+                <!-- DETAIL BOTTOM SHEET MODAL (Opened on click banner) -->
+                <div class="flag-detail-modal" id="flagDetailModal" onclick="closeDetailModal(event)">
+                    <div class="detail-sheet-card" onclick="event.stopPropagation()">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <span style="font-size:11px; font-weight:700; color:#2563eb; text-transform:uppercase;" id="modalCategoryTag">GAMIFIKASI REWARD</span>
+                            <button onclick="closeDetailModal()" style="background:none; border:none; font-size:18px; color:#64748b; cursor:pointer;">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin-bottom:6px;" id="modalTitle">Detail Notifikasi</h3>
+                        <p style="font-size:13px; color:#475569; line-height:1.4; margin-bottom:16px;" id="modalBody">Deskripsi lengkap dari event notifikasi gamifikasi mobile.</p>
+                        <div style="background:#f1f5f9; padding:10px 12px; border-radius:10px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:12px; color:#64748b;">EXP Didapatkan</span>
+                            <strong style="font-size:14px; color:#2563eb;" id="modalExpScore">+150 EXP</strong>
+                        </div>
+                        <button onclick="closeDetailModal()" style="width:100%; background:#2563eb; color:#fff; border:none; border-radius:10px; padding:10px; font-weight:700; font-size:13px; cursor:pointer;">
+                            Tutup & Lanjutkan Inspeksi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Active App Screen (Inspection Workspace) -->
+                <div class="mobile-app-content">
+                    <!-- Mobile Header -->
+                    <div class="mobile-top-header">
+                        <div class="mobile-user-profile">
+                            <div class="mobile-avatar">RZ</div>
+                            <div class="mobile-user-meta">
+                                <h4>Rizky Pratama</h4>
+                                <p>Junior Inspector • ULTG Bandung</p>
+                            </div>
+                        </div>
+                        <div class="mobile-exp-chip" id="mobileExpBadge">
+                            <i class="ri-vip-diamond-fill" style="color: #f59e0b;"></i>
+                            <span id="currentExpDisplay">3,450 XP</span>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Body: Live Inspection Task (Demonstrating Non-Intrusiveness) -->
+                    <div class="mobile-body-scroll">
+                        <!-- Stats Row -->
+                        <div class="mobile-stats-row">
+                            <div class="stat-mini-card">
+                                <div class="stat-mini-icon" style="background:#fee2e2; color:#ef4444;">
+                                    <i class="ri-fire-line"></i>
+                                </div>
+                                <div class="stat-mini-meta">
+                                    <h5>Streak Aktif</h5>
+                                    <p id="streakDisplay">7 Hari 🔥</p>
+                                </div>
+                            </div>
+                            <div class="stat-mini-card">
+                                <div class="stat-mini-icon" style="background:#f3e8ff; color:#9333ea;">
+                                    <i class="ri-trophy-line"></i>
+                                </div>
+                                <div class="stat-mini-meta">
+                                    <h5>Peringkat UPT</h5>
+                                    <p id="rankDisplay">Rank #3 🏆</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Form Card -->
+                        <div class="active-task-card">
+                            <div class="task-badge-row">
+                                <span class="status-pill-active">
+                                    <i class="ri-record-circle-fill"></i> Sedang Berjalan
+                                </span>
+                                <span style="font-size: 11px; color: #64748b; font-weight: 600;">Bay Bandung Selatan #02</span>
+                            </div>
+                            <h3 class="task-title">Inspeksi Rutin Switchyard 150kV</h3>
+                            <p class="task-sub">Cek kondisi fisik isolator, level SF6, dan anomali sambungan konduktor.</p>
+
+                            <!-- Interactive Checkbox items -->
+                            <div class="form-check-group">
+                                <div class="check-item done" onclick="toggleCheckItem(this, 50)">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <div class="custom-checkbox"><i class="ri-check-line"></i></div>
+                                        <span>Pengecekan Tekanan Gas SF6</span>
+                                    </div>
+                                    <span style="font-size:10px; font-weight:700; color:#10b981;">+50 XP</span>
+                                </div>
+
+                                <div class="check-item" onclick="toggleCheckItem(this, 50)">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <div class="custom-checkbox"></div>
+                                        <span>Inspeksi Visual Pemutus Tenaga (PMT)</span>
+                                    </div>
+                                    <span style="font-size:10px; font-weight:700; color:#2563eb;">+50 XP</span>
+                                </div>
+
+                                <div class="check-item" onclick="toggleCheckItem(this, 50)">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <div class="custom-checkbox"></div>
+                                        <span>Pengukuran Thermovisi Klem Konduktor</span>
+                                    </div>
+                                    <span style="font-size:10px; font-weight:700; color:#2563eb;">+50 XP</span>
+                                </div>
+                            </div>
+
+                            <!-- Input notes inside active form -->
+                            <div style="margin-top: 10px;">
+                                <label style="font-size: 11px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Catatan Temuan Lapangan</label>
+                                <input type="text" class="mobile-input-box" placeholder="Ketik catatan di sini sambil notifikasi muncul..." value="Kondisi isolator fase S bersih, tidak ada korosi.">
+                            </div>
+
+                            <button class="btn-mobile-action" onclick="finishInspectionAction()">
+                                <i class="ri-check-double-line"></i> Submit & Selesaikan Inspeksi
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Nav -->
+                    <div class="mobile-bottom-nav">
+                        <div class="mobile-nav-btn active">
+                            <i class="ri-file-list-3-line"></i>
+                            <span>Inspeksi</span>
+                        </div>
+                        <div class="mobile-nav-btn" onclick="triggerNotification('badge')">
+                            <i class="ri-medal-line"></i>
+                            <span>Lencana</span>
+                        </div>
+                        <div class="mobile-nav-btn" onclick="triggerNotification('rank')">
+                            <i class="ri-trophy-line"></i>
+                            <span>Peringkat</span>
+                        </div>
+                        <div class="mobile-nav-btn">
+                            <i class="ri-user-3-line"></i>
+                            <span>Profil</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-notice">
+                <i class="ri-hand-coin-line"></i> Coba klik tombol preset di kiri atau selesaikan checklist di dalam ponsel untuk melihat reaksi flag notifikasi.
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // State variables
+        let currentExp = 3450;
+        let activeTimer = null;
+        let currentNotificationData = null;
+
+        // Presets data definitions
+        const NOTIFICATION_PRESETS = {
+            exp: {
+                category: 'REWARD EXP',
+                title: '+150 EXP Berhasil Didapatkan!',
+                subtitle: 'Menyelesaikan Checklist Inspeksi Bay 150kV',
+                tag: '+150 XP',
+                expAdd: 150,
+                icon: 'ri-flashlight-fill',
+                iconColor: '#38bdf8',
+                badgeBg: 'rgba(37, 99, 235, 0.25)',
+                tagColor: '#38bdf8'
+            },
+            badge: {
+                category: 'PENCAPAIAN LENCANA',
+                title: '🏅 Lencana Terbuka: Detektif Korosi!',
+                subtitle: 'Berhasil menemukan 5 temuan korosi kritis tepat waktu',
+                tag: 'Level 1',
+                expAdd: 200,
+                icon: 'ri-medal-fill',
+                iconColor: '#fbbf24',
+                badgeBg: 'rgba(245, 158, 11, 0.25)',
+                tagColor: '#fbbf24'
+            },
+            streak: {
+                category: 'DAILY STREAK',
+                title: '🔥 Streak 7 Hari Berturut-turut!',
+                subtitle: 'EXP Multiplier 1.2x aktif untuk semua inspeksi hari ini',
+                tag: 'Multiplier 1.2x',
+                expAdd: 75,
+                icon: 'ri-fire-fill',
+                iconColor: '#f87171',
+                badgeBg: 'rgba(239, 68, 68, 0.25)',
+                tagColor: '#f87171'
+            },
+            validation: {
+                category: 'VALIDASI DISETUJUI',
+                title: '✅ Inspeksi Gardu Divalidasi!',
+                subtitle: 'Supervisor telah memverifikasi laporan Bay Bandung Selatan',
+                tag: 'Status Valid',
+                expAdd: 100,
+                icon: 'ri-checkbox-circle-fill',
+                iconColor: '#34d399',
+                badgeBg: 'rgba(16, 185, 129, 0.25)',
+                tagColor: '#34d399'
+            },
+            rank: {
+                category: 'LEADERBOARD UPDATE',
+                title: '⚡ Peringkat Kamu Naik ke #3!',
+                subtitle: 'Melewati Bayu Aji di klasemen UPT Bandung minggu ini',
+                tag: 'Top 3 UPT',
+                expAdd: 50,
+                icon: 'ri-trophy-fill',
+                iconColor: '#a78bfa',
+                badgeBg: 'rgba(139, 92, 246, 0.25)',
+                tagColor: '#a78bfa'
+            }
+        };
+
+        // Live clock update
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) clockEl.innerText = timeStr;
+            return timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Main Trigger function
+        function triggerNotification(presetKey) {
+            const data = NOTIFICATION_PRESETS[presetKey];
+            if (!data) return;
+            showFlagNotification(data);
+        }
+
+        // Custom notification trigger
+        function triggerCustomNotification() {
+            const catKey = document.getElementById('customCategory').value;
+            const baseData = NOTIFICATION_PRESETS[catKey] || NOTIFICATION_PRESETS.exp;
+            
+            const title = document.getElementById('customTitle').value || 'Notifikasi Kustom';
+            const subtitle = document.getElementById('customMessage').value || 'Pesan kustom dari simulator';
+            const tag = document.getElementById('customTag').value || 'Info';
+
+            const customData = {
+                ...baseData,
+                title: title,
+                subtitle: subtitle,
+                tag: tag,
+                expAdd: 100
+            };
+
+            showFlagNotification(customData);
+        }
+
+        // Render & Animate Flag Banner
+        function showFlagNotification(data) {
+            currentNotificationData = data;
+            const container = document.getElementById('flagContainer');
+            if (!container) return;
+
+            // Clear any existing active timer
+            if (activeTimer) clearTimeout(activeTimer);
+
+            // Add EXP reward to mobile state
+            if (data.expAdd) {
+                currentExp += data.expAdd;
+                const expDisplay = document.getElementById('currentExpDisplay');
+                if (expDisplay) {
+                    expDisplay.innerText = `${currentExp.toLocaleString()} XP`;
+                    // Micro bounce
+                    expDisplay.parentElement.style.transform = 'scale(1.08)';
+                    setTimeout(() => expDisplay.parentElement.style.transform = 'scale(1)', 300);
+                }
+            }
+
+            // Create notification card HTML
+            const timeString = updateClock();
+            container.innerHTML = `
+                <div class="inapp-flag-card" id="activeFlagCard" onclick="openDetailModal()" onmousedown="handleSwipeStart(event)">
+                    <div class="flag-dismiss-handle"></div>
+                    <div class="flag-icon-badge" style="background: ${data.badgeBg}; color: ${data.iconColor};">
+                        <i class="${data.icon}"></i>
+                        <div class="pulse-ring"></div>
+                    </div>
+                    <div class="flag-body">
+                        <div class="flag-header">
+                            <span class="flag-title-tag" style="color: ${data.tagColor};">
+                                <i class="ri-flashlight-line"></i> ${data.category}
+                            </span>
+                            <span class="flag-time">${timeString}</span>
+                        </div>
+                        <div class="flag-headline">${data.title}</div>
+                        <div class="flag-subtitle">${data.subtitle}</div>
+                    </div>
+                    <div class="flag-action-pill" style="color: ${data.tagColor};">
+                        ${data.tag}
+                    </div>
+                    <div class="flag-progress-bar"></div>
+                </div>
+            `;
+
+            // Trigger show animation
+            const card = document.getElementById('activeFlagCard');
+            requestAnimationFrame(() => {
+                card.classList.add('show');
+            });
+
+            // Append to history log
+            addHistoryLog(data.title, timeString);
+
+            // Auto dismiss after 4.5 seconds
+            activeTimer = setTimeout(() => {
+                dismissNotification();
+            }, 4500);
+        }
+
+        // Dismiss Flag Notification
+        function dismissNotification() {
+            const card = document.getElementById('activeFlagCard');
+            if (card) {
+                card.classList.add('swiping-up');
+                setTimeout(() => {
+                    const container = document.getElementById('flagContainer');
+                    if (container) container.innerHTML = '';
+                }, 300);
+            }
+        }
+
+        // Swipe up gesture simulation
+        let startY = 0;
+        function handleSwipeStart(e) {
+            startY = e.clientY || (e.touches && e.touches[0].clientY);
+            const onEnd = (evt) => {
+                const endY = evt.clientY || (evt.changedTouches && evt.changedTouches[0].clientY);
+                if (startY - endY > 20) { // Swiped up
+                    dismissNotification();
+                }
+                window.removeEventListener('mouseup', onEnd);
+                window.removeEventListener('touchend', onEnd);
+            };
+            window.addEventListener('mouseup', onEnd);
+            window.addEventListener('touchend', onEnd);
+        }
+
+        // Open Detail Modal
+        function openDetailModal() {
+            if (!currentNotificationData) return;
+            
+            // Cancel auto-dismiss while viewing modal
+            if (activeTimer) clearTimeout(activeTimer);
+
+            const modal = document.getElementById('flagDetailModal');
+            document.getElementById('modalCategoryTag').innerText = currentNotificationData.category;
+            document.getElementById('modalTitle').innerText = currentNotificationData.title;
+            document.getElementById('modalBody').innerText = currentNotificationData.subtitle;
+            document.getElementById('modalExpScore').innerText = `+${currentNotificationData.expAdd || 100} EXP`;
+
+            modal.classList.add('show');
+        }
+
+        // Close Detail Modal
+        function closeDetailModal(e) {
+            if (e && e.target !== e.currentTarget && e.type === 'click' && !e.target.closest('button')) {
+                return;
+            }
+            const modal = document.getElementById('flagDetailModal');
+            modal.classList.remove('show');
+            dismissNotification();
+        }
+
+        // Add item to history log
+        function addHistoryLog(title, time) {
+            const logContainer = document.getElementById('notificationHistory');
+            if (!logContainer) return;
+
+            const logItem = document.createElement('div');
+            logItem.className = 'history-item';
+            logItem.innerHTML = `
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;">${title}</span>
+                <span class="time">${time}</span>
+            `;
+            logContainer.prepend(logItem);
+        }
+
+        // Interactive Checklist Item in Mobile App
+        function toggleCheckItem(element, expVal) {
+            const isDone = element.classList.contains('done');
+            if (!isDone) {
+                element.classList.add('done');
+                element.querySelector('.custom-checkbox').innerHTML = '<i class="ri-check-line"></i>';
+                // Trigger non-intrusive EXP notification
+                showFlagNotification({
+                    category: 'CHECKLIST SELESAI',
+                    title: `+${expVal} EXP • Item Diverifikasi`,
+                    subtitle: element.querySelector('span').innerText,
+                    tag: `+${expVal} XP`,
+                    expAdd: expVal,
+                    icon: 'ri-checkbox-circle-fill',
+                    iconColor: '#38bdf8',
+                    badgeBg: 'rgba(37, 99, 235, 0.25)',
+                    tagColor: '#38bdf8'
+                });
+            } else {
+                element.classList.remove('done');
+                element.querySelector('.custom-checkbox').innerHTML = '';
+            }
+        }
+
+        // Finish Inspection Action
+        function finishInspectionAction() {
+            showFlagNotification({
+                category: 'INSPEKSI TUNTAS',
+                title: '🎉 Inspeksi Bay Selesai (+200 EXP)',
+                subtitle: 'Semua 3 checklist berhasil diverifikasi dengan foto thermovisi.',
+                tag: '+200 XP',
+                expAdd: 200,
+                icon: 'ri-award-fill',
+                iconColor: '#fbbf24',
+                badgeBg: 'rgba(245, 158, 11, 0.25)',
+                tagColor: '#fbbf24'
+            });
+        }
+
+        // Trigger initial welcoming notification on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                triggerNotification('exp');
+            }, 800);
+        });
+    </script>
+</body>
+</html>

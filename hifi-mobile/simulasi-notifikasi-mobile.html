@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Inspect - Simulasi In-App Flag Notification Mobile</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 & RemixIcon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Workspace Tokens */
+            --bg-workspace: #0f172a;
+            --panel-bg: #1e293b;
+            --panel-border: #334155;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+
+            /* Mobile UI Tokens (Identik form-inspeksi.html) */
+            --bg-color: #f4f6fb;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-hover: #134db0;
+            --primary-light: #eef4ff;
+            --header-blue-bg: #e0f2fe;
+            --header-blue-text: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --danger-light: #fee2e2;
+            --danger-border: #fca5a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-workspace);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Simulation Nav */
+        .workspace-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .brand-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1a65d6, #0284c7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.4);
+        }
+
+        .brand-badge h1 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .brand-badge p {
+            font-size: 11.5px;
+            color: var(--text-dim);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-portal {
+            background: #334155;
+            color: #fff;
+            border: 1px solid #475569;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-portal:hover {
+            background: #475569;
+            border-color: #64748b;
+        }
+
+        /* Workspace Main Layout */
+        .workspace-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 61px);
+            overflow: hidden;
+        }
+
+        /* Left Simulator Control Panel */
+        .control-panel {
+            width: 440px;
+            min-width: 380px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--panel-border);
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #38bdf8;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .panel-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .feature-bullets {
+            font-size: 12px;
+            color: #cbd5e1;
+            line-height: 1.5;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .feature-bullets li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .feature-bullets li i {
+            color: #38bdf8;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        /* Presets */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: #f8fafc;
+            text-align: left;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .preset-btn:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .preset-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .preset-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preset-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .preset-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .preset-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+
+        /* Custom Notification Form */
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-trigger-custom {
+            width: 100%;
+            background: linear-gradient(135deg, #1a65d6, #0284c7);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-trigger-custom:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        /* History Log */
+        .history-log-list {
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-item {
+            font-size: 11px;
+            padding: 6px 8px;
+            background: rgba(15, 23, 42, 0.4);
+            border-left: 3px solid #38bdf8;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            color: #cbd5e1;
+        }
+
+        .history-item span.time {
+            color: #64748b;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Right Preview Area */
+        .preview-area {
+            flex: 1;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-notice {
+            position: absolute;
+            bottom: 14px;
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Phone Mockup Frame */
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 870px;
+            max-height: 94vh;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border-radius: 40px;
+            border: 8px solid #1e293b;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Dynamic Island / Top Notch */
+        .device-notch {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 22px;
+            background: #0f172a;
+            border-radius: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        .notch-camera {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        .notch-sensor {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #1e293b;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 40px;
+            padding: 10px 22px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0f172a;
+            background: #ffffff;
+            z-index: 900;
+        }
+
+        .status-bar-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+        }
+
+        /* IN-APP FLAG NOTIFICATION BANNER (NON-INTRUSIVE) */
+        .inapp-flag-container {
+            position: absolute;
+            top: 44px;
+            left: 12px;
+            right: 12px;
+            z-index: 999;
+            pointer-events: none; /* User clicks through directly to form */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .inapp-flag-card {
+            pointer-events: auto; /* Banner itself is interactive */
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 16px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(-120%);
+            opacity: 0;
+            transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            user-select: none;
+        }
+
+        .inapp-flag-card.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .inapp-flag-card.swiping-up {
+            transform: translateY(-120%);
+            opacity: 0;
+            transition: all 0.25s ease-in;
+        }
+
+        .flag-icon-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .flag-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .flag-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .flag-module-tag {
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .flag-time {
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
+        .flag-headline {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.25;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .flag-subtitle {
+            font-size: 10.5px;
+            color: #cbd5e1;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .flag-action-cta {
+            padding: 5px 9px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 10.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .flag-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            width: 100%;
+            transform-origin: left;
+            animation: flagTimer 4.5s linear forwards;
+        }
+
+        @keyframes flagTimer {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+
+        .flag-dismiss-handle {
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 3px;
+        }
+
+        /* ========================================================
+           EXACT FORM-INSPEKSI.HTML MOBILE UI STYLES
+           ======================================================== */
+        .unified-header-container {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            z-index: 30;
+            flex-shrink: 0;
+        }
+
+        .app-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+        }
+        
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        
+        .header-name { 
+            font-weight: 800; 
+            font-size: 15px; 
+            color: var(--text-main); 
+            line-height: 1.2;
+        }
+
+        .header-sub {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.4px;
+        }
+        
+        .action-btn {
+            width: 36px; 
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--text-main);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-color: #bfdbfe;
+        }
+
+        .btn-toggle-ringkas {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-toggle-ringkas:active {
+            background: #dbeafe;
+        }
+
+        .dotted-divider-header {
+            height: 1px;
+            border-top: 1px dashed #cbd5e1;
+            margin: 0 18px 12px;
+        }
+
+        /* Asset Identity Details */
+        .asset-detail-panel {
+            padding: 0 18px 14px;
+            font-size: 11.5px;
+            transition: all 0.25s ease;
+        }
+        .asset-detail-panel.collapsed {
+            display: none;
+        }
+
+        .detail-grid-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .detail-col-left, .detail-col-right {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .detail-col-right {
+            text-align: right;
+            align-items: flex-end;
+        }
+
+        .detail-lbl {
+            color: #94a3b8;
+            font-size: 10.5px;
+            font-weight: 500;
+        }
+        .detail-val {
+            font-weight: 800;
+            color: var(--text-main, #0f172a);
+            font-size: 12px;
+        }
+
+        .detail-full-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 6px;
+            padding-top: 8px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        /* Content Scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 90px;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar { display: none; }
+
+        /* Parameter Test Card */
+        .test-param-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .test-param-header {
+            background: var(--header-blue-bg);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-param-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--header-blue-text);
+            line-height: 1.3;
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .btn-tutup-param {
+            background: var(--danger-light);
+            border: 1px solid var(--danger-border);
+            color: var(--danger-color);
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-tutup-param:active {
+            background: #fecaca;
+        }
+
+        .test-param-body {
+            padding: 16px;
+            transition: opacity 0.2s;
+        }
+
+        .param-field-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .param-field-label span {
+            color: #ef4444;
+        }
+
+        /* Segmented Options (Sesuai / Tidak sesuai) */
+        .param-segmented-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .param-seg-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1.5px solid #cbd5e1;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .param-seg-btn.active-sesuai {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #059669;
+            box-shadow: 0 0 0 1px #10b981;
+        }
+
+        .param-seg-btn.active-tidak {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #dc2626;
+            box-shadow: 0 0 0 1px #ef4444;
+        }
+
+        /* Number Input Group with Unit */
+        .param-unit-group {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .param-input-num {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .param-unit-label {
+            background: #f1f5f9;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            border-left: 1px solid #cbd5e1;
+        }
+
+        /* Multi-Photo Thumbnail Gallery inside Parameters */
+        .param-photo-gallery {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .param-photo-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+
+        .param-thumb-item {
+            position: relative;
+            width: 72px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .param-thumb-img-box {
+            width: 72px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #f1f5f9;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .param-thumb-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #64748b;
+            max-width: 72px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .param-add-photo-btn {
+            width: 72px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1.5px dashed #cbd5e1;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .param-add-photo-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--primary-light);
+        }
+
+        /* Photo Recap Section */
+        .photo-recap-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .photo-recap-header {
+            padding: 12px 16px;
+            background: var(--header-blue-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .photo-recap-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--header-blue-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .photo-recap-badge {
+            background: #e8f3ff;
+            color: #1a65d6;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .photo-recap-grid {
+            padding: 12px 14px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        .photo-recap-item {
+            flex: 0 0 88px;
+            width: 88px;
+            position: relative;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .photo-recap-thumb-box {
+            width: 100%;
+            height: 60px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 20px;
+        }
+
+        .photo-recap-info {
+            padding: 5px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: #ffffff;
+        }
+
+        .photo-recap-name {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-recap-sub {
+            font-size: 8px;
+            color: #64748b;
+        }
+
+        /* End Card: Catatan & Upload File */
+        .end-form-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .modal-form-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-textarea-box {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 12.5px;
+            color: var(--text-main);
+            outline: none;
+            resize: none;
+            line-height: 1.45;
+            transition: all 0.2s;
+        }
+        .form-textarea-box:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 10.5px;
+            color: #94a3b8;
+            margin-top: 4px;
+            margin-bottom: 14px;
+        }
+
+        .upload-file-trigger {
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-file-trigger:hover {
+            border-color: var(--primary-blue);
+            background: #eff6ff;
+        }
+
+        /* Bottom Fixed Action Bar */
+        .bottom-action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            padding: 14px 18px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .btn-action-laporan {
+            padding: 12px 22px;
+            border: 1.5px solid var(--danger-border);
+            background: var(--danger-light);
+            color: var(--danger-color);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-action-laporan:active {
+            background: #fecaca;
+        }
+
+        .btn-action-simpan {
+            flex: 1;
+            padding: 12px;
+            background: #1a65d6;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-action-simpan:active {
+            background: #134db0;
+        }
+
+        /* Detail Modal */
+        .flag-detail-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 1050;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .flag-detail-modal.show {
+            display: flex;
+        }
+
+        .detail-sheet-card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 22px 22px 0 0;
+            padding: 18px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Workspace Header -->
+    <header class="workspace-header">
+        <div class="brand-badge">
+            <div class="logo-icon">
+                <i class="ri-notification-3-fill"></i>
+            </div>
+            <div>
+                <h1>Simulasi In-App Flag Notification (Power Inspect Form)</h1>
+                <p>Notifikasi sistem melayang di atas layar form inspeksi tanpa mengganggu input teknisi</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="../hifi-mobile/power-inspect/inspeksi-rutin/form-inspeksi.html" class="btn-portal" target="_blank">
+                <i class="ri-external-link-line"></i> Buka Asli Form Inspeksi
+            </a>
+            <a href="../hifi-home/home.html" class="btn-portal">
+                <i class="ri-home-4-line"></i> Portal Home
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="workspace-container">
+        <!-- Control Panel (Left) -->
+        <aside class="control-panel">
+            <div>
+                <div class="section-title">
+                    <i class="ri-information-line"></i> Perilaku In-App Flag Notification
+                </div>
+                <div class="panel-card">
+                    <ul class="feature-bullets">
+                        <li>
+                            <i class="ri-checkbox-circle-fill"></i>
+                            <span><strong>Non-Intrusive:</strong> Banner melayang di atas form. Anda tetap bisa memilih radio button, mengetik form, atau scroll.</span>
+                        </li>
+                        <li>
+                            <i class="ri-checkbox-circle-fill"></i>
+                            <span><strong>Auto-Dismiss (4.5s):</strong> Progress line bergerak otomatis menghilangkan notifikasi jika diabaikan.</span>
+                        </li>
+                        <li>
+                            <i class="ri-checkbox-circle-fill"></i>
+                            <span><strong>Swipe to Dismiss:</strong> Swipe ke atas pada banner untuk menutup notifikasi instan.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Trigger Presets -->
+            <div>
+                <div class="section-title">
+                    <i class="ri-send-plane-2-line"></i> Trigger Skenario Notifikasi Masuk
+                </div>
+                <div class="preset-grid">
+                    <!-- Preset 1: Work Order Baru -->
+                    <button class="preset-btn" onclick="triggerNotification('wo_new')">
+                        <div class="preset-icon-box" style="background: rgba(26, 101, 214, 0.2); color: #38bdf8;">
+                            <i class="ri-file-add-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">WO Baru dari Tindak Lanjut</div>
+                            <div class="preset-desc">#WO-TL-2026-044 • GI Cigereleng 150kV</div>
+                        </div>
+                        <div class="preset-tag" style="color: #38bdf8;">Power Inspect</div>
+                    </button>
+
+                    <!-- Preset 2: Anomali Kritis Alert -->
+                    <button class="preset-btn" onclick="triggerNotification('critical_alert')">
+                        <div class="preset-icon-box" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">
+                            <i class="ri-alarm-warning-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Peringatan Anomali Kritis!</div>
+                            <div class="preset-desc">Suhu PMT 88°C Bay Trafo 1 UPT Bandung</div>
+                        </div>
+                        <div class="preset-tag" style="color: #f87171;">Urgent</div>
+                    </button>
+
+                    <!-- Preset 3: Persetujuan Mutasi Aset (NEW PST) -->
+                    <button class="preset-btn" onclick="triggerNotification('pst_approval')">
+                        <div class="preset-icon-box" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                            <i class="ri-swap-box-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Permintaan Persetujuan Mutasi</div>
+                            <div class="preset-desc">#REQ-MUT-2026-012 • GI Bandung Selatan</div>
+                        </div>
+                        <div class="preset-tag" style="color: #fbbf24;">NEW PST</div>
+                    </button>
+
+                    <!-- Preset 4: Permit ERS Disetujui -->
+                    <button class="preset-btn" onclick="triggerNotification('ers_permit')">
+                        <div class="preset-icon-box" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">
+                            <i class="ri-shield-check-fill"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Permit Pemasangan ERS Disetujui</div>
+                            <div class="preset-desc">#PRM-INS-2026-031 • Tower ERS T.45</div>
+                        </div>
+                        <div class="preset-tag" style="color: #34d399;">Power Swift</div>
+                    </button>
+
+                    <!-- Preset 5: Penugasan Inspeksi Ulang -->
+                    <button class="preset-btn" onclick="triggerNotification('reinspect')">
+                        <div class="preset-icon-box" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa;">
+                            <i class="ri-refresh-line"></i>
+                        </div>
+                        <div class="preset-info">
+                            <div class="preset-name">Inspeksi Ulang WO #WO-882</div>
+                            <div class="preset-desc">5 Aset memerlukan verifikasi hasil koreksi</div>
+                        </div>
+                        <div class="preset-tag" style="color: #a78bfa;">Re-Inspeksi</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Notification Builder -->
+            <div>
+                <div class="section-title">
+                    <i class="ri-tools-line"></i> Buat Notifikasi Kustom
+                </div>
+                <div class="panel-card">
+                    <div class="form-group">
+                        <label class="form-label">Modul Aplikasi</label>
+                        <select id="customModule" class="form-select">
+                            <option value="power_inspect">Power Inspect (Operasional WO & Inspeksi)</option>
+                            <option value="new_pst">NEW PST (Master Data & Aset)</option>
+                            <option value="power_swift">Power Swift - ERS (Emergency & Logistik)</option>
+                            <option value="system">Pengumuman Sistem / Jadwal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Judul Notifikasi</label>
+                        <input type="text" id="customTitle" class="form-input" value="Jadwal Pemeliharaan Mendadak Ditambahkan" placeholder="Ketik judul notifikasi...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi Singkat</label>
+                        <input type="text" id="customDesc" class="form-input" value="Bay Trafo 2 GI Cigereleng memerlukan thermovisi lanjutan" placeholder="Ketik ringkasan detail...">
+                    </div>
+                    <button class="btn-trigger-custom" onclick="triggerCustomNotification()">
+                        <i class="ri-notification-badge-line"></i> Simulasikan Notifikasi Masuk
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Log -->
+            <div>
+                <div class="section-title">
+                    <i class="ri-history-line"></i> Log Notifikasi Terkirim
+                </div>
+                <div class="history-log-list" id="notificationHistory">
+                    <div class="history-item">
+                        <span>Simulator Notifikasi Aktif</span>
+                        <span class="time">12:43</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Preview Screen -->
+        <main class="preview-area">
+            <!-- Mobile Phone Container (Identik Form Inspeksi) -->
+            <div class="mobile-container">
+                <!-- Device Top Notch -->
+                <div class="device-notch">
+                    <div class="notch-camera"></div>
+                    <div class="notch-sensor"></div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="liveClock">12:43</span>
+                    <div class="status-bar-icons">
+                        <i class="fa-solid fa-signal"></i>
+                        <i class="fa-solid fa-wifi"></i>
+                        <i class="fa-solid fa-battery-full" style="color: #10b981;"></i>
+                    </div>
+                </div>
+
+                <!-- IN-APP FLAG NOTIFICATION BANNER CONTAINER -->
+                <div class="inapp-flag-container" id="flagContainer">
+                    <!-- Dynamic notification card will be injected here -->
+                </div>
+
+                <!-- Unified Header & Asset Identity Container (FORM-INSPEKSI.HTML) -->
+                <div class="unified-header-container">
+                    <div class="app-header-top">
+                        <div class="header-left-group">
+                            <button class="action-btn" title="Kembali ke Daftar Aset">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
+                            <div class="header-title-group">
+                                <div class="header-name" id="headerAssetName">Over Current Relay</div>
+                                <div class="header-sub">FORMULIR INSPEKSI PEMELIHARAAN</div>
+                            </div>
+                        </div>
+                        <button class="btn-toggle-ringkas" id="btnToggleRingkas" onclick="toggleRingkas()">
+                            <i class="fa-solid fa-chevron-up" id="toggleIcon"></i> Ringkas
+                        </button>
+                    </div>
+
+                    <!-- Integrated Asset Identity Details (Collapsible) -->
+                    <div class="asset-detail-panel" id="assetDetailCard">
+                        <div class="dotted-divider-header"></div>
+                        
+                        <div class="detail-grid-row">
+                            <div class="detail-col-left">
+                                <span class="detail-lbl">Bay</span>
+                                <span class="detail-val" id="lblBay">PHT 150KV SUKOLILO #1</span>
+                            </div>
+                            <div class="detail-col-right">
+                                <span class="detail-lbl">Techidentno</span>
+                                <span class="detail-val" id="lblTechidentno">1002938472</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-grid-row">
+                            <div class="detail-col-left">
+                                <span class="detail-lbl">Serial</span>
+                                <span class="detail-val" id="lblSerial">36163288/08/22</span>
+                            </div>
+                            <div class="detail-col-right">
+                                <span class="detail-lbl">Penempatan</span>
+                                <span class="detail-val" id="lblPenempatan">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-grid-row">
+                            <div class="detail-col-left">
+                                <span class="detail-lbl">Merk</span>
+                                <span class="detail-val" id="lblMerk">GE</span>
+                            </div>
+                            <div class="detail-col-right">
+                                <span class="detail-lbl">Phasa</span>
+                                <span class="detail-val" id="lblPhasa">R</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-grid-row">
+                            <div class="detail-col-left">
+                                <span class="detail-lbl">Tipe</span>
+                                <span class="detail-val" id="lblTipe">MICOM P14D</span>
+                            </div>
+                            <div class="detail-col-right">
+                                <span class="detail-lbl">-</span>
+                                <span class="detail-val">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-full-row">
+                            <span class="detail-lbl">Formulir</span>
+                            <span class="detail-val" id="lblFormulir">Form IL3 - Pemeliharaan Sistem Proteksi OCR - 2 Tahunan</span>
+                        </div>
+
+                        <div class="detail-full-row" style="margin-bottom:0;">
+                            <span class="detail-lbl">Inspeksi terakhir</span>
+                            <span class="detail-val" id="lblLastInspect">1 - Very Good | 06 Maret 2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Scroll (FORM-INSPEKSI.HTML) -->
+                <div class="content-scroll" id="contentScrollArea">
+
+                    <!-- Parameter Test Card 1 -->
+                    <div class="test-param-card" id="paramCard1">
+                        <div class="test-param-header">
+                            <div class="test-param-title">Pengujian fungsi alarm dan perekam</div>
+                            <button type="button" class="btn-tutup-param">Tutup</button>
+                        </div>
+                        <div class="test-param-body">
+                            <label class="param-field-label">Hasil pengecekan fungsi alarm dan rekaman <span>*</span></label>
+                            <div class="param-segmented-row">
+                                <button type="button" class="param-seg-btn active-sesuai" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                            
+                            <!-- Multi-Photo Thumbnail Strip -->
+                            <div class="param-photo-gallery">
+                                <div class="param-photo-strip">
+                                    <div class="param-thumb-item">
+                                        <div class="param-thumb-img-box">
+                                            <i class="fa-solid fa-camera" style="color: #64748b;"></i>
+                                        </div>
+                                        <span class="param-thumb-label">Foto 1.jpg</span>
+                                    </div>
+                                    <div class="param-add-photo-btn">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Foto</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parameter Test Card 2 -->
+                    <div class="test-param-card" id="paramCard2">
+                        <div class="test-param-header">
+                            <div class="test-param-title">Pengujian fungsi non tripping sistem proteksi</div>
+                            <button type="button" class="btn-tutup-param">Tutup</button>
+                        </div>
+                        <div class="test-param-body">
+                            <label class="param-field-label">Hasil uji fungsi non tripping sistem proteksi <span>*</span></label>
+                            <div class="param-segmented-row">
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                            
+                            <div class="param-photo-gallery">
+                                <div class="param-photo-strip">
+                                    <div class="param-add-photo-btn">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Foto</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parameter Test Card 3 -->
+                    <div class="test-param-card" id="paramCard3">
+                        <div class="test-param-header">
+                            <div class="test-param-title">Pengujian individu relay proteksi</div>
+                            <button type="button" class="btn-tutup-param">Tutup</button>
+                        </div>
+                        <div class="test-param-body">
+                            <label class="param-field-label">Hasil uji individu relay <span>*</span></label>
+                            <div class="param-segmented-row">
+                                <button type="button" class="param-seg-btn active-sesuai" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                            
+                            <div class="param-unit-group">
+                                <input type="number" class="param-input-num" placeholder="Arus pick-up pengujian..." value="5.02">
+                                <span class="param-unit-label">Ampere</span>
+                            </div>
+
+                            <div class="param-photo-gallery">
+                                <div class="param-photo-strip">
+                                    <div class="param-add-photo-btn">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Foto</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rekap Foto Dokumentasi -->
+                    <div class="photo-recap-card">
+                        <div class="photo-recap-header">
+                            <div class="photo-recap-title">
+                                <i class="fa-solid fa-images" style="color: var(--primary-blue);"></i> Rekap Foto Dokumentasi
+                            </div>
+                            <span class="photo-recap-badge">2 Foto</span>
+                        </div>
+                        <div class="photo-recap-grid">
+                            <div class="photo-recap-item">
+                                <div class="photo-recap-thumb-box">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                                <div class="photo-recap-info">
+                                    <span class="photo-recap-name">Uji Alarm</span>
+                                    <span class="photo-recap-sub">Foto #1</span>
+                                </div>
+                            </div>
+                            <div class="photo-recap-item">
+                                <div class="photo-recap-thumb-box">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                                <div class="photo-recap-info">
+                                    <span class="photo-recap-name">Uji Relay</span>
+                                    <span class="photo-recap-sub">Foto #2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- End Card: Catatan & Upload File -->
+                    <div class="end-form-card">
+                        <label class="modal-form-label">Catatan</label>
+                        <textarea id="inputCatatan" class="form-textarea-box" rows="3" placeholder="Masukan catatan..." oninput="updateCatatanCount(this)">Pengujian selesai dilakukan dengan hasil normal dan tidak ada anomali pada kontak.</textarea>
+                        <div class="char-counter" id="catatanCounter">88/1000</div>
+
+                        <label class="modal-form-label">Upload File <span style="color: #ef4444;">*</span></label>
+                        <div class="upload-file-trigger">
+                            <span style="font-size: 12px; color: #1e293b; font-weight: 600;"><i class="fa-solid fa-file-pdf" style="color: #ef4444; margin-right: 6px;"></i> lampiran_hasil_uji.pdf</span>
+                            <i class="fa-solid fa-check-circle" style="color: #10b981;"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Fixed Action Bar -->
+                <div class="bottom-action-bar">
+                    <button class="btn-action-laporan">
+                        Laporan
+                    </button>
+                    <button class="btn-action-simpan" onclick="triggerNotification('wo_new')">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+
+            <div class="canvas-notice">
+                <i class="ri-mouse-line"></i> Klik tombol preset di kiri atau ketik form inspeksi di ponsel untuk melihat interaksi non-intrusive.
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // State variables
+        let activeTimer = null;
+        let currentNotification = null;
+
+        // Presets data definitions (Operational Transmisi)
+        const PRESETS = {
+            wo_new: {
+                module: 'Power Inspect',
+                modKey: 'power_inspect',
+                tagColor: '#38bdf8',
+                title: 'WO Baru dari Tindak Lanjut',
+                subtitle: '#WO-TL-2026-044 • GI Cigereleng 150kV',
+                refCode: 'WO-TL-2026-044',
+                icon: 'ri-file-add-fill',
+                iconColor: '#38bdf8',
+                badgeBg: 'rgba(26, 101, 214, 0.25)'
+            },
+            critical_alert: {
+                module: 'Anomali Kritis',
+                modKey: 'power_inspect',
+                tagColor: '#f87171',
+                title: 'Peringatan Anomali Suhu Hotspot!',
+                subtitle: 'Suhu PMT 88°C Bay Trafo 1 UPT Bandung',
+                refCode: 'ANOMALY-CRIT-2026-019',
+                icon: 'ri-alarm-warning-fill',
+                iconColor: '#f87171',
+                badgeBg: 'rgba(239, 68, 68, 0.25)'
+            },
+            pst_approval: {
+                module: 'NEW PST',
+                modKey: 'new_pst',
+                tagColor: '#fbbf24',
+                title: 'Permintaan Persetujuan Mutasi Aset',
+                subtitle: '#REQ-MUT-2026-012 • GI Bandung Selatan',
+                refCode: 'REQ-MUT-2026-012',
+                icon: 'ri-swap-box-fill',
+                iconColor: '#fbbf24',
+                badgeBg: 'rgba(245, 158, 11, 0.25)'
+            },
+            ers_permit: {
+                module: 'Power Swift',
+                modKey: 'power_swift',
+                tagColor: '#34d399',
+                title: 'Permit Pemasangan ERS Disetujui',
+                subtitle: '#PRM-INS-2026-031 • Tower ERS T.45',
+                refCode: 'PRM-INS-2026-031',
+                icon: 'ri-shield-check-fill',
+                iconColor: '#34d399',
+                badgeBg: 'rgba(16, 185, 129, 0.25)'
+            },
+            reinspect: {
+                module: 'Power Inspect',
+                modKey: 'power_inspect',
+                tagColor: '#a78bfa',
+                title: 'Inspeksi Ulang Ditugaskan',
+                subtitle: '#WO-882 • 5 Aset memerlukan verifikasi hasil',
+                refCode: 'WO-REINSPECT-882',
+                icon: 'ri-refresh-line',
+                iconColor: '#a78bfa',
+                badgeBg: 'rgba(139, 92, 246, 0.25)'
+            }
+        };
+
+        // Live clock update
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) clockEl.innerText = timeStr;
+            return timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Toggle Ringkas / Detail Asset Card
+        let isRingkas = false;
+        function toggleRingkas() {
+            isRingkas = !isRingkas;
+            const card = document.getElementById('assetDetailCard');
+            const btn = document.getElementById('btnToggleRingkas');
+            
+            if (isRingkas) {
+                card.classList.add('collapsed');
+                btn.innerHTML = '<i class="fa-solid fa-chevron-down" id="toggleIcon"></i> Detail';
+            } else {
+                card.classList.remove('collapsed');
+                btn.innerHTML = '<i class="fa-solid fa-chevron-up" id="toggleIcon"></i> Ringkas';
+            }
+        }
+
+        // Segmented Pill Selection
+        function selectParamOption(btn, type) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.param-seg-btn').forEach(b => {
+                b.classList.remove('active-sesuai', 'active-tidak');
+            });
+            if (type === 'sesuai') {
+                btn.classList.add('active-sesuai');
+            } else {
+                btn.classList.add('active-tidak');
+            }
+        }
+
+        function updateCatatanCount(textarea) {
+            document.getElementById('catatanCounter').textContent = `${textarea.value.length}/1000`;
+        }
+
+        // Trigger Notification
+        function triggerNotification(presetKey) {
+            const data = PRESETS[presetKey];
+            if (!data) return;
+            showFlagBanner(data);
+        }
+
+        // Custom Notification Trigger
+        function triggerCustomNotification() {
+            const modKey = document.getElementById('customModule').value;
+            const title = document.getElementById('customTitle').value || 'Notifikasi Baru';
+            const desc = document.getElementById('customDesc').value || 'Deskripsi notifikasi';
+
+            let modName = 'Power Inspect';
+            let tagColor = '#38bdf8';
+            let icon = 'ri-notification-3-fill';
+            let iconColor = '#38bdf8';
+            let badgeBg = 'rgba(26, 101, 214, 0.25)';
+
+            if (modKey === 'new_pst') {
+                modName = 'NEW PST';
+                tagColor = '#fbbf24';
+                icon = 'ri-database-2-fill';
+                iconColor = '#fbbf24';
+                badgeBg = 'rgba(245, 158, 11, 0.25)';
+            } else if (modKey === 'power_swift') {
+                modName = 'Power Swift';
+                tagColor = '#34d399';
+                icon = 'ri-truck-fill';
+                iconColor = '#34d399';
+                badgeBg = 'rgba(16, 185, 129, 0.25)';
+            } else if (modKey === 'system') {
+                modName = 'System Alert';
+                tagColor = '#a78bfa';
+                icon = 'ri-megaphone-fill';
+                iconColor = '#a78bfa';
+                badgeBg = 'rgba(139, 92, 246, 0.25)';
+            }
+
+            const customData = {
+                module: modName,
+                modKey: modKey,
+                tagColor: tagColor,
+                title: title,
+                subtitle: desc,
+                refCode: 'CUST-' + Math.floor(1000 + Math.random() * 9000),
+                icon: icon,
+                iconColor: iconColor,
+                badgeBg: badgeBg
+            };
+
+            showFlagBanner(customData);
+        }
+
+        // Show Flag Banner
+        function showFlagBanner(data) {
+            currentNotification = data;
+            const container = document.getElementById('flagContainer');
+            if (!container) return;
+
+            if (activeTimer) clearTimeout(activeTimer);
+
+            const timeString = updateClock();
+
+            container.innerHTML = `
+                <div class="inapp-flag-card" id="activeFlagCard" onclick="openNotificationPage()" onmousedown="handleSwipeStart(event)">
+                    <div class="flag-dismiss-handle"></div>
+                    <div class="flag-icon-badge" style="background: ${data.badgeBg}; color: ${data.iconColor};">
+                        <i class="${data.icon}"></i>
+                    </div>
+                    <div class="flag-body">
+                        <div class="flag-header-row">
+                            <span class="flag-module-tag" style="color: ${data.tagColor};">
+                                ${data.module}
+                            </span>
+                            <span class="flag-time">${timeString}</span>
+                        </div>
+                        <div class="flag-headline">${data.title}</div>
+                        <div class="flag-subtitle">${data.subtitle}</div>
+                    </div>
+                    <div class="flag-progress-bar"></div>
+                </div>
+            `;
+
+            const card = document.getElementById('activeFlagCard');
+            requestAnimationFrame(() => {
+                card.classList.add('show');
+            });
+
+            addHistoryLog(data.title, timeString);
+
+            activeTimer = setTimeout(() => {
+                dismissFlag();
+            }, 4500);
+        }
+
+        // Dismiss Flag
+        function dismissFlag() {
+            const card = document.getElementById('activeFlagCard');
+            if (card) {
+                card.classList.add('swiping-up');
+                setTimeout(() => {
+                    const container = document.getElementById('flagContainer');
+                    if (container) container.innerHTML = '';
+                }, 280);
+            }
+        }
+
+        // Swipe up gesture
+        let startY = 0;
+        function handleSwipeStart(e) {
+            startY = e.clientY || (e.touches && e.touches[0].clientY);
+            const onEnd = (evt) => {
+                const endY = evt.clientY || (evt.changedTouches && evt.changedTouches[0].clientY);
+                if (startY - endY > 18) {
+                    dismissFlag();
+                }
+                window.removeEventListener('mouseup', onEnd);
+                window.removeEventListener('touchend', onEnd);
+            };
+            window.addEventListener('mouseup', onEnd);
+            window.addEventListener('touchend', onEnd);
+        }
+
+        // Direct Open to Pusat Notifikasi
+        function openNotificationPage() {
+            if (!currentNotification) return;
+            if (activeTimer) clearTimeout(activeTimer);
+
+            const container = document.querySelector('.mobile-container');
+            if (container) container.classList.add('page-slide-out');
+
+            const modKey = currentNotification.modKey || 'power_inspect';
+            const refCode = currentNotification.refCode || '';
+
+            setTimeout(() => {
+                window.location.href = `../hifi-mobile/notifikasi-catalog-mobile.html?module=${encodeURIComponent(modKey)}&ref=${encodeURIComponent(refCode)}`;
+            }, 250);
+        }
+
+        // Add history log item
+        function addHistoryLog(title, time) {
+            const logContainer = document.getElementById('notificationHistory');
+            if (!logContainer) return;
+
+            const logItem = document.createElement('div');
+            logItem.className = 'history-item';
+            logItem.innerHTML = `
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;">${title}</span>
+                <span class="time">${time}</span>
+            `;
+            logContainer.prepend(logItem);
+        }
+
+        // Initial launch banner
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                triggerNotification('wo_new');
+            }, 600);
+        });
+    </script>
+</body>
+</html>
