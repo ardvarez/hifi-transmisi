@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Galeri Foto Evidence - ERS Mobile</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #0284c7;
+            --pln-blue: #0A58CA;
+            --bg-canvas: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 50px 0 20px;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.2s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.9;
+                transform: scale(0.996);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px 6px;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Top Header */
+        .header-section {
+            background: #ffffff;
+            padding: 12px 18px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-main-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .header-sub-code {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .header-action-btn {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #2563eb;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .header-action-btn:hover {
+            background: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        /* Demo Simulator Switcher - Outside Phone Mockup */
+        .simulator-bar {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11.5px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+            z-index: 10000;
+        }
+
+        .simulator-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .simulator-pills {
+            display: flex;
+            gap: 5px;
+        }
+
+        .sim-pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sim-pill.active.incomplete {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #b45309;
+        }
+
+        .sim-pill.active.clear {
+            background: #ecfdf5;
+            border-color: #10b981;
+            color: #047857;
+        }
+
+        /* Subtitle status & refresh bar */
+        .sync-status-strip {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .sync-status-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .btn-refresh-gallery {
+            background: none;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #2563eb;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh-gallery:hover {
+            background: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        /* Case Banner: Incomplete vs Clear */
+        .evidence-case-banner {
+            margin: 12px 18px 0;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 11.5px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .banner-incomplete {
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            color: #92400e;
+        }
+
+        .banner-clear {
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .banner-left {
+            display: flex;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        .banner-btn-action {
+            padding: 5px 11px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .btn-banner-refresh {
+            background: #d97706;
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-banner-refresh:hover {
+            background: #b45309;
+        }
+
+        .btn-banner-clear {
+            background: #059669;
+            color: #ffffff;
+            border: none;
+        }
+
+        /* Filter Segmented Control */
+        .filter-tabs-strip {
+            display: flex;
+            gap: 6px;
+            padding: 10px 18px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            margin-top: 0;
+        }
+
+        .filter-tabs-strip::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+        }
+
+        /* App Body */
+        .app-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 18px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Grid View */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .photo-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+            border-color: #93c5fd;
+        }
+
+        .photo-thumb-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .photo-thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .photo-card:hover .photo-thumb-img {
+            transform: scale(1.05);
+        }
+
+        .photo-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 9.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-mulai {
+            background: rgba(14, 165, 233, 0.95);
+            color: #ffffff;
+        }
+
+        .badge-selesai {
+            background: rgba(16, 185, 129, 0.95);
+            color: #ffffff;
+        }
+
+        .photo-expand-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.65);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            backdrop-filter: blur(4px);
+        }
+
+        .photo-info-box {
+            padding: 10px 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .photo-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .photo-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Missing / Incomplete Card Slot Style */
+        .photo-card-missing {
+            border: 2px dashed #f59e0b;
+            background: #fffbeb;
+        }
+
+        .photo-card-missing:hover {
+            border-color: #d97706;
+            background: #fef3c7;
+        }
+
+        .missing-thumb-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(245, 158, 11, 0.08);
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .missing-slot-label {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #b45309;
+            margin-bottom: 6px;
+        }
+
+        .btn-slot-refresh {
+            background: #ffffff;
+            border: 1px solid #f59e0b;
+            color: #b45309;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .btn-slot-refresh:hover {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        /* Lightbox Fullscreen Modal */
+        .lightbox-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            border-radius: inherit;
+        }
+
+        .lightbox-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-topbar {
+            padding: 16px 18px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #ffffff;
+        }
+
+        .lightbox-counter {
+            font-size: 13px;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .lightbox-btn-close {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .lightbox-btn-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lightbox-image-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 10px 14px;
+            overflow: hidden;
+        }
+
+        .lightbox-main-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            transition: transform 0.25s ease;
+        }
+
+        .lightbox-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lightbox-nav-btn:hover {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .lightbox-prev {
+            left: 12px;
+        }
+
+        .lightbox-next {
+            right: 12px;
+        }
+
+        .lightbox-details-panel {
+            background: #ffffff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 18px 20px 24px;
+            color: #0f172a;
+            max-height: 38%;
+            overflow-y: auto;
+        }
+
+        .lightbox-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .lightbox-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 12px 0 16px;
+            font-size: 11.5px;
+        }
+
+        .lightbox-meta-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .lightbox-meta-lbl {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .lightbox-meta-val {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .lightbox-action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-lightbox-download {
+            flex: 1;
+            height: 42px;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-lightbox-download:hover {
+            background: #1d4ed8;
+        }
+
+                /* Toast notification */
+        .toast-bubble {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 11.5px;
+            font-weight: 600;
+            line-height: 1.45;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 3000;
+            width: max-content;
+            max-width: calc(100% - 36px);
+            box-sizing: border-box;
+            white-space: normal;
+            word-break: break-word;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .toast-bubble i {
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .toast-bubble span {
+            flex: 1;
+        }
+
+        .toast-bubble.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* NOTES FEATURE (RULE COMPLIANCE) */
+        .notes-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 88px;
+            width: 52px;
+            height: 52px;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+
+        .notes-fab:hover {
+            transform: scale(1.06);
+            background: #1d4ed8;
+        }
+
+        .notes-panel {
+            position: fixed;
+            bottom: 86px;
+            left: 88px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .notes-panel.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notes-panel h3 {
+            margin: 0 0 10px 0;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .notes-panel ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .notes-panel li {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+        <!-- Simulator State Bar (Demo Test Switcher - Outside Phone Layer) -->
+    <div class="simulator-bar">
+        <div class="simulator-label">
+            <i class="fa-solid fa-sliders" style="color: #2563eb;"></i>
+            <span>Simulasi Kondisi:</span>
+        </div>
+        <div class="simulator-pills">
+            <button type="button" class="sim-pill incomplete active" id="btnPillIncomplete" onclick="setEvidenceState('incomplete')">
+                <i class="fa-solid fa-triangle-exclamation"></i> Tidak Lengkap (4/6)
+            </button>
+            <button type="button" class="sim-pill clear" id="btnPillClear" onclick="setEvidenceState('clear')">
+                <i class="fa-solid fa-circle-check"></i> Lengkap Clear (6/6)
+            </button>
+        </div>
+    </div>
+
+    <div class="mobile-container">
+        <!-- Toast Notification -->
+        <div class="toast-bubble" id="toastBubble">
+            <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+            <span id="toastMsg">Notifikasi</span>
+        </div>
+
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-left">
+                <a href="./pemasangan-action.html" class="back-btn" title="Kembali ke Detail Pemasangan">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="header-title-box">
+                    <h1 class="header-main-title">Galeri Foto Evidence</h1>
+                    <span class="header-sub-code" id="pageSubTitle">Pemasangan • ASM20250000001-01</span>
+                </div>
+            </div>
+            <button type="button" class="header-action-btn" onclick="downloadAllPhotos()" title="Unduh Foto Evidence">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+                <span>Unduh Foto</span>
+            </button>
+        </div>
+
+        <!-- Sync Status Strip -->
+        <div class="sync-status-strip" id="syncStatusStrip">
+            <div class="sync-status-text" id="syncStatusWrapper">
+                <i class="fa-solid fa-circle-exclamation" id="syncIcon" style="color: #d97706;"></i>
+                <span id="syncText">Dokumentasi belum lengkap (4/6 foto) • Perlu Refresh</span>
+            </div>
+            <button type="button" class="btn-refresh-gallery" id="btnGlobalRefresh" onclick="refreshToClearState()">
+                <i class="fa-solid fa-arrows-rotate" id="globalRefreshIcon"></i>
+                <span id="globalRefreshText">Refresh</span>
+            </button>
+        </div>
+
+        <!-- Case Banner: Incomplete vs Clear -->
+        <div class="evidence-case-banner banner-incomplete" id="evidenceCaseBanner">
+            <div class="banner-left">
+                <i class="fa-solid fa-triangle-exclamation" id="bannerIcon" style="font-size: 15px; margin-top: 1px; color: #d97706; flex-shrink: 0;"></i>
+                <div>
+                    <strong id="bannerTitle">Foto Evidence Belum Lengkap (4/6)</strong>
+                    <p id="bannerDesc" style="margin-top: 2px;">
+                        Masih kurang 2 foto wajib tahap penyelesaian (Tower Berdiri & Pemeriksaan Akhir). Tekan <strong>Refresh</strong> untuk sinkronisasi otomatis.
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="banner-btn-action btn-banner-refresh" id="btnBannerAction" onclick="refreshToClearState()">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Filter Segmented Tabs -->
+        <div class="filter-tabs-strip">
+            <button type="button" class="filter-chip active" id="chipTabAll" onclick="filterGallery('all', this)">Semua (4)</button>
+            <button type="button" class="filter-chip" id="chipTabMulai" onclick="filterGallery('mulai', this)">Evidence Mulai (4)</button>
+            <button type="button" class="filter-chip" id="chipTabSelesai" onclick="filterGallery('selesai', this)">Evidence Selesai (0)</button>
+        </div>
+
+        <!-- App Body / Content Area -->
+        <div class="app-body">
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Generated by JS based on evidenceState -->
+            </div>
+        </div>
+
+        <!-- Lightbox Fullscreen Viewer -->
+        <div class="lightbox-modal" id="lightboxModal">
+            <div class="lightbox-topbar">
+                <div class="lightbox-counter" id="lightboxCounter">Foto 1 dari 6</div>
+                <button type="button" class="lightbox-btn-close" onclick="closeLightbox()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="lightbox-image-wrapper">
+                <button type="button" class="lightbox-nav-btn lightbox-prev" onclick="navigateLightbox(-1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <img src="" alt="Preview Full" class="lightbox-main-img" id="lightboxImg">
+                <button type="button" class="lightbox-nav-btn lightbox-next" onclick="navigateLightbox(1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="lightbox-details-panel">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="photo-badge" id="lightboxBadge">Mulai</span>
+                    <span style="font-size: 11px; color: #64748b;" id="lightboxSize">2.4 MB</span>
+                </div>
+                <h3 class="lightbox-title" id="lightboxTitle">Kondisi Tapak Tower</h3>
+
+                <div class="lightbox-meta-grid">
+                    <div class="lightbox-meta-item">
+                        <div class="lightbox-meta-lbl">Waktu Pengambilan</div>
+                        <div class="lightbox-meta-val" id="lightboxTime">10 Mei 2025, 08:06 WIB</div>
+                    </div>
+                    <div class="lightbox-meta-item">
+                        <div class="lightbox-meta-lbl">PIC Pengunggah</div>
+                        <div class="lightbox-meta-val" id="lightboxPic">Luis Andreas BGS</div>
+                    </div>
+                    <div class="lightbox-meta-item">
+                        <div class="lightbox-meta-lbl">Koordinat GPS</div>
+                        <div class="lightbox-meta-val" id="lightboxCoord">-7.2575, 109.1866</div>
+                    </div>
+                    <div class="lightbox-meta-item">
+                        <div class="lightbox-meta-lbl">Status Sinkronisasi</div>
+                        <div class="lightbox-meta-val" id="lightboxStatus" style="color: #059669;"><i class="fa-solid fa-circle-check"></i> Tersimpan Server</div>
+                    </div>
+                </div>
+
+                <div class="lightbox-action-row">
+                    <button type="button" class="btn-lightbox-download" onclick="downloadCurrentPhoto()">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh Foto Resolusi Penuh</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Feature (Compliance with hifi-only rules) -->
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')" title="Notes & Validasi">
+        <i class="fa-solid fa-clipboard-list" style="font-size: 20px;"></i>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+        <h3>
+            <i class="fa-solid fa-circle-info"></i> Notes & Validasi Galeri
+        </h3>
+        <ul>
+            <li><strong>Case Foto Tidak Lengkap:</strong> Menampilkan peringatan banner dan slot kosong bertanda <em>Belum Lengkap</em> ketika ada foto wajib yang belum terunggah dari lapangan.</li>
+            <li><strong>Mekanisme Refresh ke Clear:</strong> Mengetuk tombol <strong>Refresh</strong> akan menyinkronkan berkas tertunda, mengubah status menjadi <strong>Clear</strong> (6/6 foto terverifikasi).</li>
+            <li><strong>Simulasi Kondisi:</strong> Tersedia tombol toggle di bagian atas untuk menguji alur <em>Tidak Lengkap</em> dan <em>Clear</em> secara langsung.</li>
+            <li><strong>Fullscreen Viewer:</strong> Mendukung inspeksi resolusi tinggi lengkap dengan waktu, PIC, dan koordinat GPS.</li>
+        </ul>
+    </div>
+
+    <script>
+        // Evidence Photos Mock Database
+        const EVIDENCE_DATA_ALL = [
+            {
+                id: 1,
+                stage: 'mulai',
+                title: 'Kondisi Tapak Sebelum Perakitan',
+                desc: 'Dokumentasi pembersihan lahan dan persiapan tapak awal tower ERS.',
+                img: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80',
+                thumb: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=400&q=80',
+                time: '10 Mei 2025, 08:06 WIB',
+                pic: 'Luis Andreas BGS',
+                coord: '-7.2575, 109.1866',
+                size: '2.8 MB',
+                available: true
+            },
+            {
+                id: 2,
+                stage: 'mulai',
+                title: 'Pemeriksaan Fondasi & Stub ERS',
+                desc: 'Verifikasi kelayakan pondasi dasar dan stub rangka tower ERS.',
+                img: 'https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=1200&q=80',
+                thumb: 'https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=400&q=80',
+                time: '10 Mei 2025, 08:14 WIB',
+                pic: 'Luis Andreas BGS',
+                coord: '-7.2575, 109.1866',
+                size: '3.1 MB',
+                available: true
+            },
+            {
+                id: 3,
+                stage: 'mulai',
+                title: 'Perakitan Kolom Bawah ERS',
+                desc: 'Penyusunan section kolom baja bawah ERS sesuai panduan teknis.',
+                img: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80',
+                thumb: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=400&q=80',
+                time: '10 Mei 2025, 08:35 WIB',
+                pic: 'Luis Andreas BGS',
+                coord: '-7.2575, 109.1866',
+                size: '2.4 MB',
+                available: true
+            },
+            {
+                id: 4,
+                stage: 'mulai',
+                title: 'Pemasangan Guy Wire & Anchor',
+                desc: 'Instalasi kawat penahan tiang dan penarikan sling pengaman.',
+                img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+                thumb: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80',
+                time: '10 Mei 2025, 09:12 WIB',
+                pic: 'Luis Andreas BGS',
+                coord: '-7.2575, 109.1866',
+                size: '3.4 MB',
+                available: true
+            },
+            {
+                id: 5,
+                stage: 'selesai',
+                title: 'Tower ERS Berdiri Tegak & Stringing',
+                desc: 'Pemasangan seluruh seksi selesai dan jalur konduktor siap difungsikan.',
+                img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80',
+                thumb: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80',
+                time: '20 Mei 2025, 14:20 WIB',
+                pic: 'Luis Andreas BGS',
+                coord: '-7.2575, 109.1866',
+                size: '4.1 MB',
+                available: false // false on incomplete state
+            },
+            {
+                id: 6,
+                stage: 'selesai',
+                title: 'Pemeriksaan Akhir & Tension Wire',
+                desc: 'Uji torsi baut dan ketegangan kawat sling pengaman akhir.',
+                img: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80',
+                thumb: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=400&q=80',
+                time: '20 Mei 2025, 16:15 WIB',
+                pic: 'Luis Andreas BGS',
+                coord: '-7.2575, 109.1866',
+                size: '3.6 MB',
+                available: false // false on incomplete state
+            }
+        ];
+
+        // Global State: 'incomplete' or 'clear'
+        let currentEvidenceState = 'incomplete';
+        let currentFilter = 'all';
+        let currentFilteredList = [];
+        let currentLightboxIndex = 0;
+
+        // Set State (incomplete vs clear)
+        function setEvidenceState(state) {
+            currentEvidenceState = state;
+
+            const pillInc = document.getElementById('btnPillIncomplete');
+            const pillClr = document.getElementById('btnPillClear');
+            const syncStrip = document.getElementById('syncStatusStrip');
+            const banner = document.getElementById('evidenceCaseBanner');
+            const bannerIcon = document.getElementById('bannerIcon');
+            const bannerTitle = document.getElementById('bannerTitle');
+            const bannerDesc = document.getElementById('bannerDesc');
+            const btnBanner = document.getElementById('btnBannerAction');
+            const syncIcon = document.getElementById('syncIcon');
+            const syncText = document.getElementById('syncText');
+            const chipAll = document.getElementById('chipTabAll');
+            const chipMulai = document.getElementById('chipTabMulai');
+            const chipSelesai = document.getElementById('chipTabSelesai');
+
+            if (state === 'incomplete') {
+                if (pillInc) pillInc.classList.add('active');
+                if (pillClr) pillClr.classList.remove('active');
+
+                // Tampilkan info refresh & banner ketika status belum lengkap
+                if (syncStrip) syncStrip.style.display = 'flex';
+                if (banner) {
+                    banner.style.display = 'flex';
+                    banner.className = 'evidence-case-banner banner-incomplete';
+                    if (bannerIcon) {
+                        bannerIcon.className = 'fa-solid fa-triangle-exclamation';
+                        bannerIcon.style.color = '#d97706';
+                    }
+                    if (bannerTitle) bannerTitle.textContent = 'Foto Evidence Belum Lengkap (4/6)';
+                    if (bannerDesc) bannerDesc.innerHTML = 'Masih kurang 2 foto wajib tahap penyelesaian. Tekan <strong>Refresh</strong> untuk sinkronisasi otomatis.';
+                    if (btnBanner) {
+                        btnBanner.className = 'banner-btn-action btn-banner-refresh';
+                        btnBanner.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh';
+                        btnBanner.onclick = refreshToClearState;
+                    }
+                }
+
+                if (syncIcon) {
+                    syncIcon.className = 'fa-solid fa-circle-exclamation';
+                    syncIcon.style.color = '#d97706';
+                }
+                if (syncText) syncText.textContent = 'Dokumentasi belum lengkap (4/6 foto) • Perlu Refresh';
+
+                if (chipAll) chipAll.textContent = 'Semua (4)';
+                if (chipMulai) chipMulai.textContent = 'Evidence Mulai (4)';
+                if (chipSelesai) chipSelesai.textContent = 'Evidence Selesai (0)';
+            } else {
+                if (pillClr) pillClr.classList.add('active');
+                if (pillInc) pillInc.classList.remove('active');
+
+                // HIDE semua bar & banner informasi refresh saat sudah berhasil (Clear) agar galeri lebih luas
+                if (syncStrip) syncStrip.style.display = 'none';
+                if (banner) banner.style.display = 'none';
+
+                if (chipAll) chipAll.textContent = 'Semua (6)';
+                if (chipMulai) chipMulai.textContent = 'Evidence Mulai (4)';
+                if (chipSelesai) chipSelesai.textContent = 'Evidence Selesai (2)';
+            }
+
+            filterGallery(currentFilter);
+        }
+
+        // Render Gallery Grid
+        function renderGallery(items) {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: span 2; text-align: center; padding: 40px 10px; color: #94a3b8;">
+                        <i class="fa-regular fa-image" style="font-size: 36px; margin-bottom: 8px;"></i>
+                        <p style="font-size: 13px;">Tidak ada foto evidence pada kategori ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach((item, index) => {
+                if (item.available) {
+                    // Regular loaded card
+                    const card = document.createElement('div');
+                    card.className = 'photo-card';
+                    card.onclick = () => openLightbox(index);
+
+                    const badgeClass = item.stage === 'mulai' ? 'badge-mulai' : 'badge-selesai';
+                    const badgeText = item.stage === 'mulai' ? 'Mulai' : 'Selesai';
+
+                    card.innerHTML = `
+                        <div class="photo-thumb-container">
+                            <img src="${item.thumb}" alt="${item.title}" class="photo-thumb-img" loading="lazy">
+                            <span class="photo-badge ${badgeClass}">${badgeText}</span>
+                            <div class="photo-expand-hint" title="Buka Detail">
+                                <i class="fa-solid fa-expand"></i>
+                            </div>
+                        </div>
+                        <div class="photo-info-box">
+                            <div class="photo-title">${item.title}</div>
+                            <div class="photo-meta-row">
+                                <span><i class="fa-regular fa-clock"></i> ${item.time.split(',')[1] || item.time}</span>
+                                <span>${item.size}</span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                } else {
+                    // Incomplete / Missing Slot Card
+                    const card = document.createElement('div');
+                    card.className = 'photo-card photo-card-missing';
+                    card.onclick = () => refreshToClearState();
+
+                    card.innerHTML = `
+                        <div class="photo-thumb-container missing-thumb-container">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 24px; color: #f59e0b; margin-bottom: 6px;"></i>
+                            <div class="missing-slot-label">Foto Belum Tersedia</div>
+                            <button type="button" class="btn-slot-refresh" onclick="event.stopPropagation(); refreshToClearState();">
+                                <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+                            </button>
+                        </div>
+                        <div class="photo-info-box">
+                            <div class="photo-title" style="color: #b45309;">${item.title}</div>
+                            <div class="photo-meta-row">
+                                <span style="color: #d97706; font-weight: 700;"><i class="fa-solid fa-circle-exclamation"></i> Belum Lengkap</span>
+                                <span style="color: #94a3b8;">Wajib Ada</span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        // Filter Gallery
+        function filterGallery(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            let baseList = EVIDENCE_DATA_ALL.map(item => {
+                if (currentEvidenceState === 'incomplete') {
+                    // Stage selesai is marked unavailable in incomplete state
+                    return {
+                        ...item,
+                        available: item.stage === 'mulai'
+                    };
+                } else {
+                    return {
+                        ...item,
+                        available: true
+                    };
+                }
+            });
+
+            if (filter === 'all') {
+                currentFilteredList = baseList;
+            } else if (filter === 'mulai') {
+                currentFilteredList = baseList.filter(item => item.stage === 'mulai');
+            } else if (filter === 'selesai') {
+                currentFilteredList = baseList.filter(item => item.stage === 'selesai');
+            }
+
+            renderGallery(currentFilteredList);
+        }
+
+        // Refresh to Clear State Functionality
+        function refreshToClearState() {
+            const icon = document.getElementById('globalRefreshIcon');
+            const txt = document.getElementById('globalRefreshText');
+            if (icon) icon.classList.add('fa-spin');
+            if (txt) txt.textContent = 'Memuat...';
+
+            showToast('Menghubungkan & memeriksa foto evidence terbaru dari server...', 'fa-arrows-rotate');
+
+            setTimeout(() => {
+                if (icon) icon.classList.remove('fa-spin');
+                if (txt) txt.textContent = 'Refresh';
+
+                setEvidenceState('clear');
+                showToast('Foto lengkap! Dokumentasi evidence berhasil di-refresh menjadi CLEAR (6/6).', 'fa-circle-check');
+            }, 900);
+        }
+
+        // Lightbox Functions
+        function openLightbox(index) {
+            const item = currentFilteredList[index];
+            if (!item || !item.available) return;
+
+            currentLightboxIndex = index;
+            updateLightboxContent();
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.remove('active');
+        }
+
+        function navigateLightbox(dir) {
+            let nextIndex = currentLightboxIndex + dir;
+            if (nextIndex < 0) nextIndex = currentFilteredList.length - 1;
+            if (nextIndex >= currentFilteredList.length) nextIndex = 0;
+
+            if (currentFilteredList[nextIndex] && currentFilteredList[nextIndex].available) {
+                currentLightboxIndex = nextIndex;
+                updateLightboxContent();
+            }
+        }
+
+        function updateLightboxContent() {
+            const item = currentFilteredList[currentLightboxIndex];
+            if (!item) return;
+
+            document.getElementById('lightboxCounter').textContent = `Foto ${currentLightboxIndex + 1} dari ${currentFilteredList.filter(x => x.available).length}`;
+            document.getElementById('lightboxImg').src = item.img;
+            document.getElementById('lightboxTitle').textContent = item.title;
+            document.getElementById('lightboxTime').textContent = item.time;
+            document.getElementById('lightboxPic').textContent = item.pic;
+            document.getElementById('lightboxCoord').textContent = item.coord;
+            document.getElementById('lightboxSize').textContent = item.size;
+
+            const badge = document.getElementById('lightboxBadge');
+            badge.className = `photo-badge ${item.stage === 'mulai' ? 'badge-mulai' : 'badge-selesai'}`;
+            badge.textContent = item.stage === 'mulai' ? 'Evidence Mulai' : 'Evidence Selesai';
+        }
+
+        function downloadCurrentPhoto() {
+            const item = currentFilteredList[currentLightboxIndex];
+            showToast(`Mengunduh "${item.title}"...`, 'fa-circle-down');
+        }
+
+        function downloadAllPhotos() {
+            const count = currentEvidenceState === 'incomplete' ? 4 : 6;
+            showToast(`Mengunduh ${count} berkas foto evidence...`, 'fa-cloud-arrow-down');
+        }
+
+        function showToast(msg, icon = 'fa-circle-check') {
+            const toast = document.getElementById('toastBubble');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.querySelector('i').className = `fa-solid ${icon}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2600);
+        }
+
+        // Initialize
+        const urlParams = new URLSearchParams(window.location.search);
+        const stateParam = urlParams.get('state');
+        const fromParam = urlParams.get('from');
+        const typeParam = urlParams.get('type');
+        const indexParam = urlParams.get('index');
+
+        // Dynamic Back Button
+        const backBtn = document.querySelector('.back-btn');
+        if (backBtn) {
+            if (fromParam === 'pembongkaran') {
+                backBtn.href = '../Pembongkaran/pembongkaran-action.html';
+                document.getElementById('pageSubTitle').textContent = 'Pembongkaran • DKL20250000001-01';
+            } else if (fromParam === 'karantina') {
+                backBtn.href = '../Karantina & Pengembalian/karantina-action.html';
+                document.getElementById('pageSubTitle').textContent = 'Karantina • KRT20250000001-01';
+            } else {
+                backBtn.href = './pemasangan-action.html';
+            }
+        }
+
+        if (stateParam === 'clear') {
+            setEvidenceState('clear');
+        } else {
+            setEvidenceState('incomplete');
+        }
+
+        const idParam = urlParams.get('id');
+        if (idParam) {
+            const prefix = fromParam === 'pembongkaran' ? 'Pembongkaran' : 'Pemasangan';
+            document.getElementById('pageSubTitle').textContent = `${prefix} • ${idParam}`;
+        }
+
+        // Auto filter by type if requested
+        if (typeParam === 'mulai') {
+            const chipMulai = document.getElementById('chipTabMulai');
+            filterGallery('mulai', chipMulai);
+        } else if (typeParam === 'selesai') {
+            const chipSelesai = document.getElementById('chipTabSelesai');
+            filterGallery('selesai', chipSelesai);
+        }
+
+        // Open specific photo if index param passed
+        if (indexParam !== null && !isNaN(parseInt(indexParam))) {
+            const targetIdx = parseInt(indexParam);
+            setTimeout(() => {
+                if (currentFilteredList[targetIdx] && currentFilteredList[targetIdx].available) {
+                    openLightbox(targetIdx);
+                }
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>

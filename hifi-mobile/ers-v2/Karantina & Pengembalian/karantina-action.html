@@ -751,18 +751,32 @@
                             <span class="meta-val">-6.9382, 107.6254</span>
                         </div>
                     </div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: var(--text-main); margin-top: 4px;">Evidence Pembongkaran:</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 4px;">
+                        <div style="font-size: 12px; font-weight: 800; color: var(--text-main);">Evidence Pembongkaran:</div>
+                        <button type="button" class="btn-refresh-evidence" id="btnRefreshEvidenceBongkar" onclick="refreshEvidenceBongkar()"
+                            style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #2563eb; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;"
+                            title="Muat ulang evidence yang gagal terunduh">
+                            <i class="fa-solid fa-arrows-rotate" id="refreshBongkarIcon" style="font-size: 11px; transition: transform 0.3s ease;"></i>
+                            <span id="refreshBongkarText">Refresh</span>
+                        </button>
+                    </div>
+                    <p style="font-size: 11px; color: #64748b; line-height: 1.4; margin: 0 0 8px 0;" id="evidenceBongkarSubtitle">
+                        Jika terdapat file upload evidence yang gagal terunduh atau belum tersinkronisasi, tekan tombol <strong>Refresh</strong> untuk memuat ulang.
+                    </p>
+                    
                     <div class="evidence-gallery-grid">
-                        <div class="evidence-thumb-box">
+                        <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer;>
                             <img src="https://images.unsplash.com/photo-1541888946425-d0fbb180c5f2?w=300" alt="Bongkar 1">
                         </div>
-                        <div class="evidence-thumb-box">
+                        <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer;>
                             <img src="https://images.unsplash.com/photo-1508873696983-2df5293cb395?w=300" alt="Bongkar 2">
                         </div>
-                        <div class="evidence-thumb-box">
-                            <img src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=300" alt="Bongkar 3">
+                        <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'"
+                            style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer;" title="Lihat Galeri Foto Evidence">
+                            <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=300&q=80"
+                                alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div class="evidence-thumb-box">
+                        <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer;>
                             <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=300" alt="Bongkar 4">
                             <div class="evidence-more-overlay">+2</div>
                         </div>
@@ -1076,6 +1090,66 @@
             confirmKedatangan();
             submitSectionCheck(checkedSectionParam);
             showToast('Check Sheet Tersimpan', `Pemeriksaan ${checkedSectionParam} telah berhasil disimpan.`, 'success');
+        }
+    
+        // Refresh Evidence Logic
+        let isBongkarRefreshed = false;
+        function refreshEvidenceBongkar() {
+            const btn = document.getElementById('btnRefreshEvidenceBongkar');
+            const icon = document.getElementById('refreshBongkarIcon');
+            const txt = document.getElementById('refreshBongkarText');
+            const banner = document.getElementById('evidenceBongkarFailedBanner');
+            const slot = document.getElementById('thumbBongkarFailedSlot');
+
+            if (!icon) return;
+            icon.classList.add('fa-spin');
+            if (txt) txt.textContent = 'Memuat...';
+            if (btn) btn.style.pointerEvents = 'none';
+
+            if (slot && !isBongkarRefreshed) {
+                slot.style.background = '#f1f5f9';
+                slot.style.border = '1px solid #cbd5e1';
+                slot.innerHTML = `
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 16px; color: #2563eb;"></i>
+                    <span style="font-size: 8.5px; font-weight: 600; color: #64748b; margin-top: 3px;">Mengunduh...</span>
+                `;
+            }
+
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                if (txt) txt.textContent = 'Refresh';
+                if (btn) btn.style.pointerEvents = 'auto';
+
+                if (slot) {
+                    slot.style.background = 'var(--bg-card)';
+                    slot.style.border = 'none';
+                    slot.style.padding = '0';
+                    slot.onclick = null;
+                    slot.title = 'Bongkar 3';
+                    slot.innerHTML = `
+                        <img src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=300" alt="Bongkar 3" style="width: 100%; height: 100%; object-fit: cover;">
+                    `;
+                }
+
+                if (banner) {
+                    banner.style.background = '#ecfdf5';
+                    banner.style.border = '1px solid #a7f3d0';
+                    banner.style.color = '#047857';
+                    banner.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 12px; color: #10b981; flex-shrink: 0;"></i>
+                            <span>Semua file evidence berhasil diunduh.</span>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        banner.style.transition = 'opacity 0.4s ease';
+                        banner.style.opacity = '0';
+                        setTimeout(() => banner.style.display = 'none', 400);
+                    }, 3500);
+                }
+
+                isBongkarRefreshed = true;
+            }, 900);
         }
     </script>
 </body>

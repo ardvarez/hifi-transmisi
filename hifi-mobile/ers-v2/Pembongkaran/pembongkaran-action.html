@@ -9,7 +9,83 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Leaflet Map Integration -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+        // Refresh Evidence Logic
+        let isBongkarRefreshed = false;
+        function refreshEvidenceBongkar() {
+            const btn = document.getElementById('btnRefreshEvidenceBongkar');
+            const icon = document.getElementById('refreshBongkarIcon');
+            const txt = document.getElementById('refreshBongkarText');
+            const banner = document.getElementById('evidenceBongkarFailedBanner');
+            const slot = document.getElementById('thumbBongkarFailedSlot');
+
+            if (!icon) return;
+            icon.classList.add('fa-spin');
+            if (txt) txt.textContent = 'Memuat...';
+            if (btn) btn.style.pointerEvents = 'none';
+
+            if (slot && !isBongkarRefreshed) {
+                slot.style.background = '#f1f5f9';
+                slot.style.border = '1px solid #cbd5e1';
+                slot.innerHTML = `
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 16px; color: #2563eb;"></i>
+                    <span style="font-size: 8.5px; font-weight: 600; color: #64748b; margin-top: 3px;">Mengunduh...</span>
+                `;
+            }
+
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                if (txt) txt.textContent = 'Refresh';
+                if (btn) btn.style.pointerEvents = 'auto';
+
+                if (slot) {
+                    slot.style.background = '#e2e8f0';
+                    slot.style.border = '1px solid #cbd5e1';
+                    slot.style.padding = '0';
+                    slot.onclick = null;
+                    slot.title = 'Evidence 3';
+                    slot.innerHTML = `
+                        <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=300&q=80"
+                            alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
+                    `;
+                }
+
+                if (banner) {
+                    banner.style.background = '#ecfdf5';
+                    banner.style.border = '1px solid #a7f3d0';
+                    banner.style.color = '#047857';
+                    banner.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 12px; color: #10b981; flex-shrink: 0;"></i>
+                            <span>Semua file evidence berhasil diunduh.</span>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        banner.style.transition = 'opacity 0.4s ease';
+                        banner.style.opacity = '0';
+                        setTimeout(() => banner.style.display = 'none', 400);
+                    }, 3500);
+                }
+
+                isBongkarRefreshed = true;
+            }, 900);
+        }
+
+        function refreshEvidencePasang() {
+            const btn = document.getElementById('btnRefreshEvidencePasang');
+            const icon = document.getElementById('refreshPasangIcon');
+            const txt = document.getElementById('refreshPasangText');
+            if (!icon) return;
+            icon.classList.add('fa-spin');
+            if (txt) txt.textContent = 'Memuat...';
+            if (btn) btn.style.pointerEvents = 'none';
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                if (txt) txt.textContent = 'Refresh';
+                if (btn) btn.style.pointerEvents = 'auto';
+            }, 800);
+        }
+    </script>
     <style>
         :root {
             --bg-canvas: #f4f6fc;
@@ -1233,18 +1309,32 @@
 
                     <!-- Evidence Pembongkaran Card -->
                     <div class="spec-card">
-                        <h3 style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Evidence Pembongkaran</h3>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <h3 style="font-size: 14px; font-weight: 800; color: #0f172a; margin: 0;">Evidence Pembongkaran</h3>
+                            <button type="button" class="btn-refresh-evidence" id="btnRefreshEvidenceBongkar" onclick="refreshEvidenceBongkar()"
+                                style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #2563eb; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;"
+                                title="Muat ulang evidence yang gagal terunduh">
+                                <i class="fa-solid fa-arrows-rotate" id="refreshBongkarIcon" style="font-size: 11px; transition: transform 0.3s ease;"></i>
+                                <span id="refreshBongkarText">Refresh</span>
+                            </button>
+                        </div>
+                        <p style="font-size: 11px; color: #64748b; line-height: 1.4; margin: 0 0 10px 0;" id="evidenceBongkarSubtitle">
+                            Jika terdapat file upload evidence yang gagal terunduh atau belum tersinkronisasi, tekan tombol <strong>Refresh</strong> untuk memuat ulang.
+                        </p>
+                        
                         <div class="evidence-gallery-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=300&q=80" alt="Evidence 1" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 2" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
-                                <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=300&q=80" alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'"
+                            style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; cursor: pointer;" title="Lihat Galeri Foto Evidence">
+                            <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=300&q=80"
+                                alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=300&q=80" alt="Evidence 4" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
                                 <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">+2</div>
                             </div>
@@ -1283,18 +1373,29 @@
 
                     <!-- Evidence Pemasangan Card -->
                     <div class="spec-card">
-                        <h3 style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Evidence Pemasangan</h3>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <h3 style="font-size: 14px; font-weight: 800; color: #0f172a; margin: 0;">Evidence Pemasangan</h3>
+                            <button type="button" class="btn-refresh-evidence" id="btnRefreshEvidencePasang" onclick="refreshEvidencePasang()"
+                                style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #2563eb; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;"
+                                title="Muat ulang evidence yang gagal terunduh">
+                                <i class="fa-solid fa-arrows-rotate" id="refreshPasangIcon" style="font-size: 11px; transition: transform 0.3s ease;"></i>
+                                <span id="refreshPasangText">Refresh</span>
+                            </button>
+                        </div>
+                        <p style="font-size: 11px; color: #64748b; line-height: 1.4; margin: 0 0 10px 0;">
+                            Jika terdapat file upload evidence yang gagal terunduh atau belum tersinkronisasi, tekan tombol <strong>Refresh</strong> untuk memuat ulang.
+                        </p>
                         <div class="evidence-gallery-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=300&q=80" alt="Evidence 1" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1544724796-5f56436f5f1c?auto=format&fit=crop&w=300&q=80" alt="Evidence 2" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=300&q=80" alt="Evidence 3" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <div class="evidence-thumb-box" style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
+                            <div class="evidence-thumb-box" onclick="window.location.href='../../ers/Pemasangan/gallery-evidence.html'" cursor: pointer; style="position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #334155; border: 1px solid #cbd5e1;">
                                 <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=300&q=80" alt="Evidence 4" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
                                 <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">+2</div>
                             </div>
