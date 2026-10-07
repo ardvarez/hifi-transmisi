@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login V2 - Transmission One Mobile PLN</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --hero-bg: #07152b;
+            --hero-color: #0b4884;
+            --bg-canvas: #ffffff;
+            --card-bg: #ffffff;
+            --input-bg: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #334155;
+            --border-color: #e2e8f0;
+            --primary-blue: #0284c7;
+            --primary-blue-hover: #0369a1;
+            --primary-blue-light: #f0f9ff;
+            --pln-gold: #f59e0b;
+            --pln-gold-light: #fef3c7;
+        }
+
+        body.dark-mode {
+            background-color: #020617 !important;
+            --hero-bg: #030a17;
+            --hero-color: #0b1329;
+            --bg-canvas: #090e1a;
+            --card-bg: #111827;
+            --input-bg: #111827;
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+            --border-color: #1e293b;
+            --primary-blue: #38bdf8;
+            --primary-blue-hover: #0284c7;
+            --primary-blue-light: rgba(56, 189, 248, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 900px;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* 1. Top Hero Section */
+        .login-hero-wrapper {
+            background-color: var(--hero-bg);
+            padding: 16px 20px 10px;
+            position: relative;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1 1 auto;
+            min-height: 220px;
+            overflow: hidden;
+            border-radius: 0;
+        }
+
+        /* Foto Transmisi Sendu (Dusk Blue Hue Shift dari Oranye Senja) */
+        .hero-bg-photo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: url('assets/transmission_sunset_header.png') center 65% / cover no-repeat;
+            filter: hue-rotate(185deg) saturate(1.15) brightness(0.8) contrast(1.15);
+            transform: scale(1.02);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Layer Kabut & Asap Biru Sendu (Atmospheric Blue Smoke) */
+        .hero-blue-smoke-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            background: 
+                radial-gradient(ellipse 90% 60% at 50% 90%, rgba(56, 189, 248, 0.45) 0%, rgba(30, 64, 175, 0.3) 45%, transparent 75%),
+                radial-gradient(circle at 15% 80%, rgba(96, 165, 250, 0.35) 0%, transparent 55%),
+                radial-gradient(circle at 85% 78%, rgba(56, 189, 248, 0.35) 0%, transparent 55%),
+                linear-gradient(180deg, rgba(7, 21, 43, 0.6) 0%, rgba(10, 25, 47, 0.08) 35%, rgba(6, 18, 38, 0.8) 100%);
+        }
+
+        .hero-top-status {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            position: relative;
+            z-index: 5;
+        }
+
+        .theme-toggle-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* 2. Login Content Body (Seamless with Rounded 12 Intersection) */
+        .login-scroll-body {
+            flex: 0 0 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 24px 20px 8px;
+            margin-top: -12px;
+            background: var(--bg-canvas);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-scroll-body::-webkit-scrollbar {
+            width: 0;
+            display: none;
+        }
+
+        .login-content-section {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        /* Form Inputs */
+        .form-group-item {
+            margin-bottom: 14px;
+        }
+
+        .form-input-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        .form-input-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-lead-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .modern-text-input {
+            width: 100%;
+            height: 48px;
+            background: var(--input-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 14px 0 40px;
+            font-size: 13.5px;
+            color: var(--text-dark);
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .modern-text-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .modern-text-input:focus {
+            border-color: var(--primary-blue);
+            background: var(--card-bg);
+            box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.12);
+        }
+
+        .form-input-box:focus-within .input-lead-icon {
+            color: var(--primary-blue);
+        }
+
+        .btn-eye-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 15px;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .btn-eye-toggle:hover {
+            color: var(--text-dark);
+        }
+
+        /* Captcha Styles */
+        .captcha-badge-box {
+            background: var(--input-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            height: 36px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 13.5px;
+            color: var(--text-dark);
+            letter-spacing: 0.8px;
+            user-select: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            flex-shrink: 0;
+        }
+
+        .btn-refresh-captcha {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            background: var(--input-bg);
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-refresh-captcha:hover {
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            background: rgba(26, 101, 214, 0.05);
+        }
+
+        .btn-refresh-captcha:active {
+            transform: scale(0.95);
+        }
+
+        /* Remove number input spinner / ticker */
+        #captchaInput::-webkit-outer-spin-button,
+        #captchaInput::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #captchaInput[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* Options Row */
+        .login-options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .remember-wrap {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--text-sub);
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+        }
+
+        .checkbox-styled {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid #cbd5e1;
+            cursor: pointer;
+            accent-color: var(--primary-blue);
+        }
+
+        .forgot-link-text {
+            color: var(--primary-blue);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .forgot-link-text:hover {
+            text-decoration: underline;
+        }
+
+        /* 3. Action Buttons */
+        .btn-primary-login {
+            width: 100%;
+            height: 42px;
+            background: var(--primary-blue);
+            border: none;
+            border-radius: 11px;
+            color: #ffffff;
+            font-size: 13.5px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 12px rgba(26, 101, 214, 0.25);
+        }
+
+        .btn-primary-login:hover {
+            background: var(--primary-blue-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 16px rgba(26, 101, 214, 0.35);
+        }
+
+        .btn-primary-login:active {
+            transform: translateY(1px);
+        }
+
+        /* Divider: Or connect using / Or sign in with */
+        /* Divider 'atau' */
+        .divider-or-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+            color: var(--text-muted);
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            gap: 10px;
+        }
+
+        .divider-or-row::before,
+        .divider-or-row::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        /* Solid SSO Button */
+        .btn-sso-action {
+            width: 100%;
+            height: 42px;
+            background: #ffffff;
+            border: 1.5px solid var(--primary-blue);
+            border-radius: 11px;
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(26, 101, 214, 0.05);
+        }
+
+        body.dark-mode .btn-sso-action {
+            background: rgba(56, 189, 248, 0.08);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        .btn-sso-action:hover {
+            background: rgba(26, 101, 214, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .btn-sso-action:active {
+            transform: translateY(1px);
+        }
+
+        /* Secondary Links: Forgot PIN & Helpdesk */
+        .card-secondary-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
+            font-size: 11.5px;
+        }
+
+        .btn-secondary-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+        }
+
+        .btn-secondary-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .secondary-bullet {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #cbd5e1;
+        }
+
+        /* 4. Footer */
+        .login-footer-branding {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 20px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        .pln-footer-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 600;
+        }
+
+        .pln-bolt-square {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background: var(--pln-gold);
+            color: #0b4884;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        /* 5. Module App Icons Row (Style from capture: [PI] [PS] [FFE] [PST] [TFA] [MTP]) */
+        .module-icons-row-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 8px;
+        }
+
+        .module-icons-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+        }
+
+        /* 5. Module App Icons Row (Matching mockup: [PI] [PS/ERS] [MTP] [PST]) */
+        .module-icons-row-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 8px;
+        }
+
+        .module-icons-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+        }
+
+        .module-icons-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .app-square-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+            position: relative;
+            padding: 7px;
+        }
+
+        body.dark-mode .app-square-btn {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-square-btn:hover {
+            transform: translateY(-3px) scale(1.08);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+            border-color: var(--primary-blue);
+        }
+
+        .app-square-btn:active {
+            transform: translateY(0);
+        }
+
+        .app-square-pi {
+            background: #00488f !important;
+            border-color: #003a73 !important;
+        }
+
+        .app-square-ps {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        .app-square-mtp {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        .app-square-pst {
+            background: #0c1e48 !important;
+            border-color: #081533 !important;
+        }
+
+        /* Dark Mode Specific Component Overrides */
+        body.dark-mode .floating-login-card {
+            background: #111827;
+            border-color: #1e293b;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .form-input-label {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .modern-text-input {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        body.dark-mode .modern-text-input::placeholder {
+            color: #64748b;
+        }
+
+        body.dark-mode .modern-text-input:focus {
+            background: #0f172a;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        body.dark-mode .input-lead-icon {
+            color: #64748b;
+        }
+
+        body.dark-mode .form-input-box:focus-within .input-lead-icon {
+            color: #38bdf8;
+        }
+
+        body.dark-mode .btn-eye-toggle {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .btn-eye-toggle:hover {
+            color: #f8fafc;
+        }
+
+        body.dark-mode .captcha-badge-box {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        body.dark-mode .btn-refresh-captcha {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        body.dark-mode .btn-refresh-captcha:hover {
+            color: #38bdf8;
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        body.dark-mode #captchaInput {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode #captchaInput:focus {
+            background: #0f172a !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+        }
+
+        body.dark-mode .checkbox-styled {
+            border-color: #475569;
+            background: #1e293b;
+        }
+
+        body.dark-mode .remember-wrap {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .forgot-link-text {
+            color: #38bdf8;
+        }
+
+        body.dark-mode .divider-or-row {
+            color: #64748b;
+        }
+
+        body.dark-mode .divider-or-row::before,
+        body.dark-mode .divider-or-row::after {
+            background: #1e293b;
+        }
+
+        body.dark-mode .btn-secondary-link {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .btn-secondary-link:hover {
+            color: #38bdf8;
+        }
+
+        body.dark-mode .secondary-bullet {
+            color: #475569;
+        }
+
+        body.dark-mode .modal-sheet {
+            background: #0f172a;
+            border-top: 1px solid #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark-mode .modal-drag-bar {
+            background: #334155;
+        }
+
+        body.dark-mode .modal-sheet-desc {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .btn-modal-cancel {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .btn-modal-cancel:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+
+        /* Toast Notification */
+        .mobile-toast {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            max-width: 90%;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .mobile-toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-sheet {
+            background: var(--card-bg);
+            width: 100%;
+            border-radius: 28px 28px 0 0;
+            padding: 22px 20px 30px;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-dark);
+            max-height: 85%;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .modal-drag-bar {
+            width: 38px;
+            height: 4px;
+            border-radius: 4px;
+            background: #cbd5e1;
+            margin: 0 auto 14px;
+        }
+
+        .modal-sheet-title {
+            font-size: 16.5px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .modal-sheet-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .modal-actions-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .modal-action-btn {
+            flex: 1;
+            height: 44px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-modal-cancel {
+            background: #f1f5f9;
+            color: var(--text-sub);
+        }
+
+        .btn-modal-confirm {
+            background: var(--primary-blue);
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+    <div class="mobile-container">
+
+        <!-- Toast Notification (Inside phone viewport) -->
+        <div class="mobile-toast" id="mobileToast">
+            <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+            <span>Pesan Notifikasi</span>
+        </div>
+
+        <!-- 1. Top Hero Section with Transmission One App Icon -->
+        <div class="login-hero-wrapper">
+            <!-- Background Foto Bergradasi Biru Sendu -->
+            <div class="hero-bg-photo"></div>
+
+            <!-- Layer Asap & Kabut Biru (Atmospheric Blue Mist & Smoke) -->
+            <div class="hero-blue-smoke-layer">
+                <svg viewBox="0 0 400 140" width="100%" height="135" preserveAspectRatio="none" style="position: absolute; bottom: 0; left: 0; right: 0; opacity: 0.85; filter: blur(5px);">
+                    <defs>
+                        <linearGradient id="blueSmoke1" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.65" />
+                            <stop offset="55%" stop-color="#2563eb" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0" />
+                        </linearGradient>
+                        <linearGradient id="blueSmoke2" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.55" />
+                            <stop offset="65%" stop-color="#0284c7" stop-opacity="0.2" />
+                            <stop offset="100%" stop-color="#07152b" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Gumpalan Asap Bergelombang (Billowing Blue Smoke) -->
+                    <path d="M -20,140 Q 40,88 100,102 T 220,82 T 320,98 T 420,72 L 420,140 Z" fill="url(#blueSmoke1)" />
+                    <path d="M -20,140 Q 60,108 130,92 T 260,108 T 360,88 T 420,102 L 420,140 Z" fill="url(#blueSmoke2)" />
+                    <path d="M 30,140 Q 110,68 190,82 T 310,72 T 410,92 L 410,140 Z" fill="url(#blueSmoke1)" opacity="0.65" />
+                </svg>
+            </div>
+
+            <!-- Top Status Bar -->
+            <div class="hero-top-status">
+                <span>9:41 AM</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; gap: 5px; font-size: 11px;">
+                        <i class="fa-solid fa-signal"></i>
+                        <i class="fa-solid fa-wifi"></i>
+                        <i class="fa-solid fa-battery-full"></i>
+                    </div>
+                    <button class="theme-toggle-btn" onclick="toggleNightMode()" title="Toggle Dark/Light Mode">
+                        <i class="fa-solid fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logo Label (Centered in Hero: TRANSMISSION ONE) -->
+            <div class="app-hero-brand-vector"
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: auto; margin-bottom: auto; position: relative; z-index: 5; padding: 22px 0;">
+                <svg viewBox="0 0 500 65" width="235" height="31" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 3px 10px rgba(0, 8, 24, 0.95)) drop-shadow(0 0 20px rgba(0, 20, 50, 0.85));">
+                    <text x="250" y="48" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif"
+                        font-size="44" font-weight="900" fill="#ffffff" letter-spacing="1">TRANSMISSION ONE</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 2. Login Content Area (Dilepas dari Card Rectangle) -->
+        <div class="login-scroll-body">
+
+            <div class="login-content-section">
+                <!-- Form Login (Langsung Login tanpa Sign Up) -->
+                <form id="loginForm" onsubmit="event.preventDefault(); handleFormLogin();">
+                    <!-- Field 1: Email / Username -->
+                    <div class="form-group-item">
+                        <label class="form-input-label" for="usernameInput">Username atau Email</label>
+                        <div class="form-input-box">
+                            <input type="text" id="usernameInput" class="modern-text-input"
+                                placeholder="Masukkan Username atau Email PLN" autocomplete="username" required>
+                            <i class="fa-regular fa-envelope input-lead-icon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Field 2: Password -->
+                    <div class="form-group-item">
+                        <label class="form-input-label" for="passwordInput">Kata Sandi</label>
+                        <div class="form-input-box">
+                            <input type="password" id="passwordInput" class="modern-text-input"
+                                placeholder="Masukkan Kata Sandi" autocomplete="current-password" required>
+                            <i class="fa-solid fa-lock input-lead-icon"></i>
+                            <button type="button" class="btn-eye-toggle" onclick="togglePasswordVisibility()"
+                                title="Tampilkan / Sembunyikan Kata Sandi">
+                                <i class="fa-regular fa-eye-slash" id="pwdEyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Field 3: Math Addition Captcha -->
+                    <div class="form-group-item">
+                        <label class="form-input-label" for="captchaInput">Kode Keamanan (Captcha)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <!-- Captcha Display Badge -->
+                            <div class="captcha-badge-box" id="captchaQuestionBadge"
+                                title="Hitung hasil penjumlahan ini">
+                                <span id="num1Text">3</span>
+                                <span style="color: #ef4444; font-weight: 800;">+</span>
+                                <span id="num2Text">4</span>
+                                <span style="color: var(--text-muted);">=</span>
+                                <span style="color: var(--primary-blue); font-weight: 800;">?</span>
+                            </div>
+
+                            <!-- Refresh Button -->
+                            <button type="button" class="btn-refresh-captcha" onclick="generateNewCaptcha()"
+                                title="Acak ulang captcha">
+                                <i class="fa-solid fa-arrows-rotate" id="captchaRefreshIcon"></i>
+                            </button>
+
+                            <!-- Captcha Answer Input -->
+                            <div class="form-input-box" style="flex: 1;">
+                                <input type="number" id="captchaInput" class="modern-text-input" placeholder="Hasil"
+                                    required inputmode="numeric"
+                                    style="height: 36px; border-radius: 10px; padding-left: 8px; text-align: center; font-size: 13.5px; font-weight: 800;"
+                                    min="0" max="99">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="login-options-row">
+                        <label class="remember-wrap">
+                            <input type="checkbox" id="rememberMeCheckbox" class="checkbox-styled" checked>
+                            <span>Remember me</span>
+                        </label>
+                        <span class="forgot-link-text" onclick="openForgotPasswordModal()">Lupa Password?</span>
+                    </div>
+
+                    <!-- Action Buttons: Log In & Log In dengan SSO -->
+                    <div style="display: flex; flex-direction: column; gap: 0; margin-top: 14px;">
+                        <!-- Button 1: Primary Login Button -->
+                        <button type="submit" class="btn-primary-login" id="btnLoginSubmit">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            <span>Log In</span>
+                        </button>
+
+                        <!-- Divider 'atau' -->
+                        <div class="divider-or-row">
+                            <span>atau</span>
+                        </div>
+
+                        <!-- Button 2: SSO Button -->
+                        <button type="button" class="btn-sso-action" onclick="openSsoModal()" id="btnSsoLogin">
+                            <i class="fa-solid fa-shield-halved" style="font-size: 13.5px;"></i>
+                            <span>Log In dengan SSO PLN</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Secondary Links: Lupa PIN & Helpdesk -->
+                <div class="card-secondary-links">
+                    <span class="btn-secondary-link" onclick="openForgotPinModal()">
+                        <i class="fa-solid fa-key"></i> Lupa PIN?
+                    </span>
+                    <span class="secondary-bullet"></span>
+                    <span class="btn-secondary-link"
+                        onclick="showToast('Hubungi Grup Operasional atau Email Ke helpdesk.pi@iconpln.co.id', 'fa-headset', '#38bdf8')">
+                        <i class="fa-solid fa-headset"></i> Bantuan IT
+                    </span>
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="login-footer-branding" style="padding-bottom: 6px; flex-shrink: 0;">
+                <div class="pln-footer-row"
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Powered by</span>
+                    <img src="../assets/logo-pln.svg" alt="PLN" style="height: 20px; width: auto; object-fit: contain;">
+                </div>
+                <div style="font-size: 10px; opacity: 0.65; margin-top: 4px; text-align: center; color: var(--text-muted);">Transmission One Mobile v2.4.0-prod</div>
+            </div>
+
+        </div>
+        <!-- MODAL 1: SSO Authentication Mock (Inside Mobile Viewport) -->
+        <div class="modal-overlay" id="ssoModal" onclick="if(event.target===this) closeSsoModal()">
+            <div class="modal-sheet">
+                <div class="modal-drag-bar"></div>
+                <div class="modal-sheet-title">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--primary-blue);"></i>
+                    <span>PLN Single Sign-On (SSO)</span>
+                </div>
+                <div class="modal-sheet-desc" id="ssoStatusText">
+                    Menghubungkan ke layanan otentikasi terpusat PLN Identity Provider...
+                </div>
+
+                <div
+                    style="background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div
+                            style="width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 13.5px; color: var(--text-dark);" id="ssoUserDisplay">Daniandra
+                                Ersya</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">daniandra@pln.co.id • NIP: 9416283ZY
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions-group">
+                    <button type="button" class="modal-action-btn btn-modal-cancel" onclick="closeSsoModal()">Batal</button>
+                    <button type="button" class="modal-action-btn btn-modal-confirm" onclick="executeSsoSuccess()">
+                        <i class="fa-solid fa-right-to-bracket"></i> Masuk via SSO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL 2: Forgot Password (Inside Mobile Viewport) -->
+        <div class="modal-overlay" id="forgotPasswordModal" onclick="if(event.target===this) closeForgotPasswordModal()">
+            <div class="modal-sheet">
+                <div class="modal-drag-bar"></div>
+
+                <!-- STATE 1: FORM INPUT -->
+                <div id="v2ForgotPwdFormState">
+                    <div class="modal-sheet-title">
+                        <i class="fa-solid fa-envelope-open-text" style="color: #0284c7;"></i>
+                        <span>Reset Kata Sandi</span>
+                    </div>
+                    <div class="modal-sheet-desc">
+                        Masukkan email korporat Anda yang terdaftar pada sistem Transmission One (@pln.co.id). Jika email tidak terdaftar, permintaan otomatis <strong>ditolak</strong>.
+                    </div>
+
+                    <!-- Quick test chips -->
+                    <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 11px;">
+                        <span style="font-weight: 700; color: var(--primary-blue);"><i class="fa-solid fa-circle-info"></i> Demo Email:</span>
+                        <div style="display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap;">
+                            <span style="background: #e0f2fe; color: #0369a1; padding: 3px 7px; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="setV2TestEmail('daniandra@pln.co.id')">daniandra@pln.co.id</span>
+                            <span style="background: #fee2e2; color: #b91c1c; padding: 3px 7px; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="setV2TestEmail('unregistered@gmail.com')">unregistered@gmail.com</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group-item">
+                        <label class="form-input-label">Email Terdaftar PLN</label>
+                        <div class="form-input-box">
+                            <input type="email" id="resetEmailInput" class="modern-text-input"
+                                placeholder="Masukkan Email PLN" value="daniandra@pln.co.id" onkeydown="if(event.key==='Enter') submitForgotPassword()">
+                            <i class="fa-regular fa-envelope input-lead-icon"></i>
+                        </div>
+                    </div>
+
+                    <div id="v2PwdRejectBanner" style="display: none; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11.5px; color: #991b1b; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>Email tidak terdaftar dalam database. Permintaan ditolak!</span>
+                    </div>
+
+                    <div class="modal-actions-group">
+                        <button type="button" class="modal-action-btn btn-modal-cancel"
+                            onclick="closeForgotPasswordModal()">Batal</button>
+                        <button type="button" class="modal-action-btn btn-modal-confirm" onclick="submitForgotPassword()">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Tautan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STATE 2: SUCCESS VIEW REPLACEMENT -->
+                <div id="v2ForgotPwdSuccessState" style="display: none; text-align: center; padding: 10px 4px 6px;">
+                    <div style="width: 58px; height: 58px; border-radius: 50%; background: #ecfdf5; color: #10b981; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3 style="font-size: 17.5px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px;">
+                        Tautan Reset Terkirim!
+                    </h3>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px;">
+                        Instruksi pemulihan kata sandi telah dikirim ke email terdaftar:
+                    </p>
+                    <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--primary-blue); display: flex; align-items: center; justify-content: center; gap: 7px;">
+                            <i class="fa-solid fa-envelope-circle-check"></i>
+                            <span id="v2PwdTargetEmail">user@pln.co.id</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 18px;">
+                        Silakan periksa folder Inbox atau Spam email Anda.
+                    </p>
+                    <button type="button" class="btn-primary-login" onclick="closeForgotPasswordModal()" style="margin-top: 0; width: 100%; height: 42px; font-size: 13px;">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Kembali ke Halaman Masuk</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL 3: Forgot PIN (Inside Mobile Viewport) -->
+        <div class="modal-overlay" id="forgotPinModal" onclick="if(event.target===this) closeForgotPinModal()">
+            <div class="modal-sheet">
+                <div class="modal-drag-bar"></div>
+
+                <!-- STATE 1: FORM INPUT -->
+                <div id="v2ForgotPinFormState">
+                    <div class="modal-sheet-title">
+                        <i class="fa-solid fa-key" style="color: #d97706;"></i>
+                        <span>Reset PIN Lapangan</span>
+                    </div>
+                    <div class="modal-sheet-desc">
+                        Masukkan email atau NIP petugas terdaftar (@pln.co.id) untuk memverifikasi dan mereset PIN offline switchyard gardu induk.
+                    </div>
+
+                    <!-- Quick test chips -->
+                    <div style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 11px;">
+                        <span style="font-weight: 700; color: #d97706;"><i class="fa-solid fa-circle-info"></i> Demo Email:</span>
+                        <div style="display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap;">
+                            <span style="background: #fef3c7; color: #b45309; padding: 3px 7px; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="setV2TestPin('daniandra@pln.co.id')">daniandra@pln.co.id</span>
+                            <span style="background: #fee2e2; color: #b91c1c; padding: 3px 7px; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="setV2TestPin('unregistered@gmail.com')">unregistered@gmail.com</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group-item">
+                        <label class="form-input-label">Email Petugas Terdaftar</label>
+                        <div class="form-input-box">
+                            <input type="text" id="pinNipInput" class="modern-text-input" placeholder="Masukkan Email PLN"
+                                value="daniandra@pln.co.id" onkeydown="if(event.key==='Enter') submitForgotPin()">
+                            <i class="fa-regular fa-envelope input-lead-icon"></i>
+                        </div>
+                    </div>
+
+                    <div id="v2PinRejectBanner" style="display: none; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11.5px; color: #991b1b; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>Email tidak terdaftar dalam database. Permintaan reset PIN ditolak!</span>
+                    </div>
+
+                    <div class="modal-actions-group">
+                        <button type="button" class="modal-action-btn btn-modal-cancel"
+                            onclick="closeForgotPinModal()">Batal</button>
+                        <button type="button" class="modal-action-btn btn-modal-confirm" style="background: #d97706;"
+                            onclick="submitForgotPin()">
+                            <i class="fa-solid fa-shield-halved"></i> Minta Reset PIN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STATE 2: SUCCESS VIEW REPLACEMENT -->
+                <div id="v2ForgotPinSuccessState" style="display: none; text-align: center; padding: 10px 4px 6px;">
+                    <div style="width: 58px; height: 58px; border-radius: 50%; background: #ecfdf5; color: #10b981; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3 style="font-size: 17.5px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px;">
+                        Verifikasi PIN Terkirim!
+                    </h3>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px;">
+                        Tautan otorisasi dan kode verifikasi reset PIN telah dikirim ke:
+                    </p>
+                    <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+                        <div style="font-size: 13px; font-weight: 700; color: #d97706; display: flex; align-items: center; justify-content: center; gap: 7px;">
+                            <i class="fa-solid fa-key"></i>
+                            <span id="v2PinTargetEmail">user@pln.co.id</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 18px;">
+                        Silakan periksa pesan atau email korporat Anda.
+                    </p>
+                    <button type="button" class="btn-primary-login" onclick="closeForgotPinModal()" style="margin-top: 0; width: 100%; height: 42px; font-size: 13px; background: #d97706;">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Kembali ke Halaman Masuk</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- NOTES PANEL (RULE COMPLIANCE) -->
+    <style>
+        .notes-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 46px;
+            height: 46px;
+            background: #1a65d6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(26, 101, 214, 0.4);
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+
+        .notes-fab:hover {
+            transform: scale(1.08);
+        }
+
+        .notes-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 24px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .notes-panel.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notes-panel h3 {
+            margin: 0 0 10px 0;
+            color: #1a65d6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14.5px;
+            font-weight: 800;
+        }
+
+        .notes-panel ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .notes-panel li {
+            margin-bottom: 4px;
+        }
+    </style>
+
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')"
+        title="Notes & Validasi">
+        <i class="fa-solid fa-clipboard-list" style="font-size: 18px;"></i>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+        <h3>
+            <i class="fa-solid fa-circle-info"></i>
+            Notes & Validasi Login V2 (Transmission One)
+        </h3>
+        <ul>
+            <li><strong>Logo Transmission One:</strong> Tampil langsung tanpa kotak/rectangle wrapper pada header hero.</li>
+            <li><strong>Konten Login Cardless:</strong> Form input dan tombol login terintegrasi langsung tanpa card rectangle container.</li>
+            <li><strong>Form Input Langsung:</strong> Headline & sub-headline welcome dihapus agar fokus langsung ke input login.</li>
+            <li><strong>Routing:</strong> Form Login & SSO langsung redirect ke <code>./catalog-mobile.html</code>.</li>
+        </ul>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Math Addition Captcha Logic
+        let captchaResult = 0;
+        function generateNewCaptcha() {
+            const num1 = Math.floor(Math.random() * 9) + 1;
+            const num2 = Math.floor(Math.random() * 9) + 1;
+            captchaResult = num1 + num2;
+            const n1 = document.getElementById('num1Text');
+            const n2 = document.getElementById('num2Text');
+            if (n1 && n2) {
+                n1.textContent = num1;
+                n2.textContent = num2;
+            }
+            const icon = document.getElementById('captchaRefreshIcon');
+            if (icon) {
+                icon.style.transform = 'rotate(360deg)';
+                icon.style.transition = 'transform 0.4s ease';
+                setTimeout(() => { icon.style.transform = ''; icon.style.transition = ''; }, 400);
+            }
+        }
+
+        // Password Visibility Toggle
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('pwdEyeIcon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.className = 'fa-regular fa-eye';
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.className = 'fa-regular fa-eye-slash';
+            }
+        }
+
+        // Form Login Submit
+        function handleFormLogin() {
+            const u = document.getElementById('usernameInput').value.trim();
+            const p = document.getElementById('passwordInput').value.trim();
+            const cAns = parseInt(document.getElementById('captchaInput').value.trim(), 10);
+
+            if (!u) {
+                showToast('Harap masukkan Email / Username!', 'fa-triangle-exclamation', '#ef4444');
+                document.getElementById('usernameInput').focus();
+                return;
+            }
+
+            if (!p) {
+                showToast('Harap masukkan Password!', 'fa-triangle-exclamation', '#ef4444');
+                document.getElementById('passwordInput').focus();
+                return;
+            }
+
+            if (isNaN(cAns) || cAns !== captchaResult) {
+                showToast('Jawaban Captcha salah! Silakan coba lagi.', 'fa-triangle-exclamation', '#ef4444');
+                generateNewCaptcha();
+                const cInput = document.getElementById('captchaInput');
+                cInput.value = '';
+                cInput.focus();
+                return;
+            }
+
+            const btn = document.getElementById('btnLoginSubmit');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Memproses...</span>';
+            btn.style.opacity = '0.7';
+
+            showToast('Autentikasi berhasil! Mengalihkan ke Catalog...', 'fa-circle-check', '#10b981');
+            setTimeout(() => {
+                window.location.href = './catalog-mobile.html';
+            }, 800);
+        }
+
+        // SSO Modals
+        function openSsoModal() {
+            document.getElementById('ssoModal').classList.add('active');
+            const u = document.getElementById('usernameInput').value.trim();
+            if (u) {
+                document.getElementById('ssoUserDisplay').textContent = u;
+            }
+        }
+
+        function closeSsoModal() {
+            document.getElementById('ssoModal').classList.remove('active');
+        }
+
+        function executeSsoSuccess() {
+            closeSsoModal();
+            const btn = document.getElementById('btnSsoLogin');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Menghubungkan SSO...</span>';
+            btn.style.opacity = '0.8';
+
+            showToast('[SSO] Login Berhasil! Masuk ke Portal Transmission One...', 'fa-shield-halved', '#10b981');
+            setTimeout(() => {
+                window.location.href = './catalog-mobile.html';
+            }, 800);
+        }
+
+        // Registered Emails & NIPs for verification
+        const REGISTERED_EMAILS = [
+            'daniandra@pln.co.id',
+            'petugas.pi@pln.co.id',
+            'admin@pln.co.id',
+            'operator.transmisi@pln.co.id',
+            'supervisor.pi@pln.co.id'
+        ];
+
+        // Forgot Password Modal
+        function openForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('active');
+            document.getElementById('v2ForgotPwdFormState').style.display = 'block';
+            document.getElementById('v2ForgotPwdSuccessState').style.display = 'none';
+            document.getElementById('v2PwdRejectBanner').style.display = 'none';
+            const input = document.getElementById('resetEmailInput');
+            input.value = 'daniandra@pln.co.id';
+            setTimeout(() => input.focus(), 200);
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('active');
+        }
+
+        function setV2TestEmail(email) {
+            document.getElementById('resetEmailInput').value = email;
+            document.getElementById('v2PwdRejectBanner').style.display = 'none';
+        }
+
+        function submitForgotPassword() {
+            const input = document.getElementById('resetEmailInput');
+            const email = input.value.trim().toLowerCase();
+            const rejectBanner = document.getElementById('v2PwdRejectBanner');
+            const formState = document.getElementById('v2ForgotPwdFormState');
+            const successState = document.getElementById('v2ForgotPwdSuccessState');
+            const targetEmail = document.getElementById('v2PwdTargetEmail');
+
+            rejectBanner.style.display = 'none';
+
+            if (!email) {
+                showToast('Masukkan email terdaftar PLN!', 'fa-triangle-exclamation', '#ef4444');
+                input.focus();
+                return;
+            }
+
+            if (!REGISTERED_EMAILS.includes(email)) {
+                // ATURAN USER: EMAIL TIDAK TERSEDIA DITOLAK
+                rejectBanner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> <span>Email <strong>${email}</strong> tidak terdaftar! Permintaan ditolak.</span>`;
+                rejectBanner.style.display = 'flex';
+                showToast('Permintaan ditolak: Email tidak terdaftar!', 'fa-circle-xmark', '#ef4444');
+                return;
+            }
+
+            // ATURAN USER: RESPON SUKSES MENGGANTI OVERLAY / POP-UP RESET
+            targetEmail.textContent = email;
+            formState.style.display = 'none';
+            successState.style.display = 'block';
+            showToast('Tautan reset kata sandi terkirim!', 'fa-circle-check', '#10b981');
+        }
+
+        // Forgot PIN Modal
+        function openForgotPinModal() {
+            document.getElementById('forgotPinModal').classList.add('active');
+            document.getElementById('v2ForgotPinFormState').style.display = 'block';
+            document.getElementById('v2ForgotPinSuccessState').style.display = 'none';
+            document.getElementById('v2PinRejectBanner').style.display = 'none';
+            const input = document.getElementById('pinNipInput');
+            input.value = 'daniandra@pln.co.id';
+            setTimeout(() => input.focus(), 200);
+        }
+
+        function closeForgotPinModal() {
+            document.getElementById('forgotPinModal').classList.remove('active');
+        }
+
+        function setV2TestPin(val) {
+            document.getElementById('pinNipInput').value = val;
+            document.getElementById('v2PinRejectBanner').style.display = 'none';
+        }
+
+        function submitForgotPin() {
+            const input = document.getElementById('pinNipInput');
+            const emailOrNip = input.value.trim().toLowerCase();
+            const rejectBanner = document.getElementById('v2PinRejectBanner');
+            const formState = document.getElementById('v2ForgotPinFormState');
+            const successState = document.getElementById('v2ForgotPinSuccessState');
+            const targetEmail = document.getElementById('v2PinTargetEmail');
+
+            rejectBanner.style.display = 'none';
+
+            if (!emailOrNip) {
+                showToast('Masukkan email atau NIP petugas terdaftar!', 'fa-triangle-exclamation', '#ef4444');
+                input.focus();
+                return;
+            }
+
+            const isEmail = emailOrNip.includes('@');
+            let isRegistered = false;
+
+            if (isEmail) {
+                isRegistered = REGISTERED_EMAILS.includes(emailOrNip);
+            } else {
+                isRegistered = ['9416283zy', '9416283', '123456'].includes(emailOrNip);
+            }
+
+            if (!isRegistered) {
+                // ATURAN USER: EMAIL/NIP TIDAK TERSEDIA DITOLAK
+                rejectBanner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> <span>Data <strong>${emailOrNip}</strong> tidak terdaftar! Permintaan reset PIN ditolak.</span>`;
+                rejectBanner.style.display = 'flex';
+                showToast('Permintaan ditolak: Akun tidak terdaftar!', 'fa-circle-xmark', '#ef4444');
+                return;
+            }
+
+            // ATURAN USER: RESPON SUKSES MENGGANTI OVERLAY / POP-UP RESET
+            targetEmail.textContent = isEmail ? emailOrNip : `${emailOrNip}@pln.co.id`;
+            formState.style.display = 'none';
+            successState.style.display = 'block';
+            showToast('Otorisasi reset PIN berhasil dikirim!', 'fa-key', '#10b981');
+        }
+
+
+        // Toast Helper
+        function showToast(msg, icon = 'fa-circle-check', color = '#4ade80') {
+            const toast = document.getElementById('mobileToast');
+            if (toast) {
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:14px;"></i> <span>${msg}</span>`;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 2600);
+            }
+        }
+
+        // Theme Toggle (Light / Dark)
+        function toggleNightMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun';
+                localStorage.setItem('pln_mobile_theme', 'dark');
+                showToast('Mode Gelap diaktifkan', 'fa-moon', '#38bdf8');
+            } else {
+                icon.className = 'fa-solid fa-moon';
+                localStorage.setItem('pln_mobile_theme', 'light');
+                showToast('Mode Terang diaktifkan', 'fa-sun', '#f59e0b');
+            }
+        }
+
+        // Init Theme and Captcha from LocalStorage or Query param
+        window.addEventListener('DOMContentLoaded', () => {
+            generateNewCaptcha();
+
+            const savedTheme = localStorage.getItem('pln_mobile_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fa-solid fa-sun';
+            }
+
+            // Check if redirected from "Hapus Data"
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('reason') === 'cleardata') {
+                setTimeout(() => {
+                    showToast('Sesi kerja & data lokal berhasil direset.', 'fa-arrows-rotate', '#10b981');
+                }, 400);
+            }
+        });
+    </script>
+</body>
+
+</html>

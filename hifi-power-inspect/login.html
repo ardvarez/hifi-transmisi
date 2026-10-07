@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Power Inspect Web PLN</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --pln-hero-blue: #3b82f6;
+            --pln-blue-btn: #1d6fdc;
+            --pln-blue-hover: #155cb8;
+            --pln-yellow: #facc15;
+            --pln-gold: #ffd200;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #d1d5db;
+            --input-focus: #1d6fdc;
+            --danger-color: #ef4444;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+            --success-color: #10b981;
+            --success-bg: #ecfdf5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #3b82f6;
+        }
+
+        /* Fullscreen Layout Split */
+        .login-web-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            overflow: hidden;
+        }
+
+        /* 1. Left Hero Branding Section */
+        .hero-branding-pane {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #ffffff;
+            z-index: 5;
+        }
+
+        /* Top Left PLN Logo */
+        .top-pln-badge {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .pln-logo-vector {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+        }
+
+        /* Dual Logos Container (Power Swift + Power Inspect) */
+        .dual-logos-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 36px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* Power Swift Card */
+        .brand-unit {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ps-hexagon-icon {
+            width: 58px;
+            height: 64px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+        }
+
+        .brand-unit-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.05;
+        }
+
+        .brand-text-power {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text-swift {
+            font-size: 26px;
+            font-weight: 900;
+            color: #f59e0b;
+            letter-spacing: 0.5px;
+        }
+
+        /* Power Inspect Card */
+        .pi-monogram-icon {
+            width: 48px;
+            height: 56px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+        }
+
+        .brand-text-inspect {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text-powerfull {
+            font-size: 9px;
+            font-weight: 800;
+            color: #93c5fd;
+            letter-spacing: 4px;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .version-label {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 0.5px;
+        }
+
+        /* Bottom Angled Decorative Stripes */
+        .bottom-decoration-stripes {
+            position: absolute;
+            bottom: -30px;
+            right: 40px;
+            width: 320px;
+            height: 120px;
+            pointer-events: none;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            z-index: 4;
+        }
+
+        .deco-band-blue {
+            position: absolute;
+            bottom: 0;
+            right: 60px;
+            width: 140px;
+            height: 110px;
+            background: #1d4ed8;
+            transform: skewX(-45deg);
+            border-top-left-radius: 12px;
+            opacity: 0.85;
+        }
+
+        .deco-band-white {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            width: 18px;
+            height: 120px;
+            background: #ffffff;
+            transform: skewX(-45deg);
+            border-radius: 4px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .deco-band-yellow {
+            position: absolute;
+            bottom: 15px;
+            right: 48px;
+            width: 16px;
+            height: 110px;
+            background: #facc15;
+            transform: skewX(-45deg);
+            border-radius: 4px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 2. Right Form Pane */
+        .login-form-pane {
+            width: 440px;
+            min-width: 380px;
+            height: 100vh;
+            background: #ffffff;
+            border-top-left-radius: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 44px;
+            position: relative;
+            z-index: 10;
+            box-shadow: -15px 0 40px rgba(0, 0, 0, 0.12);
+            overflow-y: auto;
+        }
+
+        .login-form-pane::-webkit-scrollbar {
+            width: 0;
+            display: none;
+        }
+
+        .form-header-box {
+            margin-bottom: 24px;
+        }
+
+        .form-header-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .form-header-desc {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        /* Form Elements */
+        .web-form-group {
+            margin-bottom: 16px;
+        }
+
+        .web-input-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .web-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .web-text-input {
+            width: 100%;
+            height: 44px;
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 13.5px;
+            color: var(--text-dark);
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .web-text-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .web-text-input:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(29, 111, 220, 0.12);
+        }
+
+        .btn-input-eye {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .btn-input-eye:hover {
+            color: var(--text-dark);
+        }
+
+        /* Captcha Row */
+        .captcha-flex-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .captcha-equation-display {
+            width: 140px;
+            height: 44px;
+            background: #f1f5f9;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: 4px;
+            user-select: none;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            /* Security dots background pattern */
+            background-image: 
+                radial-gradient(#94a3b8 1.2px, transparent 1.2px), 
+                radial-gradient(#cbd5e1 0.8px, #f1f5f9 0.8px);
+            background-size: 10px 10px, 6px 6px;
+        }
+
+        .captcha-equation-display::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -10%;
+            width: 120%;
+            height: 1.5px;
+            background: rgba(148, 163, 184, 0.35);
+            transform: rotate(-8deg);
+        }
+
+        .captcha-input-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .captcha-input-container .web-text-input {
+            padding-right: 38px;
+        }
+
+        .btn-captcha-reload {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-captcha-reload:hover {
+            color: var(--pln-blue-btn);
+            transform: rotate(90deg);
+        }
+
+        /* Lupa Password & PIN links */
+        .web-forgot-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-top: -4px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .web-forgot-link {
+            color: var(--pln-blue-btn);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .web-forgot-link:hover {
+            text-decoration: underline;
+            color: var(--pln-blue-hover);
+        }
+
+        .web-forgot-bullet {
+            width: 3.5px;
+            height: 3.5px;
+            background-color: #cbd5e1;
+            border-radius: 50%;
+        }
+
+        /* Submit Button */
+        .btn-web-submit {
+            width: 100%;
+            height: 44px;
+            background: var(--pln-blue-btn);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 13.5px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(29, 111, 220, 0.25);
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .btn-web-submit:hover {
+            background: var(--pln-blue-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(29, 111, 220, 0.35);
+        }
+
+        .btn-web-submit:active {
+            transform: translateY(0);
+        }
+
+        /* Divider: atau masuk dengan */
+        .divider-atau-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 14px 0;
+            color: var(--text-muted);
+            font-size: 11.5px;
+            font-weight: 500;
+        }
+
+        .divider-atau-row::before,
+        .divider-atau-row::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #e2e8f0;
+        }
+
+        /* SSO Button */
+        .btn-web-sso {
+            width: 100%;
+            height: 44px;
+            background: #ffffff;
+            border: 1.5px solid var(--pln-blue-btn);
+            border-radius: 8px;
+            color: var(--pln-blue-btn);
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-web-sso:hover {
+            background: rgba(29, 111, 220, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .btn-web-sso:active {
+            transform: translateY(0);
+        }
+
+        /* Toast Feedback */
+        .web-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10000;
+        }
+
+        .web-toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Modal Overlay (Lupa Password & SSO) */
+        .web-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            padding: 20px;
+        }
+
+        .web-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .web-modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 16px;
+            padding: 26px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(0.92);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .web-modal-overlay.active .web-modal-card {
+            transform: scale(1);
+        }
+
+        .web-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .web-modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-web-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .btn-web-close:hover {
+            color: var(--text-dark);
+        }
+
+        .web-modal-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        /* Testing Chips */
+        .sample-chips-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            font-size: 11.5px;
+        }
+
+        .chip-list-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .test-email-chip {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .test-email-chip:hover {
+            background: var(--pln-blue-btn);
+            color: #ffffff;
+        }
+
+        .test-email-chip.chip-invalid {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .test-email-chip.chip-invalid:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        /* Banner feedback */
+        .alert-feedback-banner {
+            display: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 12px;
+            font-size: 12.5px;
+            line-height: 1.4;
+        }
+
+        .alert-feedback-banner.reject {
+            display: flex;
+            gap: 8px;
+            background: var(--danger-bg);
+            border: 1.5px solid var(--danger-border);
+            color: #991b1b;
+        }
+
+        .alert-feedback-banner.success {
+            display: flex;
+            gap: 8px;
+            background: var(--success-bg);
+            border: 1.5px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .modal-footer-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal-back {
+            flex: 1;
+            height: 42px;
+            background: #f1f5f9;
+            color: var(--text-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-modal-send {
+            flex: 1.5;
+            height: 42px;
+            background: var(--pln-blue-btn);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Notes FAB for Hifi Rules */
+        .notes-fab-web {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            color: var(--pln-blue-btn);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            transition: all 0.3s ease;
+        }
+
+        .notes-fab-web:hover {
+            transform: scale(1.08);
+        }
+
+        .notes-web-panel {
+            position: fixed;
+            bottom: 78px;
+            left: 24px;
+            width: 330px;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 16px 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .notes-web-panel.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notes-web-panel h4 {
+            color: var(--pln-blue-btn);
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notes-web-panel ul {
+            padding-left: 18px;
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.55;
+        }
+
+        .notes-web-panel li {
+            margin-bottom: 4px;
+        }
+
+        /* Responsive Breakpoint */
+        @media (max-width: 900px) {
+            .login-web-layout {
+                flex-direction: column;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .hero-branding-pane {
+                min-height: 280px;
+                padding: 30px 20px;
+            }
+
+            .login-form-pane {
+                width: 100%;
+                border-top-left-radius: 36px;
+                border-top-right-radius: 36px;
+                padding: 36px 24px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Toast Notification -->
+    <div class="web-toast" id="webToast">
+        <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+        <span id="toastMsgText">Pesan Notifikasi</span>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="login-web-layout">
+
+        <!-- Left Pane: Hero Branding -->
+        <div class="hero-branding-pane">
+
+            <!-- Top Left: PLN Official Logo -->
+            <div class="top-pln-badge">
+                <img src="../hifi-mobile/assets/logo-pln.svg" alt="PLN" class="pln-logo-vector">
+            </div>
+
+            <!-- Dual Logos: Power Swift & Power Inspect -->
+            <div class="dual-logos-wrapper">
+
+                <!-- 1. Power Swift Logo -->
+                <div class="brand-unit">
+                    <div class="ps-hexagon-icon">
+                        <svg viewBox="0 0 120 132" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <clipPath id="psHexMarkClipWeb">
+                                    <polygon points="60,2 118,34 118,98 60,130 2,98 2,34" />
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#psHexMarkClipWeb)">
+                                <rect x="0" y="0" width="60" height="132" fill="#00799e"/>
+                                <rect x="60" y="0" width="60" height="132" fill="#f3781f"/>
+                                <!-- Transmission Tower Structure -->
+                                <path d="M 60 10 L 6 72 L 40 72 L 60 10" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="60" y1="36" x2="20" y2="46" stroke="#ffffff" stroke-width="4"/>
+                                <line x1="60" y1="56" x2="30" y2="60" stroke="#ffffff" stroke-width="4"/>
+                                <line x1="60" y1="46" x2="30" y2="60" stroke="#ffffff" stroke-width="3"/>
+                                <line x1="60" y1="36" x2="40" y2="72" stroke="#ffffff" stroke-width="3"/>
+                                <rect x="16" y="46" width="10" height="8" rx="2" fill="#ffffff"/>
+                                <!-- Crossarms -->
+                                <line x1="60" y1="36" x2="104" y2="46" stroke="#004880" stroke-width="4"/>
+                                <line x1="60" y1="56" x2="90" y2="60" stroke="#004880" stroke-width="4"/>
+                                <rect x="94" y="46" width="10" height="8" rx="2" fill="#004880"/>
+                                <polygon points="60,14 74,36 60,36" fill="#fdb813"/>
+                                <polygon points="60,36 82,56 60,56" fill="#fdb813"/>
+                                <polygon points="60,56 94,78 60,78" fill="#004880"/>
+                                <!-- Lightning Bolt -->
+                                <polygon points="60,28 78,64 64,64 78,98 52,126 58,80 44,80" fill="#ffffff"/>
+                                <polygon points="60,34 74,62 62,62 72,92 56,118 58,82 48,82" fill="#00799e"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="brand-unit-text">
+                        <span class="brand-text-power">POWER</span>
+                        <span class="brand-text-swift">SWIFT</span>
+                    </div>
+                </div>
+
+                <!-- 2. Power Inspect Logo -->
+                <div class="brand-unit">
+                    <div class="pi-monogram-icon">
+                        <svg viewBox="0 0 88 100" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Lightning P Mark in White -->
+                            <path d="M 24 6 L 58 6 C 74 6 84 16 84 32 C 84 46 72 56 56 56 L 36 56 L 32 74 L 50 74 L 50 96 L 32 96 L 16 96 L 24 56 L 8 56 Z" fill="#ffffff"/>
+                            <path d="M 38 20 L 56 20 C 64 20 70 24 70 32 C 70 40 64 44 56 44 L 34 44 Z" fill="#3b82f6"/>
+                            <!-- Accent Gold Square -->
+                            <rect x="68" y="0" width="16" height="16" rx="2" fill="#f59e0b"/>
+                        </svg>
+                    </div>
+                    <div class="brand-unit-text">
+                        <span class="brand-text-power">POWER</span>
+                        <span class="brand-text-inspect">INSPECT</span>
+                        <span class="brand-text-powerfull">P O W E R F U L L</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Version Tag -->
+            <div class="version-label">Version 2.5.0</div>
+
+            <!-- Diagonal Stripes Decorative Banner -->
+            <div class="bottom-decoration-stripes">
+                <div class="deco-band-blue"></div>
+                <div class="deco-band-yellow"></div>
+                <div class="deco-band-white"></div>
+            </div>
+
+        </div>
+
+        <!-- Right Pane: Login Form Card -->
+        <div class="login-form-pane">
+
+            <div class="form-header-box">
+                <h1 class="form-header-title">Masuk</h1>
+                <p class="form-header-desc">Silahkan masuk ke aplikasi terlebih dahulu.</p>
+            </div>
+
+            <form id="webLoginForm" onsubmit="event.preventDefault(); handleWebLogin();">
+
+                <!-- Field 1: Email -->
+                <div class="web-form-group">
+                    <label class="web-input-label" for="loginEmail">Email</label>
+                    <div class="web-input-wrapper">
+                        <input type="text" id="loginEmail" class="web-text-input" placeholder="Masukkan email Anda" autocomplete="username" required>
+                    </div>
+                </div>
+
+                <!-- Field 2: Kata Sandi -->
+                <div class="web-form-group">
+                    <label class="web-input-label" for="loginPassword">Kata Sandi</label>
+                    <div class="web-input-wrapper">
+                        <input type="password" id="loginPassword" class="web-text-input" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+                        <button type="button" class="btn-input-eye" onclick="togglePassword()" title="Tampilkan Kata Sandi">
+                            <i class="fa-regular fa-eye-slash" id="pwdIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Field 3: Captcha Row -->
+                <div class="web-form-group">
+                    <div class="captcha-flex-row">
+                        <!-- Captcha Equation Box -->
+                        <div class="captcha-equation-display" id="captchaBox" title="Hitung hasil persamaan">
+                            <span id="cNum1">2</span>
+                            <span style="color: #0f172a; margin: 0 4px;">+</span>
+                            <span id="cNum2">6</span>
+                            <span style="color: #0f172a; margin-left: 4px;">=</span>
+                        </div>
+
+                        <!-- Captcha Input with Reload Icon inside -->
+                        <div class="captcha-input-container">
+                            <input type="number" id="captchaAnswer" class="web-text-input" placeholder="Selesaikan persamaan" inputmode="numeric" required>
+                            <button type="button" class="btn-captcha-reload" onclick="generateCaptcha()" title="Acak Ulang Persamaan">
+                                <i class="fa-solid fa-arrows-rotate" id="reloadIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lupa Password & PIN -->
+                <div class="web-forgot-row">
+                    <a href="javascript:void(0)" class="web-forgot-link" onclick="openForgotWeb('password')">Lupa Password?</a>
+                    <span class="web-forgot-bullet"></span>
+                    <a href="javascript:void(0)" class="web-forgot-link" onclick="openForgotWeb('pin')">Lupa PIN?</a>
+                </div>
+
+                <!-- Primary Action Button -->
+                <button type="submit" class="btn-web-submit" id="btnSubmitLogin">
+                    <span>MASUK KE APLIKASI</span>
+                </button>
+
+                <!-- Divider: atau masuk dengan -->
+                <div class="divider-atau-row">
+                    <span>atau masuk dengan</span>
+                </div>
+
+                <!-- SSO Button -->
+                <button type="button" class="btn-web-sso" onclick="openSsoModal()" id="btnSsoWeb">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 13.5px;"></i>
+                    <span>SSO</span>
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL LUPA PASSWORD & PIN DENGAN VALIDASI EMAIL TERDAFTAR -->
+    <div class="web-modal-overlay" id="forgotWebModal" onclick="if(event.target===this) closeForgotWeb()">
+        <div class="web-modal-card">
+            <!-- STATE 1: FORM INPUT VIEW -->
+            <div id="forgotFormState">
+                <div class="web-modal-header">
+                    <div class="web-modal-title" id="modalWebTitle">
+                        <i class="fa-solid fa-key" style="color: var(--pln-blue-btn);"></i>
+                        <span>Lupa Password</span>
+                    </div>
+                    <button type="button" class="btn-web-close" onclick="closeForgotWeb()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <p class="web-modal-desc" id="modalWebDesc">
+                    Masukkan email Anda yang terdaftar pada sistem Power Inspect. Jika email tidak terdaftar, permintaan otomatis <strong>ditolak</strong>.
+                </p>
+
+                <!-- Demo Email Quick Fill Chips -->
+                <div class="sample-chips-box">
+                    <div style="display: flex; justify-content: space-between; font-weight: 700; color: #475569;">
+                        <span><i class="fa-solid fa-circle-info" style="color: var(--pln-blue-btn);"></i> Uji Coba Email:</span>
+                        <span style="font-size: 10px; color: #64748b;">(Demo)</span>
+                    </div>
+                    <div class="chip-list-wrap">
+                        <span class="test-email-chip" onclick="fillForgotEmail('daniandra@pln.co.id')">
+                            <i class="fa-solid fa-check"></i> daniandra@pln.co.id
+                        </span>
+                        <span class="test-email-chip" onclick="fillForgotEmail('petugas.pi@pln.co.id')">
+                            <i class="fa-solid fa-check"></i> petugas.pi@pln.co.id
+                        </span>
+                        <span class="test-email-chip chip-invalid" onclick="fillForgotEmail('random.user@gmail.com')">
+                            <i class="fa-solid fa-xmark"></i> random.user@gmail.com
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Email Input -->
+                <div class="web-form-group">
+                    <label class="web-input-label">Email Terdaftar</label>
+                    <div class="web-input-wrapper">
+                        <input type="email" id="forgotWebEmail" class="web-text-input" placeholder="Masukkan email korporat PLN..." autocomplete="email" onkeydown="if(event.key==='Enter') verifyAndSubmitForgot()">
+                    </div>
+                </div>
+
+                <!-- Rejection Banner (DITOLAK) -->
+                <div class="alert-feedback-banner reject" id="bannerReject">
+                    <i class="fa-solid fa-circle-xmark" style="font-size: 16px; flex-shrink: 0; margin-top: 1px;"></i>
+                    <div>
+                        <strong>Permintaan Ditolak!</strong>
+                        <div id="rejectMsgText">Email tidak terdaftar dalam database Power Inspect.</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-modal-back" onclick="closeForgotWeb()">Batal</button>
+                    <button type="button" class="btn-modal-send" onclick="verifyAndSubmitForgot()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Verifikasi Email</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATE 2: SUCCESS VIEW (FULL POP-UP REPLACEMENT) -->
+            <div id="forgotSuccessState" style="display: none; text-align: center; padding: 14px 6px;">
+                <div style="width: 68px; height: 68px; border-radius: 50%; background: #ecfdf5; color: #10b981; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px; box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.12);">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 8px;" id="successHeadline">
+                    Tautan Reset Berhasil Dikirim!
+                </h3>
+                <p style="font-size: 13.5px; color: #64748b; line-height: 1.5; margin-bottom: 18px;" id="successDescription">
+                    Instruksi verifikasi pemulihan telah dikirimkan ke email korporat terdaftar:
+                </p>
+                <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #1d6fdc; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-envelope-circle-check"></i>
+                        <span id="targetSuccessEmail">user@pln.co.id</span>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 24px; line-height: 1.4;">
+                    Silakan periksa folder <strong>Kotak Masuk (Inbox)</strong> atau folder <strong>Spam</strong> email Anda untuk melanjutkan.
+                </p>
+                <button type="button" class="btn-web-submit" onclick="closeForgotWeb()" style="margin-top: 0; width: 100%;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Halaman Masuk</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SSO WEB -->
+    <div class="web-modal-overlay" id="ssoWebModal" onclick="if(event.target===this) closeSsoWeb()">
+        <div class="web-modal-card">
+            <div class="web-modal-header">
+                <div class="web-modal-title">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--pln-blue-btn);"></i>
+                    <span>Single Sign-On (SSO) PLN</span>
+                </div>
+                <button type="button" class="btn-web-close" onclick="closeSsoWeb()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <p class="web-modal-desc">
+                Menghubungkan ke layanan terpusat PLN Identity Provider untuk autentikasi Power Inspect & Power Swift.
+            </p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #dbeafe; color: var(--pln-blue-btn); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 700; color: #0f172a;" id="ssoWebName">Daniandra Ersya</div>
+                    <div style="font-size: 11.5px; color: #64748b;">daniandra@pln.co.id • NIP: 9416283ZY</div>
+                </div>
+            </div>
+
+            <div class="modal-footer-btns">
+                <button type="button" class="btn-modal-back" onclick="closeSsoWeb()">Batal</button>
+                <button type="button" class="btn-modal-send" onclick="executeSsoWeb()">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Masuk via SSO</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTES PANEL (HIFI RULE COMPLIANCE) -->
+    <div class="notes-fab-web" onclick="document.getElementById('notesWebPanel').classList.toggle('active')" title="Notes & Validasi Web">
+        <i class="fa-solid fa-clipboard-list" style="font-size: 18px;"></i>
+    </div>
+
+    <div class="notes-web-panel" id="notesWebPanel">
+        <h4>
+            <i class="fa-solid fa-circle-info"></i>
+            Notes & Validasi Web UI
+        </h4>
+        <ul>
+            <li><strong>Desain Web Power Inspect:</strong> Mengikuti screenshot login portal resmi <code>powerinspect.pln.co.id/login</code> (Dual logo Power Swift & Power Inspect, banner aksen garis diagonal, form split kanan sudut melengkung 70px).</li>
+            <li><strong>Lupa Password & Lupa PIN:</strong> Menggunakan validasi email terdaftar. Jika email tidak terdaftar (contoh email non-PLN / random), request otomatis <strong>ditolak</strong> dengan feedback merah.</li>
+            <li><strong>Mock Email Terdaftar:</strong> <code>daniandra@pln.co.id</code>, <code>petugas.pi@pln.co.id</code>, <code>admin@pln.co.id</code>.</li>
+            <li><strong>Routing Login:</strong> Form masuk dan SSO mengarahkan ke dashboard utama Power Inspect (<code>./dashboard-utama-pi/dashboard-peta.html</code>).</li>
+        </ul>
+    </div>
+
+    <script>
+        // Mock Registered Emails
+        const REGISTERED_EMAILS = [
+            'daniandra@pln.co.id',
+            'petugas.pi@pln.co.id',
+            'admin@pln.co.id',
+            'operator.transmisi@pln.co.id',
+            'supervisor.pi@pln.co.id'
+        ];
+
+        let captchaSum = 8;
+        let activeWebForgotType = 'password';
+
+        // Captcha generator
+        function generateCaptcha() {
+            const n1 = Math.floor(Math.random() * 8) + 1;
+            const n2 = Math.floor(Math.random() * 8) + 1;
+            captchaSum = n1 + n2;
+
+            document.getElementById('cNum1').textContent = n1;
+            document.getElementById('cNum2').textContent = n2;
+
+            const icon = document.getElementById('reloadIcon');
+            if (icon) {
+                icon.style.transform = 'rotate(360deg)';
+                icon.style.transition = 'transform 0.4s ease';
+                setTimeout(() => {
+                    icon.style.transform = '';
+                    icon.style.transition = '';
+                }, 400);
+            }
+        }
+
+        // Toggle Password visibility
+        function togglePassword() {
+            const pwd = document.getElementById('loginPassword');
+            const icon = document.getElementById('pwdIcon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.className = 'fa-regular fa-eye';
+            } else {
+                pwd.type = 'password';
+                icon.className = 'fa-regular fa-eye-slash';
+            }
+        }
+
+        // Form Login Submit
+        function handleWebLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pwd = document.getElementById('loginPassword').value.trim();
+            const ans = parseInt(document.getElementById('captchaAnswer').value.trim(), 10);
+
+            if (!email) {
+                showToast('Harap masukkan email Anda!', 'fa-circle-exclamation', '#ef4444');
+                document.getElementById('loginEmail').focus();
+                return;
+            }
+
+            if (!pwd) {
+                showToast('Harap masukkan kata sandi!', 'fa-circle-exclamation', '#ef4444');
+                document.getElementById('loginPassword').focus();
+                return;
+            }
+
+            if (isNaN(ans) || ans !== captchaSum) {
+                showToast('Hasil captcha salah! Coba lagi.', 'fa-triangle-exclamation', '#ef4444');
+                generateCaptcha();
+                const aInput = document.getElementById('captchaAnswer');
+                aInput.value = '';
+                aInput.focus();
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitLogin');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>MEMPROSES...</span>';
+            btn.style.opacity = '0.8';
+
+            showToast('Login Berhasil! Mengalihkan ke Dashboard...', 'fa-circle-check', '#10b981');
+            setTimeout(() => {
+                window.location.href = './dashboard-utama-pi/dashboard-peta.html';
+            }, 800);
+        }
+
+        // Forgot Modal (Password / PIN)
+        function openForgotWeb(type) {
+            activeWebForgotType = type;
+            const modal = document.getElementById('forgotWebModal');
+            const title = document.getElementById('modalWebTitle');
+            const desc = document.getElementById('modalWebDesc');
+            const input = document.getElementById('forgotWebEmail');
+
+            // Reset back to Form Input State (hide success view)
+            document.getElementById('forgotFormState').style.display = 'block';
+            document.getElementById('forgotSuccessState').style.display = 'none';
+            document.getElementById('bannerReject').style.display = 'none';
+            input.value = '';
+            input.style.borderColor = '';
+
+            if (type === 'password') {
+                title.innerHTML = '<i class="fa-solid fa-lock-open" style="color: var(--pln-blue-btn);"></i> <span>Lupa Password Web</span>';
+                desc.innerHTML = 'Masukkan email Anda yang terdaftar pada sistem Power Inspect. Jika email tidak terdaftar, permintaan otomatis <strong>ditolak</strong>.';
+            } else {
+                title.innerHTML = '<i class="fa-solid fa-key" style="color: #f59e0b;"></i> <span>Lupa PIN Pengguna</span>';
+                desc.innerHTML = 'Masukkan email Anda yang terdaftar pada sistem Power Inspect untuk memverifikasi dan mereset PIN otorisasi Anda.';
+            }
+
+            modal.classList.add('active');
+            setTimeout(() => input.focus(), 200);
+        }
+
+        function closeForgotWeb() {
+            document.getElementById('forgotWebModal').classList.remove('active');
+        }
+
+        function fillForgotEmail(val) {
+            const input = document.getElementById('forgotWebEmail');
+            input.value = val;
+            document.getElementById('bannerReject').style.display = 'none';
+            input.style.borderColor = '';
+        }
+
+        function verifyAndSubmitForgot() {
+            const input = document.getElementById('forgotWebEmail');
+            const email = input.value.trim().toLowerCase();
+            const bannerReject = document.getElementById('bannerReject');
+            const rejectMsg = document.getElementById('rejectMsgText');
+            const formState = document.getElementById('forgotFormState');
+            const successState = document.getElementById('forgotSuccessState');
+            const successHeadline = document.getElementById('successHeadline');
+            const successDescription = document.getElementById('successDescription');
+            const targetEmail = document.getElementById('targetSuccessEmail');
+
+            bannerReject.style.display = 'none';
+            input.style.borderColor = '';
+
+            if (!email) {
+                showToast('Masukkan email terlebih dahulu!', 'fa-triangle-exclamation', '#ef4444');
+                input.focus();
+                return;
+            }
+
+            if (!email.includes('@') || !email.includes('.')) {
+                rejectMsg.textContent = 'Format email tidak valid. Masukkan alamat email yang benar.';
+                bannerReject.style.display = 'flex';
+                input.style.borderColor = '#ef4444';
+                return;
+            }
+
+            // ATURAN USER: Jika email tidak tersedia/terdaftar -> DITOLAK
+            const isRegistered = REGISTERED_EMAILS.includes(email);
+
+            if (!isRegistered) {
+                rejectMsg.innerHTML = `Email <strong>"${email}"</strong> tidak terdaftar dalam database Power Inspect. Permintaan reset <strong>DITOLAK</strong>.`;
+                bannerReject.style.display = 'flex';
+                input.style.borderColor = '#ef4444';
+                showToast('Permintaan ditolak: Email tidak terdaftar!', 'fa-circle-xmark', '#ef4444');
+                return;
+            }
+
+            // EMAIL TERDAFTAR -> GANTI KONTEN POP-UP DENGAN RESPON SUKSES
+            if (activeWebForgotType === 'password') {
+                successHeadline.textContent = 'Tautan Reset Kata Sandi Terkirim!';
+                successDescription.textContent = 'Instruksi pemulihan kata sandi telah berhasil dikirimkan ke email korporat terdaftar:';
+            } else {
+                successHeadline.textContent = 'Kode Verifikasi PIN Terkirim!';
+                successDescription.textContent = 'Kode otorisasi reset PIN telah berhasil dikirimkan ke email korporat terdaftar:';
+            }
+
+            targetEmail.textContent = email;
+
+            // Transisi: Sembunyikan form input dan tampilkan layar sukses
+            formState.style.display = 'none';
+            successState.style.display = 'block';
+
+            showToast('Email terverifikasi! Berhasil dikirim.', 'fa-circle-check', '#10b981');
+        }
+
+        // SSO Web Modal
+        function openSsoModal() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (email) {
+                document.getElementById('ssoWebName').textContent = email.split('@')[0];
+            }
+            document.getElementById('ssoWebModal').classList.add('active');
+        }
+
+        function closeSsoWeb() {
+            document.getElementById('ssoWebModal').classList.remove('active');
+        }
+
+        function executeSsoWeb() {
+            closeSsoWeb();
+            const btn = document.getElementById('btnSsoWeb');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Menghubungkan SSO...</span>';
+            btn.style.opacity = '0.8';
+
+            showToast('[SSO] Autentikasi berhasil! Mengalihkan...', 'fa-shield-halved', '#10b981');
+            setTimeout(() => {
+                window.location.href = './dashboard-utama-pi/dashboard-peta.html';
+            }, 800);
+        }
+
+        // Toast Helper
+        function showToast(msg, icon = 'fa-circle-check', color = '#4ade80') {
+            const toast = document.getElementById('webToast');
+            const txt = document.getElementById('toastMsgText');
+            if (toast && txt) {
+                toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:15px;"></i> <span>${msg}</span>`;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2800);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            generateCaptcha();
+        });
+    </script>
+</body>
+
+</html>
