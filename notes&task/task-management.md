@@ -85,7 +85,7 @@ Spreadsheet bernama `Task Management` dengan tiga sheet. Baris 1 di tiap sheet a
 
 | Kolom | Header | Isi |
 | ------- | -------- | ----- |
-| A | `id` | `t_` + 8 karakter acak, dibuat oleh Apps Script |
+| A | `id` | UUID v4 standar, dibuat oleh Apps Script (`Utilities.getUuid()`) |
 | B | `title` | Judul, wajib, maksimal 200 karakter |
 | C | `description` | Detail task |
 | D | `status` | `todo`, `in_progress`, `done`, `cancelled` (default `todo`) |
@@ -106,7 +106,7 @@ Spreadsheet bernama `Task Management` dengan tiga sheet. Baris 1 di tiap sheet a
 
 | Kolom | Header | Isi |
 | ------- | -------- | ----- |
-| A | `id` | `c_` + 8 karakter acak |
+| A | `id` | UUID v4 standar (`Utilities.getUuid()`) |
 | B | `task_id` | `id` task pemilik komentar |
 | C | `body` | Isi komentar, maksimal 2000 karakter |
 | D | `created_at` | Timestamp ISO |
@@ -117,7 +117,7 @@ Spreadsheet bernama `Task Management` dengan tiga sheet. Baris 1 di tiap sheet a
 
 | Kolom | Header | Isi |
 | ------- | -------- | ----- |
-| A | `id` | `a_` + 8 karakter acak |
+| A | `id` | UUID v4 standar (`Utilities.getUuid()`) |
 | B | `task_id` | `id` task pemilik foto |
 | C | `comment_id` | `id` komentar bila foto dilampirkan di komentar; kosong bila langsung di task |
 | D | `file_id` | ID file di Google Drive (tidak dikirim ke UI maupun agent) |
@@ -347,7 +347,7 @@ function json_(obj) {
 }
 
 function now_() { return new Date().toISOString(); }
-function uid_() { return Utilities.getUuid().replace(/-/g, "").slice(0, 8); }
+function uid_() { return Utilities.getUuid(); }
 function todayStr_() {
   return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
 }
@@ -540,7 +540,7 @@ function createTask_(input) {
   validateTask_(t);
   const ts = now_();
   const task = Object.assign({}, t, {
-    id: "t_" + uid_(),
+    id: uid_(),
     priority: Number(t.priority),
     created_at: ts,
     updated_at: ts,
@@ -594,7 +594,7 @@ function addComment_(taskId, body, role) {
   if (!text) throw new Error("Komentar tidak boleh kosong");
   if (text.length > 2000) throw new Error("Komentar maksimal 2000 karakter");
   const comment = add_("comments", {
-    id: "c_" + uid_(), task_id: taskId, body: text, created_at: now_(), deleted_at: "",
+    id: uid_(), task_id: taskId, body: text, created_at: now_(), deleted_at: "",
     author: role === "agent" ? "agent" : "me",
   });
   return { ok: true, comment };
@@ -616,7 +616,7 @@ function addAttachment_(p) {
   const name = String(p.file_name || "foto").replace(/[^\w.\- ]/g, "_").slice(0, 80);
   const file = folder_().createFile(Utilities.newBlob(bytes, p.mime_type, name));
   const att = add_("attachments", {
-    id: "a_" + uid_(), task_id: p.task_id, comment_id: p.comment_id || "",
+    id: uid_(), task_id: p.task_id, comment_id: p.comment_id || "",
     file_id: file.getId(), file_name: name, mime_type: p.mime_type,
     size: bytes.length, created_at: now_(), deleted_at: "",
   });

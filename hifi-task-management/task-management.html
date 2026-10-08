@@ -1462,11 +1462,22 @@
                 </div>
 
                 <!-- Meta Details Grid -->
-                <div style="background: var(--surface); padding: 14px; border-radius: var(--radius-md); font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <div><strong style="color: var(--text-muted);">Kategori:</strong> <span id="drawerCategory">-</span></div>
-                    <div><strong style="color: var(--text-muted);">Jatuh Tempo:</strong> <span id="drawerDueDate">-</span></div>
-                    <div><strong style="color: var(--text-muted);">Type:</strong> <span id="drawerTypeVal">-</span></div>
-                    <div><strong style="color: var(--text-muted);">Tags:</strong> <span id="drawerTags">-</span></div>
+                <div style="background: var(--surface); padding: 14px; border-radius: var(--radius-md); font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div><strong style="color: var(--text-muted);">Kategori:</strong> <span id="drawerCategory">-</span></div>
+                        <div><strong style="color: var(--text-muted);">Jatuh Tempo:</strong> <span id="drawerDueDate">-</span></div>
+                        <div><strong style="color: var(--text-muted);">Type:</strong> <span id="drawerTypeVal">-</span></div>
+                        <div><strong style="color: var(--text-muted);">Tags:</strong> <span id="drawerTags">-</span></div>
+                    </div>
+                    <div style="border-top: 1px dashed var(--border); padding-top: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <strong style="color: var(--text-muted);">Task UUID:</strong>
+                            <code id="drawerUuid" style="font-family: monospace; font-size: 11px; color: var(--pln-blue); background: var(--card); padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; user-select: all;">-</code>
+                        </div>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="copyDrawerUuid()" style="padding: 2px 8px; font-size: 11px; height: 26px;">
+                            <i class="ri-file-copy-line"></i> Salin UUID
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Comments & Evidence Section -->
@@ -1581,7 +1592,7 @@
         // Initial Mock Data if localStorage is empty
         const INITIAL_TASKS = [
             {
-                id: "t_wo_maint_01",
+                id: "d3b07384-d113-469b-9878-3a2fe01ad001",
                 title: "Penambahan tanggal pemeliharaan pada inspeksi rutin mobile terdapat pada daftar WO",
                 description: "Tampilkan informasi tanggal pemeliharaan yang direncanakan pada setiap kartu WO di modul inspeksi rutin mobile agar teknisi lapangan mengetahui jadwal presisi.",
                 status: "todo",
@@ -1599,7 +1610,7 @@
                 attachment_count: 0
             },
             {
-                id: "t_wo_expire_02",
+                id: "e4c18495-e224-470c-a989-4b3ff12be002",
                 title: "Penambahan tanggal Kedaluwarsa yang artinya + 1 hari dari tanggal akhir suatu WO atau Jadwal Inspeksi",
                 description: "Implementasikan formula auto-expiry: tanggal_kedaluwarsa = tanggal_akhir_jadwal + 1 hari. Berlaku pada WO dan jadwal inspeksi aktif.",
                 status: "todo",
@@ -1617,7 +1628,7 @@
                 attachment_count: 0
             },
             {
-                id: "t_auth_reset_03",
+                id: "f5d29506-f335-481d-ba90-5c40023cf003",
                 title: "Penambahan reset pin dan password pada halaman login V1 pada mobile dan web",
                 description: "Fasilitas reset PIN 6-digit dan kata sandi mandiri melalui verifikasi akun/email pada tampilan login Power Inspect V1 (Web & Mobile).",
                 status: "done",
@@ -1638,32 +1649,32 @@
 
         const INITIAL_COMMENTS = [
             {
-                id: "c_com_01",
-                task_id: "t_wo_maint_01",
+                id: "8a12bc34-5678-490a-bcde-123456789001",
+                task_id: "d3b07384-d113-469b-9878-3a2fe01ad001",
                 body: "Analisis layout kartu WO mobile telah disiapkan. Parameter tanggal rencana pemeliharaan siap dihubungkan ke field header kartu.",
                 author: "agent",
                 created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
                 deleted_at: ""
             },
             {
-                id: "c_com_02",
-                task_id: "t_wo_expire_02",
+                id: "9b23cd45-6789-4a1b-cdef-234567890002",
+                task_id: "e4c18495-e224-470c-a989-4b3ff12be002",
                 body: "Kalkulasi batas toleransi +1 hari sudah diuji pada probis validasi jadwal inspeksi rutin.",
                 author: "agent",
                 created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
                 deleted_at: ""
             },
             {
-                id: "c_com_03",
-                task_id: "t_auth_reset_03",
+                id: "ac34de56-789a-4b2c-def0-345678900003",
+                task_id: "f5d29506-f335-481d-ba90-5c40023cf003",
                 body: "Flow lupa PIN dan password pada halaman login V1 Web dan Mobile sudah diimplementasikan dan ditest.",
                 author: "agent",
                 created_at: new Date(Date.now() - 3600000 * 1).toISOString(),
                 deleted_at: ""
             },
             {
-                id: "c_com_04",
-                task_id: "t_auth_reset_03",
+                id: "bd45ef67-89ab-4c3d-ef01-456789000004",
+                task_id: "f5d29506-f335-481d-ba90-5c40023cf003",
                 body: "Sudah diverifikasi dan berfungsi baik pada kedua platform.",
                 author: "me",
                 created_at: new Date().toISOString(),
@@ -1673,9 +1684,9 @@
 
         const INITIAL_ATTACHMENTS = [
             {
-                id: "a_801a2b3c",
-                task_id: "t_wo_maint_01",
-                comment_id: "c_com_01",
+                id: "c1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f01",
+                task_id: "d3b07384-d113-469b-9878-3a2fe01ad001",
+                comment_id: "8a12bc34-5678-490a-bcde-123456789001",
                 file_name: "layout_wo_mobile.jpg",
                 mime_type: "image/jpeg",
                 size: 245000,
@@ -1802,7 +1813,7 @@
 
         // Local Storage API Fallback Simulator with Agent & Owner logic
         const STORAGE_DATA_VERSION_KEY = "hifi_task_seed_version";
-        const SEED_VERSION = "2026_10_08_wo_tasks_v3";
+        const SEED_VERSION = "2026_10_08_wo_tasks_v4_uuid";
 
         function loadLocalData() {
             const currentVersion = localStorage.getItem(STORAGE_DATA_VERSION_KEY);
@@ -1847,7 +1858,16 @@
                 setTimeout(() => {
                     const now = new Date().toISOString();
                     const today = now.split("T")[0];
-                    const uid = () => Math.random().toString(36).substring(2, 10);
+                    const uid = () => {
+                        if (typeof crypto !== "undefined" && crypto.randomUUID) {
+                            return crypto.randomUUID();
+                        }
+                        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+                            const r = Math.random() * 16 | 0;
+                            const v = c === "x" ? r : (r & 0x3 | 0x8);
+                            return v.toString(16);
+                        });
+                    };
 
                     try {
                         switch (action) {
@@ -1905,7 +1925,7 @@
                                 const taskInput = payload.task || {};
                                 if (!taskInput.title) throw new Error("Judul wajib diisi");
                                 const newTask = {
-                                    id: "t_" + uid(),
+                                    id: uid(),
                                     title: taskInput.title.trim().slice(0, 200),
                                     description: taskInput.description || "",
                                     status: taskInput.status || "todo",
@@ -1981,7 +2001,7 @@
                                 const body = (payload.body || "").trim();
                                 if (!body) throw new Error("Komentar tidak boleh kosong");
                                 const comment = {
-                                    id: "c_" + uid(),
+                                    id: uid(),
                                     task_id: taskId,
                                     body: body.slice(0, 2000),
                                     author: payload.author || "me",
@@ -2006,7 +2026,7 @@
                             case "addAttachment": {
                                 const taskId = payload.task_id;
                                 const att = {
-                                    id: "a_" + uid(),
+                                    id: uid(),
                                     task_id: taskId,
                                     comment_id: payload.comment_id || "",
                                     file_name: payload.file_name || "foto.jpg",
@@ -2262,6 +2282,7 @@
                             ${task.description ? `<div class="task-desc">${escapeHtml(task.description)}</div>` : ''}
 
                             <div class="task-meta-row">
+                                <span class="meta-tag" style="font-family: monospace; font-size: 11px;" title="Task UUID: ${task.id}"><i class="ri-fingerprint-line"></i> ${task.id.slice(0, 8)}...</span>
                                 ${dateBadge}
                                 ${tagsHtml}
                                 <div class="task-counts">
@@ -2526,6 +2547,7 @@
             document.getElementById("drawerDueDate").innerText = task.due_date ? formatDate(task.due_date) : "Tidak ada";
             document.getElementById("drawerTags").innerText = task.tags || "-";
             document.getElementById("drawerTypeVal").innerText = task.type || "Tidak ada";
+            document.getElementById("drawerUuid").innerText = task.id;
 
             const priorityLabels = { 1: "Tinggi", 2: "Sedang", 3: "Rendah" };
             const statusLabels = { todo: "To Do", in_progress: "In Progress", done: "Selesai", cancelled: "Dibatalkan" };
@@ -2565,6 +2587,32 @@
 
             drawer.classList.add("open");
             loadTaskNotes(taskId);
+        }
+
+        function copyDrawerUuid() {
+            const uuidEl = document.getElementById("drawerUuid");
+            if (uuidEl && uuidEl.innerText && uuidEl.innerText !== "-") {
+                const text = uuidEl.innerText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast("Task UUID berhasil disalin", "success");
+                    }).catch(() => {
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            showToast("Task UUID berhasil disalin", "success");
         }
 
         function toggleCurrentDrawerOwner() {
