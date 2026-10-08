@@ -297,12 +297,15 @@ const MAX_PHOTOS_PER_TASK = 10;
 const AGENT_ACTIONS = ["scan", "summary", "notes", "addComment"];
 const READ_ACTIONS = ["list", "scan", "summary", "notes", "getAttachment"];
 
+const DEFAULT_API_TOKEN = ""; // opsional: isi token Anda di Apps Script
+const DEFAULT_AGENT_TOKEN = ""; // opsional: isi token agent Anda di Apps Script
+
 // ---------- infrastruktur ----------
 
 function role_(token) {
   const props = PropertiesService.getScriptProperties();
-  const full = (props.getProperty("API_TOKEN") || props.getProperty("API_KEY") || "").trim();
-  const agent = (props.getProperty("AGENT_TOKEN") || "").trim();
+  const full = (props.getProperty("API_TOKEN") || props.getProperty("API_KEY") || DEFAULT_API_TOKEN).trim();
+  const agent = (props.getProperty("AGENT_TOKEN") || DEFAULT_AGENT_TOKEN).trim();
   const incoming = String(token || "").trim();
   if (full && agent && full === agent) {
     throw new Error("API_TOKEN dan AGENT_TOKEN harus berbeda");
