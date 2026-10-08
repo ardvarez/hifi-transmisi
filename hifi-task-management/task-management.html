@@ -1145,10 +1145,21 @@
             top: 20px;
             right: 24px;
             color: #fff;
-            font-size: 32px;
-            background: transparent;
+            font-size: 26px;
+            background: rgba(255, 255, 255, 0.15);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: none;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -1552,10 +1563,15 @@
                 </div>
             </div>
 
-            <div class="modal-footer" style="justify-content: space-between;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="testApiConnection()" id="btnTestConn">
-                    <i class="ri-flashlight-line"></i> Tes Koneksi
-                </button>
+            <div class="modal-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="testApiConnection()" id="btnTestConn">
+                        <i class="ri-flashlight-line"></i> Tes Koneksi & Token
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="clearSettingsToLocalStorage()" style="color: var(--danger); border-color: var(--danger);">
+                        <i class="ri-restart-line"></i> Reset ke Local
+                    </button>
+                </div>
                 <div style="display: flex; gap: 8px;">
                     <button type="button" class="btn btn-outline" onclick="closeSettingsModal()">Tutup</button>
                     <button type="button" class="btn btn-primary" onclick="saveSettings()">Simpan</button>
@@ -1566,7 +1582,7 @@
 
     <!-- Lightbox Image Viewer -->
     <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
-        <button class="lightbox-close">&times;</button>
+        <button class="lightbox-close" onclick="closeLightbox()"><i class="ri-close-line"></i></button>
         <img src="" id="lightboxImg" class="lightbox-img" onclick="event.stopPropagation()">
     </div>
 
@@ -1758,10 +1774,11 @@
             }
         }
 
-        // Test API Connection
+        // Test API Connection & Token Validation
         async function testApiConnection() {
             const btn = document.getElementById("btnTestConn");
             const apiUrl = document.getElementById("settingApiUrl").value.trim();
+            const apiToken = document.getElementById("settingApiToken").value.trim();
 
             if (!apiUrl) {
                 showToast("Harap isi Web App URL terlebih dahulu", "warning");
@@ -1772,19 +1789,45 @@
             btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Menguji...';
 
             try {
-                const res = await fetch(apiUrl, { method: "GET" });
-                const json = await res.json();
-                if (json.ok) {
-                    showToast(`Koneksi Web App sukses: ${json.service}`, "success");
+                if (apiToken) {
+                    const res = await fetch(apiUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain" },
+                        body: JSON.stringify({ action: "summary", token: apiToken })
+                    });
+                    const json = await res.json();
+                    if (json.ok) {
+                        showToast("Koneksi & API_TOKEN valid! Siap dipakai.", "success");
+                    } else {
+                        showToast(`Server menolak token: ${json.error || 'Token salah'}`, "error");
+                    }
                 } else {
-                    showToast(`Respon server: ${JSON.stringify(json)}`, "warning");
+                    const res = await fetch(apiUrl, { method: "GET" });
+                    const json = await res.json();
+                    if (json.ok) {
+                        showToast(`URL aktif (${json.service}), masukkan Token untuk verifikasi penuh`, "warning");
+                    } else {
+                        showToast(`Respon server: ${JSON.stringify(json)}`, "warning");
+                    }
                 }
             } catch (err) {
                 showToast(`Gagal menghubungi server: ${err.message}`, "error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="ri-flashlight-line"></i> Tes Koneksi';
+                btn.innerHTML = '<i class="ri-flashlight-line"></i> Tes Koneksi & Token';
             }
+        }
+
+        function clearSettingsToLocalStorage() {
+            document.getElementById("settingApiUrl").value = "";
+            document.getElementById("settingApiToken").value = "";
+            localStorage.removeItem(STORAGE_CONFIG_KEY);
+            closeSettingsModal();
+            updateModeDisplay();
+            showToast("Beralih ke Local Storage Mode", "info");
+            loadLocalData();
+            renderStats();
+            renderTaskList();
         }
 
         // API Call Wrapper
@@ -2794,7 +2837,7 @@
                 html += `
                     <div class="preview-upload-item">
                         <img src="${fileObj.data}">
-                        <button type="button" class="preview-remove-btn" onclick="removeStagedEvidence(${idx})">&times;</button>
+                        <button type="button" class="preview-remove-btn" onclick="removeStagedEvidence(${idx})" title="Hapus"><i class="ri-close-line"></i></button>
                     </div>
                 `;
             });

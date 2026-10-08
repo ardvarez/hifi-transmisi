@@ -301,14 +301,15 @@ const READ_ACTIONS = ["list", "scan", "summary", "notes", "getAttachment"];
 
 function role_(token) {
   const props = PropertiesService.getScriptProperties();
-  const full = props.getProperty("API_TOKEN");
-  const agent = props.getProperty("AGENT_TOKEN");
+  const full = (props.getProperty("API_TOKEN") || props.getProperty("API_KEY") || "").trim();
+  const agent = (props.getProperty("AGENT_TOKEN") || "").trim();
+  const incoming = String(token || "").trim();
   if (full && agent && full === agent) {
     throw new Error("API_TOKEN dan AGENT_TOKEN harus berbeda");
   }
-  if (!token) return null;
-  if (full && token === full) return "me";
-  if (agent && token === agent) return "agent";
+  if (!incoming) return null;
+  if (full && incoming === full) return "me";
+  if (agent && incoming === agent) return "agent";
   return null;
 }
 
