@@ -29,3 +29,4 @@
 - Kalo mau cek tampilan jangan buka localhost langsung ke path file aja bukanya dari home.html
 - Jika ada notes atau validasi tolong buatkan sekalian dengan trigger C:\KERJAAN\Project\hifi-transmisi\py fix\inject_notes.py supaya tidak tertinggal atau kelupaan.
 - Dom digunakan hanya ketika ada perintah saja, jangan terlalu inisiatif scanning page
+- Testing diarahkan ke [localhost](http://localhost:8000/hifi-home/home.html) namun pastikan devnya sudah berjalan
