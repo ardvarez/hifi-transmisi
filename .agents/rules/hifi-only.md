@@ -21,3 +21,4 @@ trigger: always_on
 - Pastikan pengecekan tag sebelum trigger selesai ke user, biar ga ada bug ataupun error dari FE
 - Gaperlu pakai dom karena itu ngabisin token bang
 - Kurangi penggunaan Emoji, icon atau emoji digunakan untuk bagian yang memang perlu saja
+- Semua file dokumentasi/catatan/spesifikasi markdown (`.md`) disimpan terpusat di dalam folder `notes&task/` agar rapi dan mudah di-maintain

@@ -1,0 +1,2907 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Management & Notes - Personal Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --pln-blue: #0A58CA;
+            --pln-blue-mid: #0d6efd;
+            --pln-blue-light: #E7F1FF;
+            --pln-yellow: #F7A800;
+            --pln-yellow-light: #FEF3D6;
+            --agent-purple: #7C3AED;
+            --agent-purple-bg: #F5F3FF;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --surface: #F1F5F9;
+            --border: #E2E8F0;
+            --border-hover: #CBD5E1;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --danger: #DC2626;
+            --danger-bg: #FEF2F2;
+            --success: #16A34A;
+            --success-bg: #F0FDF4;
+            --warning: #D97706;
+            --warning-bg: #FFFBEB;
+            --info: #0284C7;
+            --info-bg: #F0F9FF;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, .brand-title {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Topbar Header */
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--pln-blue), var(--pln-blue-mid));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(10, 88, 202, 0.25);
+        }
+
+        .brand-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Mode Status Badge */
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-badge.api-mode {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .mode-badge.mock-mode {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .mode-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--pln-blue);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(10, 88, 202, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #084aa8;
+            box-shadow: 0 4px 10px rgba(10, 88, 202, 0.35);
+        }
+
+        .btn-agent {
+            background: var(--agent-purple-bg);
+            color: var(--agent-purple);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+
+        .btn-agent:hover {
+            background: var(--agent-purple);
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: var(--card);
+            border-color: var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--border-hover);
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        /* Main Container */
+        .app-container {
+            max-width: 1320px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.blue { background: var(--pln-blue-light); color: var(--pln-blue); }
+        .stat-icon.purple { background: var(--agent-purple-bg); color: var(--agent-purple); }
+        .stat-icon.amber { background: var(--warning-bg); color: var(--warning); }
+        .stat-icon.red { background: var(--danger-bg); color: var(--danger); }
+        .stat-icon.green { background: var(--success-bg); color: var(--success); }
+
+        /* Filter & Controls Panel */
+        .controls-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .controls-row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Status Tabs */
+        .tabs-pills {
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            padding: 3px;
+            border-radius: var(--radius-md);
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .tab-pill {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            color: var(--text-secondary);
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-pill:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-pill.active {
+            background: var(--card);
+            color: var(--pln-blue);
+            font-weight: 600;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+        }
+
+        .tab-pill .badge {
+            margin-left: 6px;
+            padding: 2px 6px;
+            font-size: 11px;
+            border-radius: 999px;
+            background: var(--border);
+            color: var(--text-secondary);
+        }
+
+        .tab-pill.active .badge {
+            background: var(--pln-blue-light);
+            color: var(--pln-blue);
+        }
+
+        /* Search & Filter Row */
+        .controls-row-filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        @media (max-width: 1100px) {
+            .controls-row-filters {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .controls-row-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Standard Input UI PLN Styling */
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .pln-input {
+            width: 100%;
+            height: 38px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .pln-input.has-icon {
+            padding-left: 36px;
+        }
+
+        .pln-input:focus {
+            border-color: var(--pln-blue-mid);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Standard Combo Box (>3 options) */
+        .pln-select {
+            width: 100%;
+            height: 38px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .pln-select:focus {
+            border-color: var(--pln-blue-mid);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Multi-Select Dropdown Checklist (Standard Input UI) */
+        .multiselect-dropdown {
+            position: relative;
+            user-select: none;
+        }
+
+        .multiselect-trigger {
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--card);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .multiselect-trigger:hover {
+            border-color: var(--border-hover);
+        }
+
+        .multiselect-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 60;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .multiselect-menu.open {
+            display: flex;
+        }
+
+        .multiselect-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .multiselect-item:hover {
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .multiselect-item input[type="checkbox"] {
+            accent-color: var(--pln-blue);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        /* Segmented Pill (Radio Button <= 3 options - Text only, no icons) */
+        .segmented-pill-group {
+            display: inline-flex;
+            background: var(--surface);
+            padding: 3px;
+            border-radius: var(--radius-md);
+            gap: 2px;
+            border: 1px solid var(--border);
+            width: 100%;
+        }
+
+        .segmented-pill-btn {
+            flex: 1;
+            text-align: center;
+            padding: 6px 10px;
+            font-size: 12.5px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .segmented-pill-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .segmented-pill-btn.active {
+            background: var(--card);
+            color: var(--pln-blue);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+
+        .segmented-pill-btn.active-agent {
+            background: var(--agent-purple);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(124, 58, 237, 0.25);
+        }
+
+        /* Task Cards List */
+        .task-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .task-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .task-card.is-done {
+            background: #FAFAFC;
+            opacity: 0.85;
+        }
+
+        .task-card.is-done .task-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-card.is-agent {
+            border-left: 4px solid var(--agent-purple);
+        }
+
+        /* Quick Status Checkbox / Action */
+        .task-check-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid var(--border-hover);
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: 2px;
+            color: transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .task-check-btn:hover {
+            border-color: var(--pln-blue);
+        }
+
+        .task-check-btn.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+
+        .task-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .task-header-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .task-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.45;
+        }
+
+        .task-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11.5px;
+            font-weight: 500;
+        }
+
+        .meta-priority-1 { background: var(--danger-bg); color: var(--danger); font-weight: 600; }
+        .meta-priority-2 { background: var(--warning-bg); color: var(--warning); font-weight: 600; }
+        .meta-priority-3 { background: var(--surface); color: var(--text-secondary); }
+
+        .meta-status-todo { background: var(--surface); color: var(--text-secondary); }
+        .meta-status-in_progress { background: var(--info-bg); color: var(--info); }
+        .meta-status-done { background: var(--success-bg); color: var(--success); }
+        .meta-status-cancelled { background: var(--danger-bg); color: var(--danger); }
+
+        .meta-owner-agent { background: var(--agent-purple-bg); color: var(--agent-purple); font-weight: 600; }
+        .meta-owner-me { background: var(--surface); color: var(--text-secondary); }
+
+        .meta-type-tag {
+            background: #EDE9FE;
+            color: #6D28D9;
+            font-weight: 600;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .meta-date {
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .meta-date.overdue {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .meta-date.due-today {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .meta-tag {
+            background: var(--surface);
+            color: var(--text-secondary);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .task-counts {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .count-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: var(--card);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-lg);
+            padding: 48px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 26px;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .empty-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 360px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--card);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 620px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.96); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background: #FAFAFC;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Form elements inside modal */
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-label .req {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            min-height: 90px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--pln-blue-mid);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Drawer / Detail View */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(2px);
+            display: none;
+            justify-content: flex-end;
+            z-index: 90;
+        }
+
+        .drawer-overlay.open {
+            display: flex;
+        }
+
+        .drawer-container {
+            width: 100%;
+            max-width: 660px;
+            background: var(--card);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 24px rgba(15, 23, 42, 0.15);
+            animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .drawer-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Comments & Evidence Section */
+        .comments-section {
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .comments-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .comment-item {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .comment-item.from-agent {
+            background: var(--agent-purple-bg);
+            border-left: 3px solid var(--agent-purple);
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .author-badge {
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .author-badge.agent {
+            background: var(--agent-purple);
+            color: #fff;
+        }
+
+        .author-badge.me {
+            background: var(--border);
+            color: var(--text-secondary);
+        }
+
+        .comment-body {
+            font-size: 13.5px;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            line-height: 1.45;
+        }
+
+        .evidence-thumbnails {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .evidence-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .evidence-thumb:hover {
+            transform: scale(1.04);
+            border-color: var(--pln-blue);
+        }
+
+        .comment-input-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preview-upload-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .preview-upload-item {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            flex-shrink: 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .preview-upload-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* Toast Alert */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 200;
+        }
+
+        .toast {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--pln-blue);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            min-width: 280px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Lightbox Image Preview */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+            padding: 20px;
+        }
+
+        .lightbox-modal.open {
+            display: flex;
+        }
+
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            color: #fff;
+            font-size: 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Topbar Navigation -->
+    <header class="topbar">
+        <div class="brand-container">
+            <div class="brand-badge">TM</div>
+            <div>
+                <div class="brand-title">Task & Notes Management</div>
+                <div class="brand-subtitle">Personal Workspace & Agent Delegation Tracker</div>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <!-- Mode Indicator Badge -->
+            <div id="modeBadge" class="mode-badge mock-mode" onclick="openSettingsModal()" title="Klik untuk konfigurasi Apps Script Web App">
+                <span class="mode-dot"></span>
+                <span id="modeText">Local Storage Mode</span>
+            </div>
+
+            <button class="btn btn-outline btn-sm" onclick="exportCSV()" title="Ekspor data task ke CSV">
+                <i class="ri-file-download-line"></i> Ekspor CSV
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="openSettingsModal()" title="Buka pengaturan API Web App & Token">
+                <i class="ri-settings-3-line"></i> Pengaturan
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openTaskModal()">
+                <i class="ri-add-line"></i> Tambah Task
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="app-container">
+        
+        <!-- Summary Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">Total Task</span>
+                    <span class="stat-value" id="statTotal">0</span>
+                </div>
+                <div class="stat-icon blue">
+                    <i class="ri-task-line"></i>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">Diserahkan ke Agent</span>
+                    <span class="stat-value" id="statAgent">0</span>
+                </div>
+                <div class="stat-icon purple">
+                    <i class="ri-robot-line"></i>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">Hari Ini & Overdue</span>
+                    <span class="stat-value" id="statDueToday">0</span>
+                </div>
+                <div class="stat-icon red">
+                    <i class="ri-alarm-warning-line"></i>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">Dalam Pengerjaan</span>
+                    <span class="stat-value" id="statInProgress">0</span>
+                </div>
+                <div class="stat-icon amber">
+                    <i class="ri-loader-2-line"></i>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">Selesai</span>
+                    <span class="stat-value" id="statCompleted">0</span>
+                </div>
+                <div class="stat-icon green">
+                    <i class="ri-checkbox-circle-line"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls: Tabs, Search & Filters -->
+        <section class="controls-card">
+            <div class="controls-row-top">
+                <!-- Status Tab Pills -->
+                <div class="tabs-pills">
+                    <button class="tab-pill active" onclick="setStatusTab('all')">
+                        Semua <span class="badge" id="tabCountAll">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('agent')">
+                        Agent Task <span class="badge" id="tabCountAgent">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('today')">
+                        Hari Ini & Overdue <span class="badge" id="tabCountToday">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('todo')">
+                        To Do <span class="badge" id="tabCountTodo">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('in_progress')">
+                        In Progress <span class="badge" id="tabCountInProgress">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('done')">
+                        Selesai <span class="badge" id="tabCountDone">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('cancelled')">
+                        Dibatalkan <span class="badge" id="tabCountCancelled">0</span>
+                    </button>
+                    <button class="tab-pill" onclick="setStatusTab('deleted')">
+                        Tempat Sampah <span class="badge" id="tabCountDeleted">0</span>
+                    </button>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn btn-outline btn-sm" onclick="syncData()" id="refreshBtn" title="Sinkronkan dengan Google Sheets">
+                        <i class="ri-refresh-line"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters & Search Toolbar -->
+            <div class="controls-row-filters">
+                <!-- Search bar -->
+                <div class="input-group">
+                    <i class="ri-search-line"></i>
+                    <input type="text" class="pln-input has-icon" id="searchInput" placeholder="Cari judul, type, deskripsi..." oninput="handleSearch(this.value)">
+                </div>
+
+                <!-- Owner Filter (Standard Combobox >3 or clean select) -->
+                <select class="pln-select" id="filterOwner" onchange="applyFilters()">
+                    <option value="">Semua Pemilik</option>
+                    <option value="me">Milik Saya (me)</option>
+                    <option value="agent">Diserahkan ke Agent</option>
+                </select>
+
+                <!-- Priority Filter (Standard Combobox >3 options) -->
+                <select class="pln-select" id="filterPriority" onchange="applyFilters()">
+                    <option value="">Semua Prioritas</option>
+                    <option value="1">Prioritas Tinggi (1)</option>
+                    <option value="2">Prioritas Sedang (2)</option>
+                    <option value="3">Prioritas Rendah (3)</option>
+                </select>
+
+                <!-- Category Filter (Standard Combobox >3 options) -->
+                <select class="pln-select" id="filterCategory" onchange="applyFilters()">
+                    <option value="">Semua Kategori</option>
+                    <option value="Pekerjaan">Pekerjaan</option>
+                    <option value="Operasi">Operasi</option>
+                    <option value="Pribadi">Pribadi</option>
+                    <option value="Belajar">Belajar</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+
+                <!-- Tags Multi-Select Checklist Dropdown (Standard Input UI) -->
+                <div class="multiselect-dropdown" id="filterTagsDropdown">
+                    <div class="multiselect-trigger" onclick="toggleMultiSelect('filterTagsDropdown')">
+                        <span id="filterTagsLabel">Pilih Tag...</span>
+                        <i class="ri-arrow-down-s-line"></i>
+                    </div>
+                    <div class="multiselect-menu">
+                        <label class="multiselect-item"><input type="checkbox" value="urgent" onchange="onTagFilterChange()"> urgent</label>
+                        <label class="multiselect-item"><input type="checkbox" value="laporan" onchange="onTagFilterChange()"> laporan</label>
+                        <label class="multiselect-item"><input type="checkbox" value="evaluasi" onchange="onTagFilterChange()"> evaluasi</label>
+                        <label class="multiselect-item"><input type="checkbox" value="dokumentasi" onchange="onTagFilterChange()"> dokumentasi</label>
+                        <label class="multiselect-item"><input type="checkbox" value="review" onchange="onTagFilterChange()"> review</label>
+                    </div>
+                </div>
+
+                <!-- Sort Order (Standard Combobox >3 options) -->
+                <select class="pln-select" id="sortBy" onchange="applyFilters()">
+                    <option value="due_asc">Due Date (Terdekat)</option>
+                    <option value="due_desc">Due Date (Terjauh)</option>
+                    <option value="prio_asc">Prioritas (Tertinggi)</option>
+                    <option value="created_desc">Terbaru Dibuat</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Task List Area -->
+        <section class="task-list-container" id="taskListContainer">
+            <!-- Dynamic task items injected here -->
+        </section>
+
+    </main>
+
+    <!-- Modal Form: Tambah / Edit Task -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title" id="taskModalTitle">Tambah Task Baru</h3>
+                <button class="btn-ghost" onclick="closeTaskModal()"><i class="ri-close-line" style="font-size: 20px;"></i></button>
+            </div>
+            <form id="taskForm" onsubmit="handleSaveTask(event)">
+                <input type="hidden" id="formTaskId">
+                <div class="modal-body">
+                    <!-- Title Input (PLN standard text) -->
+                    <div>
+                        <label class="form-label" for="taskTitle">Judul Task <span class="req">*</span></label>
+                        <input type="text" id="taskTitle" class="pln-input" placeholder="Misal: Siapkan laporan mingguan..." maxlength="200" required>
+                    </div>
+
+                    <!-- Pemilik Task (Radio <= 3 opsi -> Segmented Pill text only) -->
+                    <div class="form-grid-2">
+                        <div>
+                            <label class="form-label">Pemilik Task (Owner)</label>
+                            <div class="segmented-pill-group" id="formOwnerGroup">
+                                <button type="button" class="segmented-pill-btn active" data-val="me" onclick="setFormOwner('me')">Saya (me)</button>
+                                <button type="button" class="segmented-pill-btn" data-val="agent" onclick="setFormOwner('agent')">Agent</button>
+                            </div>
+                            <input type="hidden" id="formOwner" value="me">
+                        </div>
+                        <div>
+                            <label class="form-label" for="formType">Type Task (Petunjuk Agent)</label>
+                            <input type="text" id="formType" class="pln-input" placeholder="Misal: riset, rangkum" maxlength="30">
+                        </div>
+                    </div>
+
+                    <!-- Priority (Standard Input: Radio Button <= 3 opsi -> Segmented Pill text only) -->
+                    <div>
+                        <label class="form-label">Prioritas <span class="req">*</span></label>
+                        <div class="segmented-pill-group" id="formPriorityGroup">
+                            <button type="button" class="segmented-pill-btn" data-val="1" onclick="setFormPriority(1)">Tinggi</button>
+                            <button type="button" class="segmented-pill-btn active" data-val="2" onclick="setFormPriority(2)">Sedang</button>
+                            <button type="button" class="segmented-pill-btn" data-val="3" onclick="setFormPriority(3)">Rendah</button>
+                        </div>
+                        <input type="hidden" id="formPriority" value="2">
+                    </div>
+
+                    <!-- Status & Category (Standard Input: Combobox / Select > 3 opsi) -->
+                    <div class="form-grid-2">
+                        <div>
+                            <label class="form-label" for="formStatus">Status</label>
+                            <select id="formStatus" class="pln-select">
+                                <option value="todo">To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="done">Selesai</option>
+                                <option value="cancelled">Dibatalkan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" for="formCategory">Kategori</label>
+                            <select id="formCategory" class="pln-select">
+                                <option value="Pekerjaan">Pekerjaan</option>
+                                <option value="Operasi">Operasi</option>
+                                <option value="Pribadi">Pribadi</option>
+                                <option value="Belajar">Belajar</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Due date & Tags -->
+                    <div class="form-grid-2">
+                        <div>
+                            <label class="form-label" for="formDueDate">Jatuh Tempo (Due Date)</label>
+                            <input type="date" id="formDueDate" class="pln-input">
+                        </div>
+                        <div>
+                            <label class="form-label" for="formTags">Tags (pisahkan koma)</label>
+                            <input type="text" id="formTags" class="pln-input" placeholder="urgent, laporan">
+                        </div>
+                    </div>
+
+                    <!-- Description (PLN TextArea) -->
+                    <div>
+                        <label class="form-label" for="formDescription">Deskripsi & Catatan Detail</label>
+                        <textarea id="formDescription" class="form-textarea" placeholder="Tambahkan rincian pekerjaan atau checklist..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeTaskModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitTask">Simpan Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Drawer / Slide-Over: Detail Task & Catatan Bukti -->
+    <div class="drawer-overlay" id="detailDrawer" onclick="handleDrawerOverlayClick(event)">
+        <div class="drawer-container" id="drawerContainer">
+            <div class="drawer-header">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span class="meta-pill meta-status-todo" id="drawerStatusBadge">To Do</span>
+                    <span class="meta-pill meta-priority-2" id="drawerPriorityBadge">Sedang</span>
+                    <span class="meta-pill meta-owner-me" id="drawerOwnerBadge">Milik Saya</span>
+                    <span class="meta-type-tag" id="drawerTypeBadge" style="display: none;"></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn btn-outline btn-sm" id="btnDrawerToggleOwner" onclick="toggleCurrentDrawerOwner()">
+                        <i class="ri-robot-line"></i> Serahkan ke Agent
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="editCurrentDrawerTask()"><i class="ri-edit-line"></i> Edit</button>
+                    <button class="btn-ghost" onclick="closeDetailDrawer()"><i class="ri-close-line" style="font-size: 20px;"></i></button>
+                </div>
+            </div>
+
+            <div class="drawer-body">
+                <div>
+                    <h2 id="drawerTitle" style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;"></h2>
+                    <p id="drawerDesc" style="font-size: 14px; color: var(--text-secondary); white-space: pre-wrap; line-height: 1.5;"></p>
+                </div>
+
+                <!-- Meta Details Grid -->
+                <div style="background: var(--surface); padding: 14px; border-radius: var(--radius-md); font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div><strong style="color: var(--text-muted);">Kategori:</strong> <span id="drawerCategory">-</span></div>
+                    <div><strong style="color: var(--text-muted);">Jatuh Tempo:</strong> <span id="drawerDueDate">-</span></div>
+                    <div><strong style="color: var(--text-muted);">Type:</strong> <span id="drawerTypeVal">-</span></div>
+                    <div><strong style="color: var(--text-muted);">Tags:</strong> <span id="drawerTags">-</span></div>
+                </div>
+
+                <!-- Comments & Evidence Section -->
+                <div class="comments-section">
+                    <div class="comments-title">
+                        <span>Catatan & Bukti Pelaksanaan</span>
+                        <span id="drawerCommentCount" style="font-size: 12px; color: var(--text-muted);">0 Komentar</span>
+                    </div>
+
+                    <!-- Input Box for New Comment & Photo -->
+                    <div class="comment-input-box" id="commentBoxContainer">
+                        <textarea id="commentText" class="form-textarea" placeholder="Tulis komentar atau progres pengerjaan..." style="min-height: 70px;"></textarea>
+                        
+                        <!-- Uploaded photo previews before send -->
+                        <div class="preview-upload-strip" id="evidencePreviewStrip" style="display: none;"></div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="file" id="evidenceFileInput" accept="image/jpeg,image/png,image/webp" multiple style="display: none;" onchange="handleEvidenceSelect(event)">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('evidenceFileInput').click()">
+                                    <i class="ri-camera-lens-line"></i> Lampirkan Foto
+                                </button>
+                                <span id="fileCountBadge" style="font-size: 11px; color: var(--text-muted); margin-left: 6px;"></span>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <button type="button" class="btn btn-agent btn-sm" onclick="sendMockAgentComment()" title="Simulasikan respon komentar dari Agent">
+                                    <i class="ri-robot-line"></i> Balas sbg Agent
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="sendCommentWithEvidence()" id="btnSendComment">
+                                    <i class="ri-send-plane-fill"></i> Kirim
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comment & Evidence Stream -->
+                    <div id="commentListStream" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                        <!-- dynamic comments -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Pengaturan API Google Apps Script & Token -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Pengaturan Integrasi API</h3>
+                <button class="btn-ghost" onclick="closeSettingsModal()"><i class="ri-close-line" style="font-size: 20px;"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.45;">
+                    Konfigurasikan Web App URL dari Google Apps Script dan Token rahasia. Sesuai arsitektur, <code>API_TOKEN</code> dipakai di UI ini, sementara <code>AGENT_TOKEN</code> (terbatas) disimpan khusus di konfigurasi agent.
+                </p>
+
+                <div>
+                    <label class="form-label" for="settingApiUrl">Google Apps Script Web App URL</label>
+                    <input type="url" id="settingApiUrl" class="pln-input" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+
+                <div>
+                    <label class="form-label" for="settingApiToken">API_TOKEN (Token Pemilik / UI)</label>
+                    <input type="password" id="settingApiToken" class="pln-input" placeholder="Masukkan API_TOKEN Anda...">
+                </div>
+
+                <div style="background: var(--surface); padding: 12px; border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px;">
+                    <div><strong>Info Keamanan Token:</strong></div>
+                    <div>&bull; <code>API_TOKEN</code> memiliki akses penuh membaca dan menulis seluruh task di browser.</div>
+                    <div>&bull; <code>AGENT_TOKEN</code> hanya dapat mengakses task dengan status <code>owner = agent</code> dan tidak memiliki akses foto.</div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="justify-content: space-between;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="testApiConnection()" id="btnTestConn">
+                    <i class="ri-flashlight-line"></i> Tes Koneksi
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-outline" onclick="closeSettingsModal()">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Image Viewer -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+        <button class="lightbox-close">&times;</button>
+        <img src="" id="lightboxImg" class="lightbox-img" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Application Script -->
+    <script>
+        // Storage Keys
+        const STORAGE_CONFIG_KEY = "hifi_task_api_config";
+        const STORAGE_TASKS_KEY = "hifi_task_local_tasks";
+        const STORAGE_COMMENTS_KEY = "hifi_task_local_comments";
+        const STORAGE_ATTACHMENTS_KEY = "hifi_task_local_attachments";
+
+        // State
+        let tasks = [];
+        let comments = [];
+        let attachments = [];
+        let currentTab = "all";
+        let activeTaskId = null;
+        let stagedEvidenceFiles = []; // base64 payload array before comment submit
+
+        // Initial Mock Data if localStorage is empty
+        const INITIAL_TASKS = [
+            {
+                id: "t_101a2b3c",
+                title: "Periksa kelengkapan tower transmisi bay 1-4",
+                description: "Lakukan verifikasi data fisik isolator, grounding, dan baut pengunci bersama pengelola tapak.",
+                status: "in_progress",
+                priority: 1,
+                category: "Operasi",
+                tags: "urgent,laporan",
+                owner: "me",
+                type: "lapangan",
+                due_date: new Date().toISOString().split("T")[0],
+                created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+                updated_at: new Date().toISOString(),
+                completed_at: "",
+                deleted_at: "",
+                comment_count: 1,
+                attachment_count: 1
+            },
+            {
+                id: "t_202b3c4d",
+                title: "Riset regulasi terbaru transmisi 150kV",
+                description: "Cari aturan PLN & ESDM terbaru terkait jarak aman span kawat dan pohon di koridor.",
+                status: "todo",
+                priority: 2,
+                category: "Pekerjaan",
+                tags: "evaluasi,review",
+                owner: "agent",
+                type: "riset",
+                due_date: new Date(Date.now() + 3600000 * 48).toISOString().split("T")[0],
+                created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
+                updated_at: new Date().toISOString(),
+                completed_at: "",
+                deleted_at: "",
+                comment_count: 1,
+                attachment_count: 0
+            },
+            {
+                id: "t_303c4d5e",
+                title: "Rekap data uji ketahanan material isolator",
+                description: "Export data batch hasil uji laboratorium untuk arsip digital dan laporan triwulan.",
+                status: "done",
+                priority: 3,
+                category: "Pekerjaan",
+                tags: "laporan",
+                owner: "me",
+                type: "rekap",
+                due_date: new Date(Date.now() - 3600000 * 72).toISOString().split("T")[0],
+                created_at: new Date(Date.now() - 3600000 * 80).toISOString(),
+                updated_at: new Date().toISOString(),
+                completed_at: new Date().toISOString(),
+                deleted_at: "",
+                comment_count: 1,
+                attachment_count: 0
+            }
+        ];
+
+        const INITIAL_COMMENTS = [
+            {
+                id: "c_901a8b7c",
+                task_id: "t_101a2b3c",
+                body: "Sudah dilakukan pemeriksaan awal di lapangan. Kondisi baut tapak 2 sedikit kendor dan telah diperbaiki.",
+                author: "me",
+                created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+                deleted_at: ""
+            },
+            {
+                id: "c_902a8b7d",
+                task_id: "t_202b3c4d",
+                body: "Hasil riset regulasi Permen ESDM No 13/2021: Jarak bebas minimum ruang bebas SUTT 150kV adalah 8,5 meter dari konduktor terendah.",
+                author: "agent",
+                created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+                deleted_at: ""
+            }
+        ];
+
+        const INITIAL_ATTACHMENTS = [
+            {
+                id: "a_801a2b3c",
+                task_id: "t_101a2b3c",
+                comment_id: "c_901a8b7c",
+                file_name: "evidence_grounding_tower.jpg",
+                mime_type: "image/jpeg",
+                size: 245000,
+                data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect fill='%230A58CA' width='400' height='300'/><text fill='%23ffffff' font-family='sans-serif' font-size='20' dy='10.5' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'>Bukti Lapangan ERS</text></svg>",
+                created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+                deleted_at: ""
+            }
+        ];
+
+        // Init App
+        window.addEventListener("DOMContentLoaded", () => {
+            loadConfig();
+            loadLocalData();
+            updateModeDisplay();
+            renderStats();
+            renderTaskList();
+
+            // Outside click listeners for multi-select
+            document.addEventListener("click", (e) => {
+                const ms = document.getElementById("filterTagsDropdown");
+                if (ms && !ms.contains(e.target)) {
+                    const menu = ms.querySelector(".multiselect-menu");
+                    if (menu) menu.classList.remove("open");
+                }
+            });
+        });
+
+        // Config Management
+        function getConfig() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_CONFIG_KEY)) || { apiUrl: "", apiToken: "" };
+            } catch (e) {
+                return { apiUrl: "", apiToken: "" };
+            }
+        }
+
+        function isApiConfigured() {
+            const cfg = getConfig();
+            return Boolean(cfg.apiUrl && cfg.apiToken);
+        }
+
+        function loadConfig() {
+            const cfg = getConfig();
+            document.getElementById("settingApiUrl").value = cfg.apiUrl || "";
+            document.getElementById("settingApiToken").value = cfg.apiToken || "";
+        }
+
+        function saveSettings() {
+            const apiUrl = document.getElementById("settingApiUrl").value.trim();
+            const apiToken = document.getElementById("settingApiToken").value.trim();
+            localStorage.setItem(STORAGE_CONFIG_KEY, JSON.stringify({ apiUrl, apiToken }));
+            closeSettingsModal();
+            updateModeDisplay();
+            showToast("Pengaturan integrasi berhasil disimpan", "success");
+            if (apiUrl && apiToken) {
+                syncData();
+            }
+        }
+
+        function updateModeDisplay() {
+            const badge = document.getElementById("modeBadge");
+            const text = document.getElementById("modeText");
+            if (isApiConfigured()) {
+                badge.className = "mode-badge api-mode";
+                text.innerText = "Google Apps Script API";
+            } else {
+                badge.className = "mode-badge mock-mode";
+                text.innerText = "Local Storage Mode";
+            }
+        }
+
+        // Test API Connection
+        async function testApiConnection() {
+            const btn = document.getElementById("btnTestConn");
+            const apiUrl = document.getElementById("settingApiUrl").value.trim();
+
+            if (!apiUrl) {
+                showToast("Harap isi Web App URL terlebih dahulu", "warning");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Menguji...';
+
+            try {
+                const res = await fetch(apiUrl, { method: "GET" });
+                const json = await res.json();
+                if (json.ok) {
+                    showToast(`Koneksi Web App sukses: ${json.service}`, "success");
+                } else {
+                    showToast(`Respon server: ${JSON.stringify(json)}`, "warning");
+                }
+            } catch (err) {
+                showToast(`Gagal menghubungi server: ${err.message}`, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-flashlight-line"></i> Tes Koneksi';
+            }
+        }
+
+        // API Call Wrapper
+        async function callApi(action, payload = {}) {
+            const cfg = getConfig();
+            if (!isApiConfigured()) {
+                return localApiMock(action, payload);
+            }
+
+            const response = await fetch(cfg.apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({
+                    action,
+                    token: cfg.apiToken,
+                    ...payload
+                })
+            });
+
+            const data = await response.json();
+            if (!data.ok) {
+                throw new Error(data.error || "Gagal memproses permintaan");
+            }
+            return data;
+        }
+
+        // Local Storage API Fallback Simulator with Agent & Owner logic
+        function loadLocalData() {
+            const t = localStorage.getItem(STORAGE_TASKS_KEY);
+            const c = localStorage.getItem(STORAGE_COMMENTS_KEY);
+            const a = localStorage.getItem(STORAGE_ATTACHMENTS_KEY);
+
+            tasks = t ? JSON.parse(t) : INITIAL_TASKS;
+            comments = c ? JSON.parse(c) : INITIAL_COMMENTS;
+            attachments = a ? JSON.parse(a) : INITIAL_ATTACHMENTS;
+
+            // Normalize old tasks that didn't have owner/type
+            tasks = tasks.map(task => ({
+                ...task,
+                owner: task.owner || "me",
+                type: task.type || ""
+            }));
+
+            comments = comments.map(com => ({
+                ...com,
+                author: com.author || "me"
+            }));
+
+            saveLocalData();
+        }
+
+        function saveLocalData() {
+            localStorage.setItem(STORAGE_TASKS_KEY, JSON.stringify(tasks));
+            localStorage.setItem(STORAGE_COMMENTS_KEY, JSON.stringify(comments));
+            localStorage.setItem(STORAGE_ATTACHMENTS_KEY, JSON.stringify(attachments));
+        }
+
+        function localApiMock(action, payload) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    const now = new Date().toISOString();
+                    const today = now.split("T")[0];
+                    const uid = () => Math.random().toString(36).substring(2, 10);
+
+                    try {
+                        switch (action) {
+                            case "list": {
+                                const includeDeleted = payload.includeDeleted === true;
+                                const activeComments = comments.filter(c => !c.deleted_at);
+                                const activeAtts = attachments.filter(a => !a.deleted_at);
+                                const result = tasks
+                                    .filter(t => includeDeleted || !t.deleted_at)
+                                    .map(t => ({
+                                        ...t,
+                                        owner: t.owner || "me",
+                                        comment_count: activeComments.filter(c => c.task_id === t.id).length,
+                                        attachment_count: activeAtts.filter(a => a.task_id === t.id).length
+                                    }));
+                                resolve({ ok: true, tasks: result });
+                                break;
+                            }
+                            case "scan": {
+                                const limit = Math.min(Math.max(Number(payload.limit) || 50, 1), 200);
+                                const statuses = payload.status ? [].concat(payload.status) : ["todo", "in_progress"];
+                                let list = tasks.filter(t => !t.deleted_at && statuses.includes(t.status));
+                                // If agent token, filter to owner === 'agent'
+                                if (payload.role === "agent" || payload.owner === "agent") {
+                                    list = list.filter(t => t.owner === "agent");
+                                } else if (payload.owner) {
+                                    list = list.filter(t => t.owner === payload.owner);
+                                }
+                                if (payload.priority) list = list.filter(t => Number(t.priority) === Number(payload.priority));
+                                if (payload.type) list = list.filter(t => t.type === payload.type);
+                                if (payload.due_before) list = list.filter(t => t.due_date && t.due_date < payload.due_before);
+                                if (payload.updated_since) list = list.filter(t => t.updated_at > payload.updated_since);
+
+                                list.sort((a, b) => Number(a.priority) - Number(b.priority) || String(a.due_date || "9999").localeCompare(String(b.due_date || "9999")));
+                                const scanned = list.slice(0, limit);
+                                resolve({ ok: true, tasks: scanned, total: list.length, truncated: list.length > limit });
+                                break;
+                            }
+                            case "summary": {
+                                const all = tasks.filter(t => !t.deleted_at && (payload.role !== "agent" || t.owner === "agent"));
+                                const open = all.filter(t => t.status === "todo" || t.status === "in_progress");
+                                const counts = { todo: 0, in_progress: 0, done: 0, cancelled: 0 };
+                                all.forEach(t => { if (counts[t.status] !== undefined) counts[t.status]++; });
+                                resolve({
+                                    ok: true,
+                                    today,
+                                    counts,
+                                    open: open.length,
+                                    overdue: open.filter(t => t.due_date && t.due_date < today),
+                                    due_today: open.filter(t => t.due_date === today)
+                                });
+                                break;
+                            }
+                            case "create": {
+                                const taskInput = payload.task || {};
+                                if (!taskInput.title) throw new Error("Judul wajib diisi");
+                                const newTask = {
+                                    id: "t_" + uid(),
+                                    title: taskInput.title.trim().slice(0, 200),
+                                    description: taskInput.description || "",
+                                    status: taskInput.status || "todo",
+                                    priority: Number(taskInput.priority) || 2,
+                                    category: taskInput.category || "Pekerjaan",
+                                    tags: taskInput.tags || "",
+                                    owner: taskInput.owner || "me",
+                                    type: (taskInput.type || "").trim().slice(0, 30),
+                                    due_date: taskInput.due_date || "",
+                                    created_at: now,
+                                    updated_at: now,
+                                    completed_at: taskInput.status === "done" ? now : "",
+                                    deleted_at: "",
+                                    comment_count: 0,
+                                    attachment_count: 0
+                                };
+                                tasks.unshift(newTask);
+                                saveLocalData();
+                                resolve({ ok: true, task: newTask });
+                                break;
+                            }
+                            case "update": {
+                                const id = payload.id;
+                                const changes = payload.changes || {};
+                                const idx = tasks.findIndex(t => t.id === id);
+                                if (idx === -1) throw new Error("Task tidak ditemukan");
+                                if ("priority" in changes) changes.priority = Number(changes.priority);
+                                if ("type" in changes) changes.type = String(changes.type || "").trim().slice(0, 30);
+                                changes.updated_at = now;
+                                if (changes.status && changes.status !== tasks[idx].status) {
+                                    changes.completed_at = changes.status === "done" ? now : "";
+                                }
+                                tasks[idx] = { ...tasks[idx], ...changes };
+                                saveLocalData();
+                                resolve({ ok: true, task: tasks[idx] });
+                                break;
+                            }
+                            case "delete": {
+                                const id = payload.id;
+                                const idx = tasks.findIndex(t => t.id === id);
+                                if (idx !== -1) {
+                                    tasks[idx].deleted_at = now;
+                                    tasks[idx].updated_at = now;
+                                    saveLocalData();
+                                }
+                                resolve({ ok: true });
+                                break;
+                            }
+                            case "restore": {
+                                const id = payload.id;
+                                const idx = tasks.findIndex(t => t.id === id);
+                                if (idx !== -1) {
+                                    tasks[idx].deleted_at = "";
+                                    tasks[idx].updated_at = now;
+                                    saveLocalData();
+                                }
+                                resolve({ ok: true, task: tasks[idx] });
+                                break;
+                            }
+                            case "notes": {
+                                const taskId = payload.task_id;
+                                const task = tasks.find(t => t.id === taskId);
+                                if (!task || task.deleted_at) throw new Error("Task tidak ditemukan");
+                                const taskComments = comments
+                                    .filter(c => c.task_id === taskId && !c.deleted_at)
+                                    .map(c => ({ ...c, author: c.author || "me" }));
+                                const taskAtts = attachments.filter(a => a.task_id === taskId && !a.deleted_at);
+                                resolve({ ok: true, comments: taskComments, attachments: taskAtts });
+                                break;
+                            }
+                            case "addComment": {
+                                const taskId = payload.task_id;
+                                const body = (payload.body || "").trim();
+                                if (!body) throw new Error("Komentar tidak boleh kosong");
+                                const comment = {
+                                    id: "c_" + uid(),
+                                    task_id: taskId,
+                                    body: body.slice(0, 2000),
+                                    author: payload.author || "me",
+                                    created_at: now,
+                                    deleted_at: ""
+                                };
+                                comments.push(comment);
+                                saveLocalData();
+                                resolve({ ok: true, comment });
+                                break;
+                            }
+                            case "deleteComment": {
+                                const id = payload.id;
+                                const idx = comments.findIndex(c => c.id === id);
+                                if (idx !== -1) {
+                                    comments[idx].deleted_at = now;
+                                    saveLocalData();
+                                }
+                                resolve({ ok: true });
+                                break;
+                            }
+                            case "addAttachment": {
+                                const taskId = payload.task_id;
+                                const att = {
+                                    id: "a_" + uid(),
+                                    task_id: taskId,
+                                    comment_id: payload.comment_id || "",
+                                    file_name: payload.file_name || "foto.jpg",
+                                    mime_type: payload.mime_type || "image/jpeg",
+                                    size: payload.size || (payload.data ? payload.data.length : 0),
+                                    data: payload.data,
+                                    created_at: now,
+                                    deleted_at: ""
+                                };
+                                attachments.push(att);
+                                saveLocalData();
+                                resolve({ ok: true, attachment: att });
+                                break;
+                            }
+                            case "deleteAttachment": {
+                                const id = payload.id;
+                                const idx = attachments.findIndex(a => a.id === id);
+                                if (idx !== -1) {
+                                    attachments[idx].deleted_at = now;
+                                    saveLocalData();
+                                }
+                                resolve({ ok: true });
+                                break;
+                            }
+                            default:
+                                reject(new Error("Action tidak dikenal"));
+                        }
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, 80);
+            });
+        }
+
+        // Sync Data from Server or Local
+        async function syncData() {
+            const btn = document.getElementById("refreshBtn");
+            btn.innerHTML = '<i class="ri-refresh-line ri-spin"></i> Memuat...';
+            try {
+                const res = await callApi("list", { includeDeleted: true });
+                tasks = res.tasks.map(t => ({ ...t, owner: t.owner || "me", type: t.type || "" }));
+                saveLocalData();
+                renderStats();
+                renderTaskList();
+                showToast("Data task berhasil disinkronkan", "success");
+            } catch (err) {
+                showToast(`Gagal sinkron data: ${err.message}`, "error");
+            } finally {
+                btn.innerHTML = '<i class="ri-refresh-line"></i> Refresh';
+            }
+        }
+
+        // Render Statistics & Tab Badges
+        function renderStats() {
+            const active = tasks.filter(t => !t.deleted_at);
+            const todayStr = new Date().toISOString().split("T")[0];
+
+            const total = active.length;
+            const completed = active.filter(t => t.status === "done").length;
+            const inProgress = active.filter(t => t.status === "in_progress").length;
+            const agentCount = active.filter(t => t.owner === "agent").length;
+            const dueTodayOrOverdue = active.filter(t => {
+                if (t.status === "done" || t.status === "cancelled") return false;
+                if (!t.due_date) return false;
+                return t.due_date <= todayStr;
+            }).length;
+
+            document.getElementById("statTotal").innerText = total;
+            document.getElementById("statAgent").innerText = agentCount;
+            document.getElementById("statCompleted").innerText = completed;
+            document.getElementById("statInProgress").innerText = inProgress;
+            document.getElementById("statDueToday").innerText = dueTodayOrOverdue;
+
+            // Tab badge counts
+            document.getElementById("tabCountAll").innerText = total;
+            document.getElementById("tabCountAgent").innerText = agentCount;
+            document.getElementById("tabCountToday").innerText = dueTodayOrOverdue;
+            document.getElementById("tabCountTodo").innerText = active.filter(t => t.status === "todo").length;
+            document.getElementById("tabCountInProgress").innerText = inProgress;
+            document.getElementById("tabCountDone").innerText = completed;
+            document.getElementById("tabCountCancelled").innerText = active.filter(t => t.status === "cancelled").length;
+            document.getElementById("tabCountDeleted").innerText = tasks.filter(t => Boolean(t.deleted_at)).length;
+        }
+
+        // Filtering & Sorting Logic
+        function getFilteredTasks() {
+            const search = document.getElementById("searchInput").value.toLowerCase().trim();
+            const owner = document.getElementById("filterOwner").value;
+            const prio = document.getElementById("filterPriority").value;
+            const cat = document.getElementById("filterCategory").value;
+            const sortBy = document.getElementById("sortBy").value;
+            const todayStr = new Date().toISOString().split("T")[0];
+
+            // Get selected tags from checklist dropdown
+            const checkedTags = Array.from(document.querySelectorAll("#filterTagsDropdown input[type='checkbox']:checked"))
+                .map(cb => cb.value.toLowerCase());
+
+            let list = tasks.slice();
+
+            // Filter Tab
+            if (currentTab === "deleted") {
+                list = list.filter(t => Boolean(t.deleted_at));
+            } else {
+                list = list.filter(t => !t.deleted_at);
+                if (currentTab === "agent") {
+                    list = list.filter(t => t.owner === "agent");
+                } else if (currentTab === "today") {
+                    list = list.filter(t => t.due_date && t.due_date <= todayStr && t.status !== "done" && t.status !== "cancelled");
+                } else if (currentTab !== "all") {
+                    list = list.filter(t => t.status === currentTab);
+                }
+            }
+
+            // Search Filter (Title, Description, Type, Tags)
+            if (search) {
+                list = list.filter(t => {
+                    const matchTitle = (t.title || "").toLowerCase().includes(search);
+                    const matchDesc = (t.description || "").toLowerCase().includes(search);
+                    const matchType = (t.type || "").toLowerCase().includes(search);
+                    const matchTags = (t.tags || "").toLowerCase().includes(search);
+                    return matchTitle || matchDesc || matchType || matchTags;
+                });
+            }
+
+            // Owner Filter
+            if (owner) {
+                list = list.filter(t => (t.owner || "me") === owner);
+            }
+
+            // Priority Filter
+            if (prio) {
+                list = list.filter(t => String(t.priority) === prio);
+            }
+
+            // Category Filter
+            if (cat) {
+                list = list.filter(t => (t.category || "").toLowerCase() === cat.toLowerCase());
+            }
+
+            // Tags Filter
+            if (checkedTags.length > 0) {
+                list = list.filter(t => {
+                    const taskTags = (t.tags || "").toLowerCase().split(",").map(s => s.trim());
+                    return checkedTags.some(tag => taskTags.includes(tag));
+                });
+            }
+
+            // Sorting
+            list.sort((a, b) => {
+                if (sortBy === "due_asc") {
+                    if (!a.due_date) return 1;
+                    if (!b.due_date) return -1;
+                    return a.due_date.localeCompare(b.due_date);
+                } else if (sortBy === "due_desc") {
+                    if (!a.due_date) return 1;
+                    if (!b.due_date) return -1;
+                    return b.due_date.localeCompare(a.due_date);
+                } else if (sortBy === "prio_asc") {
+                    return Number(a.priority) - Number(b.priority);
+                } else if (sortBy === "created_desc") {
+                    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+                }
+                return 0;
+            });
+
+            return list;
+        }
+
+        // Render Task List
+        function renderTaskList() {
+            const container = document.getElementById("taskListContainer");
+            const filtered = getFilteredTasks();
+            const todayStr = new Date().toISOString().split("T")[0];
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="ri-inbox-line"></i></div>
+                        <div class="empty-title">Tidak Ada Task</div>
+                        <div class="empty-text">Tidak ada task yang cocok dengan kriteria filter saat ini. Buat task baru atau sesuaikan filter pencarian.</div>
+                        <button class="btn btn-primary btn-sm" onclick="openTaskModal()" style="margin-top: 8px;">
+                            <i class="ri-add-line"></i> Buat Task Sekarang
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const priorityLabels = { 1: "Tinggi", 2: "Sedang", 3: "Rendah" };
+            const statusLabels = { todo: "To Do", in_progress: "In Progress", done: "Selesai", cancelled: "Dibatalkan" };
+
+            let html = "";
+            filtered.forEach(task => {
+                const isDone = task.status === "done";
+                const isDeleted = Boolean(task.deleted_at);
+                const isAgent = task.owner === "agent";
+
+                // Date warning classes
+                let dateBadge = "";
+                if (task.due_date) {
+                    let dateClass = "meta-date";
+                    let dateIcon = '<i class="ri-calendar-line"></i>';
+                    if (!isDone && task.due_date < todayStr) {
+                        dateClass += " overdue";
+                        dateIcon = '<i class="ri-error-warning-line"></i> Terlambat: ';
+                    } else if (!isDone && task.due_date === todayStr) {
+                        dateClass += " due-today";
+                        dateIcon = '<i class="ri-time-line"></i> Hari Ini: ';
+                    }
+                    dateBadge = `<span class="${dateClass}">${dateIcon} ${formatDate(task.due_date)}</span>`;
+                }
+
+                // Tags HTML
+                let tagsHtml = "";
+                if (task.tags) {
+                    task.tags.split(",").forEach(tg => {
+                        const clean = tg.trim();
+                        if (clean) tagsHtml += `<span class="meta-tag">#${escapeHtml(clean)}</span>`;
+                    });
+                }
+
+                // Type HTML
+                let typeHtml = "";
+                if (task.type) {
+                    typeHtml = `<span class="meta-type-tag">${escapeHtml(task.type)}</span>`;
+                }
+
+                // Owner Badge
+                const ownerBadge = isAgent 
+                    ? `<span class="meta-pill meta-owner-agent"><i class="ri-robot-line"></i> Agent</span>`
+                    : ``;
+
+                html += `
+                    <div class="task-card ${isDone ? 'is-done' : ''} ${isAgent ? 'is-agent' : ''}">
+                        <!-- Quick status toggle -->
+                        <div class="task-check-btn ${isDone ? 'checked' : ''}" 
+                             onclick="toggleTaskStatus('${task.id}', event)" 
+                             title="${isDone ? 'Tandai belum selesai' : 'Tandai selesai'}">
+                            <i class="ri-check-line" style="font-size: 16px;"></i>
+                        </div>
+
+                        <!-- Main Clickable Task Content -->
+                        <div class="task-main" onclick="openDetailDrawer('${task.id}')">
+                            <div class="task-header-row">
+                                <span class="task-title">${escapeHtml(task.title)}</span>
+                                ${ownerBadge}
+                                ${typeHtml}
+                                <span class="meta-pill meta-priority-${task.priority}">P${task.priority} ${priorityLabels[task.priority] || ''}</span>
+                                <span class="meta-pill meta-status-${task.status}">${statusLabels[task.status] || task.status}</span>
+                                ${task.category ? `<span class="meta-pill" style="background:var(--surface); color:var(--text-secondary);">${escapeHtml(task.category)}</span>` : ''}
+                            </div>
+
+                            ${task.description ? `<div class="task-desc">${escapeHtml(task.description)}</div>` : ''}
+
+                            <div class="task-meta-row">
+                                ${dateBadge}
+                                ${tagsHtml}
+                                <div class="task-counts">
+                                    <span class="count-item" title="Jumlah Komentar"><i class="ri-chat-3-line"></i> ${task.comment_count || 0}</span>
+                                    <span class="count-item" title="Jumlah Lampiran Bukti"><i class="ri-image-line"></i> ${task.attachment_count || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Action Buttons -->
+                        <div class="task-actions">
+                            ${!isDeleted ? `
+                                <button class="btn btn-outline btn-sm" onclick="toggleTaskOwner('${task.id}', event)" title="${isAgent ? 'Ambil kembali ke Saya' : 'Serahkan pekerjaan ke Agent'}">
+                                    ${isAgent ? 'Ambil Kembali' : '<i class="ri-robot-line"></i> Serahkan'}
+                                </button>
+                                <button class="btn-ghost" onclick="editTaskFromList('${task.id}', event)" title="Edit task"><i class="ri-edit-line"></i></button>
+                                <button class="btn-ghost" onclick="deleteTaskItem('${task.id}', event)" title="Hapus task" style="color: var(--danger);"><i class="ri-delete-bin-line"></i></button>
+                            ` : `
+                                <button class="btn btn-outline btn-sm" onclick="restoreTaskItem('${task.id}', event)" title="Pulihkan task"><i class="ri-restart-line"></i> Pulihkan</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Tab Switching
+        function setStatusTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll(".tab-pill").forEach(el => el.classList.remove("active"));
+            event.currentTarget.classList.add("active");
+            renderTaskList();
+        }
+
+        function handleSearch(val) {
+            renderTaskList();
+        }
+
+        function applyFilters() {
+            renderTaskList();
+        }
+
+        // Multi-Select Checklist Dropdown
+        function toggleMultiSelect(id) {
+            const dropdown = document.getElementById(id);
+            const menu = dropdown.querySelector(".multiselect-menu");
+            menu.classList.toggle("open");
+        }
+
+        function onTagFilterChange() {
+            const checked = Array.from(document.querySelectorAll("#filterTagsDropdown input[type='checkbox']:checked"))
+                .map(cb => cb.value);
+            const label = document.getElementById("filterTagsLabel");
+            if (checked.length === 0) {
+                label.innerText = "Pilih Tag...";
+            } else if (checked.length === 1) {
+                label.innerText = checked[0];
+            } else {
+                label.innerText = `${checked.length} Tag Dipilih`;
+            }
+            renderTaskList();
+        }
+
+        // Priority Segmented Pill Selector (Standard Input UI <= 3 options)
+        function setFormPriority(val) {
+            document.getElementById("formPriority").value = val;
+            const btns = document.querySelectorAll("#formPriorityGroup .segmented-pill-btn");
+            btns.forEach(b => {
+                if (Number(b.getAttribute("data-val")) === Number(val)) {
+                    b.classList.add("active");
+                } else {
+                    b.classList.remove("active");
+                }
+            });
+        }
+
+        // Owner Segmented Pill Selector (Standard Input UI <= 3 options)
+        function setFormOwner(val) {
+            document.getElementById("formOwner").value = val;
+            const btns = document.querySelectorAll("#formOwnerGroup .segmented-pill-btn");
+            btns.forEach(b => {
+                const bVal = b.getAttribute("data-val");
+                if (bVal === val) {
+                    if (val === "agent") {
+                        b.classList.add("active-agent");
+                    } else {
+                        b.classList.add("active");
+                    }
+                } else {
+                    b.classList.remove("active");
+                    b.classList.remove("active-agent");
+                }
+            });
+        }
+
+        // Task CRUD Actions
+        function openTaskModal(editTask = null) {
+            const modal = document.getElementById("taskModal");
+            const titleEl = document.getElementById("taskModalTitle");
+            const form = document.getElementById("taskForm");
+            form.reset();
+
+            if (editTask) {
+                titleEl.innerText = "Edit Task";
+                document.getElementById("formTaskId").value = editTask.id;
+                document.getElementById("taskTitle").value = editTask.title || "";
+                setFormPriority(editTask.priority || 2);
+                setFormOwner(editTask.owner || "me");
+                document.getElementById("formType").value = editTask.type || "";
+                document.getElementById("formStatus").value = editTask.status || "todo";
+                document.getElementById("formCategory").value = editTask.category || "Pekerjaan";
+                document.getElementById("formDueDate").value = editTask.due_date || "";
+                document.getElementById("formTags").value = editTask.tags || "";
+                document.getElementById("formDescription").value = editTask.description || "";
+            } else {
+                titleEl.innerText = "Tambah Task Baru";
+                document.getElementById("formTaskId").value = "";
+                setFormPriority(2);
+                setFormOwner("me");
+                document.getElementById("formType").value = "";
+                document.getElementById("formStatus").value = "todo";
+                document.getElementById("formCategory").value = "Pekerjaan";
+                document.getElementById("formDueDate").value = "";
+                document.getElementById("formTags").value = "";
+                document.getElementById("formDescription").value = "";
+            }
+
+            modal.classList.add("open");
+            document.getElementById("taskTitle").focus();
+        }
+
+        function closeTaskModal() {
+            document.getElementById("taskModal").classList.remove("open");
+        }
+
+        async function handleSaveTask(e) {
+            e.preventDefault();
+            const btn = document.getElementById("btnSubmitTask");
+            const id = document.getElementById("formTaskId").value;
+            const title = document.getElementById("taskTitle").value.trim();
+            const priority = Number(document.getElementById("formPriority").value);
+            const owner = document.getElementById("formOwner").value;
+            const type = document.getElementById("formType").value.trim();
+            const status = document.getElementById("formStatus").value;
+            const category = document.getElementById("formCategory").value;
+            const due_date = document.getElementById("formDueDate").value;
+            const tags = document.getElementById("formTags").value.trim();
+            const description = document.getElementById("formDescription").value.trim();
+
+            if (!title) {
+                showToast("Judul task wajib diisi", "warning");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
+
+            const payloadTask = {
+                title,
+                priority,
+                owner,
+                type,
+                status,
+                category,
+                due_date,
+                tags,
+                description
+            };
+
+            try {
+                if (id) {
+                    await callApi("update", { id, changes: payloadTask });
+                    showToast("Task berhasil diperbarui", "success");
+                } else {
+                    await callApi("create", { task: payloadTask });
+                    showToast("Task baru berhasil dibuat", "success");
+                }
+                closeTaskModal();
+                await syncData();
+            } catch (err) {
+                showToast(`Gagal menyimpan: ${err.message}`, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan Task";
+            }
+        }
+
+        async function toggleTaskOwner(id, e) {
+            if (e) e.stopPropagation();
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            const nextOwner = (task.owner === "agent") ? "me" : "agent";
+            try {
+                await callApi("update", { id, changes: { owner: nextOwner } });
+                await syncData();
+                showToast(nextOwner === "agent" ? "Task diserahkan ke Agent" : "Task diambil kembali oleh Saya", "info");
+                if (activeTaskId === id) {
+                    openDetailDrawer(id);
+                }
+            } catch (err) {
+                showToast(`Gagal mengubah pemilik: ${err.message}`, "error");
+            }
+        }
+
+        async function toggleTaskStatus(id, e) {
+            e.stopPropagation();
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            const nextStatus = task.status === "done" ? "todo" : "done";
+            try {
+                await callApi("update", { id, changes: { status: nextStatus } });
+                await syncData();
+                showToast(nextStatus === "done" ? "Task selesai!" : "Task dipindahkan ke To Do", "success");
+            } catch (err) {
+                showToast(`Gagal update status: ${err.message}`, "error");
+            }
+        }
+
+        function editTaskFromList(id, e) {
+            e.stopPropagation();
+            const task = tasks.find(t => t.id === id);
+            if (task) openTaskModal(task);
+        }
+
+        async function deleteTaskItem(id, e) {
+            e.stopPropagation();
+            if (!confirm("Pindahkan task ini ke Tempat Sampah?")) return;
+            try {
+                await callApi("delete", { id });
+                showToast("Task dipindahkan ke Tempat Sampah", "info");
+                await syncData();
+            } catch (err) {
+                showToast(`Gagal menghapus: ${err.message}`, "error");
+            }
+        }
+
+        async function restoreTaskItem(id, e) {
+            e.stopPropagation();
+            try {
+                await callApi("restore", { id });
+                showToast("Task berhasil dipulihkan", "success");
+                await syncData();
+            } catch (err) {
+                showToast(`Gagal memulihkan: ${err.message}`, "error");
+            }
+        }
+
+        // Detail Drawer & Comments
+        async function openDetailDrawer(taskId) {
+            activeTaskId = taskId;
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const drawer = document.getElementById("detailDrawer");
+            document.getElementById("drawerTitle").innerText = task.title;
+            document.getElementById("drawerDesc").innerText = task.description || "Tidak ada deskripsi detail.";
+            document.getElementById("drawerCategory").innerText = task.category || "-";
+            document.getElementById("drawerDueDate").innerText = task.due_date ? formatDate(task.due_date) : "Tidak ada";
+            document.getElementById("drawerTags").innerText = task.tags || "-";
+            document.getElementById("drawerTypeVal").innerText = task.type || "Tidak ada";
+
+            const priorityLabels = { 1: "Tinggi", 2: "Sedang", 3: "Rendah" };
+            const statusLabels = { todo: "To Do", in_progress: "In Progress", done: "Selesai", cancelled: "Dibatalkan" };
+
+            const badgeStatus = document.getElementById("drawerStatusBadge");
+            badgeStatus.className = `meta-pill meta-status-${task.status}`;
+            badgeStatus.innerText = statusLabels[task.status] || task.status;
+
+            const badgePrio = document.getElementById("drawerPriorityBadge");
+            badgePrio.className = `meta-pill meta-priority-${task.priority}`;
+            badgePrio.innerText = `Prioritas ${priorityLabels[task.priority]}`;
+
+            const badgeOwner = document.getElementById("drawerOwnerBadge");
+            const btnToggleOwner = document.getElementById("btnDrawerToggleOwner");
+            if (task.owner === "agent") {
+                badgeOwner.className = "meta-pill meta-owner-agent";
+                badgeOwner.innerHTML = '<i class="ri-robot-line"></i> Pemilik: Agent';
+                btnToggleOwner.innerHTML = '<i class="ri-user-line"></i> Ambil Kembali';
+            } else {
+                badgeOwner.className = "meta-pill meta-owner-me";
+                badgeOwner.innerText = "Pemilik: Saya (me)";
+                btnToggleOwner.innerHTML = '<i class="ri-robot-line"></i> Serahkan ke Agent';
+            }
+
+            const badgeType = document.getElementById("drawerTypeBadge");
+            if (task.type) {
+                badgeType.style.display = "inline-flex";
+                badgeType.innerText = task.type;
+            } else {
+                badgeType.style.display = "none";
+            }
+
+            // Reset comment input state
+            document.getElementById("commentText").value = "";
+            stagedEvidenceFiles = [];
+            renderStagedEvidence();
+
+            drawer.classList.add("open");
+            loadTaskNotes(taskId);
+        }
+
+        function toggleCurrentDrawerOwner() {
+            if (activeTaskId) {
+                toggleTaskOwner(activeTaskId);
+            }
+        }
+
+        function closeDetailDrawer() {
+            document.getElementById("detailDrawer").classList.remove("open");
+            activeTaskId = null;
+        }
+
+        function handleDrawerOverlayClick(e) {
+            if (e.target.id === "detailDrawer") {
+                closeDetailDrawer();
+            }
+        }
+
+        function editCurrentDrawerTask() {
+            const task = tasks.find(t => t.id === activeTaskId);
+            if (task) {
+                closeDetailDrawer();
+                openTaskModal(task);
+            }
+        }
+
+        async function loadTaskNotes(taskId) {
+            const stream = document.getElementById("commentListStream");
+            stream.innerHTML = '<div style="font-size: 13px; color: var(--text-muted);"><i class="ri-loader-4-line ri-spin"></i> Memuat catatan & foto bukti...</div>';
+
+            try {
+                const res = await callApi("notes", { task_id: taskId });
+                const notesComments = res.comments || [];
+                const notesAtts = res.attachments || [];
+
+                document.getElementById("drawerCommentCount").innerText = `${notesComments.length} Komentar, ${notesAtts.length} Bukti`;
+
+                if (notesComments.length === 0 && notesAtts.length === 0) {
+                    stream.innerHTML = '<div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">Belum ada catatan atau foto bukti untuk task ini.</div>';
+                    return;
+                }
+
+                let html = "";
+                // Comments stream
+                notesComments.forEach(c => {
+                    const isAgent = c.author === "agent";
+                    const cAtts = notesAtts.filter(a => a.comment_id === c.id);
+                    let attsHtml = "";
+                    if (cAtts.length > 0) {
+                        attsHtml = '<div class="evidence-thumbnails">';
+                        cAtts.forEach(a => {
+                            const src = a.data ? a.data : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="%23cbd5e1"><rect width="80" height="80"/></svg>';
+                            attsHtml += `<img src="${src}" class="evidence-thumb" onclick="openLightbox('${src}')" title="${escapeHtml(a.file_name)}">`;
+                        });
+                        attsHtml += '</div>';
+                    }
+
+                    const authorLabel = isAgent 
+                        ? `<span class="author-badge agent"><i class="ri-robot-line"></i> Agent</span>`
+                        : `<span class="author-badge me"><i class="ri-user-line"></i> Anda</span>`;
+
+                    html += `
+                        <div class="comment-item ${isAgent ? 'from-agent' : ''}">
+                            <div class="comment-header">
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    ${authorLabel}
+                                    <span>&bull; ${formatDateTime(c.created_at)}</span>
+                                </div>
+                                <button class="btn-ghost" style="padding: 2px;" onclick="deleteCommentItem('${c.id}')" title="Hapus komentar"><i class="ri-delete-bin-line" style="font-size: 14px; color: var(--danger);"></i></button>
+                            </div>
+                            <div class="comment-body">${escapeHtml(c.body)}</div>
+                            ${attsHtml}
+                        </div>
+                    `;
+                });
+
+                // Attachments directly attached to task (without comment)
+                const directAtts = notesAtts.filter(a => !a.comment_id);
+                if (directAtts.length > 0) {
+                    let directHtml = '<div class="comment-item"><div class="comment-header"><span>Foto Bukti Langsung</span></div><div class="evidence-thumbnails">';
+                    directAtts.forEach(a => {
+                        const src = a.data ? a.data : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="%23cbd5e1"><rect width="80" height="80"/></svg>';
+                        directHtml += `<img src="${src}" class="evidence-thumb" onclick="openLightbox('${src}')" title="${escapeHtml(a.file_name)}">`;
+                    });
+                    directHtml += '</div></div>';
+                    html = directHtml + html;
+                }
+
+                stream.innerHTML = html;
+            } catch (err) {
+                stream.innerHTML = `<div style="font-size: 13px; color: var(--danger);">Gagal memuat catatan: ${err.message}</div>`;
+            }
+        }
+
+        // Image Compression Client-Side Canvas (Max 1600px, 0.8 Quality)
+        async function handleEvidenceSelect(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+
+            const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
+            for (const file of files) {
+                if (!allowedMimes.includes(file.type)) {
+                    showToast(`Format file ${file.name} tidak didukung. Gunakan JPEG/PNG/WebP.`, "warning");
+                    continue;
+                }
+                if (stagedEvidenceFiles.length >= 10) {
+                    showToast("Maksimal 10 foto bukti per task.", "warning");
+                    break;
+                }
+
+                try {
+                    const compressedBase64 = await compressImageFile(file);
+                    stagedEvidenceFiles.push({
+                        fileName: file.name,
+                        mimeType: file.type,
+                        data: compressedBase64
+                    });
+                } catch (e) {
+                    showToast(`Gagal memproses gambar ${file.name}: ${e.message}`, "error");
+                }
+            }
+
+            event.target.value = "";
+            renderStagedEvidence();
+        }
+
+        function compressImageFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement("canvas");
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDimension = 1600;
+
+                        if (width > height && width > maxDimension) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        } else if (height > maxDimension) {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedDataUrl = canvas.toDataURL(file.type || "image/jpeg", 0.82);
+                        resolve(compressedDataUrl);
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
+        }
+
+        function renderStagedEvidence() {
+            const strip = document.getElementById("evidencePreviewStrip");
+            const badge = document.getElementById("fileCountBadge");
+
+            if (stagedEvidenceFiles.length === 0) {
+                strip.style.display = "none";
+                strip.innerHTML = "";
+                badge.innerText = "";
+                return;
+            }
+
+            strip.style.display = "flex";
+            badge.innerText = `${stagedEvidenceFiles.length} foto dipilih`;
+
+            let html = "";
+            stagedEvidenceFiles.forEach((fileObj, idx) => {
+                html += `
+                    <div class="preview-upload-item">
+                        <img src="${fileObj.data}">
+                        <button type="button" class="preview-remove-btn" onclick="removeStagedEvidence(${idx})">&times;</button>
+                    </div>
+                `;
+            });
+            strip.innerHTML = html;
+        }
+
+        function removeStagedEvidence(idx) {
+            stagedEvidenceFiles.splice(idx, 1);
+            renderStagedEvidence();
+        }
+
+        // Send Comment with Attached Evidence
+        async function sendCommentWithEvidence() {
+            const body = document.getElementById("commentText").value.trim();
+            const btn = document.getElementById("btnSendComment");
+
+            if (!body && stagedEvidenceFiles.length === 0) {
+                showToast("Tulis komentar atau pilih foto bukti terlebih dahulu.", "warning");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Mengirim...';
+
+            try {
+                let commentId = "";
+                if (body) {
+                    const cRes = await callApi("addComment", { task_id: activeTaskId, body, author: "me" });
+                    commentId = cRes.comment ? cRes.comment.id : "";
+                }
+
+                for (const fileObj of stagedEvidenceFiles) {
+                    await callApi("addAttachment", {
+                        task_id: activeTaskId,
+                        comment_id: commentId,
+                        file_name: fileObj.fileName,
+                        mime_type: fileObj.mimeType,
+                        data: fileObj.data
+                    });
+                }
+
+                document.getElementById("commentText").value = "";
+                stagedEvidenceFiles = [];
+                renderStagedEvidence();
+
+                showToast("Catatan & bukti berhasil disimpan", "success");
+                await loadTaskNotes(activeTaskId);
+                await syncData();
+            } catch (err) {
+                showToast(`Gagal mengirim: ${err.message}`, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-send-plane-fill"></i> Kirim';
+            }
+        }
+
+        // Simulate Agent Comment in Local Mode
+        async function sendMockAgentComment() {
+            const body = document.getElementById("commentText").value.trim() || "Agent telah selesai memproses dan menelaah rincian instruksi ini.";
+            try {
+                await callApi("addComment", { task_id: activeTaskId, body, author: "agent" });
+                document.getElementById("commentText").value = "";
+                showToast("Komentar dari Agent berhasil diposting", "success");
+                await loadTaskNotes(activeTaskId);
+                await syncData();
+            } catch (err) {
+                showToast(`Gagal memposting: ${err.message}`, "error");
+            }
+        }
+
+        async function deleteCommentItem(commentId) {
+            if (!confirm("Hapus catatan ini?")) return;
+            try {
+                await callApi("deleteComment", { id: commentId });
+                showToast("Komentar dihapus", "info");
+                loadTaskNotes(activeTaskId);
+                syncData();
+            } catch (err) {
+                showToast(`Gagal menghapus: ${err.message}`, "error");
+            }
+        }
+
+        // Settings Modal
+        function openSettingsModal() {
+            loadConfig();
+            document.getElementById("settingsModal").classList.add("open");
+        }
+
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").classList.remove("open");
+        }
+
+        // Lightbox
+        function openLightbox(src) {
+            document.getElementById("lightboxImg").src = src;
+            document.getElementById("lightboxModal").classList.add("open");
+        }
+
+        function closeLightbox() {
+            document.getElementById("lightboxModal").classList.remove("open");
+        }
+
+        // Export to CSV
+        function exportCSV() {
+            if (tasks.length === 0) {
+                showToast("Tidak ada data task untuk diekspor", "warning");
+                return;
+            }
+
+            const headers = ["id", "title", "description", "status", "priority", "category", "tags", "owner", "type", "due_date", "created_at", "completed_at"];
+            const rows = tasks.map(t => [
+                t.id,
+                `"${(t.title || '').replace(/"/g, '""')}"`,
+                `"${(t.description || '').replace(/"/g, '""')}"`,
+                t.status,
+                t.priority,
+                t.category,
+                `"${t.tags || ''}"`,
+                t.owner || "me",
+                t.type || "",
+                t.due_date || "",
+                t.created_at || "",
+                t.completed_at || ""
+            ]);
+
+            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `task_management_${new Date().toISOString().split("T")[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Data task berhasil diekspor ke CSV", "success");
+        }
+
+        // Toast Helper
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+
+            let icon = "ri-information-line";
+            if (type === "success") icon = "ri-checkbox-circle-line";
+            if (type === "error") icon = "ri-error-warning-line";
+            if (type === "warning") icon = "ri-alert-line";
+
+            toast.innerHTML = `<i class="${icon}"></i> <span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(6px)";
+                setTimeout(() => toast.remove(), 250);
+            }, 3500);
+        }
+
+        // Utility formatting
+        function formatDate(isoStr) {
+            if (!isoStr) return "-";
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return isoStr;
+            return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+        }
+
+        function formatDateTime(isoStr) {
+            if (!isoStr) return "-";
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return isoStr;
+            return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+
+</html>

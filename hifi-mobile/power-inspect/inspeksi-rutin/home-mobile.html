@@ -1435,6 +1435,558 @@
             background: #ffffff !important;
         }
 
+    
+        /* ========================================================
+           MULTI GI BOTTOM SHEET & USER ROLE MODE SWITCHER
+           ======================================================== */
+        .user-mode-switcher-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 7px 12px;
+            margin: 10px 18px 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            gap: 10px;
+        }
+
+        .mode-switcher-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .mode-segmented-track {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 4px;
+            border: 1px solid #e2e8f0;
+            flex: 1;
+            max-width: 250px;
+        }
+
+        .mode-seg-btn {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .mode-seg-btn:hover {
+            color: var(--text-main);
+        }
+
+        .mode-seg-btn.active {
+            background: #1a65d6;
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 2px 6px rgba(26, 101, 214, 0.25);
+        }
+
+        .active-pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4);
+            display: inline-block;
+        }
+
+        .header-location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            margin-top: 2px;
+            background: #eef4ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1.2;
+            transition: all 0.2s ease;
+            user-select: none;
+            max-width: 250px;
+        }
+
+        .header-location-badge:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            transform: translateY(-1px);
+        }
+
+        .header-location-badge.mode-multi-active {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .location-dot-icon {
+            font-size: 11px;
+            color: #ef4444;
+            flex-shrink: 0;
+        }
+
+        .header-location-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+
+        .multi-gi-chip {
+            font-size: 9.5px;
+            font-weight: 800;
+            background: #1a65d6;
+            color: #ffffff;
+            padding: 1px 6px;
+            border-radius: 6px;
+            letter-spacing: 0.2px;
+            flex-shrink: 0;
+        }
+
+        .location-chevron {
+            font-size: 10px;
+            color: var(--primary-blue);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        /* Bottom Sheet Styling */
+        .bottom-sheet-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: flex-end;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            border-radius: inherit;
+        }
+
+        .bottom-sheet-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .gi-sheet-card {
+            width: 100%;
+            max-height: 82vh;
+            background: #ffffff;
+            border-top-left-radius: 26px;
+            border-top-right-radius: 26px;
+            padding: 14px 18px 20px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bottom-sheet-overlay.show .gi-sheet-card {
+            transform: translateY(0);
+        }
+
+        .drag-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 4px;
+            margin: 0 auto 12px;
+        }
+
+        .gi-sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .gi-sheet-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gi-sheet-main-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gi-sheet-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .btn-sheet-close-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-sheet-close-icon:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .gi-user-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+        }
+
+        .user-role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .assigned-gi-count {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .assigned-gi-count strong {
+            color: #10b981;
+        }
+
+        .gi-search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+        }
+
+        .gi-search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 12.5px;
+            color: var(--text-main);
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .gi-list-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 48vh;
+            padding-right: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+        }
+
+        .gi-list-divider {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin: 6px 0 2px 4px;
+        }
+
+        .gi-select-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .gi-select-item:hover {
+            border-color: #93c5fd;
+            background: #fbfdff;
+        }
+
+        .gi-select-item.active {
+            border-color: var(--primary-blue);
+            background: #f0f7ff;
+            box-shadow: 0 3px 12px rgba(26, 101, 214, 0.08);
+        }
+
+        .gi-item-radio {
+            font-size: 18px;
+            color: #cbd5e1;
+            margin-top: 1px;
+            transition: color 0.2s ease;
+        }
+
+        .gi-select-item.active .gi-item-radio {
+            color: var(--primary-blue);
+        }
+
+        .gi-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .gi-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gi-item-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.1px;
+        }
+
+        .gi-type-badge {
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .gi-type-badge.all { background: #e0f2fe; color: #0284c7; }
+        .gi-type-badge.ais { background: #dbeafe; color: #1d4ed8; }
+        .gi-type-badge.gis { background: #fae8ff; color: #86198f; }
+
+        .gi-item-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gi-wo-highlight {
+            color: #d97706;
+            font-weight: 700;
+        }
+
+        .gi-location-detail {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .gi-item-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .gi-sub-chip {
+            font-size: 9.5px;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .gi-sheet-footer {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-sheet-submit {
+            width: 100%;
+            padding: 11px;
+            border-radius: 12px;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-sheet-submit:hover {
+            background: var(--primary-blue-hover);
+        }
+
+        /* Floating Toast Message */
+        .gi-toast {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(40px);
+            background: #1e293b;
+            color: #ffffff;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            z-index: 10001;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .gi-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Dark Mode Overrides */
+        body.dark-mode .user-mode-switcher-container,
+        html.dark-mode .user-mode-switcher-container {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .mode-segmented-track,
+        html.dark-mode .mode-segmented-track {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .mode-seg-btn,
+        html.dark-mode .mode-seg-btn {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .mode-seg-btn.active,
+        html.dark-mode .mode-seg-btn.active {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode .header-location-badge,
+        html.dark-mode .header-location-badge {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #38bdf8 !important;
+        }
+        body.dark-mode .header-location-badge:hover,
+        html.dark-mode .header-location-badge:hover {
+            background: #27354a !important;
+            border-color: #0284c7 !important;
+        }
+        body.dark-mode .location-chevron,
+        html.dark-mode .location-chevron {
+            color: #38bdf8 !important;
+        }
+        body.dark-mode .gi-sheet-card,
+        html.dark-mode .gi-sheet-card {
+            background: #1e293b !important;
+            border-top: 1px solid #334155 !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .drag-handle,
+        html.dark-mode .drag-handle {
+            background: #475569 !important;
+        }
+        body.dark-mode .gi-sheet-main-title,
+        html.dark-mode .gi-sheet-main-title {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .btn-sheet-close-icon,
+        html.dark-mode .btn-sheet-close-icon {
+            background: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .gi-user-info-bar,
+        html.dark-mode .gi-user-info-bar {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .gi-search-box,
+        html.dark-mode .gi-search-box {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .gi-search-box input,
+        html.dark-mode .gi-search-box input {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .gi-select-item,
+        html.dark-mode .gi-select-item {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .gi-select-item:hover,
+        html.dark-mode .gi-select-item:hover {
+            background: #162033 !important;
+            border-color: #0284c7 !important;
+        }
+        body.dark-mode .gi-select-item.active,
+        html.dark-mode .gi-select-item.active {
+            background: #13233d !important;
+            border-color: #38bdf8 !important;
+        }
+        body.dark-mode .gi-item-name,
+        html.dark-mode .gi-item-name {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .gi-sub-chip,
+        html.dark-mode .gi-sub-chip {
+            background: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode .gi-toast,
+        html.dark-mode .gi-toast {
+            background: #0284c7 !important;
+            color: #ffffff !important;
+        }
+
     </style>
 </head>
 <body>
@@ -1485,6 +2037,189 @@
 
     <div class="mobile-container">
         
+        <!-- Multi GI Bottom Sheet Modal -->
+        <div id="multiGISheetModal" class="bottom-sheet-overlay" onclick="closeMultiGISheet()">
+            <div class="bottom-sheet-card gi-sheet-card" onclick="event.stopPropagation()">
+                <div class="drag-handle"></div>
+                
+                <!-- Sheet Header -->
+                <div class="gi-sheet-header">
+                    <div class="gi-sheet-title-group">
+                        <div class="gi-sheet-main-title">
+                            <i class="fa-solid fa-building-shield" style="color: var(--primary-blue);"></i>
+                            Pilih Gardu Induk
+                        </div>
+                        <div class="gi-sheet-sub">Lokasi Dinas: <strong>ULTG SURABAYA UTARA</strong></div>
+                    </div>
+                    <button type="button" class="btn-sheet-close-icon" onclick="closeMultiGISheet()" title="Tutup">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Role Banner / Assignment Info -->
+                <div class="gi-user-info-bar">
+                    <div class="user-role-badge">
+                        <i class="fa-solid fa-user-shield"></i> User Multi GI
+                    </div>
+                    <div class="assigned-gi-count">
+                        <i class="fa-solid fa-layer-group"></i> <strong>5 GI</strong> Ditugaskan
+                    </div>
+                </div>
+
+                <!-- Search Box -->
+                <div class="gi-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="giSearchInput" placeholder="Cari nama Gardu Induk..." oninput="searchGIList()">
+                    <button type="button" id="btnClearGISearch" onclick="clearGISearch()" style="display:none; background:none; border:none; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-circle-xmark"></i></button>
+                </div>
+
+                <!-- Scrollable GI List -->
+                <div class="gi-list-scrollable" id="giListScrollable">
+                    
+                    <!-- Option: Semua GI (Multi GI Terpadu) -->
+                    <div class="gi-select-item active" data-gi-id="all" onclick="selectGI('all', 'ULTG SURABAYA UTARA', 'Multi GI', 14, 8, 3, 2)">
+                        <div class="gi-item-radio">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="gi-item-content">
+                            <div class="gi-item-top">
+                                <span class="gi-item-name">Semua Gardu Induk</span>
+                                <span class="gi-type-badge all">Terpadu</span>
+                            </div>
+                            <div class="gi-item-meta">
+                                <span><i class="fa-solid fa-building"></i> 5 Gardu Induk</span>
+                                <span>•</span>
+                                <span><i class="fa-solid fa-clipboard-list"></i> 14 WO Total</span>
+                            </div>
+                            <div class="gi-item-chips">
+                                <span class="gi-sub-chip">Kalisari</span>
+                                <span class="gi-sub-chip">Wonokromo</span>
+                                <span class="gi-sub-chip">Sby Selatan</span>
+                                <span class="gi-sub-chip">Rungkut</span>
+                                <span class="gi-sub-chip">Waru</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gi-list-divider">GARDU INDUK YANG DIPEGANG</div>
+
+                    <!-- GI 1: Kalisari -->
+                    <div class="gi-select-item" data-gi-id="GI 150KV KALISARI" onclick="selectGI('GI 150KV KALISARI', 'GI 150KV KALISARI', 'AIS 150kV', 2, 1, 0, 1)">
+                        <div class="gi-item-radio">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+                        <div class="gi-item-content">
+                            <div class="gi-item-top">
+                                <span class="gi-item-name">GI 150KV KALISARI</span>
+                                <span class="gi-type-badge ais">AIS 150 kV</span>
+                            </div>
+                            <div class="gi-item-meta">
+                                <span><i class="fa-solid fa-bolt"></i> 4 Peralatan</span>
+                                <span>•</span>
+                                <span class="gi-wo-highlight"><i class="fa-solid fa-clock"></i> 2 Work Order</span>
+                            </div>
+                            <div class="gi-location-detail"><i class="fa-solid fa-location-dot"></i> Jl. Kalisari No. 1, Surabaya Utara</div>
+                        </div>
+                    </div>
+
+                    <!-- GI 2: Wonokromo -->
+                    <div class="gi-select-item" data-gi-id="GIS 150KV WONOKROMO" onclick="selectGI('GIS 150KV WONOKROMO', 'GIS 150KV WONOKROMO', 'GIS 150kV', 1, 1, 1, 0)">
+                        <div class="gi-item-radio">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+                        <div class="gi-item-content">
+                            <div class="gi-item-top">
+                                <span class="gi-item-name">GIS 150KV WONOKROMO</span>
+                                <span class="gi-type-badge gis">GIS 150 kV</span>
+                            </div>
+                            <div class="gi-item-meta">
+                                <span><i class="fa-solid fa-bolt"></i> 5 Peralatan</span>
+                                <span>•</span>
+                                <span class="gi-wo-highlight"><i class="fa-solid fa-clock"></i> 1 Work Order</span>
+                            </div>
+                            <div class="gi-location-detail"><i class="fa-solid fa-location-dot"></i> Jl. Wonokromo No. 18, Surabaya Utara</div>
+                        </div>
+                    </div>
+
+                    <!-- GI 3: Surabaya Selatan -->
+                    <div class="gi-select-item" data-gi-id="GI 150KV SURABAYA SELATAN" onclick="selectGI('GI 150KV SURABAYA SELATAN', 'GI 150KV SURABAYA SELATAN', 'AIS 150kV', 3, 1, 1, 1)">
+                        <div class="gi-item-radio">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+                        <div class="gi-item-content">
+                            <div class="gi-item-top">
+                                <span class="gi-item-name">GI 150KV SURABAYA SELATAN</span>
+                                <span class="gi-type-badge ais">AIS 150 kV</span>
+                            </div>
+                            <div class="gi-item-meta">
+                                <span><i class="fa-solid fa-bolt"></i> 3 Peralatan</span>
+                                <span>•</span>
+                                <span class="gi-wo-highlight"><i class="fa-solid fa-clock"></i> 3 Work Order</span>
+                            </div>
+                            <div class="gi-location-detail"><i class="fa-solid fa-location-dot"></i> Jl. Karah Agung, Surabaya</div>
+                        </div>
+                    </div>
+
+                    <!-- GI 4: Rungkut -->
+                    <div class="gi-select-item" data-gi-id="GI 150KV RUNGKUT" onclick="selectGI('GI 150KV RUNGKUT', 'GI 150KV RUNGKUT', 'AIS 150kV', 2, 1, 1, 0)">
+                        <div class="gi-item-radio">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+                        <div class="gi-item-content">
+                            <div class="gi-item-top">
+                                <span class="gi-item-name">GI 150KV RUNGKUT</span>
+                                <span class="gi-type-badge ais">AIS 150 kV</span>
+                            </div>
+                            <div class="gi-item-meta">
+                                <span><i class="fa-solid fa-bolt"></i> 4 Peralatan</span>
+                                <span>•</span>
+                                <span class="gi-wo-highlight"><i class="fa-solid fa-clock"></i> 2 Work Order</span>
+                            </div>
+                            <div class="gi-location-detail"><i class="fa-solid fa-location-dot"></i> Kawasan Industri SIER, Surabaya</div>
+                        </div>
+                    </div>
+
+                    <!-- GI 5: Waru -->
+                    <div class="gi-select-item" data-gi-id="GI 150KV WARU" onclick="selectGI('GI 150KV WARU', 'GI 150KV WARU', 'GIS 150kV', 4, 1, 0, 0)">
+                        <div class="gi-item-radio">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+                        <div class="gi-item-content">
+                            <div class="gi-item-top">
+                                <span class="gi-item-name">GI 150KV WARU</span>
+                                <span class="gi-type-badge gis">GIS 150 kV</span>
+                            </div>
+                            <div class="gi-item-meta">
+                                <span><i class="fa-solid fa-bolt"></i> 6 Peralatan</span>
+                                <span>•</span>
+                                <span class="gi-wo-highlight"><i class="fa-solid fa-clock"></i> 4 Work Order</span>
+                            </div>
+                            <div class="gi-location-detail"><i class="fa-solid fa-location-dot"></i> Jl. Raya Waru, Perbatasan Surabaya-Sidoarjo</div>
+                        </div>
+                    </div>
+
+                    <div id="noGIResults" style="display:none; text-align:center; padding: 24px 10px; color: var(--text-muted); font-size: 12px;">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size:20px; margin-bottom:8px; display:block; opacity:0.4;"></i>
+                        Tidak ada Gardu Induk yang cocok
+                    </div>
+
+                </div>
+
+                <!-- Sheet Footer -->
+                <div class="gi-sheet-footer">
+                    <button type="button" class="btn-sheet-submit" onclick="closeMultiGISheet()">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Toast Message for GI Selection -->
+        <div id="giToast" class="gi-toast">
+            <i class="fa-solid fa-circle-check" style="color: #38bdf8;"></i>
+            <span id="giToastText">Lokasi aktif diperbarui</span>
+        </div>
+        
         <!-- Notification Flag -->
         <div id="notifFlag" class="notif-flag" onclick="goToNotif()">
             <div class="notif-icon"><i class="fas fa-exclamation-circle"></i></div>
@@ -1503,7 +2238,12 @@
                 </a>
                 <div class="header-title-group">
                     <div class="header-name">ardan.test</div>
-                    <div class="header-sub">ULTG SURABAYA UTARA</div>
+                    <div class="header-location-badge mode-multi-active" id="headerLocationBadge" onclick="handleLocationClick()" title="Klik untuk pilih Gardu Induk (Multi GI)">
+                        <i class="fa-solid fa-location-dot location-dot-icon"></i>
+                        <span class="header-location-text" id="headerLocationText">Multi GI (5 Gardu Induk)</span>
+                        <span class="multi-gi-chip" id="headerGIChip">Multi GI</span>
+                        <i class="fa-solid fa-chevron-down location-chevron"></i>
+                    </div>
                 </div>
             </div>
             <div class="header-actions">
@@ -1517,6 +2257,22 @@
                     <i class="fa-regular fa-bell"></i>
                     <span id="notifDot" class="notif-dot"></span>
                 </div>
+            </div>
+        </div>
+
+        <!-- User Role Mode Switcher Bar -->
+        <div class="user-mode-switcher-container">
+            <div class="mode-switcher-label">
+                <i class="fa-solid fa-user-gear" style="color: var(--primary-blue);"></i> Mode Role:
+            </div>
+            <div class="mode-segmented-track">
+                <button type="button" class="mode-seg-btn" id="btnModeUltg" onclick="switchUserRoleMode('ultg')" title="Beralih ke mode User ULTG">
+                    <i class="fa-solid fa-building"></i> User ULTG
+                </button>
+                <button type="button" class="mode-seg-btn active" id="btnModeMultiGi" onclick="switchUserRoleMode('multi_gi')" title="Beralih ke mode User Multi GI">
+                    <i class="fa-solid fa-layer-group"></i> Multi GI
+                    <span class="active-pulse-dot"></span>
+                </button>
             </div>
         </div>
 
@@ -2169,6 +2925,228 @@
             }
         }
         initTheme();
+
+        /* ========================================================
+           USER MODE SWITCHER & MULTI GI LOGIC
+           ======================================================== */
+        let currentUserMode = 'multi_gi'; // 'ultg' or 'multi_gi'
+        let currentSelectedGI = 'all';
+
+        function switchUserRoleMode(mode) {
+            currentUserMode = mode;
+            try {
+                localStorage.setItem('power_inspect_user_mode', mode);
+            } catch(e) {}
+
+            const btnUltg = document.getElementById('btnModeUltg');
+            const btnMulti = document.getElementById('btnModeMultiGi');
+            const headerBadge = document.getElementById('headerLocationBadge');
+            const headerTxt = document.getElementById('headerLocationText');
+            const headerChip = document.getElementById('headerGIChip');
+            const headerChevron = document.querySelector('.location-chevron');
+
+            if (mode === 'multi_gi') {
+                if (btnUltg) btnUltg.classList.remove('active');
+                if (btnMulti) btnMulti.classList.add('active');
+
+                // Determine display text from saved or default
+                let savedGI = 'all';
+                try {
+                    savedGI = localStorage.getItem('power_inspect_selected_gi') || 'all';
+                } catch(e) {}
+
+                if (savedGI === 'all') {
+                    if (headerTxt) headerTxt.textContent = 'Multi GI (5 Gardu Induk)';
+                    if (headerChip) {
+                        headerChip.textContent = 'Multi GI';
+                        headerChip.style.background = '#1a65d6';
+                    }
+                    if (typeof filterState !== 'undefined') {
+                        filterState.garduInduk = 'Semua Gardu Induk';
+                        applyFilters();
+                    }
+                } else {
+                    if (headerTxt) headerTxt.textContent = savedGI;
+                    if (headerChip) {
+                        headerChip.textContent = 'GI Aktif';
+                        headerChip.style.background = '#059669';
+                    }
+                    if (typeof filterState !== 'undefined') {
+                        filterState.garduInduk = savedGI;
+                        applyFilters();
+                    }
+                }
+
+                if (headerBadge) {
+                    headerBadge.style.cursor = 'pointer';
+                    headerBadge.title = 'Klik untuk pilih Gardu Induk (Multi GI)';
+                    headerBadge.classList.add('mode-multi-active');
+                }
+                if (headerChevron) headerChevron.style.display = 'inline-block';
+
+                showGIToast('Mode aktif: User Multi GI (5 Gardu Induk)');
+            } else {
+                // Mode User ULTG
+                if (btnMulti) btnMulti.classList.remove('active');
+                if (btnUltg) btnUltg.classList.add('active');
+
+                if (headerTxt) headerTxt.textContent = 'ULTG SURABAYA UTARA';
+                if (headerChip) {
+                    headerChip.textContent = 'User ULTG';
+                    headerChip.style.background = '#0369a1';
+                }
+                if (headerBadge) {
+                    headerBadge.style.cursor = 'pointer';
+                    headerBadge.title = 'Lokasi Dinas: ULTG Surabaya Utara';
+                    headerBadge.classList.remove('mode-multi-active');
+                }
+                if (headerChevron) headerChevron.style.display = 'none';
+
+                // Reset filter to all GIs in ULTG
+                if (typeof filterState !== 'undefined') {
+                    filterState.garduInduk = 'Semua Gardu Induk';
+                    applyFilters();
+                }
+
+                showGIToast('Mode aktif: User ULTG Surabaya Utara');
+            }
+        }
+
+        function handleLocationClick() {
+            if (currentUserMode === 'multi_gi') {
+                openMultiGISheet();
+            } else {
+                showGIToast('Lokasi Dinas: ULTG SURABAYA UTARA (Seluruh Unit)');
+            }
+        }
+
+        function openMultiGISheet() {
+            const modal = document.getElementById('multiGISheetModal');
+            if (modal) modal.classList.add('show');
+            const searchInput = document.getElementById('giSearchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                searchGIList();
+            }
+        }
+
+        function closeMultiGISheet() {
+            const modal = document.getElementById('multiGISheetModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function searchGIList() {
+            const q = (document.getElementById('giSearchInput')?.value || '').toLowerCase().trim();
+            const clearBtn = document.getElementById('btnClearGISearch');
+            if (clearBtn) clearBtn.style.display = q.length > 0 ? 'inline-block' : 'none';
+
+            const items = document.querySelectorAll('#giListScrollable .gi-select-item');
+            let visible = 0;
+            items.forEach(item => {
+                const name = (item.querySelector('.gi-item-name')?.textContent || '').toLowerCase();
+                const meta = (item.querySelector('.gi-item-meta')?.textContent || '').toLowerCase();
+                const detail = (item.querySelector('.gi-location-detail')?.textContent || '').toLowerCase();
+                if (q === '' || name.includes(q) || meta.includes(q) || detail.includes(q)) {
+                    item.style.display = 'flex';
+                    visible++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            const noRes = document.getElementById('noGIResults');
+            if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        function clearGISearch() {
+            const input = document.getElementById('giSearchInput');
+            if (input) {
+                input.value = '';
+                searchGIList();
+                input.focus();
+            }
+        }
+
+        function selectGI(id, displayName, subtitle, woCount, giCount, anomaliCount, pendingSyncCount) {
+            currentSelectedGI = id;
+
+            // 1. Update selection radio/UI in sheet
+            document.querySelectorAll('#giListScrollable .gi-select-item').forEach(item => {
+                const isMatch = item.getAttribute('data-gi-id') === id;
+                item.classList.toggle('active', isMatch);
+                const radio = item.querySelector('.gi-item-radio i');
+                if (radio) {
+                    radio.className = isMatch ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
+                }
+            });
+
+            // 2. Update Header location text & badge
+            const headerTxt = document.getElementById('headerLocationText');
+            const headerChip = document.getElementById('headerGIChip');
+            if (headerTxt) {
+                headerTxt.textContent = id === 'all' ? 'Multi GI (5 Gardu Induk)' : displayName;
+            }
+            if (headerChip) {
+                if (id === 'all') {
+                    headerChip.textContent = 'Multi GI';
+                    headerChip.style.background = '#1a65d6';
+                } else {
+                    headerChip.textContent = 'GI Aktif';
+                    headerChip.style.background = '#059669';
+                }
+            }
+
+            // 3. Filter Task Cards in taskListContainer
+            if (typeof filterState !== 'undefined') {
+                filterState.garduInduk = id === 'all' ? 'Semua Gardu Induk' : id;
+                applyFilters();
+            }
+
+            // 4. Save to localStorage
+            try {
+                localStorage.setItem('power_inspect_selected_gi', id);
+            } catch(e) {}
+
+            // 5. Toast feedback
+            showGIToast(id === 'all' ? 'Tampilan: Semua Gardu Induk (Multi GI)' : 'Gardu Induk aktif: ' + displayName);
+
+            // 6. Close sheet
+            setTimeout(closeMultiGISheet, 260);
+        }
+
+        function showGIToast(msg) {
+            const toast = document.getElementById('giToast');
+            const toastTxt = document.getElementById('giToastText');
+            if (!toast || !toastTxt) return;
+            toastTxt.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Restore saved Mode & GI on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            let savedMode = 'multi_gi';
+            try {
+                savedMode = localStorage.getItem('power_inspect_user_mode') || 'multi_gi';
+            } catch(e) {}
+            switchUserRoleMode(savedMode);
+
+            if (savedMode === 'multi_gi') {
+                let savedGI = 'all';
+                try {
+                    savedGI = localStorage.getItem('power_inspect_selected_gi') || 'all';
+                } catch(e) {}
+                if (savedGI !== 'all') {
+                    const targetItem = document.querySelector(`.gi-select-item[data-gi-id="${savedGI}"]`);
+                    if (targetItem) {
+                        targetItem.click();
+                    }
+                }
+            }
+        });
+
     </script>
 
     <!-- NOTES FEATURE (INJECTED) -->
@@ -2252,6 +3230,7 @@
       </h3>
       <ul>
         <li><strong>Desain Seragam:</strong> Tone dan styling diselaraskan dengan Dashboard Power Inspect (Plus Jakarta Sans, border halus, badge modern).</li>
+        <li><strong>Mode Switcher & Multi GI:</strong> Mode switcher untuk beralih antara User ULTG dan User Multi GI (akses 5 Gardu Induk yang dipegang).</li>
         <li><strong>Filter Chips:</strong> Fitur filter cepat (Semua GI, 150kV, GIS, Trafo) untuk mempermudah pencarian aset di lapangan.</li>
         <li><strong>Akses & Navigasi:</strong> Tombol Back langsung kembali ke Home Power Inspect (`../home-mobile.html`).</li>
       </ul>
