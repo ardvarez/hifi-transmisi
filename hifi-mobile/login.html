@@ -730,6 +730,17 @@
             color: #ffffff;
         }
 
+        .sample-email-chip.sso-chip {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .sample-email-chip.sso-chip:hover {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
         .sample-email-chip.invalid-chip {
             background: #fee2e2;
             color: #b91c1c;
@@ -1057,7 +1068,7 @@
                     </div>
 
                     <p class="modal-description" id="modalDescription">
-                        Masukkan email Anda yang terdaftar pada sistem Power Inspect. Jika email tidak terdaftar, permintaan akan otomatis ditolak.
+                        Masukkan email Anda yang terdaftar pada sistem Power Inspect. Akun SSO PLN (@pln.co.id) dikelola terpusat dan dilarang mereset password di aplikasi ini.
                     </p>
 
                     <!-- Sample Registered Emails Helper for testing -->
@@ -1067,13 +1078,13 @@
                             <span style="font-size: 10px; color: #64748b;">(Demo Tester)</span>
                         </div>
                         <div class="sample-chip-list">
-                            <span class="sample-email-chip" onclick="fillTestEmail('daniandra@pln.co.id')" title="Email Terdaftar">
-                                <i class="fa-solid fa-check"></i> daniandra@pln.co.id
+                            <span class="sample-email-chip sso-chip" onclick="fillTestEmail('daniandra@pln.co.id')" title="Akun SSO (@pln.co.id) - Dibatasi">
+                                <i class="fa-solid fa-shield-halved"></i> daniandra@pln.co.id (SSO)
                             </span>
-                            <span class="sample-email-chip" onclick="fillTestEmail('petugas.pi@pln.co.id')" title="Email Terdaftar">
-                                <i class="fa-solid fa-check"></i> petugas.pi@pln.co.id
+                            <span class="sample-email-chip" onclick="fillTestEmail('mitra.inspeksi@vendor.com')" title="Akun Non-SSO Terdaftar - Diizinkan">
+                                <i class="fa-solid fa-check"></i> mitra.inspeksi@vendor.com
                             </span>
-                            <span class="sample-email-chip invalid-chip" onclick="fillTestEmail('tidak.terdaftar@gmail.com')" title="Email Tidak Terdaftar">
+                            <span class="sample-email-chip invalid-chip" onclick="fillTestEmail('tidak.terdaftar@gmail.com')" title="Email Tidak Terdaftar - Ditolak">
                                 <i class="fa-solid fa-xmark"></i> tidak.terdaftar@gmail.com
                             </span>
                         </div>
@@ -1084,12 +1095,12 @@
                         <input type="email" id="forgotEmailInput" class="standard-input" placeholder="Masukkan email terdaftar..." autocomplete="email" onkeydown="if(event.key==='Enter') submitForgotRequest()">
                     </div>
 
-                    <!-- Rejection Feedback (Ditolak) -->
+                    <!-- Rejection Feedback (Ditolak / Dibatasi) -->
                     <div class="rejection-banner" id="rejectionBanner">
-                        <i class="fa-solid fa-circle-xmark" style="font-size: 16px; flex-shrink: 0; margin-top: 1px;"></i>
+                        <i class="fa-solid fa-circle-xmark" id="rejectionIcon" style="font-size: 16px; flex-shrink: 0; margin-top: 1px;"></i>
                         <div>
-                            <strong>Permintaan Ditolak!</strong>
-                            <div id="rejectionMsg">Email tidak terdaftar dalam database Power Inspect. Mohon gunakan email korporat terdaftar.</div>
+                            <strong id="rejectionTitle">Permintaan Ditolak!</strong>
+                            <div id="rejectionMsg">Email tidak terdaftar dalam database Power Inspect. Mohon gunakan email terdaftar.</div>
                         </div>
                     </div>
 
@@ -1180,8 +1191,9 @@
         </h4>
         <ul>
             <li><strong>Desain V1 Power Inspect:</strong> Mengikuti layout mobile native asli dengan logo Power Inspect, math addition captcha, dan dekorasi PLN di footer.</li>
-            <li><strong>Lupa Password & Lupa PIN:</strong> Wajib mengisikan email yang terdaftar. Jika email tidak terdaftar (contoh: akun random/gmail), sistem langsung <strong>menolak</strong> permintaan dengan banner feedback merah.</li>
-            <li><strong>Daftar Email Terdaftar (Mock):</strong> <code>daniandra@pln.co.id</code>, <code>petugas.pi@pln.co.id</code>, <code>admin@pln.co.id</code>, <code>operator@pln.co.id</code>.</li>
+            <li><strong>Pembatasan Reset Password Akun SSO (@pln.co.id):</strong> User SSO / email <code>@pln.co.id</code> <strong>dilarang/dibatasi</strong> melakukan reset password mandiri di aplikasi karena kredensial dikelola terpusat via IAM PLN.</li>
+            <li><strong>Lupa Password (Non-SSO / Mitra):</strong> Hanya akun eksternal/mitra terdaftar (contoh: <code>mitra.inspeksi@vendor.com</code>) yang dapat menerima tautan pemulihan password.</li>
+            <li><strong>Daftar Email Mock:</strong> <code>daniandra@pln.co.id</code> (SSO PLN), <code>mitra.inspeksi@vendor.com</code> (Mitra Terdaftar).</li>
             <li><strong>Routing:</strong> Login form & SSO diarahkan ke <code>./catalog-mobile.html</code>.</li>
         </ul>
     </div>
@@ -1192,9 +1204,8 @@
             'daniandra@pln.co.id',
             'petugas.pi@pln.co.id',
             'admin@pln.co.id',
-            'operator@pln.co.id',
-            'supervisor.pi@pln.co.id',
-            'inspektor.cbm@pln.co.id'
+            'mitra.inspeksi@vendor.com',
+            'kontraktor.cbm@partner.co.id'
         ];
 
         let currentCaptchaResult = 6;
@@ -1288,11 +1299,11 @@
 
             if (type === 'password') {
                 title.innerHTML = '<i class="fa-solid fa-lock-open" style="color: #1d6fdc;"></i> <span>Lupa Password</span>';
-                desc.textContent = 'Masukkan email korporat Anda yang terdaftar pada sistem Power Inspect. Tautan pemulihan kata sandi akan dikirim ke email terdaftar.';
+                desc.innerHTML = 'Masukkan email non-SSO/mitra yang terdaftar. <br><span style="color: #b91c1c; font-weight: 600;"><i class="fa-solid fa-shield-halved"></i> Catatan: Akun SSO (@pln.co.id) dilarang reset di sini, gunakan IAM PLN.</span>';
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Kirim Tautan Password</span>';
             } else {
                 title.innerHTML = '<i class="fa-solid fa-key" style="color: #f59e0b;"></i> <span>Lupa PIN</span>';
-                desc.textContent = 'Masukkan email korporat Anda yang terdaftar pada sistem Power Inspect untuk memverifikasi dan mereset 6-digit PIN inspeksi lapangan Anda.';
+                desc.textContent = 'Masukkan email terdaftar pada sistem Power Inspect untuk memverifikasi dan mereset 6-digit PIN inspeksi lapangan Anda.';
                 btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> <span>Minta Reset PIN</span>';
             }
 
@@ -1311,11 +1322,13 @@
             input.style.borderColor = '';
         }
 
-        // Submit Forgot Request (Strict Registered Email Verification)
+        // Submit Forgot Request (Strict Registered Email Verification & SSO Restriction)
         function submitForgotRequest() {
             const emailInput = document.getElementById('forgotEmailInput');
             const email = emailInput.value.trim().toLowerCase();
             const rejectBanner = document.getElementById('rejectionBanner');
+            const rejectIcon = document.getElementById('rejectionIcon');
+            const rejectTitle = document.getElementById('rejectionTitle');
             const rejectMsg = document.getElementById('rejectionMsg');
             const formState = document.getElementById('mobileForgotFormState');
             const successState = document.getElementById('mobileForgotSuccessState');
@@ -1334,9 +1347,23 @@
 
             // Validasi format email sederhana
             if (!email.includes('@') || !email.includes('.')) {
+                rejectTitle.textContent = 'Format Email Tidak Valid!';
                 rejectMsg.textContent = 'Format email tidak valid. Masukkan format email yang benar.';
+                if (rejectIcon) rejectIcon.className = 'fa-solid fa-circle-xmark';
                 rejectBanner.classList.add('active');
                 emailInput.style.borderColor = '#ef4444';
+                return;
+            }
+
+            // ATURAN USER: Reset password untuk user SSO atau @pln.co.id DILARANG / DIBATASI
+            const isPlnDomain = email.endsWith('@pln.co.id') || email.includes('@pln.');
+            if (activeForgotType === 'password' && isPlnDomain) {
+                rejectTitle.textContent = 'Akses Dibatasi (Akun SSO PLN)';
+                rejectMsg.innerHTML = `Akun SSO PLN (<strong>${email}</strong>) menggunakan sistem autentikasi terpusat. Reset kata sandi <strong>dilarang/dibatasi</strong> di aplikasi ini.<br><span style="font-size: 11px; color: #b91c1c; margin-top: 5px; display: block;"><i class="fa-solid fa-circle-info"></i> Silakan lakukan pembaruan kata sandi melalui <strong>Portal IAM / SSO PLN</strong>.</span>`;
+                if (rejectIcon) rejectIcon.className = 'fa-solid fa-shield-halved';
+                rejectBanner.classList.add('active');
+                emailInput.style.borderColor = '#ef4444';
+                showToast('Akun SSO (@pln.co.id) tidak dapat reset kata sandi!', 'fa-shield-halved', '#ef4444');
                 return;
             }
 
@@ -1345,7 +1372,9 @@
 
             if (!isRegistered) {
                 // TAMPILKAN STATUS DITOLAK
+                rejectTitle.textContent = 'Permintaan Ditolak!';
                 rejectMsg.innerHTML = `Email <strong>"${email}"</strong> tidak terdaftar dalam sistem Power Inspect! Permintaan reset ${activeForgotType.toUpperCase()} <strong>DITOLAK</strong>.`;
+                if (rejectIcon) rejectIcon.className = 'fa-solid fa-circle-xmark';
                 rejectBanner.classList.add('active');
                 emailInput.style.borderColor = '#ef4444';
                 showToast('Permintaan ditolak: Email tidak terdaftar!', 'fa-circle-xmark', '#ef4444');
