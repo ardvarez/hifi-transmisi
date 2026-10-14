@@ -999,13 +999,19 @@
                         </div>
                     </div>
 
-                    <!-- Remember Me & Forgot Password -->
+                    <!-- Remember Me & Forgot Password / Reset PIN -->
                     <div class="login-options-row">
                         <label class="remember-wrap">
                             <input type="checkbox" id="rememberMeCheckbox" class="checkbox-styled" checked>
                             <span>Remember me</span>
                         </label>
-                        <span class="forgot-link-text" onclick="openForgotPasswordModal()">Lupa Password?</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="forgot-link-text" onclick="openForgotPasswordModal()">Lupa Password?</span>
+                            <span style="color: var(--border-color); font-size: 11px;">•</span>
+                            <span class="forgot-link-text" onclick="openForgotPinModal()" style="color: #d97706; display: inline-flex; align-items: center; gap: 4px;" title="Reset 6-digit PIN Inspeksi Lapangan">
+                                <i class="fa-solid fa-key" style="font-size: 10px;"></i> Reset PIN?
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Action Buttons: Log In & Log In dengan SSO -->
@@ -1029,10 +1035,10 @@
                     </div>
                 </form>
 
-                <!-- Secondary Links: Lupa PIN & Helpdesk -->
+                <!-- Secondary Links: Reset PIN & Helpdesk -->
                 <div class="card-secondary-links">
                     <span class="btn-secondary-link" onclick="openForgotPinModal()">
-                        <i class="fa-solid fa-key"></i> Lupa PIN?
+                        <i class="fa-solid fa-key" style="color: #d97706;"></i> Reset PIN Lapangan
                     </span>
                     <span class="secondary-bullet"></span>
                     <span class="btn-secondary-link"
@@ -1165,24 +1171,33 @@
             </div>
         </div>
 
-        <!-- MODAL 3: Forgot PIN (Inside Mobile Viewport) -->
+        <!-- MODAL 3: Reset PIN Interactive Wizard (Inside Mobile Viewport) -->
         <div class="modal-overlay" id="forgotPinModal" onclick="if(event.target===this) closeForgotPinModal()">
             <div class="modal-sheet">
                 <div class="modal-drag-bar"></div>
 
-                <!-- STATE 1: FORM INPUT -->
-                <div id="v2ForgotPinFormState">
+                <!-- Wizard Step Progress Indicators -->
+                <div class="pin-step-indicators-wrap" id="pinStepIndicators">
+                    <div class="pin-step-dot active" id="pinStepDot1" title="Langkah 1: Identifikasi Akun">1</div>
+                    <div class="pin-step-line" id="pinStepLine1"></div>
+                    <div class="pin-step-dot" id="pinStepDot2" title="Langkah 2: Verifikasi OTP">2</div>
+                    <div class="pin-step-line" id="pinStepLine2"></div>
+                    <div class="pin-step-dot" id="pinStepDot3" title="Langkah 3: Buat PIN Baru">3</div>
+                </div>
+
+                <!-- STEP 1: FORM INPUT AKUN / EMAIL / NIP -->
+                <div id="v2ForgotPinStep1">
                     <div class="modal-sheet-title">
                         <i class="fa-solid fa-key" style="color: #d97706;"></i>
                         <span>Reset PIN Lapangan</span>
                     </div>
                     <div class="modal-sheet-desc">
-                        Masukkan email atau NIP petugas terdaftar (@pln.co.id) untuk memverifikasi dan mereset PIN offline switchyard gardu induk.
+                        Masukkan email korporat (@pln.co.id) atau NIP petugas terdaftar untuk memverifikasi akun Anda.
                     </div>
 
                     <!-- Quick test chips -->
                     <div style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 11px;">
-                        <span style="font-weight: 700; color: #d97706;"><i class="fa-solid fa-circle-info"></i> Demo Email:</span>
+                        <span style="font-weight: 700; color: #d97706;"><i class="fa-solid fa-circle-info"></i> Demo Akun:</span>
                         <div style="display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap;">
                             <span style="background: #fef3c7; color: #b45309; padding: 3px 7px; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="setV2TestPin('daniandra@pln.co.id')">daniandra@pln.co.id</span>
                             <span style="background: #fee2e2; color: #b91c1c; padding: 3px 7px; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="setV2TestPin('unregistered@gmail.com')">unregistered@gmail.com</span>
@@ -1193,7 +1208,7 @@
                         <label class="form-input-label">Email Petugas Terdaftar</label>
                         <div class="form-input-box">
                             <input type="text" id="pinNipInput" class="modern-text-input" placeholder="Masukkan Email PLN"
-                                value="daniandra@pln.co.id" onkeydown="if(event.key==='Enter') submitForgotPin()">
+                                value="daniandra@pln.co.id" onkeydown="if(event.key==='Enter') submitForgotPinStep1()">
                             <i class="fa-regular fa-envelope input-lead-icon"></i>
                         </div>
                     </div>
@@ -1207,37 +1222,134 @@
                         <button type="button" class="modal-action-btn btn-modal-cancel"
                             onclick="closeForgotPinModal()">Batal</button>
                         <button type="button" class="modal-action-btn btn-modal-confirm" style="background: #d97706;"
-                            onclick="submitForgotPin()">
-                            <i class="fa-solid fa-shield-halved"></i> Minta Reset PIN
+                            onclick="submitForgotPinStep1()">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Kode OTP
                         </button>
                     </div>
                 </div>
 
-                <!-- STATE 2: SUCCESS VIEW REPLACEMENT -->
-                <div id="v2ForgotPinSuccessState" style="display: none; text-align: center; padding: 10px 4px 6px;">
+                <!-- STEP 2: VERIFIKASI 6-DIGIT OTP -->
+                <div id="v2ForgotPinStep2" style="display: none;">
+                    <div class="modal-sheet-title">
+                        <i class="fa-solid fa-shield-halved" style="color: #d97706;"></i>
+                        <span>Verifikasi Kode OTP</span>
+                    </div>
+                    <div class="modal-sheet-desc">
+                        Masukkan 6-digit kode verifikasi yang telah dikirim ke: <strong id="v2OtpTargetEmail" style="color: var(--text-dark);">daniandra@pln.co.id</strong>
+                    </div>
+
+                    <!-- Quick OTP Demo Chip -->
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 8px 12px; margin-bottom: 8px; font-size: 11px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #059669; font-weight: 700;"><i class="fa-solid fa-key"></i> Demo Kode OTP:</span>
+                        <span style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 6px; cursor: pointer; font-weight: 800; letter-spacing: 2px;" onclick="fillDemoOtp('849201')">849201 (Klik Isi)</span>
+                    </div>
+
+                    <!-- 6 Digit OTP Inputs -->
+                    <div class="otp-inputs-row">
+                        <input type="text" class="otp-digit-box" id="otpBox1" maxlength="1" inputmode="numeric" oninput="handleOtpBoxInput(1, this, event)" onkeydown="handleOtpBoxKeydown(1, event)">
+                        <input type="text" class="otp-digit-box" id="otpBox2" maxlength="1" inputmode="numeric" oninput="handleOtpBoxInput(2, this, event)" onkeydown="handleOtpBoxKeydown(2, event)">
+                        <input type="text" class="otp-digit-box" id="otpBox3" maxlength="1" inputmode="numeric" oninput="handleOtpBoxInput(3, this, event)" onkeydown="handleOtpBoxKeydown(3, event)">
+                        <input type="text" class="otp-digit-box" id="otpBox4" maxlength="1" inputmode="numeric" oninput="handleOtpBoxInput(4, this, event)" onkeydown="handleOtpBoxKeydown(4, event)">
+                        <input type="text" class="otp-digit-box" id="otpBox5" maxlength="1" inputmode="numeric" oninput="handleOtpBoxInput(5, this, event)" onkeydown="handleOtpBoxKeydown(5, event)">
+                        <input type="text" class="otp-digit-box" id="otpBox6" maxlength="1" inputmode="numeric" oninput="handleOtpBoxInput(6, this, event)" onkeydown="handleOtpBoxKeydown(6, event)">
+                    </div>
+
+                    <div id="v2OtpErrorBanner" style="display: none; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; font-size: 11.5px; color: #991b1b; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span id="v2OtpErrorText">Kode OTP salah atau belum lengkap (6 digit)!</span>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 6px;">
+                        <span style="font-size: 11px; color: var(--text-muted);">Tidak menerima kode? </span>
+                        <span style="font-size: 11px; font-weight: 700; color: #d97706; cursor: pointer;" onclick="resendOtpCode()">Kirim Ulang OTP</span>
+                    </div>
+
+                    <div class="modal-actions-group">
+                        <button type="button" class="modal-action-btn btn-modal-cancel"
+                            onclick="goToPinStep(1)">Kembali</button>
+                        <button type="button" class="modal-action-btn btn-modal-confirm" style="background: #d97706;"
+                            onclick="submitForgotPinStep2()">
+                            <i class="fa-solid fa-circle-check"></i> Verifikasi OTP
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: MASUKKAN PIN BARU & KONFIRMASI PIN -->
+                <div id="v2ForgotPinStep3" style="display: none;">
+                    <div class="modal-sheet-title">
+                        <i class="fa-solid fa-lock" style="color: #d97706;"></i>
+                        <span>Buat PIN Baru</span>
+                    </div>
+                    <div class="modal-sheet-desc">
+                        Masukkan 6-digit angka PIN baru untuk otentikasi inspeksi offline dan operasional gardu.
+                    </div>
+
+                    <div class="form-group-item">
+                        <label class="form-input-label">PIN Baru (6 Digit Angka)</label>
+                        <div class="form-input-box">
+                            <input type="password" id="newPinInput" class="modern-text-input pin-secure-input"
+                                placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="new-password">
+                            <i class="fa-solid fa-key input-lead-icon"></i>
+                            <button type="button" class="btn-eye-toggle" onclick="togglePinVisibility('newPinInput', 'newPinEyeIcon')">
+                                <i class="fa-regular fa-eye-slash" id="newPinEyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group-item">
+                        <label class="form-input-label">Konfirmasi PIN Baru</label>
+                        <div class="form-input-box">
+                            <input type="password" id="confirmPinInput" class="modern-text-input pin-secure-input"
+                                placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="new-password"
+                                onkeydown="if(event.key==='Enter') submitForgotPinStep3()">
+                            <i class="fa-solid fa-shield-halved input-lead-icon"></i>
+                            <button type="button" class="btn-eye-toggle" onclick="togglePinVisibility('confirmPinInput', 'confirmPinEyeIcon')">
+                                <i class="fa-regular fa-eye-slash" id="confirmPinEyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="v2NewPinErrorBanner" style="display: none; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-top: 6px; font-size: 11.5px; color: #991b1b; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span id="v2NewPinErrorText">PIN harus 6 digit angka dan kedua input harus cocok!</span>
+                    </div>
+
+                    <div class="modal-actions-group">
+                        <button type="button" class="modal-action-btn btn-modal-cancel"
+                            onclick="goToPinStep(2)">Kembali</button>
+                        <button type="button" class="modal-action-btn btn-modal-confirm" style="background: #10b981;"
+                            onclick="submitForgotPinStep3()">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan PIN Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: SUCCESS VIEW -->
+                <div id="v2ForgotPinStep4" style="display: none; text-align: center; padding: 10px 4px 6px;">
                     <div style="width: 58px; height: 58px; border-radius: 50%; background: #ecfdf5; color: #10b981; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);">
                         <i class="fa-solid fa-circle-check"></i>
                     </div>
                     <h3 style="font-size: 17.5px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px;">
-                        Verifikasi PIN Terkirim!
+                        PIN Berhasil Direset!
                     </h3>
                     <p style="font-size: 12px; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px;">
-                        Tautan otorisasi dan kode verifikasi reset PIN telah dikirim ke:
+                        PIN 6-digit baru Anda telah aktif dan dapat langsung digunakan untuk otorisasi inspeksi offline:
                     </p>
                     <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
                         <div style="font-size: 13px; font-weight: 700; color: #d97706; display: flex; align-items: center; justify-content: center; gap: 7px;">
                             <i class="fa-solid fa-key"></i>
-                            <span id="v2PinTargetEmail">user@pln.co.id</span>
+                            <span id="v2PinSuccessEmail">daniandra@pln.co.id</span>
                         </div>
                     </div>
-                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 18px;">
-                        Silakan periksa pesan atau email korporat Anda.
+                    <p style="font-size: 11px; color: #059669; font-weight: 700; margin-bottom: 18px;">
+                        <i class="fa-solid fa-shield-check"></i> PIN baru siap digunakan di seluruh fitur offline gardu.
                     </p>
-                    <button type="button" class="btn-primary-login" onclick="closeForgotPinModal()" style="margin-top: 0; width: 100%; height: 42px; font-size: 13px; background: #d97706;">
+                    <button type="button" class="btn-primary-login" onclick="finishResetPin()" style="margin-top: 0; width: 100%; height: 42px; font-size: 13px; background: #10b981;">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Kembali ke Halaman Masuk</span>
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
@@ -1328,6 +1440,7 @@
             <li><strong>Logo Transmission One:</strong> Tampil langsung tanpa kotak/rectangle wrapper pada header hero.</li>
             <li><strong>Konten Login Cardless:</strong> Form input dan tombol login terintegrasi langsung tanpa card rectangle container.</li>
             <li><strong>Form Input Langsung:</strong> Headline & sub-headline welcome dihapus agar fokus langsung ke input login.</li>
+            <li><strong>Reset PIN Lapangan:</strong> Fitur wizard interaktif 3 tahap (Verifikasi Akun Terdaftar -> Input 6-Digit OTP -> Buat & Konfirmasi PIN Baru) untuk otentikasi inspeksi offline.</li>
             <li><strong>Routing:</strong> Form Login & SSO langsung redirect ke <code>./catalog-mobile.html</code>.</li>
         </ul>
     </div>
@@ -1489,12 +1602,15 @@
             showToast('Tautan reset kata sandi terkirim!', 'fa-circle-check', '#10b981');
         }
 
-        // Forgot PIN Modal
+        // Multi-Step Reset PIN Interactive Wizard Logic
+        let activeResetPinEmail = '';
+
         function openForgotPinModal() {
             document.getElementById('forgotPinModal').classList.add('active');
-            document.getElementById('v2ForgotPinFormState').style.display = 'block';
-            document.getElementById('v2ForgotPinSuccessState').style.display = 'none';
+            goToPinStep(1);
             document.getElementById('v2PinRejectBanner').style.display = 'none';
+            document.getElementById('v2OtpErrorBanner').style.display = 'none';
+            document.getElementById('v2NewPinErrorBanner').style.display = 'none';
             const input = document.getElementById('pinNipInput');
             input.value = 'daniandra@pln.co.id';
             setTimeout(() => input.focus(), 200);
@@ -1509,13 +1625,63 @@
             document.getElementById('v2PinRejectBanner').style.display = 'none';
         }
 
-        function submitForgotPin() {
+        function goToPinStep(step) {
+            // Hide all steps
+            document.getElementById('v2ForgotPinStep1').style.display = 'none';
+            document.getElementById('v2ForgotPinStep2').style.display = 'none';
+            document.getElementById('v2ForgotPinStep3').style.display = 'none';
+            document.getElementById('v2ForgotPinStep4').style.display = 'none';
+
+            const indicatorsWrap = document.getElementById('pinStepIndicators');
+            const d1 = document.getElementById('pinStepDot1');
+            const d2 = document.getElementById('pinStepDot2');
+            const d3 = document.getElementById('pinStepDot3');
+            const l1 = document.getElementById('pinStepLine1');
+            const l2 = document.getElementById('pinStepLine2');
+
+            // Reset indicators
+            [d1, d2, d3].forEach(d => { d.className = 'pin-step-dot'; });
+            [l1, l2].forEach(l => { l.className = 'pin-step-line'; });
+
+            if (step === 1) {
+                indicatorsWrap.style.display = 'flex';
+                document.getElementById('v2ForgotPinStep1').style.display = 'block';
+                d1.className = 'pin-step-dot active';
+            } else if (step === 2) {
+                indicatorsWrap.style.display = 'flex';
+                document.getElementById('v2ForgotPinStep2').style.display = 'block';
+                d1.className = 'pin-step-dot completed';
+                l1.className = 'pin-step-line active';
+                d2.className = 'pin-step-dot active';
+                // Focus first OTP box
+                setTimeout(() => {
+                    const b1 = document.getElementById('otpBox1');
+                    if (b1) b1.focus();
+                }, 200);
+            } else if (step === 3) {
+                indicatorsWrap.style.display = 'flex';
+                document.getElementById('v2ForgotPinStep3').style.display = 'block';
+                d1.className = 'pin-step-dot completed';
+                l1.className = 'pin-step-line active';
+                d2.className = 'pin-step-dot completed';
+                l2.className = 'pin-step-line active';
+                d3.className = 'pin-step-dot active';
+                setTimeout(() => {
+                    const np = document.getElementById('newPinInput');
+                    if (np) np.focus();
+                }, 200);
+            } else if (step === 4) {
+                // Success step hides step indicators
+                indicatorsWrap.style.display = 'none';
+                document.getElementById('v2ForgotPinStep4').style.display = 'block';
+            }
+        }
+
+        // STEP 1 Submit: Check registered email/NIP
+        function submitForgotPinStep1() {
             const input = document.getElementById('pinNipInput');
             const emailOrNip = input.value.trim().toLowerCase();
             const rejectBanner = document.getElementById('v2PinRejectBanner');
-            const formState = document.getElementById('v2ForgotPinFormState');
-            const successState = document.getElementById('v2ForgotPinSuccessState');
-            const targetEmail = document.getElementById('v2PinTargetEmail');
 
             rejectBanner.style.display = 'none';
 
@@ -1535,18 +1701,139 @@
             }
 
             if (!isRegistered) {
-                // ATURAN USER: EMAIL/NIP TIDAK TERSEDIA DITOLAK
+                // Sesuai aturan: Akun tidak terdaftar ditolak
                 rejectBanner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> <span>Data <strong>${emailOrNip}</strong> tidak terdaftar! Permintaan reset PIN ditolak.</span>`;
                 rejectBanner.style.display = 'flex';
                 showToast('Permintaan ditolak: Akun tidak terdaftar!', 'fa-circle-xmark', '#ef4444');
                 return;
             }
 
-            // ATURAN USER: RESPON SUKSES MENGGANTI OVERLAY / POP-UP RESET
-            targetEmail.textContent = isEmail ? emailOrNip : `${emailOrNip}@pln.co.id`;
-            formState.style.display = 'none';
-            successState.style.display = 'block';
-            showToast('Otorisasi reset PIN berhasil dikirim!', 'fa-key', '#10b981');
+            activeResetPinEmail = isEmail ? emailOrNip : `${emailOrNip}@pln.co.id`;
+            document.getElementById('v2OtpTargetEmail').textContent = activeResetPinEmail;
+            document.getElementById('v2PinSuccessEmail').textContent = activeResetPinEmail;
+
+            showToast('Kode OTP verifikasi terkirim!', 'fa-paper-plane', '#10b981');
+            goToPinStep(2);
+        }
+
+        // STEP 2: OTP Logic
+        function fillDemoOtp(code) {
+            for (let i = 0; i < 6; i++) {
+                const box = document.getElementById(`otpBox${i + 1}`);
+                if (box) box.value = code[i] || '';
+            }
+            document.getElementById('v2OtpErrorBanner').style.display = 'none';
+            const b6 = document.getElementById('otpBox6');
+            if (b6) b6.focus();
+            showToast('Kode OTP demo terisi (849201)', 'fa-key', '#38bdf8');
+        }
+
+        function handleOtpBoxInput(index, el, event) {
+            el.value = el.value.replace(/[^0-9]/g, '');
+            document.getElementById('v2OtpErrorBanner').style.display = 'none';
+            if (el.value.length >= 1) {
+                if (index < 6) {
+                    const nextBox = document.getElementById(`otpBox${index + 1}`);
+                    if (nextBox) nextBox.focus();
+                }
+            }
+        }
+
+        function handleOtpBoxKeydown(index, event) {
+            if (event.key === 'Backspace') {
+                const currentBox = document.getElementById(`otpBox${index}`);
+                if (currentBox && currentBox.value === '' && index > 1) {
+                    const prevBox = document.getElementById(`otpBox${index - 1}`);
+                    if (prevBox) {
+                        prevBox.focus();
+                        prevBox.value = '';
+                    }
+                }
+            } else if (event.key === 'Enter') {
+                submitForgotPinStep2();
+            }
+        }
+
+        function resendOtpCode() {
+            showToast('Kode OTP baru telah dikirimkan ke email!', 'fa-arrows-rotate', '#38bdf8');
+            for (let i = 1; i <= 6; i++) {
+                const b = document.getElementById(`otpBox${i}`);
+                if (b) b.value = '';
+            }
+            const b1 = document.getElementById('otpBox1');
+            if (b1) b1.focus();
+        }
+
+        function submitForgotPinStep2() {
+            let otp = '';
+            for (let i = 1; i <= 6; i++) {
+                const b = document.getElementById(`otpBox${i}`);
+                if (b) otp += b.value.trim();
+            }
+
+            const errorBanner = document.getElementById('v2OtpErrorBanner');
+            const errorText = document.getElementById('v2OtpErrorText');
+
+            if (otp.length < 6) {
+                errorText.textContent = 'Harap lengkapi 6 digit kode OTP verifikasi!';
+                errorBanner.style.display = 'flex';
+                showToast('Lengkapi 6 digit kode OTP!', 'fa-triangle-exclamation', '#ef4444');
+                return;
+            }
+
+            // Simulasi verifikasi OTP (Demo valid jika 6 digit angka)
+            errorBanner.style.display = 'none';
+            showToast('Kode OTP valid! Silakan buat PIN baru.', 'fa-circle-check', '#10b981');
+            goToPinStep(3);
+        }
+
+        // STEP 3: Buat & Konfirmasi PIN Baru
+        function togglePinVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye-slash';
+            }
+        }
+
+        function submitForgotPinStep3() {
+            const pin1 = document.getElementById('newPinInput').value.trim();
+            const pin2 = document.getElementById('confirmPinInput').value.trim();
+            const errorBanner = document.getElementById('v2NewPinErrorBanner');
+            const errorText = document.getElementById('v2NewPinErrorText');
+
+            errorBanner.style.display = 'none';
+
+            if (!pin1 || pin1.length !== 6 || !/^\d+$/.test(pin1)) {
+                errorText.textContent = 'PIN baru harus terdiri dari tepat 6 digit angka!';
+                errorBanner.style.display = 'flex';
+                showToast('PIN harus 6 digit angka!', 'fa-triangle-exclamation', '#ef4444');
+                document.getElementById('newPinInput').focus();
+                return;
+            }
+
+            if (pin1 !== pin2) {
+                errorText.textContent = 'Konfirmasi PIN tidak cocok dengan PIN baru!';
+                errorBanner.style.display = 'flex';
+                showToast('Konfirmasi PIN tidak cocok!', 'fa-triangle-exclamation', '#ef4444');
+                document.getElementById('confirmPinInput').focus();
+                return;
+            }
+
+            // Sukses Reset PIN
+            showToast('PIN berhasil diperbarui!', 'fa-circle-check', '#10b981');
+            goToPinStep(4);
+        }
+
+        // STEP 4: Selesai
+        function finishResetPin() {
+            closeForgotPinModal();
+            showToast('PIN baru 6-digit berhasil diaktifkan!', 'fa-key', '#10b981');
         }
 
 
