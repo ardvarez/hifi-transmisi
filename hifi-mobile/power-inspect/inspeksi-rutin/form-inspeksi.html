@@ -797,6 +797,39 @@
             box-shadow: 0 0 0 3px rgba(26, 101, 214, 0.1);
         }
 
+        /* 4. Sub-Uraian Beruntun (Dynamic Cascading Sub-Sections) */
+        .sub-uraian-card {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            animation: fadeInSub 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes fadeInSub {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sub-uraian-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+        .badge-box-tag {
+            background: #e0f2fe;
+            color: #0284c7;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
         /* End of Form: Catatan & Upload File Card */
         .end-form-card {
             background: #ffffff;
@@ -2156,6 +2189,21 @@
             color: #64748b !important;
         }
 
+        body.dark-mode .sub-uraian-card,
+        html.dark-mode .sub-uraian-card {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .sub-uraian-header,
+        html.dark-mode .sub-uraian-header {
+            border-bottom-color: #334155 !important;
+        }
+        body.dark-mode .badge-box-tag,
+        html.dark-mode .badge-box-tag {
+            background: rgba(2, 132, 199, 0.2) !important;
+            color: #38bdf8 !important;
+        }
+
         body.dark-mode div[style*="color: #1e293b"],
         body.dark-mode div[style*="color:#1e293b"],
         body.dark-mode div[style*="color: #0f172a"],
@@ -2712,6 +2760,7 @@
                  4. Combo Box (> 3 opsi: Dropdown Select standar)
                  5. Checkbox (Multi-Select Checklist Dropdown)
                  6. Text (Single-line Input & Multi-line Text Area)
+                 7. Uraian Beruntun (Dynamic Sub-Uraian: misal 1 Box vs 3 Box)
                  *Uraian dengan hasil inspeksi sebelumnya ditandai warna oranye kontras tinggi*
                  ======================================================== -->
 
@@ -2868,6 +2917,72 @@
                     <div class="param-photo-gallery">
                         <div class="param-photo-strip" id="photoStrip_param2"></div>
                     </div>
+                </div>
+            </div>
+
+            <!-- CARD 3: URAIAN BERUNTUN (DYNAMIC SUB-URAIAN BERDASARKAN JAWABAN UTAMA) -->
+            <div class="test-param-card" id="paramCard3">
+                <div class="test-param-header">
+                    <div class="test-param-title">3. Pemeriksaan Kondisi Box Proteksi (Uraian Beruntun)</div>
+                    <button type="button" class="btn-tutup-param" id="btnTutup3" onclick="openKendalaForParam(3, 'Pemeriksaan Kondisi Box Proteksi')">Tutup</button>
+                    <span class="param-closed-badge" id="closedBadge3">Terkendala</span>
+                </div>
+                <div class="test-param-body">
+                    
+                    <!-- URAIAN UTAMA (PILIHAN JUMLAH BOX: 1 BOX ATAU 3 BOX) -->
+                    <div class="param-field-group">
+                        <span class="param-sub-badge"><i class="fa-solid fa-layer-group"></i> URAIAN UTAMA BERUNTUN</span>
+                        <label class="param-field-label">Konfigurasi Jumlah Box Proteksi</label>
+                        <div class="param-segmented-row" id="boxCountSegmentedRow">
+                            <button type="button" class="param-seg-btn active-blue" onclick="selectBoxCount(this, '1')">1 Box</button>
+                            <button type="button" class="param-seg-btn" onclick="selectBoxCount(this, '3')">3 Box</button>
+                        </div>
+                    </div>
+
+                    <!-- CONTAINER SUB-URAIAN DINAMIS -->
+                    <div id="subUraianBoxContainer">
+                        <!-- Default 1 Box -->
+                        <div class="sub-uraian-card">
+                            <div class="sub-uraian-header">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-cube" style="color:var(--primary-blue);"></i>
+                                    <span>Box Utama (Kompak)</span>
+                                </div>
+                                <span class="badge-box-tag">Fasa Gabungan</span>
+                            </div>
+                            
+                            <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                                <label class="param-field-label">Kondisi Fisik & Kerapatan Box</label>
+                                <div class="param-segmented-row" style="margin-bottom: 0;">
+                                    <button type="button" class="param-seg-btn active-prev" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                    <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                                </div>
+                            </div>
+
+                            <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                                <label class="param-field-label">Temperatur Suhu Ruang Box</label>
+                                <div class="param-unit-group">
+                                    <input type="number" step="0.1" class="param-input-num has-prev-value" data-has-prev="true" placeholder="32.5 (Sebelumnya)" value="" oninput="handleInputState(this)">
+                                    <span class="param-unit-label">°C</span>
+                                </div>
+                            </div>
+
+                            <div class="param-field-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                                <label class="param-field-label">Catatan Pemeriksaan Box <span class="label-optional">(Opsional)</span></label>
+                                <input type="text" class="param-input-text has-prev-value" data-has-prev="true" placeholder="Seal karet pintu rapat dan heater aktif (Hasil sebelumnya)..." value="" oninput="handleInputState(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOTO DOKUMENTASI URAIAN 3 -->
+                    <div class="param-field-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                        <span class="param-sub-badge"><i class="fa-solid fa-camera"></i> FOTO DOKUMENTASI URAIAN</span>
+                        <input type="file" id="fileInput_param3" accept="image/*" style="display:none;" onchange="handleFileUpload('param3', event)">
+                        <div class="param-photo-gallery">
+                            <div class="param-photo-strip" id="photoStrip_param3"></div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -3035,6 +3150,138 @@
             btn.classList.add('active-blue');
         }
 
+        // Uraian Beruntun Handler: Menyesuaikan Sub-Uraian Berdasarkan Jumlah Box
+        function selectBoxCount(btn, count) {
+            selectParamOption(btn, count);
+            const container = document.getElementById('subUraianBoxContainer');
+            if (!container) return;
+            
+            if (count === '1') {
+                container.innerHTML = `
+                    <div class="sub-uraian-card">
+                        <div class="sub-uraian-header">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-cube" style="color:var(--primary-blue);"></i>
+                                <span>Box Utama (Kompak)</span>
+                            </div>
+                            <span class="badge-box-tag">Fasa Gabungan</span>
+                        </div>
+                        
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Kondisi Fisik & Kerapatan Box</label>
+                            <div class="param-segmented-row" style="margin-bottom: 0;">
+                                <button type="button" class="param-seg-btn active-blue" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                        </div>
+
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Temperatur Suhu Ruang Box</label>
+                            <div class="param-unit-group">
+                                <input type="number" step="0.1" class="param-input-num is-filled" placeholder="32.5" value="32.5" oninput="handleInputState(this)">
+                                <span class="param-unit-label">°C</span>
+                            </div>
+                        </div>
+
+                        <div class="param-field-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                            <label class="param-field-label">Catatan Pemeriksaan Box <span class="label-optional">(Opsional)</span></label>
+                            <input type="text" class="param-input-text is-filled" value="Seal karet pintu rapat dan heater aktif" oninput="handleInputState(this)">
+                        </div>
+                    </div>
+                `;
+            } else if (count === '3') {
+                container.innerHTML = `
+                    <!-- SUB BOX 1 -->
+                    <div class="sub-uraian-card">
+                        <div class="sub-uraian-header">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-cube" style="color:var(--primary-blue);"></i>
+                                <span>Box 1</span>
+                            </div>
+                            <span class="badge-box-tag">Fasa R</span>
+                        </div>
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Kondisi Fisik & Kerapatan Box 1</label>
+                            <div class="param-segmented-row" style="margin-bottom: 0;">
+                                <button type="button" class="param-seg-btn active-blue" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                        </div>
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Temperatur Suhu Ruang Box 1</label>
+                            <div class="param-unit-group">
+                                <input type="number" step="0.1" class="param-input-num is-filled" placeholder="32.0" value="32.0" oninput="handleInputState(this)">
+                                <span class="param-unit-label">°C</span>
+                            </div>
+                        </div>
+                        <div class="param-field-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                            <label class="param-field-label">Catatan Pemeriksaan Box 1 <span class="label-optional">(Opsional)</span></label>
+                            <input type="text" class="param-input-text is-filled" value="Kondisi bersih, seal rapat" oninput="handleInputState(this)">
+                        </div>
+                    </div>
+
+                    <!-- SUB BOX 2 -->
+                    <div class="sub-uraian-card">
+                        <div class="sub-uraian-header">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-cube" style="color:var(--primary-blue);"></i>
+                                <span>Box 2</span>
+                            </div>
+                            <span class="badge-box-tag">Fasa S</span>
+                        </div>
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Kondisi Fisik & Kerapatan Box 2</label>
+                            <div class="param-segmented-row" style="margin-bottom: 0;">
+                                <button type="button" class="param-seg-btn active-blue" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                        </div>
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Temperatur Suhu Ruang Box 2</label>
+                            <div class="param-unit-group">
+                                <input type="number" step="0.1" class="param-input-num is-filled" placeholder="32.2" value="32.2" oninput="handleInputState(this)">
+                                <span class="param-unit-label">°C</span>
+                            </div>
+                        </div>
+                        <div class="param-field-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                            <label class="param-field-label">Catatan Pemeriksaan Box 2 <span class="label-optional">(Opsional)</span></label>
+                            <input type="text" class="param-input-text is-filled" value="Kondisi bersih, heater aktif" oninput="handleInputState(this)">
+                        </div>
+                    </div>
+
+                    <!-- SUB BOX 3 -->
+                    <div class="sub-uraian-card">
+                        <div class="sub-uraian-header">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-cube" style="color:var(--primary-blue);"></i>
+                                <span>Box 3</span>
+                            </div>
+                            <span class="badge-box-tag">Fasa T</span>
+                        </div>
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Kondisi Fisik & Kerapatan Box 3</label>
+                            <div class="param-segmented-row" style="margin-bottom: 0;">
+                                <button type="button" class="param-seg-btn active-blue" onclick="selectParamOption(this, 'sesuai')">Sesuai</button>
+                                <button type="button" class="param-seg-btn" onclick="selectParamOption(this, 'tidak')">Tidak sesuai</button>
+                            </div>
+                        </div>
+                        <div class="param-field-group" style="margin-bottom: 10px; padding-bottom: 10px;">
+                            <label class="param-field-label">Temperatur Suhu Ruang Box 3</label>
+                            <div class="param-unit-group">
+                                <input type="number" step="0.1" class="param-input-num is-filled" placeholder="32.8" value="32.8" oninput="handleInputState(this)">
+                                <span class="param-unit-label">°C</span>
+                            </div>
+                        </div>
+                        <div class="param-field-group" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                            <label class="param-field-label">Catatan Pemeriksaan Box 3 <span class="label-optional">(Opsional)</span></label>
+                            <input type="text" class="param-input-text is-filled" value="Kondisi bersih, grounding kokoh" oninput="handleInputState(this)">
+                        </div>
+                    </div>
+                `;
+            }
+            showToast(`Uraian disesuaikan untuk ${count} Box`);
+        }
+
         // Input Angka & Text State Handler (Berubah Biru Bold Saat Diisi)
         function handleInputState(input) {
             if (input.value && input.value.trim() !== '') {
@@ -3136,9 +3383,8 @@
 
                 // 1. Clear fields
                 if (card) {
-                    card.querySelectorAll('.param-seg-btn').forEach(b => b.classList.remove('active-sesuai', 'active-tidak'));
-                    const numInput = card.querySelector('.param-input-num');
-                    if (numInput) numInput.value = '';
+                    card.querySelectorAll('.param-seg-btn').forEach(b => b.classList.remove('active-sesuai', 'active-tidak', 'active-blue', 'active-prev'));
+                    card.querySelectorAll('.param-input-num, .param-input-text, textarea').forEach(inp => inp.value = '');
                 }
 
                 // 2. Clear photos for this parameter
