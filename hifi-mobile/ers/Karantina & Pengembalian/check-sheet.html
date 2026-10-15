@@ -1345,9 +1345,27 @@
             <div class="item-group-container">
                 
                 <!-- Group Card Title -->
-                <div class="group-header-card">
-                    <h2 class="group-title">Plate Column</h2>
-                    <span class="group-subtitle">15 Aksesoris</span>
+                <div class="group-header-card" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <h2 class="group-title" id="compNameTitle1" style="margin: 0;">Plate Column</h2>
+                            <span class="chip-karantina-ulang" id="chipKarantinaUlang1" style="display: none; font-size: 10px; font-weight: 800; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.3px; white-space: nowrap; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-arrows-rotate" style="font-size: 9px;"></i>Karantina Ulang
+                            </span>
+                        </div>
+                        <span class="group-subtitle" id="compSubTitle1">15 Aksesoris</span>
+                    </div>
+                </div>
+
+                <!-- Catatan Reject Verifikator (Untuk Gambaran Perbaikan) -->
+                <div id="rejectNoteCard1" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; border-left: 4px solid #e11d48; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #e11d48; font-size: 11px;"></i>
+                        <span style="font-size: 10.5px; font-weight: 800; color: #9f1239; text-transform: uppercase; letter-spacing: 0.4px;">Catatan Reject Verifikator</span>
+                    </div>
+                    <div id="rejectNoteText1" style="font-size: 11.5px; line-height: 1.45; color: #881337; font-weight: 500;">
+                        <!-- Diisi via JS -->
+                    </div>
                 </div>
 
                 <!-- 1. Jumlah Peralatan Normal -->
@@ -1496,10 +1514,19 @@
     </div>
 
     <script>
-        // Read URL section param
+        // Read URL params
         const urlParams = new URLSearchParams(window.location.search);
         const sectionParam = urlParams.get('section') || 'Column Section';
-        document.getElementById('pageSectionSubtitle').textContent = sectionParam;
+        const orderIdParam = urlParams.get('id') || 'RTR20250000001';
+        const isKarantinaUlang = urlParams.get('mode') === 'karantina_ulang' || orderIdParam === 'RTR20250000004' || orderIdParam.includes('004');
+
+        document.getElementById('pageSectionSubtitle').textContent = `${sectionParam} • ${orderIdParam}`;
+
+        const backLink = document.querySelector('.header-left .back-btn');
+        if (backLink) {
+            const modeParam = isKarantinaUlang ? '&mode=karantina_ulang' : '';
+            backLink.setAttribute('onclick', `navigateSmooth('./karantina-action.html?id=${encodeURIComponent(orderIdParam)}${modeParam}', event)`);
+        }
 
         const photoStore = {};
 
@@ -1507,6 +1534,9 @@
             const inputs = document.querySelectorAll('.stock-calc-field');
             let total = 0;
             inputs.forEach(input => {
+                if (input.closest('.item-group-container') && input.closest('.item-group-container').style.display === 'none') {
+                    return;
+                }
                 const val = parseInt(input.value, 10);
                 if (!isNaN(val) && val > 0) {
                     total += val;
@@ -1518,6 +1548,55 @@
         function updateCharCounter(textarea, counterId) {
             const count = textarea.value.length;
             document.getElementById(counterId).textContent = `${count}/200`;
+        }
+
+        // If karantina ulang, show chip & pre-fill quantities & show reject note
+        if (isKarantinaUlang) {
+            const chip = document.getElementById('chipKarantinaUlang1');
+            if (chip) chip.style.display = 'inline-flex';
+
+            const noteCard = document.getElementById('rejectNoteCard1');
+            const noteText = document.getElementById('rejectNoteText1');
+            if (noteCard) noteCard.style.display = 'block';
+
+            // Sembunyikan komponen lain yang tidak perlu karantina ulang
+            const allGroups = document.querySelectorAll('.item-group-container');
+            allGroups.forEach((group, index) => {
+                if (index > 0) group.style.display = 'none';
+            });
+
+            if (sectionParam === 'Column Section') {
+                if (noteText) noteText.textContent = '"Foto 14 baut bengkok/karat blur. Harap foto ulang fisik material dan pastikan apakah masih bisa di-retorque/repair."';
+
+                const inputs = document.querySelectorAll('.stock-calc-field');
+                if (inputs.length >= 3) {
+                    inputs[0].value = '186'; // Normal
+                    inputs[1].value = '0';   // Tidak ada
+                    inputs[2].value = '14';  // Rusak (14 pcs Bolt Assembly)
+                }
+                const textarea = document.querySelector('.sheet-textarea');
+                if (textarea) {
+                    textarea.value = 'Ditemukan ulir aus pada 14 pcs baut sambungan M16x65.';
+                    const counter = document.getElementById('counterPlate');
+                    if (counter) counter.textContent = `${textarea.value.length}/200`;
+                }
+            } else if (sectionParam === 'Foundation Section') {
+                if (noteText) noteText.textContent = '"Terdapat selisih 2 unit dari data pembongkaran. Cari di rak transit gudang sebelum di-submit kembali ke Asman."';
+
+                const inputs = document.querySelectorAll('.stock-calc-field');
+                if (inputs.length >= 3) {
+                    inputs[0].value = '10'; // Normal
+                    inputs[1].value = '2';  // Selisih 2 unit Base Pivot
+                    inputs[2].value = '0';  // Rusak
+                }
+                const textarea = document.querySelector('.sheet-textarea');
+                if (textarea) {
+                    textarea.value = 'Selisih 2 unit Base Pivot belum ditemukan di peti kontainer.';
+                    const counter = document.getElementById('counterPlate');
+                    if (counter) counter.textContent = `${textarea.value.length}/200`;
+                }
+            }
+            calculateTotalStock();
         }
 
         function openEvidenceModal(itemTitle, targetCounterId) {
@@ -1580,7 +1659,8 @@
 
         function handleSimpanPengecekan() {
             alert('Hasil pengecekan check sheet berhasil disimpan!');
-            navigateSmooth('./karantina-action.html?checked=true&section=' + encodeURIComponent(sectionParam));
+            const modeParam = isKarantinaUlang ? '&mode=karantina_ulang' : '';
+            navigateSmooth('./karantina-action.html?checked=true&section=' + encodeURIComponent(sectionParam) + '&id=' + encodeURIComponent(orderIdParam) + modeParam);
         }
 
         function navigateSmooth(url, event) {

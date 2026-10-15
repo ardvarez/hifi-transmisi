@@ -415,6 +415,12 @@
             border: 1px solid #fde68a;
         }
 
+        .badge-ditolak {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecdd3;
+        }
+
         /* 2-Column Meta Grid */
         .meta-grid-2col {
             display: grid;
@@ -897,7 +903,7 @@
                 <div class="quick-filter-scroll-wrapper">
                     <div class="filter-scroll-row">
                         <button type="button" class="quick-filter-pill active" onclick="setChipFilter('all', this)">
-                            <i class="fa-solid fa-layer-group"></i> Semua (3)
+                            <i class="fa-solid fa-layer-group"></i> Semua (4)
                         </button>
                         <button type="button" class="quick-filter-pill" onclick="setChipFilter('mulai', this)">
                             Siap Dikirim (1)
@@ -907,6 +913,9 @@
                         </button>
                         <button type="button" class="quick-filter-pill" onclick="setChipFilter('karantina', this)">
                             Sedang Dikarantina (1)
+                        </button>
+                        <button type="button" class="quick-filter-pill" onclick="setChipFilter('ditolak', this)">
+                            Ditolak (1)
                         </button>
                     </div>
                 </div>
@@ -1094,6 +1103,68 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Card 4: RTR20250000004 (Status: Ditolak / Karantina Ulang) -->
+            <div class="retur-card" id="card_RTR004" data-status="ditolak" data-code="RTR20250000004" onclick="handleCardClick(event, 'RTR20250000004', 'Ditolak', 'SUTT 150kV Mandirancan')">
+                <div class="card-header-row">
+                    <div class="permit-code-box">
+                        <div class="permit-icon-bubble" style="background: #fef2f2; color: #dc2626;">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </div>
+                        <div class="permit-code-text">
+                            <h3>RTR20250000004</h3>
+                            <p>Ex-Bongkar SUTT Mandirancan</p>
+                        </div>
+                    </div>
+                    <span class="status-badge badge-ditolak">
+                        <i class="fa-solid fa-circle-xmark"></i> Ditolak
+                    </span>
+                </div>
+
+                <div class="meta-grid-2col">
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-regular fa-calendar-check"></i> Waktu Tiba</span>
+                        <span class="meta-pill-value">29 Okt 2025</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-clock-rotate-left"></i> Status Verifikasi</span>
+                        <span class="meta-pill-value" style="color: #dc2626; font-weight: 800;">Karantina Ulang</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-cubes-stacked"></i> Jumlah TE</span>
+                        <span class="meta-pill-value">2 Set Tower</span>
+                    </div>
+                    <div class="meta-pill-cell">
+                        <span class="meta-pill-label"><i class="fa-solid fa-tag"></i> Merk ERS</span>
+                        <span class="meta-pill-value">Tower Solution</span>
+                    </div>
+                </div>
+
+                <!-- Wadah Catatan Verifikator Asman -->
+                <div class="card-error-container" style="background: #fffbeb; border: 1px solid #fde68a;" onclick="event.stopPropagation(); openDetailModal('RTR20250000004', 'Ditolak', 'SUTT 150kV Mandirancan')">
+                    <div class="card-error-left">
+                        <div class="card-error-icon" style="background: #fef3c7; color: #d97706;">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="card-error-text-box">
+                            <div class="card-error-title" style="color: #92400e;">Catatan Verifikator Asman</div>
+                            <div class="card-error-sub" style="color: #b45309;">2 Komponen Ditolak: Selisih 2 unit Base Pivot & foto cacat baut blur.</div>
+                        </div>
+                    </div>
+                    <span class="card-error-badge" style="background: #fee2e2; color: #b91c1c;">
+                        <i class="fa-solid fa-rotate-left"></i> Revisi
+                    </span>
+                </div>
+
+                <div class="card-actions-row">
+                    <button type="button" class="btn-action-outline" onclick="event.stopPropagation(); openDetailModal('RTR20250000004', 'Ditolak', 'SUTT 150kV Mandirancan')">
+                        <i class="fa-regular fa-eye"></i> Lihat Detail
+                    </button>
+                    <a href="karantina-action.html?id=RTR20250000004&mode=karantina_ulang" class="btn-action-solid" style="background: #dc2626;" onclick="event.stopPropagation()">
+                        <i class="fa-solid fa-pen-to-square"></i> Revisi Karantina
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Drawer Modal: Keberangkatan (Waktu Pengiriman Dimulai) -->
@@ -1182,6 +1253,23 @@
                         <span class="meta-pill-value">45 Item (3 Section)</span>
                     </div>
                 </div>
+
+                <div id="detailRejectNoteBox" style="display: none; background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 10px 12px; margin-bottom: 14px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #b45309; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Catatan Verifikator Asman (Ditolak)
+                    </div>
+                    <div style="font-size: 11.5px; color: #78350f; line-height: 1.4;">
+                        "Terdapat selisih 2 unit Base Pivot & foto kerusakan baut blur. Lakukan verifikasi fisik ulang di gudang transit."
+                    </div>
+                </div>
+
+                <a href="karantina-action.html?id=RTR20250000004&mode=karantina_ulang" id="btnDetailBukaKarantinaUlang" class="btn-action-solid" style="display: none; width: 100%; height: 42px; margin-bottom: 8px; background: #dc2626; text-decoration: none;">
+                    <i class="fa-solid fa-pen-to-square"></i> Buka Proses Karantina Ulang
+                </a>
+
+                <a href="#" id="btnDetailBukaAksi" class="btn-action-solid" style="width: 100%; height: 42px; margin-bottom: 8px; text-decoration: none;" onclick="handleDetailOpenAksi(event)">
+                    <i class="fa-solid fa-clipboard-check"></i> Buka Halaman Karantina
+                </a>
 
                 <button type="button" class="btn-action-outline" style="width: 100%; height: 42px; margin-bottom: 8px; border-color: #fecdd3; color: #be123c; background: #fff1f2;" onclick="openErrorLogFromDetail()">
                     <i class="fa-solid fa-triangle-exclamation"></i> Buka Log Error BE / Mobile Hit
@@ -1483,6 +1571,8 @@
             // If user clicked directly on the card surface
             if (status === 'karantina' || status === 'Sedang Dikarantina') {
                 window.location.href = `karantina-action.html?id=${encodeURIComponent(code)}`;
+            } else if (status === 'ditolak' || status === 'Ditolak' || code === 'RTR20250000004') {
+                window.location.href = `karantina-action.html?id=${encodeURIComponent(code)}&mode=karantina_ulang`;
             } else {
                 openDetailModal(code, status, site);
             }
@@ -1496,7 +1586,32 @@
                 const siteEl = document.getElementById('detailModalSite');
                 if (siteEl) siteEl.textContent = site;
             }
+
+            const rejectBox = document.getElementById('detailRejectNoteBox');
+            const rejectBtn = document.getElementById('btnDetailBukaKarantinaUlang');
+            const normalBtn = document.getElementById('btnDetailBukaAksi');
+
+            if (code === 'RTR20250000004' || status === 'Ditolak') {
+                if (rejectBox) rejectBox.style.display = 'block';
+                if (rejectBtn) rejectBtn.style.display = 'flex';
+                if (normalBtn) normalBtn.style.display = 'none';
+            } else {
+                if (rejectBox) rejectBox.style.display = 'none';
+                if (rejectBtn) rejectBtn.style.display = 'none';
+                if (normalBtn) normalBtn.style.display = 'flex';
+            }
+
             document.getElementById('detailModal').classList.add('active');
+        }
+
+        function handleDetailOpenAksi(event) {
+            if (event) event.preventDefault();
+            closeDrawerDirect('detailModal');
+            if (activeDetailCode === 'RTR20250000004') {
+                window.location.href = `karantina-action.html?id=${encodeURIComponent(activeDetailCode)}&mode=karantina_ulang`;
+            } else {
+                window.location.href = `list-karantina.html?id=${encodeURIComponent(activeDetailCode)}`;
+            }
         }
 
         function toggleFilterDrawer(open) {

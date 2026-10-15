@@ -497,6 +497,51 @@
             white-space: normal;
             word-break: break-word;
         }
+
+        /* Verifikator Alert Banner (Karantina Ulang) */
+        .verifikator-alert-banner {
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .verifikator-alert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .verifikator-alert-tag {
+            background: #fef3c7;
+            color: #b45309;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .verifikator-alert-text {
+            font-size: 11.5px;
+            color: #92400e;
+            line-height: 1.45;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 10px;
+            border-radius: 8px;
+            border-left: 2px solid #f59e0b;
+            margin-top: 6px;
+        }
     </style>
 </head>
 
@@ -534,6 +579,9 @@
                     <p id="pageSectionSubtitle">Column Section</p>
                 </div>
             </div>
+            <span class="verifikator-alert-tag" id="sheetModeTag" style="display: none; background: #fee2e2; color: #b91c1c;">
+                <i class="fa-solid fa-rotate-left"></i> Revisi
+            </span>
         </div>
 
         <!-- Content Body -->
@@ -544,8 +592,24 @@
                     <div class="group-header-title">
                         <i class="fa-solid fa-cube"></i>
                         <h2>Plate Column & Mast Modul</h2>
+                        <span class="chip-karantina-ulang" id="chipKarantinaUlang" style="display: none; font-size: 10px; font-weight: 700; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 2px 8px; border-radius: 6px; white-space: nowrap; align-items: center; gap: 4px;">
+                            <i class="fa-solid fa-arrows-rotate" style="font-size: 9px;"></i> Karantina Ulang
+                        </span>
                     </div>
-                    <span class="group-subtitle-pill">15 Aksesoris</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="group-subtitle-pill">15 Aksesoris</span>
+                    </div>
+                </div>
+
+                <!-- Catatan Reject Verifikator (Untuk Gambaran Perbaikan) -->
+                <div id="rejectNoteCardV2" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; border-left: 4px solid #e11d48; border-radius: 12px; padding: 11px 13px;">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #e11d48; font-size: 11px;"></i>
+                        <span style="font-size: 10.5px; font-weight: 800; color: #9f1239; text-transform: uppercase; letter-spacing: 0.4px;">Catatan Reject Verifikator</span>
+                    </div>
+                    <div id="rejectNoteTextV2" style="font-size: 11.5px; line-height: 1.45; color: #881337; font-weight: 500;">
+                        <!-- Diisi via JS -->
+                    </div>
                 </div>
 
                 <!-- 1. Normal -->
@@ -724,13 +788,13 @@
     </div>
 
     <script>
-        // Read URL section param
         const urlParams = new URLSearchParams(window.location.search);
         const sectionParam = urlParams.get('section') || 'Column Section';
-        const orderIdParam = urlParams.get('id') || 'QRN20250000001';
-        document.getElementById('pageSectionSubtitle').textContent = sectionParam;
+        const isModeUlang = urlParams.get('mode') === 'karantina_ulang';
+        const orderIdParam = urlParams.get('id') || (isModeUlang ? 'RTR20250000004' : 'RTR20250000001');
+        document.getElementById('pageSectionSubtitle').textContent = `${sectionParam} • ${orderIdParam}`;
         const modalSection = document.getElementById('modalSavedSection');
-        if (modalSection) modalSection.textContent = sectionParam;
+        if (modalSection) modalSection.textContent = `${sectionParam} (${orderIdParam})`;
 
         let currentPhotoCounterId = null;
         let toastTimeout = null;
@@ -767,6 +831,9 @@
             const inputs = document.querySelectorAll('.stock-calc-field');
             let total = 0;
             inputs.forEach(input => {
+                if (input.closest('.item-group-container') && input.closest('.item-group-container').style.display === 'none') {
+                    return;
+                }
                 const val = parseInt(input.value, 10);
                 if (!isNaN(val) && val > 0) {
                     total += val;
@@ -815,8 +882,64 @@
             showToast('Pemeriksaan Disimpan', `Pemeriksaan ${sectionParam} berhasil dicatat.`, 'success');
         }
 
+        const modeParam = urlParams.get('mode');
+        const isKarantinaUlang = modeParam === 'karantina_ulang';
+
+        if (isKarantinaUlang) {
+            const chip = document.getElementById('chipKarantinaUlang');
+            const modeTag = document.getElementById('sheetModeTag');
+            const noteCard = document.getElementById('rejectNoteCardV2');
+            const noteText = document.getElementById('rejectNoteTextV2');
+
+            if (chip) chip.style.display = 'inline-flex';
+            if (modeTag) modeTag.style.display = 'inline-flex';
+            if (noteCard) noteCard.style.display = 'block';
+
+            // Sembunyikan komponen lain yang tidak perlu karantina ulang
+            const allGroups = document.querySelectorAll('.item-group-container');
+            allGroups.forEach((group, index) => {
+                if (index > 0) group.style.display = 'none';
+            });
+
+            if (sectionParam === 'Column Section') {
+                if (noteText) noteText.textContent = '"Foto 14 baut bengkok/karat blur. Harap foto ulang fisik material dan pastikan apakah masih bisa di-retorque/repair."';
+
+                const inputs = document.querySelectorAll('.stock-calc-field');
+                if (inputs.length >= 3) {
+                    inputs[0].value = 100; // Normal
+                    inputs[1].value = 0;   // Hilang/Tidak Tersedia
+                    inputs[2].value = 14;  // Rusak (14 pcs)
+                }
+                const photoBtns = document.querySelectorAll('.photo-counter-btn');
+                if (photoBtns.length >= 3) {
+                    photoBtns[2].textContent = '2 Foto';
+                    photoBtns[2].classList.add('has-photo');
+                }
+                const textareas = document.querySelectorAll('.sheet-textarea');
+                if (textareas.length > 0) {
+                    textareas[0].value = '14 baut ulir tengah aus & terdeformasi ~2mm. Foto fisik resolusi tinggi telah diperbarui.';
+                    updateCharCounter(textareas[0], 'counterPlate');
+                }
+            } else if (sectionParam === 'Foundation Section') {
+                if (noteText) noteText.textContent = '"Terdapat selisih 2 unit dari data pembongkaran. Cari di rak transit gudang sebelum di-submit kembali ke Asman."';
+
+                const inputs = document.querySelectorAll('.stock-calc-field');
+                if (inputs.length >= 3) {
+                    inputs[0].value = 13; // Normal
+                    inputs[1].value = 2;  // Hilang/Selisih
+                    inputs[2].value = 0;  // Rusak
+                }
+                const textareas = document.querySelectorAll('.sheet-textarea');
+                if (textareas.length > 0) {
+                    textareas[0].value = '2 unit Base Pivot masih dalam penelusuran di rak transit bongkaran gudang.';
+                    updateCharCounter(textareas[0], 'counterPlate');
+                }
+            }
+        }
+
         function redirectToKarantinaAction() {
-            window.location.href = `karantina-action.html?id=${encodeURIComponent(orderIdParam)}&checked=true&section=${encodeURIComponent(sectionParam)}`;
+            const modeQuery = isKarantinaUlang ? '&mode=karantina_ulang' : '';
+            window.location.href = `karantina-action.html?id=${encodeURIComponent(orderIdParam)}&checked=true&section=${encodeURIComponent(sectionParam)}${modeQuery}`;
         }
 
         function closeDrawer(e, id) {
