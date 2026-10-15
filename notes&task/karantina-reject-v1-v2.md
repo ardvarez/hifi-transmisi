@@ -107,3 +107,9 @@ Fitur simulasi penanganan **Data Reject (Karantina Ulang)** diimplementasikan se
 - **V2 ([ers-v2/karantina-action.html](file:///c:/KERJAAN/Project/hifi-transmisi/hifi-mobile/ers-v2/Karantina%20&%20Pengembalian/karantina-action.html))**:
   - Sengaja **dibiarkan dan dipertahankan** sebagai versi enhancement modern untuk memperlihatkan gap kemajuan UI/UX.
   - Memiliki icon box per-seksi, subtitle item rincian, status badge pill, serta `komponen-ulang-box` terintegrasi langsung di dalam kartu (menampilkan nama komponen reject, catatan verifikator inline, dan breakdown kuantitas Normal/Rusak/Tidak Tersedia).
+
+### 5. Aturan Penomoran Permit & Kode Kerja Mobile
+- **Nomor Permit adalah Sekaligus Kode Kerja Mobile**:
+  - Pemasangan: `INST202500091` berfungsi ganda sebagai Nomor Permit Pemasangan dan Kode Pekerjaan Lapangan.
+  - Pembongkaran: `DIS20250012` berfungsi ganda sebagai Nomor Permit Pembongkaran dan Kode Pekerjaan Lapangan.
+  - Karantina: `RTR202501100000` / `RTR20250000001` berfungsi sebagai Nomor Permohonan / Permit Karantina.
