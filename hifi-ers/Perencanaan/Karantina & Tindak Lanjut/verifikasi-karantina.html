@@ -647,7 +647,7 @@ tbody td {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   margin-bottom: 24px;
-  overflow: hidden;
+  position: relative;
 }
 
 .section-header {
@@ -659,6 +659,8 @@ tbody td {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
 }
 
 .section-title {
@@ -748,17 +750,21 @@ tbody td {
   border-color: var(--pln-blue);
 }
 
-/* BOTTOM ACTION BAR */
+/* BOTTOM ACTION BAR (STICKY FOOTER) */
 .bottom-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 60;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 24px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  margin-top: 24px;
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.08);
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -793,6 +799,18 @@ tbody td {
   background: var(--danger-light);
 }
 
+.btn-reject:disabled,
+.btn-reject[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #94A3B8;
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-approve {
   padding: 10px 28px;
   border-radius: var(--radius-sm);
@@ -810,6 +828,21 @@ tbody td {
   background: var(--pln-blue-mid);
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(10, 88, 202, 0.35);
+}
+
+.btn-approve:disabled,
+.btn-approve[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: #94A3B8;
+  border-color: #94A3B8;
+  box-shadow: none;
+  transform: none;
+}
+
+tr.row-selected {
+  background-color: #F0F9FF !important;
 }
 
 /* ================= MODALS ================= */
@@ -1476,14 +1509,17 @@ tbody td {
             <span style="font-size: 12px; color: var(--text-secondary);">Total 14 Komponen Diperiksa</span>
           </div>
 
-          <!-- TABLE AKSESORIS HASIL KARANTINA -->
+          <!-- TABLE KOMPONEN HASIL KARANTINA -->
           <div class="table-wrapper">
             <table class="inner-table">
               <thead>
                 <tr>
+                  <th style="width: 38px; text-align: center;">
+                    <input type="checkbox" id="checkAllKomponen" title="Pilih Semua Komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="toggleSelectAllKomponen(this)">
+                  </th>
                   <th style="width: 36px;">No</th>
                   <th>Kode Material</th>
-                  <th style="text-align: left;">Aksesoris</th>
+                  <th style="text-align: left;">Komponen</th>
                   <th>Merk</th>
                   <th>Stock Operasi</th>
                   <th>Stock Standby</th>
@@ -1497,6 +1533,9 @@ tbody td {
               </thead>
               <tbody>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">1</td>
                   <td><code>BB 2 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Bolt Assembly M20 x 240 (with 1 nut. 2 flat washers)</td>
@@ -1516,6 +1555,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">2</td>
                   <td><code>BB 3 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Bolt Assembly for Baseplate M16x65</td>
@@ -1535,6 +1577,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">3</td>
                   <td><code>BB 4 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Bolt Assembly M16x65 class 8.8 ZC (For Insulator)</td>
@@ -1554,6 +1599,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">4</td>
                   <td><code>BB 5 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Bolt Assembly M20x80 class 8.8 ZC</td>
@@ -1573,6 +1621,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">5</td>
                   <td><code>BB 6 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Bolt Assembly for OHGW mount M20x150</td>
@@ -1592,6 +1643,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">6</td>
                   <td><code>AA 3 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Tower Section 460x460x2580 mm</td>
@@ -1611,6 +1665,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">7</td>
                   <td><code>AA 4 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Backup plate for Universal Attachment 254x292x12.7 mm</td>
@@ -1630,6 +1687,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">8</td>
                   <td><code>AA 5 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Universal Attachment for Guy Wires/Insulators/Anchors</td>
@@ -1649,6 +1709,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">9</td>
                   <td><code>BB 7 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Sky Arm Device</td>
@@ -1668,6 +1731,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">10</td>
                   <td><code>AA 7 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Line Post Insulator</td>
@@ -1687,6 +1753,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">11</td>
                   <td><code>AA 8 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Suspension Insulator</td>
@@ -1706,6 +1775,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">12</td>
                   <td><code>AA 9 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Grading Ring (Post Insulator)</td>
@@ -1725,6 +1797,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">13</td>
                   <td><code>AA 10 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Grading Ring (Suspension Insulator)</td>
@@ -1744,6 +1819,9 @@ tbody td {
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="check-item-komponen" style="cursor: pointer; width: 15px; height: 15px; accent-color: var(--pln-blue);" onchange="handleRowCheckChange(this)">
+                  </td>
                   <td style="text-align: center;">14</td>
                   <td><code>AA 11 TS</code></td>
                   <td style="text-align: left; font-weight: 500;">Base Pivot for line post insulator</td>
@@ -1765,21 +1843,22 @@ tbody td {
               </tbody>
             </table>
           </div>
-        </div>
 
-        <!-- ACTION FOOTER BAR -->
-        <div class="bottom-bar">
-          <div class="bottom-info">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            Persetujuan akan merubah status stok inventory dan mentrigger pengembalian mutasi.
-          </div>
-          <div class="bottom-buttons">
-            <button class="btn-reject" onclick="openRejectModal()">
-              Tolak (Reject)
-            </button>
-            <button class="btn-approve" onclick="openApproveModal()">
-              Setujui (Approve)
-            </button>
+          <!-- ACTION FOOTER BAR (FOOTER TABEL HASIL KARANTINA) -->
+          <div class="bottom-bar">
+            <div class="bottom-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span>Persetujuan akan merubah status stok inventory dan mentrigger pengembalian mutasi.</span>
+              <span id="selectedCountText" style="margin-left: 10px; font-weight: 600; color: var(--pln-blue); background: #EFF6FF; padding: 2px 8px; border-radius: 4px; font-size: 11.5px;">0 komponen dipilih</span>
+            </div>
+            <div class="bottom-buttons">
+              <button class="btn-reject" id="btnRejectAction" onclick="openRejectModal()" disabled title="Ceklis minimal 1 baris komponen untuk menolak">
+                Tolak (Reject)
+              </button>
+              <button class="btn-approve" id="btnApproveAction" onclick="openApproveModal()" disabled title="Ceklis minimal 1 baris komponen untuk menyetujui">
+                Setujui (Approve)
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1797,7 +1876,7 @@ tbody td {
             Evidence Pemeriksaan Fisik Komponen
           </div>
           <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;" id="evidenceSubtitle">
-            Aksesoris: Plate Column | Kode: BB 1 TS | Merk: Tower Solution
+            Komponen: Plate Column | Kode: BB 1 TS | Merk: Tower Solution
           </div>
         </div>
         <button class="modal-close" onclick="closeModal('evidenceModal')">&times;</button>
@@ -2011,7 +2090,7 @@ tbody td {
       </div>
       <div class="modal-body">
         <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">
-          Apakah Anda yakin ingin menyetujui hasil verifikasi karantina material ini?
+          Apakah Anda yakin ingin menyetujui hasil verifikasi karantina material ini (<span id="modalApproveCount" style="color:var(--pln-blue); font-weight:700;">0</span> komponen terpilih)?
         </p>
         <p style="font-size: 12.5px; color: var(--text-secondary);">
           Setelah disetujui, sistem akan otomatis:
@@ -2040,9 +2119,20 @@ tbody td {
         <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">
-          Apakah Anda yakin ingin menolak data verifikasi karantina ini?
+        <p style="margin-bottom: 10px; font-weight: 600; color: var(--text-primary);">
+          Apakah Anda yakin ingin menolak data verifikasi karantina ini (<span id="modalRejectCount" style="color:var(--danger); font-weight:700;">0</span> komponen terpilih)?
         </p>
+
+        <!-- LIST KOMPONEN YANG DIREJECT -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+            Daftar Komponen yang Ditolak:
+          </div>
+          <div id="rejectItemsList" style="max-height: 140px; overflow-y: auto; background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
         <div style="margin-bottom: 8px;">
           <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
             Masukan Keterangan Reject <span style="color:var(--danger);">*</span>
@@ -2077,6 +2167,7 @@ tbody td {
       <li><strong>Role Verifikator:</strong> Dilakukan oleh Asman Konstruksi UPT peminjam atau user perencanaan.</li>
       <li><strong>Approval Per-Gudang:</strong> Approval dilakukan per gudang walaupun terdapat lebih dari 1 gudang pada pengajuan agar pengecekannya mendetail.</li>
       <li><strong>Nomor Kembar:</strong> Memungkinkan dalam approval ada 2 nomor yang sama jika lokasinya berbeda gudang.</li>
+      <li><strong>Ceklis Komponen:</strong> Verifikator perlu memilih/menceklis baris komponen yang diverifikasi sebelum tombol Setujui (Approve) atau Tolak (Reject) aktif.</li>
       <li><strong>Dampak Sistem:</strong> Jika disetujui (Approve), status stok pada Inventory otomatis terupdate dan mentrigger proses pengembalian mutasi.</li>
       <li><strong>Penolakan (Reject):</strong> Wajib mencantumkan alasan penolakan untuk diteruskan kembali ke Pelaksana PDKB.</li>
     </ul>
@@ -2199,11 +2290,73 @@ tbody td {
         document.getElementById('badgeStatusPermit').style.color = '#92400E';
       }
 
+      resetKomponenCheckboxes();
       switchView('detail');
     }
 
+    function toggleSelectAllKomponen(masterCb) {
+      const checkboxes = document.querySelectorAll('.check-item-komponen');
+      checkboxes.forEach(cb => {
+        cb.checked = masterCb.checked;
+        const row = cb.closest('tr');
+        if (cb.checked) {
+          row.classList.add('row-selected');
+        } else {
+          row.classList.remove('row-selected');
+        }
+      });
+      updateSelectionState();
+    }
+
+    function handleRowCheckChange(cb) {
+      const row = cb.closest('tr');
+      if (cb.checked) {
+        row.classList.add('row-selected');
+      } else {
+        row.classList.remove('row-selected');
+      }
+      updateSelectionState();
+    }
+
+    function updateSelectionState() {
+      const allCbs = document.querySelectorAll('.check-item-komponen');
+      const checkedCbs = document.querySelectorAll('.check-item-komponen:checked');
+      const total = allCbs.length;
+      const count = checkedCbs.length;
+
+      const checkAll = document.getElementById('checkAllKomponen');
+      if (checkAll) {
+        checkAll.checked = (total > 0 && count === total);
+        checkAll.indeterminate = (count > 0 && count < total);
+      }
+
+      const countText = document.getElementById('selectedCountText');
+      if (countText) {
+        countText.innerText = `${count} komponen dipilih`;
+      }
+
+      const btnReject = document.getElementById('btnRejectAction');
+      const btnApprove = document.getElementById('btnApproveAction');
+      if (btnReject) btnReject.disabled = (count === 0);
+      if (btnApprove) btnApprove.disabled = (count === 0);
+    }
+
+    function resetKomponenCheckboxes() {
+      const checkAll = document.getElementById('checkAllKomponen');
+      if (checkAll) {
+        checkAll.checked = false;
+        checkAll.indeterminate = false;
+      }
+      document.querySelectorAll('.check-item-komponen').forEach(cb => {
+        cb.checked = false;
+        const row = cb.closest('tr');
+        if (row) row.classList.remove('row-selected');
+      });
+      updateSelectionState();
+    }
+
     function openEvidenceModal(nama, kode, merk, standby, rusak, hilang) {
-      document.getElementById('evidenceSubtitle').innerText = `Aksesoris: ${nama} | Kode Material: ${kode} | Merk: ${merk}`;
+      document.getElementById('evidenceSubtitle').innerText = `Komponen: ${nama} | Kode Material: ${kode} | Merk: ${merk}`;
       document.getElementById('evStandbyCount').innerText = standby;
       document.getElementById('evRusakCount').innerText = rusak;
       document.getElementById('evHilangCount').innerText = hilang;
@@ -2224,10 +2377,44 @@ tbody td {
     }
 
     function openApproveModal() {
+      const count = document.querySelectorAll('.check-item-komponen:checked').length;
+      if (count === 0) {
+        showToast('Pilih minimal satu baris komponen terlebih dahulu!', 'danger');
+        return;
+      }
+      document.getElementById('modalApproveCount').innerText = count;
       document.getElementById('approveModal').classList.add('active');
     }
 
     function openRejectModal() {
+      const checkedCbs = document.querySelectorAll('.check-item-komponen:checked');
+      if (checkedCbs.length === 0) {
+        showToast('Pilih minimal satu baris komponen terlebih dahulu!', 'danger');
+        return;
+      }
+      document.getElementById('modalRejectCount').innerText = checkedCbs.length;
+
+      const listEl = document.getElementById('rejectItemsList');
+      if (listEl) {
+        listEl.innerHTML = '';
+        checkedCbs.forEach((cb, idx) => {
+          const row = cb.closest('tr');
+          const kode = row.querySelector('code')?.innerText.trim() || '';
+          const nama = row.cells[3]?.innerText.trim() || '';
+
+          const itemEl = document.createElement('div');
+          itemEl.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; font-size: 12px;' + (idx < checkedCbs.length - 1 ? ' border-bottom: 1px dashed #FECACA;' : '');
+          itemEl.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <span style="font-weight: 700; color: #DC2626; min-width: 16px;">${idx + 1}.</span>
+              <span style="font-weight: 500; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis;" title="${nama}">${nama}</span>
+            </div>
+            <code style="background: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-size: 11px; white-space: nowrap; font-weight: 600;">${kode}</code>
+          `;
+          listEl.appendChild(itemEl);
+        });
+      }
+
       document.getElementById('rejectReason').value = '';
       document.getElementById('rejectError').style.display = 'none';
       document.getElementById('rejectModal').classList.add('active');
