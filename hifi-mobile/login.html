@@ -830,6 +830,105 @@
             gap: 6px;
         }
 
+        .btn-modal-submit:disabled,
+        .btn-modal-submit.btn-disabled {
+            background: #94a3b8 !important;
+            color: #f1f5f9 !important;
+            cursor: not-allowed !important;
+            opacity: 0.85;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        /* Anti-Spam Cooldown Timer Styling */
+        .timer-mini-pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1.5px 6px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #1d6fdc;
+            border: 1px solid #bfdbfe;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-left: 3px;
+            vertical-align: middle;
+        }
+
+        .timer-mini-pill.pin-pill {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+
+        .cooldown-active-banner {
+            display: none;
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 9px 12px;
+            margin-top: 10px;
+            font-size: 11.5px;
+            color: #1e40af;
+            line-height: 1.45;
+        }
+
+        .cooldown-active-banner.active {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .cooldown-active-banner.pin-theme {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .cooldown-success-card {
+            background: #f8fafc;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: #475569;
+        }
+
+        .btn-resend-outline {
+            width: 100%;
+            height: 42px;
+            border-radius: 10px;
+            border: 1.5px solid #1d6fdc;
+            background: #ffffff;
+            color: #1d6fdc;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-resend-outline:hover:not(:disabled) {
+            background: #eff6ff;
+        }
+
+        .btn-resend-outline:disabled {
+            border-color: #cbd5e1;
+            color: #94a3b8;
+            background: #f8fafc;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
         /* Floating Notes Button (Compliance with hifi-only rules) */
         .notes-fab {
             position: fixed;
@@ -1012,9 +1111,13 @@
 
                 <!-- Lupa Password & Lupa PIN Links (User Requirement) -->
                 <div class="forgot-options-row">
-                    <a href="javascript:void(0)" class="forgot-link-btn" onclick="openForgotModal('password')">Lupa Password?</a>
+                    <a href="javascript:void(0)" class="forgot-link-btn" id="linkForgotPwd" onclick="openForgotModal('password')">
+                        Lupa Password? <span class="timer-mini-pill" id="pillForgotPwd" style="display: none;"><i class="fa-solid fa-clock"></i> <span id="pillSecPwd">60s</span></span>
+                    </a>
                     <span class="forgot-divider-dot"></span>
-                    <a href="javascript:void(0)" class="forgot-link-btn" onclick="openForgotModal('pin')">Lupa PIN?</a>
+                    <a href="javascript:void(0)" class="forgot-link-btn" id="linkForgotPin" onclick="openForgotModal('pin')">
+                        Lupa PIN? <span class="timer-mini-pill pin-pill" id="pillForgotPin" style="display: none;"><i class="fa-solid fa-clock"></i> <span id="pillSecPin">60s</span></span>
+                    </a>
                 </div>
 
                 <!-- Sign In Button -->
@@ -1104,6 +1207,15 @@
                         </div>
                     </div>
 
+                    <!-- Cooldown Active Anti-Spam Banner in Form -->
+                    <div class="cooldown-active-banner" id="formCooldownBanner">
+                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 15px; flex-shrink: 0; margin-top: 2px;"></i>
+                        <div>
+                            <strong id="formCooldownTitle">Cooldown Anti-Spam Aktif</strong>
+                            <div id="formCooldownMsg">Permintaan baru saja dikirim. Harap tunggu <strong id="formCooldownSec">60 detik</strong> sebelum mengirim ulang.</div>
+                        </div>
+                    </div>
+
                     <div class="modal-actions">
                         <button type="button" class="btn-modal-cancel" onclick="closeForgotModal()">Batal</button>
                         <button type="button" class="btn-modal-submit" onclick="submitForgotRequest()" id="btnSubmitForgot">
@@ -1130,9 +1242,23 @@
                             <span id="mobileTargetEmail">user@pln.co.id</span>
                         </div>
                     </div>
-                    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 18px; line-height: 1.35;">
+                    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 14px; line-height: 1.35;">
                         Silakan periksa folder <strong>Kotak Masuk (Inbox)</strong> atau folder <strong>Spam</strong> email Anda.
                     </p>
+
+                    <!-- Cooldown Anti-Spam Card & Resend Button -->
+                    <div class="cooldown-success-card" id="successCooldownCard">
+                        <span id="successCooldownBadge">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Kirim ulang tersedia dalam <strong id="successCooldownTimer">60 detik</strong>
+                        </span>
+                        <span style="font-size: 10.5px; color: #94a3b8; font-weight: 600;">Anti-Spam</span>
+                    </div>
+
+                    <button type="button" class="btn-resend-outline" id="btnResendSuccess" onclick="handleResendRequest()" disabled>
+                        <i class="fa-solid fa-rotate-right" id="resendIcon"></i>
+                        <span id="btnResendText">Kirim Ulang (60s)</span>
+                    </button>
+
                     <button type="button" class="btn-submit-signin" onclick="closeForgotModal()" style="margin-top: 0; width: 100%; height: 44px; font-size: 13.5px;">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Kembali ke Halaman Masuk</span>
@@ -1193,6 +1319,7 @@
             <li><strong>Desain V1 Power Inspect:</strong> Mengikuti layout mobile native asli dengan logo Power Inspect, math addition captcha, dan dekorasi PLN di footer.</li>
             <li><strong>Pembatasan Reset Password Akun SSO (@pln.co.id):</strong> User SSO / email <code>@pln.co.id</code> <strong>dilarang/dibatasi</strong> melakukan reset password mandiri di aplikasi karena kredensial dikelola terpusat via IAM PLN.</li>
             <li><strong>Lupa Password (Non-SSO / Mitra):</strong> Hanya akun eksternal/mitra terdaftar (contoh: <code>mitra.inspeksi@vendor.com</code>) yang dapat menerima tautan pemulihan password.</li>
+            <li><strong>Anti-Spam Cooldown Timer:</strong> Ditambahkan timer 60 detik setelah aksi reset dieksekusi. Setiap tipe (Lupa PIN & Lupa Password) memiliki timer independen masing-masing, dilengkapi countdown pada badge link, form warning banner, dan tombol kirim ulang.</li>
             <li><strong>Daftar Email Mock:</strong> <code>daniandra@pln.co.id</code> (SSO PLN), <code>mitra.inspeksi@vendor.com</code> (Mitra Terdaftar).</li>
             <li><strong>Routing:</strong> Login form & SSO diarahkan ke <code>./catalog-mobile.html</code>.</li>
         </ul>
@@ -1281,6 +1408,145 @@
             }, 800);
         }
 
+        // Anti-Spam Timer Config (60 detik per jenis aksi)
+        const FORGOT_COOLDOWN_SEC = 60;
+        const cooldownTimers = {
+            password: 0,
+            pin: 0
+        };
+        const lastSentEmail = {
+            password: '',
+            pin: ''
+        };
+
+        function getRemainingCooldown(type) {
+            const end = cooldownTimers[type] || 0;
+            return Math.max(0, Math.ceil((end - Date.now()) / 1000));
+        }
+
+        function triggerCooldown(type, email) {
+            cooldownTimers[type] = Date.now() + (FORGOT_COOLDOWN_SEC * 1000);
+            if (email) lastSentEmail[type] = email;
+            updateAllCooldownUI();
+        }
+
+        function updateAllCooldownUI() {
+            const remPwd = getRemainingCooldown('password');
+            const remPin = getRemainingCooldown('pin');
+
+            // 1. Update Mini Pills di halaman login utama
+            const pillPwd = document.getElementById('pillForgotPwd');
+            const secPwd = document.getElementById('pillSecPwd');
+            if (pillPwd && secPwd) {
+                if (remPwd > 0) {
+                    pillPwd.style.display = 'inline-flex';
+                    secPwd.textContent = remPwd + 's';
+                } else {
+                    pillPwd.style.display = 'none';
+                }
+            }
+
+            const pillPin = document.getElementById('pillForgotPin');
+            const secPin = document.getElementById('pillSecPin');
+            if (pillPin && secPin) {
+                if (remPin > 0) {
+                    pillPin.style.display = 'inline-flex';
+                    secPin.textContent = remPin + 's';
+                } else {
+                    pillPin.style.display = 'none';
+                }
+            }
+
+            // 2. Update Modal View jika modal terbuka
+            const modal = document.getElementById('forgotModal');
+            if (modal && modal.classList.contains('active')) {
+                const currentRem = getRemainingCooldown(activeForgotType);
+                const formState = document.getElementById('mobileForgotFormState');
+                const successState = document.getElementById('mobileForgotSuccessState');
+                const submitBtn = document.getElementById('btnSubmitForgot');
+                const formBanner = document.getElementById('formCooldownBanner');
+                const formSec = document.getElementById('formCooldownSec');
+                const formTitle = document.getElementById('formCooldownTitle');
+
+                const typeLabel = activeForgotType === 'password' ? 'Password' : 'PIN';
+
+                // Jika di Form Input View
+                if (formState && formState.style.display !== 'none') {
+                    if (currentRem > 0) {
+                        if (formBanner) {
+                            formBanner.className = activeForgotType === 'pin' ? 'cooldown-active-banner pin-theme active' : 'cooldown-active-banner active';
+                            if (formTitle) formTitle.textContent = `Cooldown Anti-Spam ${typeLabel} Aktif`;
+                            if (formSec) formSec.textContent = `${currentRem} detik`;
+                        }
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('btn-disabled');
+                            submitBtn.innerHTML = `<i class="fa-solid fa-clock"></i> <span>Tunggu (${currentRem}s)</span>`;
+                        }
+                    } else {
+                        if (formBanner) formBanner.classList.remove('active');
+                        if (submitBtn && submitBtn.disabled) {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('btn-disabled');
+                            if (activeForgotType === 'password') {
+                                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Kirim Tautan Password</span>';
+                            } else {
+                                submitBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> <span>Minta Reset PIN</span>';
+                            }
+                        }
+                    }
+                }
+
+                // Jika di Success View
+                if (successState && successState.style.display !== 'none') {
+                    const badge = document.getElementById('successCooldownBadge');
+                    const resendBtn = document.getElementById('btnResendSuccess');
+                    const resendText = document.getElementById('btnResendText');
+
+                    if (currentRem > 0) {
+                        if (badge) {
+                            badge.innerHTML = `<i class="fa-solid fa-clock-rotate-left" style="color: #d97706;"></i> Kirim ulang ${typeLabel} tersedia dalam <strong style="color: #0f172a;">${currentRem} detik</strong>`;
+                        }
+                        if (resendBtn) resendBtn.disabled = true;
+                        if (resendText) resendText.textContent = `Kirim Ulang (${currentRem}s)`;
+                    } else {
+                        if (badge) {
+                            badge.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Anda dapat mengirim ulang ${typeLabel} sekarang.`;
+                        }
+                        if (resendBtn) resendBtn.disabled = false;
+                        if (resendText) resendText.textContent = `Kirim Ulang ${typeLabel}`;
+                    }
+                }
+            }
+        }
+
+        function handleResendRequest() {
+            const currentRem = getRemainingCooldown(activeForgotType);
+            if (currentRem > 0) {
+                showToast(`Harap tunggu ${currentRem} detik sebelum mengirim ulang!`, 'fa-clock', '#f59e0b');
+                return;
+            }
+
+            const email = lastSentEmail[activeForgotType] || document.getElementById('forgotEmailInput').value.trim();
+            if (!email) {
+                document.getElementById('mobileForgotFormState').style.display = 'block';
+                document.getElementById('mobileForgotSuccessState').style.display = 'none';
+                return;
+            }
+
+            const resendIcon = document.getElementById('resendIcon');
+            if (resendIcon) {
+                resendIcon.classList.add('fa-spin');
+                setTimeout(() => resendIcon.classList.remove('fa-spin'), 600);
+            }
+
+            // Start cooldown again
+            triggerCooldown(activeForgotType, email);
+
+            const typeLabel = activeForgotType === 'password' ? 'Tautan reset kata sandi' : 'Kode verifikasi PIN';
+            showToast(`${typeLabel} berhasil dikirim ulang ke ${email}!`, 'fa-paper-plane', '#10b981');
+        }
+
         // Open Forgot Password / PIN Modal
         function openForgotModal(type) {
             activeForgotType = type;
@@ -1308,6 +1574,7 @@
             }
 
             modal.classList.add('active');
+            updateAllCooldownUI();
             setTimeout(() => input.focus(), 200);
         }
 
@@ -1324,6 +1591,14 @@
 
         // Submit Forgot Request (Strict Registered Email Verification & SSO Restriction)
         function submitForgotRequest() {
+            const currentRem = getRemainingCooldown(activeForgotType);
+            const typeLabel = activeForgotType === 'password' ? 'Password' : 'PIN';
+
+            if (currentRem > 0) {
+                showToast(`Harap tunggu ${currentRem} detik sebelum meminta reset ${typeLabel} lagi!`, 'fa-clock', '#f59e0b');
+                return;
+            }
+
             const emailInput = document.getElementById('forgotEmailInput');
             const email = emailInput.value.trim().toLowerCase();
             const rejectBanner = document.getElementById('rejectionBanner');
@@ -1392,6 +1667,9 @@
 
             targetEmail.textContent = email;
 
+            // Trigger Cooldown Anti-Spam (60s) khusus untuk tipe aktif (password atau pin)
+            triggerCooldown(activeForgotType, email);
+
             // Swapping UI View
             formState.style.display = 'none';
             successState.style.display = 'block';
@@ -1453,6 +1731,10 @@
             refreshCaptcha();
             updateClock();
             setInterval(updateClock, 30000);
+
+            // Real-time cooldown updates for anti-spam timer
+            updateAllCooldownUI();
+            setInterval(updateAllCooldownUI, 1000);
 
             // Handle reason param if redirected
             const urlParams = new URLSearchParams(window.location.search);
