@@ -33,7 +33,7 @@ Dashboard ERS pada path `c:\KERJAAN\Project\hifi-transmisi\hifi-ers\Dashboard\da
       - Accent top bar gradient (Emerald).
       - Header Penghantar & Unit Pelaksana.
       - **Dual Reference Chips**: Tag biru `ASM2026...` (Izin) & Tag teal `PTE2026...` (Perencanaan).
-      - **Multi-Tower Pill Switcher** (`[ 1. T.03 ] [ 2. T.02 ] [ 3. T.01 ]`).
+      - **Multi-Tower Pill Switcher**: Format label sederhana & jelas (`[ Tower 1 ] [ Tower 2 ] [ Tower 3 ]`).
       - Box detail tower aktif (Nama Tower & Functloc).
       - 2x2 Spec Box: Merk & Tipe, Jumlah Set, Klasifikasi, Total Tower.
       - Timeline progress bar visual tanggal pasang s/d rencana bongkar.
@@ -41,7 +41,7 @@ Dashboard ERS pada path `c:\KERJAAN\Project\hifi-transmisi\hifi-ers\Dashboard\da
     - Tabel 15 kolom dan KPI cards otomatis tersinkronisasi menampilkan data tower operasional terpasang saat tab ini aktif.
   - Tombol **Buka Semua Detail / Tutup Semua Detail**.
   - **Tinggi Peta Ditingkatkan (560px)**: Seluruh peta kepulauan Indonesia langsung terlihat utuh tanpa terpotong.
-  - **Tooltip / Popup Diperbesar (345px width & typography ramah lansia/senior)**: Font title (13.5px), spek nilai (12px), chip/dates/button (10.5-11px), padding lebih lega.
+  - **Tooltip / Popup Diperbesar (385px width & typography ramah lansia/senior)**: Bebas terpotong (override Leaflet maxWidth 450px), tanggal & tombol tampil utuh.
   - Legend peta interaktif (Set ERS, Tower Operasi, Tower Terpasang).
 - **Grafik Analitik ERS (3 Chart Card di Atas Tabel)**:
   1. **ERS Operasi Per Unit**: Horizontal Bar Chart menampilkan jumlah ERS Terpasang (biru) dan Selesai (hijau) per Unit Induk (P3BS, P3BSUL, UIT JBT, NTB, P3BKAL, UIT JBM, dsb.).
