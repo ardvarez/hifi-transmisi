@@ -40,6 +40,8 @@ Dashboard ERS pada path `c:\KERJAAN\Project\hifi-transmisi\hifi-ers\Dashboard\da
       - Footer PIC Pemasangan & Tombol pintas `Lihat di Tabel ↓`.
     - Tabel 15 kolom dan KPI cards otomatis tersinkronisasi menampilkan data tower operasional terpasang saat tab ini aktif.
   - Tombol **Buka Semua Detail / Tutup Semua Detail**.
+  - **Tinggi Peta Ditingkatkan (560px)**: Seluruh peta kepulauan Indonesia langsung terlihat utuh tanpa terpotong.
+  - **Tooltip / Popup Diperbesar (345px width & typography ramah lansia/senior)**: Font title (13.5px), spek nilai (12px), chip/dates/button (10.5-11px), padding lebih lega.
   - Legend peta interaktif (Set ERS, Tower Operasi, Tower Terpasang).
 - **Grafik Analitik ERS (3 Chart Card di Atas Tabel)**:
   1. **ERS Operasi Per Unit**: Horizontal Bar Chart menampilkan jumlah ERS Terpasang (biru) dan Selesai (hijau) per Unit Induk (P3BS, P3BSUL, UIT JBT, NTB, P3BKAL, UIT JBM, dsb.).
