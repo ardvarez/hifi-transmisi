@@ -14,7 +14,8 @@ Dashboard ERS pada path `c:\KERJAAN\Project\hifi-transmisi\hifi-ers\Dashboard\da
 - **Peta Interaktif (Leaflet)**:
   - Tab 1: **Set ERS** dengan pin marker gudang/lokasi dan popup detail.
   - Tab 2: **Tower Operasi**:
-    - Titik tower beroperasi menggunakan icon transmisi tower (dark navy circle dengan transmisi tower putih dan outer halo translucent).
+    - Titik tower beroperasi menggunakan icon transmisi tower (biru primary circle dengan transmisi tower putih dan outer halo translucent).
+    - Legend peta disederhanakan menjadi 1 item representatif (**Tower Operasi** warna biru primary).
     - Cluster bulat biru dengan angka agregasi titik (misal cluster 2).
     - Popup card mengusung **Modern Card Grid**:
       - Accent top bar gradient (Navy).
@@ -26,7 +27,8 @@ Dashboard ERS pada path `c:\KERJAAN\Project\hifi-transmisi\hifi-ers\Dashboard\da
       - Tombol aksi cepat: `Lihat di Tabel ↓`.
   - Tab 3: **Tower Operasi Terpasang** (Data Acuan Perencanaan & Perizinan Pemasangan ERS):
     - Titik tower operasional yang telah disetujui izin pemasangannya (badge emerald hijau `Terpasang (Izin Lengkap)`).
-    - Marker khusus emerald green dengan animasi halo.
+    - Marker icon transmisi tower warna biru primary dengan animasi outer halo.
+    - Legend peta 1 item representatif (**Tower Operasi Terpasang** warna biru primary).
     - Popup card mengusung **Modern Card Grid + Multi-Tower Switcher**:
       - Accent top bar gradient (Emerald).
       - Header Penghantar & Unit Pelaksana.

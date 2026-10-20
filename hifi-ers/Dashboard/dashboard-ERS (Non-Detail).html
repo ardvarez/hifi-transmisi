@@ -855,7 +855,7 @@
       transform: translateY(-0.5px);
     }
 
-    /* TOWER OPERASI MARKER ICON (DARK SLATE BLUE WITH TRANSMISSION TOWER & HALO) */
+    /* TOWER OPERASI MARKER ICON (PRIMARY BLUE WITH TRANSMISSION TOWER & HALO) */
     .tower-marker-wrap {
       position: relative;
       width: 44px;
@@ -871,7 +871,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(45, 62, 90, 0.28);
+      background: rgba(37, 99, 235, 0.22);
     }
 
     .tower-marker-core {
@@ -879,18 +879,18 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      background: #2d3b55;
+      background: var(--primary, #2563eb);
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
-      transition: transform 0.2s;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+      transition: transform 0.2s, background 0.2s;
     }
 
     .tower-marker-wrap:hover .tower-marker-core {
       transform: scale(1.12);
-      background: #1e293b;
+      background: var(--primary-hover, #1d4ed8);
     }
 
     /* TOWER OPERASI CLUSTER CIRCLE (BLUE TRANSLUCENT WITH BOLD COUNT) */
@@ -920,7 +920,7 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
-    /* TOWER OPERASI TERPASANG MARKER (EMERALD GREEN WITH HALO) */
+    /* TOWER OPERASI TERPASANG MARKER (PRIMARY BLUE WITH HALO) */
     .tower-terpasang-wrap {
       position: relative;
       width: 44px;
@@ -936,8 +936,8 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(0, 91, 148, 0.2);
-      border: 1.5px solid rgba(0, 91, 148, 0.4);
+      background: rgba(37, 99, 235, 0.22);
+      border: 1.5px solid rgba(37, 99, 235, 0.4);
     }
 
     .tower-terpasang-core {
@@ -945,18 +945,18 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: #005B94;
+      background: var(--primary, #2563eb);
       display: flex;
       align-items: center;
       justify-content: center;
       border: 2px solid #ffffff;
-      box-shadow: 0 3px 8px rgba(0, 91, 148, 0.35);
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
       transition: transform 0.2s, background 0.2s;
     }
 
     .tower-terpasang-wrap:hover .tower-terpasang-core {
       transform: scale(1.12);
-      background: #004570;
+      background: var(--primary-hover, #1d4ed8);
     }
 
     /* LEAFLET LEGEND */
@@ -2953,24 +2953,7 @@
       const legend = L.control({ position: 'bottomright' });
       legend.onAdd = function () {
         const div = L.DomUtil.create('div', 'map-legend-box');
-        div.innerHTML = `
-          <div class="map-legend-title">LEGEND</div>
-          <div class="map-legend-item">
-            <span class="legend-color-dot" style="background:#2563eb;"></span>
-            <span>Set ERS (Master Distribusi)</span>
-          </div>
-          <div class="map-legend-item">
-            <span class="legend-color-dot" style="background:#2d3b55;"></span>
-            <span>Tower Operasi (Wilayah)</span>
-          </div>
-          <div class="map-legend-item">
-            <span class="legend-color-dot" style="background:#005B94;"></span>
-            <span>Tower Terpasang (Perencanaan & Izin)</span>
-          </div>
-          <div class="map-legend-item" style="margin-top:8px; border-top:1px solid #f1f5f9; padding-top:4px; color:#94a3b8; font-size:10px;">
-            OpenStreetMap contributors
-          </div>
-        `;
+        div.id = 'mapLegendBox';
         return div;
       };
       legend.addTo(map);
@@ -2978,7 +2961,48 @@
       renderMapMarkers();
     }
 
+    function updateMapLegend() {
+      const box = document.getElementById('mapLegendBox');
+      if (!box) return;
+
+      if (activeMapTab === 'tower') {
+        box.innerHTML = `
+          <div class="map-legend-title">LEGEND</div>
+          <div class="map-legend-item">
+            <span class="legend-color-dot" style="background:#2563eb;"></span>
+            <span>Tower Operasi</span>
+          </div>
+          <div class="map-legend-item" style="margin-top:8px; border-top:1px solid #f1f5f9; padding-top:4px; color:#94a3b8; font-size:10px;">
+            OpenStreetMap contributors
+          </div>
+        `;
+      } else if (activeMapTab === 'terpasang') {
+        box.innerHTML = `
+          <div class="map-legend-title">LEGEND</div>
+          <div class="map-legend-item">
+            <span class="legend-color-dot" style="background:#2563eb;"></span>
+            <span>Tower Operasi Terpasang</span>
+          </div>
+          <div class="map-legend-item" style="margin-top:8px; border-top:1px solid #f1f5f9; padding-top:4px; color:#94a3b8; font-size:10px;">
+            OpenStreetMap contributors
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="map-legend-title">LEGEND</div>
+          <div class="map-legend-item">
+            <span class="legend-color-dot" style="background:#2563eb;"></span>
+            <span>Set ERS (Master Distribusi)</span>
+          </div>
+          <div class="map-legend-item" style="margin-top:8px; border-top:1px solid #f1f5f9; padding-top:4px; color:#94a3b8; font-size:10px;">
+            OpenStreetMap contributors
+          </div>
+        `;
+      }
+    }
+
     function renderMapMarkers() {
+      updateMapLegend();
       setErsMarkersLayer.clearLayers();
       towerOperasiMarkersLayer.clearLayers();
       towerTerpasangMarkersLayer.clearLayers();
