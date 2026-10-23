@@ -113,3 +113,15 @@ Fitur simulasi penanganan **Data Reject (Karantina Ulang)** diimplementasikan se
   - Pemasangan: `INST202500091` berfungsi ganda sebagai Nomor Permit Pemasangan dan Kode Pekerjaan Lapangan.
   - Pembongkaran: `DIS20250012` berfungsi ganda sebagai Nomor Permit Pembongkaran dan Kode Pekerjaan Lapangan.
   - Karantina: `RTR202501100000` / `RTR20250000001` berfungsi sebagai Nomor Permohonan / Permit Karantina.
+
+---
+
+## 7. Penambahan Informasi Merk pada Check Sheet (23 Okt 2026)
+- **Fungsi Informasi Merk**:
+  - Merk disajikan murni sebagai **informasi visual (bukan dropdown pilihan)** agar teknisi dapat membedakan secara instan antara komponen dengan merk berbeda (misal: Column Merk A / Lindsay vs Column Merk B / Tower Solution).
+  - Menggunakan badge informasi kompak `.group-merk-info` dengan varian warna penanda (`.merk-lindsay`, `.merk-tower-solution`, `.merk-sbb`).
+- **Hierarki Layout Header Komponen**:
+  1. `Nama Komponen` (misal: `Plate Column`)
+  2. `<status>` (`chip-karantina-ulang`, tampil saat status reject verifikator)
+  3. `<merk>` (Informasi badge, contoh: `<span class="group-merk-info merk-lindsay"><i class="fa-solid fa-tag"></i> Merk: Lindsay</span>`)
+  4. `15 Aksesoris` (`group-subtitle` / `group-subtitle-pill`)
