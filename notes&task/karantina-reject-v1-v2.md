@@ -122,6 +122,6 @@ Fitur simulasi penanganan **Data Reject (Karantina Ulang)** diimplementasikan se
   - Menggunakan badge informasi kompak `.group-merk-info` dengan varian warna penanda (`.merk-lindsay`, `.merk-tower-solution`, `.merk-sbb`).
 - **Hierarki Layout Header Komponen**:
   1. `Nama Komponen` (misal: `Plate Column`)
-  2. `<status>` (`chip-karantina-ulang`, tampil saat status reject verifikator)
-  3. `<merk>` (Informasi badge, contoh: `<span class="group-merk-info merk-lindsay"><i class="fa-solid fa-tag"></i> Merk: Lindsay</span>`)
+  2. `<merk>` (Informasi badge text-only, contoh: `<span class="group-merk-info merk-lindsay">Merk: Lindsay</span>`)
+  3. `<status>` (`chip-karantina-ulang`, tampil saat status reject verifikator)
   4. `15 Aksesoris` (`group-subtitle` / `group-subtitle-pill`)
