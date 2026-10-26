@@ -125,3 +125,16 @@ Fitur simulasi penanganan **Data Reject (Karantina Ulang)** diimplementasikan se
   2. `<merk>` (Informasi badge text-only, contoh: `<span class="group-merk-info merk-lindsay">Merk: Lindsay</span>`)
   3. `<status>` (`chip-karantina-ulang`, tampil saat status reject verifikator)
   4. `15 Aksesoris` (`group-subtitle` / `group-subtitle-pill`)
+
+---
+
+## 8. Multi-Tower Accordion pada Verifikasi Karantina Web ([verifikasi-karantina.html](file:///c:/KERJAAN/Project/hifi-transmisi/hifi-ers/Perencanaan/Karantina%20&%20Tindak%20Lanjut/verifikasi-karantina.html)) (26 Okt 2026)
+- **Struktur Multi-Tower**:
+  - Di bawah bagian **Hasil Pemeriksaan Karantina Komponen**, daftar komponen kini dibungkus ke dalam accordion per-template tower (`.tower-accordion-item`) untuk mendukung multi-tower dalam 1 permohonan karantina.
+  - Header Accordion 1: `Template Tower: Tower Solution - 150kV - Tension (Batch 1)` (Tapak SUTT #0085).
+  - Header Accordion 2: `Template Tower: Lindsay - 150kV - Suspension (Batch 2)` (Tapak SUTT #0086).
+- **Penurunan Tombol Detail Pemasangan & Pembongkaran**:
+  - Tombol **Detail Pemasangan** dan **Detail Pembongkaran** yang sebelumnya di header halaman telah diturunkan ke masing-masing sub-bar accordion tower (`.tower-action-subbar`).
+  - Parameter tower diteruskan secara dinamis (`openDetailPemasanganModal('tower1' / 'tower2')` dan `openDetailPembongkaranModal('tower1' / 'tower2')`) sehingga isi drawer menyesuaikan permit, tapak, dan spesifikasi tower terkait.
+- **Pengecekan Komponen**:
+  - Checkbox per-tabel maupun global tetap sinkron dengan counter komponen terpilih dan tombol aksi Verifikasi / Reject.
