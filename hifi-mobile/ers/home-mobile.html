@@ -1125,6 +1125,488 @@
             color: #38bdf8 !important;
         }
 
+
+        /* ========================================================
+           GRAB-STYLE FULL MAP VIEW & OVERLAY (75:25 / 50:50)
+           ======================================================== */
+        .map-view-box {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .map-open-grab-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(10, 88, 202, 0.95);
+            color: #ffffff;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+            pointer-events: auto;
+            text-decoration: none;
+        }
+
+        .map-open-grab-badge:hover {
+            background: #084298;
+            transform: scale(1.03);
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .grab-map-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: grabSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .grab-map-modal.active {
+            display: flex;
+        }
+
+        @keyframes grabSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Top Floating Navigation */
+        .grab-top-nav {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1050;
+            pointer-events: none;
+        }
+
+        .grab-circle-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            font-size: 13px;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.2s;
+        }
+
+        .grab-circle-btn:active {
+            transform: scale(0.92);
+            background: #f1f5f9;
+        }
+
+        .grab-top-title-pill {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .grab-title-main {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+
+        .grab-title-sub {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #0284c7;
+        }
+
+        /* Grab Map Viewport (Default 75%, Expandable to 50%) */
+        .grab-map-viewport {
+            width: 100%;
+            height: 75%;
+            position: relative;
+            background: #e2e8f0;
+            transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #grabLeafletMap {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Floating Tab Group inside Grab Map */
+        .grab-map-tab-float {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+            padding: 3px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15);
+            z-index: 900;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .grab-map-tab-float::-webkit-scrollbar {
+            display: none;
+        }
+
+        .grab-tab-pill {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 9px;
+            font-size: 10px;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .grab-tab-pill.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(10, 88, 202, 0.3);
+        }
+
+        /* Grab Bottom Sheet Overlay (Default 25%, Expandable to 50%) */
+        .grab-bottom-sheet {
+            width: 100%;
+            height: 25%;
+            background: #ffffff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -6px 25px rgba(15, 23, 42, 0.12);
+            z-index: 950;
+            display: flex;
+            flex-direction: column;
+            transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* 50:50 Proportions State */
+        .grab-map-modal.expanded-50 .grab-map-viewport {
+            height: 50%;
+        }
+
+        .grab-map-modal.expanded-50 .grab-bottom-sheet {
+            height: 50%;
+        }
+
+        /* Sheet Drag Handle & Header */
+        .grab-sheet-header {
+            padding: 8px 14px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .grab-drag-bar {
+            width: 36px;
+            height: 4px;
+            border-radius: 4px;
+            background: #cbd5e1;
+            margin-bottom: 8px;
+        }
+
+        .grab-sheet-title-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grab-sheet-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .grab-count-badge {
+            font-size: 9.5px;
+            font-weight: 700;
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .grab-toggle-size-pill {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 4px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .grab-toggle-size-pill:active {
+            background: #dbeafe;
+        }
+
+        /* Sheet Body (Horizontal in 25%, Vertical in 50%) */
+        .grab-sheet-body {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 14px;
+            display: flex;
+            gap: 10px;
+            background: var(--bg-canvas);
+        }
+
+        .grab-map-modal.expanded-50 .grab-sheet-body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Grab Overlay Location Card */
+        .grab-loc-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1.5px solid var(--border-color);
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            width: 280px;
+        }
+
+        .grab-map-modal.expanded-50 .grab-loc-card {
+            width: 100%;
+        }
+
+        .grab-loc-card:hover, .grab-loc-card.active-card {
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 14px rgba(10, 88, 202, 0.15);
+            background: #fafcff;
+        }
+
+        .grab-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .grab-card-unit {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .grab-card-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 5px;
+            background: #fef3c7;
+            color: #d97706;
+            white-space: nowrap;
+        }
+
+        .grab-card-penghantar {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .grab-card-specs {
+            display: flex;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .grab-card-chips {
+            display: flex;
+            gap: 5px;
+            font-size: 9px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .grab-card-chip {
+            background: #f1f5f9;
+            color: #334155;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .grab-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 6px;
+            font-size: 9.5px;
+            color: var(--text-muted);
+        }
+
+        .grab-btn-focus {
+            background: #0A58CA;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .grab-btn-focus:active {
+            background: #084298;
+        }
+
+        /* CLUSTER PIN (PULSING RING ALA GRAB) */
+        .grab-cluster-pin {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #0A58CA;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 0 0 5px rgba(10, 88, 202, 0.28), 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+            animation: grabPulse 2s infinite;
+        }
+
+        .grab-cluster-pin:hover {
+            transform: scale(1.15);
+        }
+
+        .grab-cluster-pin .cluster-count {
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .grab-cluster-pin .cluster-lbl {
+            font-size: 7.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1;
+        }
+
+        @keyframes grabPulse {
+            0% { box-shadow: 0 0 0 0 rgba(10, 88, 202, 0.5), 0 4px 12px rgba(0,0,0,0.3); }
+            70% { box-shadow: 0 0 0 9px rgba(10, 88, 202, 0), 0 4px 12px rgba(0,0,0,0.3); }
+            100% { box-shadow: 0 0 0 0 rgba(10, 88, 202, 0), 0 4px 12px rgba(0,0,0,0.3); }
+        }
+
+        /* Dark Mode for Grab Map View */
+        body.dark-mode .grab-map-modal, html.dark-mode .grab-map-modal {
+            background: #0f172a !important;
+        }
+        body.dark-mode .grab-circle-btn, html.dark-mode .grab-circle-btn {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .grab-top-title-pill, html.dark-mode .grab-top-title-pill,
+        body.dark-mode .grab-bottom-sheet, html.dark-mode .grab-bottom-sheet,
+        body.dark-mode .grab-sheet-header, html.dark-mode .grab-sheet-header {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .grab-title-main, html.dark-mode .grab-title-main,
+        body.dark-mode .grab-sheet-title, html.dark-mode .grab-sheet-title,
+        body.dark-mode .grab-card-penghantar, html.dark-mode .grab-card-penghantar {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .grab-sheet-body, html.dark-mode .grab-sheet-body {
+            background: #0f172a !important;
+        }
+        body.dark-mode .grab-loc-card, html.dark-mode .grab-loc-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .grab-card-chip, html.dark-mode .grab-card-chip {
+            background: #0f172a !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode .grab-map-tab-float, html.dark-mode .grab-map-tab-float {
+            background: rgba(30, 41, 59, 0.95) !important;
+        }
+
         /* Leaflet Custom Popup Styling */
         .leaflet-popup-content-wrapper {
             border-radius: 12px !important;
@@ -2296,8 +2778,11 @@
                     </div>
                 </div>
 
-                <div class="map-view-box">
+                <div class="map-view-box" onclick="window.location.href='./peta-mobile.html'" style="cursor: pointer;" title="Buka Peta Interaktif (Mode Grab)">
                     <div id="indonesiaMap"></div>
+                    <a href="./peta-mobile.html" class="map-open-grab-badge" onclick="event.stopPropagation()" title="Buka Detail Peta">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Detail
+                    </a>
                 </div>
 
                 <div class="map-legend-box">
@@ -2494,6 +2979,7 @@
                 <button class="btn-apply-filter" onclick="applyFilterDrawer()">Terapkan Filter</button>
             </div>
         </div>
+
     </div>
 
     <!-- Leaflet JS -->
@@ -2741,6 +3227,7 @@
         let currentMarkers = [];
         let allPopupsOpen = false;
 
+
         function initMap() {
             map = L.map('indonesiaMap', {
                 zoomControl: true,
@@ -2750,6 +3237,11 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
             markersLayer = L.layerGroup().addTo(map);
             renderMapMarkers('set');
+
+            // Click map to navigate to dedicated Grab-style map
+            map.on('click', () => {
+                window.location.href = './peta-mobile.html';
+            });
         }
 
         function renderMapMarkers(mode = 'set') {
@@ -2862,7 +3354,7 @@
             const markerCountText = document.getElementById('mapMarkerCountText');
             if (markerCountText) {
                 markerCountText.style.color = legendColor;
-                markerCountText.innerText = `${dataList.length} Titik ${mode === 'terpasang' ? 'Tower Terpasang' : (mode === 'tower' ? 'Tower Operasi' : 'Set ERS')}`;
+                markerCountText.innerText = `${dataList.length} Titik ${mode === 'terpasang' ? 'Tower Operasi Terpasang' : (mode === 'tower' ? 'Tower Operasi' : 'Set ERS')}`;
             }
         }
 

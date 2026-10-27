@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Peta Persebaran ERS - Mobile</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-blue: #0A58CA;
+            --primary-blue-hover: #084298;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px 6px;
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 50;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Grab Main View Container */
+        .grab-view-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Floating Top Navigation */
+        .grab-top-nav {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        .grab-circle-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            font-size: 13px;
+            cursor: pointer;
+            pointer-events: auto;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .grab-circle-btn:active {
+            transform: scale(0.92);
+            background: #f1f5f9;
+        }
+
+        .grab-top-title-pill {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            padding: 8px 18px;
+            border-radius: 20px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+        }
+
+        .grab-title-main {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        /* Map Viewport Area (Default 75%, Expandable to 50%) */
+        .grab-map-viewport {
+            width: 100%;
+            height: 75%;
+            position: relative;
+            background: #d0e4f2;
+            transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #petaLeafletMap {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Floating Mode Tabs on Map */
+        .grab-map-tab-float {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+            padding: 3px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15);
+            z-index: 400;
+            gap: 4px;
+        }
+
+        .grab-tab-pill {
+            flex: 1;
+            padding: 7px 6px;
+            border-radius: 9px;
+            font-size: 10.5px;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .grab-tab-pill.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(10, 88, 202, 0.3);
+        }
+
+        /* Bottom Sheet Overlay (Default 25%, Expandable to 50%) */
+        .grab-bottom-sheet {
+            width: 100%;
+            height: 25%;
+            background: #ffffff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -6px 25px rgba(15, 23, 42, 0.12);
+            z-index: 450;
+            display: flex;
+            flex-direction: column;
+            transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* 50:50 Proportions State */
+        .grab-view-container.expanded-50 .grab-map-viewport {
+            height: 50%;
+        }
+
+        .grab-view-container.expanded-50 .grab-bottom-sheet {
+            height: 50%;
+        }
+
+        /* Sheet Header & Drag Handle */
+        .grab-sheet-header {
+            padding: 8px 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .grab-drag-bar {
+            width: 36px;
+            height: 4px;
+            border-radius: 4px;
+            background: #cbd5e1;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+
+        .grab-sheet-header:hover .grab-drag-bar {
+            background: var(--primary-blue);
+        }
+
+        .grab-sheet-title-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grab-sheet-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .grab-count-badge {
+            font-size: 9.5px;
+            font-weight: 700;
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .btn-sheet-back {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 9px;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .btn-sheet-back:active {
+            background: #e2e8f0;
+        }
+
+        .sheet-expand-indicator {
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+
+        .grab-view-container.expanded-50 .sheet-expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        /* Sheet Body (Always vertical scrollable) */
+        .grab-sheet-body {
+            flex: 1;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--bg-canvas);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 1. LOCATION LIST CARDS */
+        .grab-loc-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1.5px solid var(--border-color);
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .grab-loc-card:hover,
+        .grab-loc-card.active-card {
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 14px rgba(10, 88, 202, 0.15);
+            background: #fafcff;
+        }
+
+        .grab-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .grab-card-unit {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .grab-card-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 5px;
+            background: #fef3c7;
+            color: #d97706;
+            white-space: nowrap;
+        }
+
+        .grab-card-penghantar {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.25;
+        }
+
+        .grab-card-specs {
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .grab-card-chips {
+            display: flex;
+            gap: 5px;
+            font-size: 9.5px;
+            flex-wrap: wrap;
+        }
+
+        .grab-card-chip {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-weight: 600;
+            border: 1px solid #bfdbfe;
+        }
+
+        .grab-card-chip.plan {
+            background: #f0f9ff;
+            color: #0369a1;
+            border-color: #bae6fd;
+        }
+
+        .grab-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 6px;
+            margin-top: 2px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .grab-btn-detail {
+            background: #0A58CA;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .grab-btn-detail:active {
+            background: #084298;
+        }
+
+        /* 2. DETAIL PROSES PEMASANGAN CARD (Adapted from dashboard-ERS) */
+        .pk-detail-container {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.25s ease-out;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+                .pk-detail-status-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .pk-detail-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .pk-detail-title-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pk-detail-penghantar {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .pk-detail-sub {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pk-detail-badge {
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #fef3c7;
+            color: #d97706;
+            white-space: nowrap;
+        }
+
+        .pk-detail-badge.blue {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        /* ID CHIPS */
+        .pk-id-chips {
+            display: flex;
+            gap: 7px;
+        }
+
+        .pk-id-chip {
+            flex: 1;
+            padding: 6px 9px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .pk-id-chip.permit {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .pk-id-chip.plan {
+            background: #f0f9ff;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .pk-chip-lbl {
+            font-family: 'Inter', sans-serif;
+            font-size: 8.5px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .pk-id-chip-val {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        /* MULTI TOWER PILLS */
+        .pk-tower-pill-bar {
+            display: flex;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pk-tower-pill {
+            flex: 1;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+            cursor: pointer;
+            background: transparent;
+            color: #64748b;
+            transition: all 0.15s;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .pk-tower-pill.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .pk-tower-active-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .pk-tower-active-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .pk-tower-active-name {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pk-tower-idx-tag {
+            font-size: 9px;
+            font-weight: 700;
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #bae6fd;
+        }
+
+        .pk-tower-active-sub {
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary-blue);
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 2X2 SPEC GRID */
+        .pk-spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+        }
+
+        .pk-spec-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 7px 9px;
+        }
+
+        .pk-spec-lbl {
+            font-size: 8.5px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 3.5px;
+            margin-bottom: 2px;
+        }
+
+        .pk-spec-val {
+            font-size: 11.5px;
+            color: #0f172a;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        /* MIXED COMPONENTS CARD */
+        .pk-mixed-card {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-left: 3.5px solid #f59e0b;
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pk-mixed-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .pk-mixed-badge {
+            font-size: 9px;
+            font-weight: 800;
+            color: #b45309;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            padding: 2px 7px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .pk-mixed-subtitle {
+            font-size: 10px;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .pk-mixed-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid #fde68a;
+            border-radius: 6px;
+            padding: 6px 8px;
+        }
+
+        .pk-mixed-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .pk-mixed-role {
+            font-size: 8.5px;
+            color: #78350f;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .pk-mixed-val {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Dark mode for mixed card */
+        body.dark-mode .pk-mixed-card {
+            background: #451a03 !important;
+            border-color: #78350f !important;
+            border-left-color: #f59e0b !important;
+        }
+        body.dark-mode .pk-mixed-badge {
+            background: #78350f !important;
+            color: #fde68a !important;
+            border-color: #92400e !important;
+        }
+        body.dark-mode .pk-mixed-subtitle {
+            color: #fde68a !important;
+        }
+        body.dark-mode .pk-mixed-grid {
+            background: #1e293b !important;
+            border-color: #78350f !important;
+        }
+        body.dark-mode .pk-mixed-role {
+            color: #fde68a !important;
+        }
+        body.dark-mode .pk-mixed-val {
+            color: #f8fafc !important;
+        }
+
+        /* TIMELINE BOX */
+        .pk-timeline-box {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .pk-timeline-dates {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .pk-duration-tag {
+            font-size: 9px;
+            font-weight: 700;
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 2px 6px;
+            border-radius: 99px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .pk-timeline-track {
+            height: 4.5px;
+            background: #bfdbfe;
+            border-radius: 99px;
+            margin: 5px 0 3px 0;
+            overflow: hidden;
+        }
+
+        .pk-timeline-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0A58CA, #2563eb);
+            border-radius: 99px;
+            width: 50%;
+        }
+
+        .pk-timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.5px;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        /* DETAIL FOOTER */
+        .pk-detail-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 10px;
+            gap: 6px;
+        }
+
+        .pk-detail-pic {
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        .pk-btn-recenter {
+            background: #eff6ff;
+            color: var(--primary-blue);
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Marker Pins */
+        .ers-marker-pin {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #0A58CA;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 11px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .ers-marker-pin:hover {
+            transform: scale(1.15);
+        }
+
+        .ers-marker-pin.tower {
+            background: #059669;
+        }
+
+        .ers-marker-pin.terpasang {
+            background: #d97706;
+            box-shadow: 0 0 0 3.5px rgba(217, 119, 6, 0.25), 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Cluster Pin (Numbers only, pulsing ring) */
+        .grab-cluster-pin {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0A58CA;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 0 0 4.5px rgba(10, 88, 202, 0.28), 0 4px 12px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: transform 0.2s;
+            animation: grabPulse 2s infinite;
+        }
+
+        .grab-cluster-pin:hover {
+            transform: scale(1.15);
+        }
+
+        .grab-cluster-pin .cluster-count {
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        @keyframes grabPulse {
+            0% { box-shadow: 0 0 0 0 rgba(10, 88, 202, 0.5), 0 4px 12px rgba(0,0,0,0.3); }
+            70% { box-shadow: 0 0 0 9px rgba(10, 88, 202, 0), 0 4px 12px rgba(0,0,0,0.3); }
+            100% { box-shadow: 0 0 0 0 rgba(10, 88, 202, 0), 0 4px 12px rgba(0,0,0,0.3); }
+        }
+
+        
+        /* EXACT USER SCREENSHOT CARD & POPUP STYLING */
+        .ui-screenshot-card,
+        .ui-screenshot-popup {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            border: 1px solid #dbeafe;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ui-sc-header {
+            background: #0A58CA;
+            color: #ffffff;
+            padding: 7px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ui-sc-title {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .ui-sc-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0 2px;
+            line-height: 1;
+            opacity: 0.9;
+        }
+        .ui-sc-close:hover {
+            opacity: 1;
+        }
+
+        .ui-sc-body {
+            padding: 6px 12px;
+        }
+
+        .ui-sc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .ui-sc-row:last-child {
+            border-bottom: none;
+        }
+
+        .ui-sc-lbl {
+            font-size: 12px;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .ui-sc-val {
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        /* UI Set Metrics Grid for list item cards */
+        .ui-set-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin: 8px 0 6px 0;
+        }
+        .ui-set-metric-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 5px 6px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .ui-set-metric-box .metric-lbl {
+            font-size: 9.5px;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .ui-set-metric-box .metric-val {
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .ui-set-metric-box .metric-val.primary { color: #0A58CA; }
+        .ui-set-metric-box .metric-val.warning { color: #d97706; }
+        .ui-set-metric-box .metric-val.accent { color: #0284c7; }
+
+        .ers-marker-pin.set {
+            background: #0A58CA;
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 10px rgba(10, 88, 202, 0.4);
+        }
+
+        body.dark-mode .ui-screenshot-card,
+        body.dark-mode .ui-screenshot-popup {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        body.dark-mode .ui-sc-row {
+            border-bottom-color: #334155;
+        }
+        body.dark-mode .ui-sc-lbl {
+            color: #cbd5e1;
+        }
+        body.dark-mode .ui-sc-val {
+            color: #f8fafc;
+        }
+        body.dark-mode .ui-set-metric-box {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        /* Custom Leaflet Popup */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px !important;
+            padding: 0 !important;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2) !important;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .leaflet-popup-content {
+            margin: 0 !important;
+            line-height: 1.3 !important;
+            min-width: 200px;
+            max-width: 240px;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #0f172a;
+        }
+
+        body.dark-mode .mobile-container {
+            background-color: #0f172a !important;
+        }
+
+        body.dark-mode .status-bar {
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .grab-circle-btn {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .grab-top-title-pill,
+        body.dark-mode .grab-bottom-sheet,
+        body.dark-mode .grab-sheet-header,
+        body.dark-mode .pk-detail-container {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .grab-title-main,
+        body.dark-mode .grab-sheet-title,
+        body.dark-mode .grab-card-penghantar,
+        body.dark-mode .pk-detail-penghantar,
+        body.dark-mode .pk-spec-val,
+        body.dark-mode .pk-tower-active-name {
+            color: #f8fafc !important;
+        }
+
+        body.dark-mode .grab-sheet-body {
+            background: #0f172a !important;
+        }
+
+        body.dark-mode .grab-loc-card,
+        body.dark-mode .pk-spec-box,
+        body.dark-mode .pk-tower-active-box {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .grab-card-chip,
+        body.dark-mode .pk-id-chip.permit,
+        body.dark-mode .pk-id-chip.plan {
+            background: #0f172a !important;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .pk-tower-pill-bar {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .pk-timeline-box {
+            background: #0f172a !important;
+            border-color: #1e3a8a !important;
+        }
+
+        body.dark-mode .btn-sheet-back {
+            background: #0f172a !important;
+            color: #38bdf8 !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .grab-map-tab-float {
+            background: rgba(30, 41, 59, 0.95) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Grab Map Main View -->
+        <div class="grab-view-container" id="grabViewContainer">
+            <!-- Top Floating Navigation -->
+            <div class="grab-top-nav">
+                <a href="./home-mobile.html" class="grab-circle-btn" title="Kembali ke Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="grab-top-title-pill">
+                    <i class="fa-solid fa-map-location-dot" style="color: #0A58CA; font-size: 13px;"></i>
+                    <span class="grab-title-main">Peta Persebaran ERS</span>
+                </div>
+                <button class="grab-circle-btn" type="button" onclick="recenterGrabMap()" title="Pusatkan Peta">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+            </div>
+
+            <!-- Map Viewport (Default 75%) -->
+            <div class="grab-map-viewport" id="grabMapViewport">
+                <div id="petaLeafletMap"></div>
+                <div class="grab-map-tab-float">
+                    <button class="grab-tab-pill" id="grabTabSet" onclick="switchGrabMode('set')">Set ERS</button>
+                    <button class="grab-tab-pill" id="grabTabTower" onclick="switchGrabMode('tower')">Tower Operasi</button>
+                    <button class="grab-tab-pill active" id="grabTabTerpasang" onclick="switchGrabMode('terpasang')">Tower Operasi Terpasang</button>
+                </div>
+            </div>
+
+            <!-- Bottom Sheet Overlay (Default 25%) -->
+            <div class="grab-bottom-sheet" id="grabBottomSheet">
+                <div class="grab-sheet-header" onclick="toggleGrabSheetSize()" title="Ketuk untuk ubah rasio 75:25 / 50:50">
+                    <div class="grab-drag-bar"></div>
+                    <div class="grab-sheet-title-row">
+                        <div class="grab-sheet-title" id="sheetTitleArea">
+                            <i class="fa-solid fa-location-dot" style="color: #0A58CA;"></i>
+                            <span id="grabSheetTitleText">Titik Lokasi ERS Terpasang</span>
+                            <span class="grab-count-badge" id="grabSheetCountBadge">4 Titik</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-up sheet-expand-indicator" id="sheetExpandIcon"></i>
+                    </div>
+                </div>
+
+                <div class="grab-sheet-body" id="grabSheetBody">
+                    <!-- Location Cards / Installation Details will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Master Datasets with Full Installation Specs
+                // Unit Induk points from DB UNYU (sigatra_dbprod / m_unit_induk)
+        const ersMasterData = [
+            {
+                id: 'ui_uitjbm',
+                unitInduk: 'UITJBM',
+                namaLengkap: 'UIT Jawa Bagian Madura',
+                kodeSap: '3600',
+                functloc: 'TRS-3600',
+                lat: -7.349328,
+                lng: 112.7049211,
+                setLengkap: 0,
+                setTidakLengkap: 9,
+                ersOperasi: 2,
+                status: 'Perlu Pemenuhan'
+            },
+            {
+                id: 'ui_uitjbt',
+                unitInduk: 'UITJBT',
+                namaLengkap: 'UIT Jawa Bagian Tengah',
+                kodeSap: '3500',
+                functloc: 'TRS-3500',
+                lat: -6.9505088,
+                lng: 107.6120455,
+                setLengkap: 3,
+                setTidakLengkap: 1,
+                ersOperasi: 7,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_uitjbb',
+                unitInduk: 'UITJBB',
+                namaLengkap: 'UIT Jawa Bagian Barat',
+                kodeSap: '3400',
+                functloc: 'TRS-3400',
+                lat: -6.3474203,
+                lng: 106.7861222,
+                setLengkap: 2,
+                setTidakLengkap: 1,
+                ersOperasi: 1,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_p2b',
+                unitInduk: 'P2B',
+                namaLengkap: 'Pusat Pengatur Beban',
+                kodeSap: '3300',
+                functloc: 'TRS-3300',
+                lat: -6.3473687,
+                lng: 106.7832771,
+                setLengkap: 1,
+                setTidakLengkap: 0,
+                ersOperasi: 0,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_p3bs',
+                unitInduk: 'P3BS',
+                namaLengkap: 'P3B Sumatera',
+                kodeSap: '3200',
+                functloc: 'TRS-3200',
+                lat: 0.501669,
+                lng: 101.4084236,
+                setLengkap: 2,
+                setTidakLengkap: 2,
+                ersOperasi: 37,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_p3bkal',
+                unitInduk: 'P3BKAL',
+                namaLengkap: 'P3B Kalimantan',
+                kodeSap: '2400',
+                functloc: 'TRS-2400',
+                lat: -0.0572442,
+                lng: 109.3310352,
+                setLengkap: 2,
+                setTidakLengkap: 0,
+                ersOperasi: 1,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_p3bsul',
+                unitInduk: 'P3BSUL',
+                namaLengkap: 'P3B Sulawesi',
+                kodeSap: '2500',
+                functloc: 'TRS-2500',
+                lat: -5.1468992,
+                lng: 119.471138,
+                setLengkap: 3,
+                setTidakLengkap: 1,
+                ersOperasi: 16,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_babel',
+                unitInduk: 'BABEL',
+                namaLengkap: 'PLN UIW Bangka Belitung',
+                kodeSap: '6600',
+                functloc: 'TRS-6600',
+                lat: -2.1001754,
+                lng: 106.1117171,
+                setLengkap: 1,
+                setTidakLengkap: 0,
+                ersOperasi: 0,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_ntb',
+                unitInduk: 'NTB',
+                namaLengkap: 'PLN UIW Nusa Tenggara Barat',
+                kodeSap: '7700',
+                functloc: 'TRS-7700',
+                lat: -8.5771556,
+                lng: 116.0817995,
+                setLengkap: 2,
+                setTidakLengkap: 1,
+                ersOperasi: 2,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_ntt',
+                unitInduk: 'NTT',
+                namaLengkap: 'PLN UIW Nusa Tenggara Timur',
+                kodeSap: '7800',
+                functloc: 'TRS-7800',
+                lat: -10.1555595,
+                lng: 123.6336971,
+                setLengkap: 1,
+                setTidakLengkap: 1,
+                ersOperasi: 0,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_mmu',
+                unitInduk: 'MMU',
+                namaLengkap: 'PLN UIW Maluku & Maluku Utara',
+                kodeSap: '7500',
+                functloc: 'TRS-7500',
+                lat: -3.6986841,
+                lng: 128.1801533,
+                setLengkap: 1,
+                setTidakLengkap: 1,
+                ersOperasi: 0,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_ppb',
+                unitInduk: 'PPB',
+                namaLengkap: 'PLN UIW Papua & Papua Barat',
+                kodeSap: '7600',
+                functloc: 'TRS-7600',
+                lat: -2.5428291,
+                lng: 140.7026887,
+                setLengkap: 1,
+                setTidakLengkap: 0,
+                ersOperasi: 0,
+                status: 'Siap Operasi'
+            },
+            {
+                id: 'ui_puslitbang',
+                unitInduk: 'PUSLITBANG',
+                namaLengkap: 'PLN Puslitbang Ketenagalistrikan',
+                kodeSap: '9900',
+                functloc: 'TRS-9900',
+                lat: -6.155,
+                lng: 106.82,
+                setLengkap: 1,
+                setTidakLengkap: 0,
+                ersOperasi: 0,
+                status: 'Siap Operasi'
+            }
+        ];
+
+        const towerOperasiData = [
+            {
+                id: 'topo_1',
+                no: 1,
+                                unitInduk: 'UIKL SULAWESI',
+                unitPelaksana: 'UPT KENDARI',
+                penghantar: 'SUTT 150 kV Kendari - Unaaha',
+                tower: 'T.14, T.15',
+                towers: ['T.14 Kendari - Unaaha', 'T.15 Kendari - Unaaha'],
+                functlocs: ['TRS-1520-014.001-T0014', 'TRS-1520-015.001-T0015'],
+                lat: -3.9782,
+                lng: 122.5182,
+                jumlahSet: 2,
+                merk: 'LINDSEY',
+                rencanaErs: 'LINDSEY - 150kV - Tension',
+                tipePemasangan: 'Amblas Tebing Hujan',
+                picPemasangan: 'TIM ERS UPT KENDARI',
+                penyebab: 'Amblas tanah lereng tebing hujan lebat',
+                tanggal: '24 Februari 2026',
+                rencanaBongkar: '31 Desember 2026',
+                durasi: '10 Bulan',
+                statusSet: 'Lengkap',
+                status: 'Operasi Aktif'
+            },
+            {
+                id: 'topo_2',
+                no: 2,
+                                unitInduk: 'UIKL KALIMANTAN',
+                unitPelaksana: 'UPT PONTIANAK',
+                penghantar: 'SUTT 150 kV Siantan - Singkawang #065',
+                tower: 'T.065',
+                towers: ['T.065 Siantan - Singkawang'],
+                functlocs: ['TRS-1533-065.001-T0065'],
+                lat: 0.245,
+                lng: 109.112,
+                jumlahSet: 1,
+                merk: 'LINDSEY',
+                rencanaErs: 'LINDSEY - 150kV - Suspension',
+                tipePemasangan: 'Korosi Pasang Surut',
+                picPemasangan: 'TIM ERS PONTIANAK',
+                penyebab: 'Korosi pondasi rawa pasang surut',
+                tanggal: '14 Februari 2026',
+                rencanaBongkar: '31 Desember 2027',
+                durasi: '1 Thn, 10 Bln',
+                statusSet: 'Lengkap',
+                status: 'Operasi Aktif'
+            },
+            {
+                id: 'topo_3',
+                no: 3,
+                                unitInduk: 'UIW NTB',
+                unitPelaksana: 'UPT MATARAM',
+                penghantar: 'SUTT 150 kV Ampenan - Senggigi #018',
+                tower: 'T.018',
+                towers: ['T.018 Ampenan - Senggigi'],
+                functlocs: ['TRS-1540-018.001-T0018'],
+                lat: -8.512,
+                lng: 116.078,
+                jumlahSet: 1,
+                merk: 'LINDSEY',
+                rencanaErs: 'LINDSEY - 150kV - Tension',
+                tipePemasangan: 'Abrasi Pantai',
+                picPemasangan: 'TIM ERS MATARAM',
+                penyebab: 'Abrasi pantai dan galian drainase',
+                tanggal: '31 Januari 2025',
+                rencanaBongkar: '31 Desember 2027',
+                durasi: '2 Thn, 11 Bln',
+                statusSet: 'Lengkap',
+                status: 'Operasi Aktif'
+            },
+            {
+                id: 'topo_4',
+                no: 4,
+                                unitInduk: 'UIT JBT',
+                unitPelaksana: 'UPT SEMARANG',
+                penghantar: 'SUTET 500 kV Ungaran - Mandirancan',
+                tower: 'T.11',
+                towers: ['T.11 Ungaran - Mandirancan'],
+                functlocs: ['TRS-5212-011.001-T0011'],
+                lat: -7.1282,
+                lng: 110.4039,
+                jumlahSet: 2,
+                merk: 'SBB',
+                rencanaErs: 'SBB - 500kV - Tension',
+                tipePemasangan: 'Pergeseran Lereng Labil',
+                picPemasangan: 'TIM ERS UIT JBT',
+                penyebab: 'Pergeseran tanah labil lereng gunung',
+                tanggal: '18 Februari 2026',
+                rencanaBongkar: '30 November 2026',
+                durasi: '9 Bulan',
+                statusSet: 'Lengkap',
+                status: 'Operasi Aktif'
+            }
+        ];
+
+        const towerTerpasangData = [
+            {
+                id: 'tt_1',
+                no: 1,
+                noPermit: 'ASM2026020100014',
+                noPerencanaan: 'PTE2026000054',
+                unitInduk: 'UIP3BSUL',
+                unitPelaksana: 'UPT KENDARI',
+                penghantar: 'TRS 150kV KENDARI',
+                tower: 'TOWER 14, TOWER 15, TOWER 16',
+                towers: ['TOWER 14 TRS 150kV Kendari', 'TOWER 15 TRS 150kV Kendari', 'TOWER 16 TRS 150kV Kendari'],
+                functlocs: ['TRS-2519-014.020-T0014', 'TRS-2519-014.020-T0015', 'TRS-2519-014.020-T0016'],
+                lat: -3.9782,
+                lng: 122.5182,
+                jumlahSet: 2,
+                merk: 'Lindsey',
+                rencanaErs: 'Lindsey - 150kV - Tension',
+                isMixed: true,
+                mixedWith: 'SBB',
+                mixedBrands: ['Lindsey', 'SBB'],
+                mixedMainBrand: 'Lindsey (Kolom Tiang & Beam)',
+                mixedSecondaryBrand: 'SBB (Guy Wire & Aksesoris)',
+                tipePemasangan: 'Tower Kritis',
+                picPemasangan: 'TIM ERS UIP3BSUL',
+                penyebab: 'Tower Kritis pergerakan struktur tanah tebing',
+                tanggal: '24 Februari 2026',
+                rencanaBongkar: '31 Desember 2026',
+                durasi: '10 Bulan',
+                statusSet: 'Lengkap',
+                status: 'Terpasang'
+            },
+            {
+                id: 'tt_2',
+                no: 2,
+                noPermit: 'INS2026010500009',
+                noPerencanaan: 'PTE2026000051',
+                unitInduk: 'UITJBT',
+                unitPelaksana: 'UPT SEMARANG',
+                penghantar: 'TRS 500kV UNGARAN',
+                tower: 'TOWER 11',
+                towers: ['TOWER 11 TRS 500kV Ungaran'],
+                functlocs: ['TRS-5212-004.011-T0011'],
+                lat: -7.1282,
+                lng: 110.4039,
+                jumlahSet: 2,
+                merk: 'SBB',
+                rencanaErs: 'SBB - 150kV - Suspension',
+                tipePemasangan: 'Tower Kritis',
+                picPemasangan: 'TIM ERS UIT JBT',
+                penyebab: 'Pergeseran tanah lereng bukit',
+                tanggal: '18 Februari 2026',
+                rencanaBongkar: '30 November 2026',
+                durasi: '9 Bulan',
+                statusSet: 'Lengkap',
+                status: 'Terpasang'
+            },
+            {
+                id: 'tt_3',
+                no: 3,
+                noPermit: 'ASM2026012000022',
+                noPerencanaan: 'PTE2026000048',
+                unitInduk: 'P3BS',
+                unitPelaksana: 'UPT PADANG',
+                penghantar: 'SUTT 150kV Pauh Limo - Indarung',
+                tower: 'T.09',
+                towers: ['T.09 SUTT 150kV Pauh Limo'],
+                functlocs: ['TRS-1102-009.001-T0009'],
+                lat: -0.9492,
+                lng: 100.4172,
+                jumlahSet: 1,
+                merk: 'LINDSEY',
+                rencanaErs: 'Lindsey - 150kV - Tension',
+                tipePemasangan: 'Darurat Cuaca Ekstrem',
+                picPemasangan: 'TIM ERS UPT PADANG',
+                penyebab: 'Pohon tumbang menghantam konduktor',
+                tanggal: '20 Januari 2026',
+                rencanaBongkar: '15 September 2026',
+                durasi: '8 Bulan',
+                statusSet: 'Lengkap',
+                status: 'Terpasang'
+            },
+            {
+                id: 'tt_4',
+                no: 4,
+                noPermit: 'INS2026020200031',
+                noPerencanaan: 'PTE2026000059',
+                unitInduk: 'UIP3BSUL',
+                unitPelaksana: 'UPT MAKASSAR',
+                penghantar: 'SUTT 150kV Tello - Daya',
+                tower: 'T.24',
+                towers: ['T.24 SUTT 150kV Tello - Daya'],
+                functlocs: ['TRS-2401-024.010-T0024'],
+                lat: -5.1477,
+                lng: 119.4327,
+                jumlahSet: 2,
+                merk: 'Tower Solution',
+                rencanaErs: 'Tower Solution - 150kV - Tension',
+                isMixed: true,
+                mixedWith: 'Lindsey',
+                mixedBrands: ['Tower Solution', 'Lindsey'],
+                mixedMainBrand: 'Tower Solution (Struktur Utama)',
+                mixedSecondaryBrand: 'Lindsey (Guying & Anchor)',
+                tipePemasangan: 'Perkuatan Saluran',
+                picPemasangan: 'TIM ERS SULSELRABAR',
+                penyebab: 'Pembangunan jalan layang kota',
+                tanggal: '02 Februari 2026',
+                rencanaBongkar: '31 Oktober 2026',
+                durasi: '9 Bulan',
+                statusSet: 'Lengkap',
+                status: 'Terpasang'
+            }
+        ];
+
+        let map, markersLayer;
+        let activeTab = 'terpasang';
+        let isExpanded = false;
+        let currentViewMode = 'list'; // 'list' | 'detail'
+        let activeSelectedItemId = null;
+        let activeTowerPillIdx = 0;
+
+        function initMap() {
+            map = L.map('petaLeafletMap', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([-6.0, 109.5], 5.4);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+
+// Zoom control removed for clean mobile touch interaction
+
+            map.on('zoomend', () => {
+                renderMarkers();
+            });
+
+            // Scroll listener on sheet body to auto-expand to 50:50
+            const sheetBody = document.getElementById('grabSheetBody');
+            if (sheetBody) {
+                sheetBody.addEventListener('scroll', () => {
+                    if (sheetBody.scrollTop > 15 && !isExpanded) {
+                        expandTo50();
+                    }
+                });
+            }
+
+            switchGrabMode('terpasang');
+        }
+
+        function recenterGrabMap() {
+            if (map) {
+                map.setView([-6.0, 109.5], 5.4);
+            }
+        }
+
+        function expandTo50() {
+            if (!isExpanded) {
+                isExpanded = true;
+                const container = document.getElementById('grabViewContainer');
+                if (container) container.classList.add('expanded-50');
+                setTimeout(() => {
+                    if (map) map.invalidateSize();
+                }, 320);
+            }
+        }
+
+        function collapseTo25() {
+            if (isExpanded) {
+                isExpanded = false;
+                const container = document.getElementById('grabViewContainer');
+                if (container) container.classList.remove('expanded-50');
+                setTimeout(() => {
+                    if (map) map.invalidateSize();
+                }, 320);
+            }
+        }
+
+        function toggleGrabSheetSize() {
+            if (isExpanded) {
+                collapseTo25();
+            } else {
+                expandTo50();
+            }
+        }
+
+        function switchGrabMode(mode) {
+            activeTab = mode;
+            currentViewMode = 'list';
+            activeSelectedItemId = null;
+
+            document.getElementById('grabTabSet').classList.toggle('active', mode === 'set');
+            document.getElementById('grabTabTower').classList.toggle('active', mode === 'tower');
+            document.getElementById('grabTabTerpasang').classList.toggle('active', mode === 'terpasang');
+
+            updateSheetHeader();
+            renderMarkers();
+            renderSheetBody();
+        }
+
+        function getCurrentData() {
+            if (activeTab === 'terpasang') return towerTerpasangData;
+            if (activeTab === 'tower') return towerOperasiData;
+            return ersMasterData;
+        }
+
+        function updateSheetHeader() {
+            const titleArea = document.getElementById('sheetTitleArea');
+            const dataList = getCurrentData();
+
+            if (currentViewMode === 'detail') {
+                let detailTitle = 'Detail Tower Operasi Terpasang';
+                if (activeTab === 'set') detailTitle = 'Detail Set ERS';
+                else if (activeTab === 'tower') detailTitle = 'Detail Tower Operasi';
+
+                titleArea.innerHTML = `
+                    <button class="btn-sheet-back" type="button" onclick="backToList()">
+                        <i class="fa-solid fa-arrow-left"></i> Kembali
+                    </button>
+                    <span style="font-size:12px; font-weight:800; color:var(--text-dark);">${detailTitle}</span>
+                `;
+            } else {
+                let titleText = 'Titik Lokasi Tower Operasi Terpasang';
+                if (activeTab === 'tower') titleText = 'Titik Lokasi Tower Operasi';
+                else if (activeTab === 'set') titleText = 'Titik Lokasi Set ERS';
+
+                titleArea.innerHTML = `
+                    <i class="fa-solid fa-location-dot" style="color: #0A58CA;"></i>
+                    <span id="grabSheetTitleText">${titleText}</span>
+                    <span class="grab-count-badge" id="grabSheetCountBadge">${dataList.length} Titik</span>
+                `;
+            }
+        }
+
+        function renderMarkers() {
+            if (!map || !markersLayer) return;
+            markersLayer.clearLayers();
+
+            const currentData = getCurrentData();
+            const currentZoom = map.getZoom();
+
+            // Cluster when zoomed out (zoom <= 5)
+            if (currentZoom <= 5) {
+                const clusters = {};
+                const singles = [];
+
+                currentData.forEach(item => {
+                    let clusterKey = null;
+                    if (item.lat < 0 && item.lng > 118 && item.lng < 125) clusterKey = 'Sulawesi';
+                    else if (item.lat < -6 && item.lng > 106 && item.lng < 115) clusterKey = 'Jawa';
+                    else if (item.lat > -6 && item.lng < 106) clusterKey = 'Sumatera';
+
+                    if (clusterKey) {
+                        if (!clusters[clusterKey]) clusters[clusterKey] = [];
+                        clusters[clusterKey].push(item);
+                    } else {
+                        singles.push(item);
+                    }
+                });
+
+                Object.keys(clusters).forEach(key => {
+                    const items = clusters[key];
+                    if (items.length > 1) {
+                        const avgLat = items.reduce((s, it) => s + it.lat, 0) / items.length;
+                        const avgLng = items.reduce((s, it) => s + it.lng, 0) / items.length;
+
+                        const clusterIcon = L.divIcon({
+                            html: `<div class="grab-cluster-pin">
+                                <span class="cluster-count">${items.length}</span>
+                            </div>`,
+                            className: '',
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16]
+                        });
+
+                        const clusterMarker = L.marker([avgLat, avgLng], { icon: clusterIcon });
+                        clusterMarker.on('click', () => {
+                            map.setView([avgLat, avgLng], 7.5);
+                        });
+                        markersLayer.addLayer(clusterMarker);
+                    } else {
+                        singles.push(...items);
+                    }
+                });
+
+                singles.forEach(item => renderSingleMarker(item));
+            } else {
+                currentData.forEach(item => renderSingleMarker(item));
+            }
+        }
+
+        function renderSingleMarker(item) {
+            if (activeTab === 'set') {
+                const customIcon = L.divIcon({
+                    html: `<div class="ers-marker-pin set"><i class="fa-solid fa-building-columns"></i></div>`,
+                    className: 'custom-leaflet-pin',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 28],
+                    popupAnchor: [0, -28]
+                });
+
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+
+                marker.on('click', () => {
+                    activeSelectedItemId = item.id;
+                    map.setView([item.lat, item.lng], 8.5, { animate: true });
+                    renderLocationListCards();
+                    const cardEl = document.getElementById(`card_${item.id}`);
+                    if (cardEl) {
+                        cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+
+                // EXACT USER SCREENSHOT POPUP
+                marker.bindPopup(`
+                    <div class="ui-screenshot-popup">
+                        <div class="ui-sc-header">
+                            <span class="ui-sc-title">${item.unitInduk}</span>
+                            <button class="ui-sc-close" type="button" onclick="map.closePopup();">✕</button>
+                        </div>
+                        <div class="ui-sc-body">
+                            <div class="ui-sc-row">
+                                <span class="ui-sc-lbl">Set Lengkap</span>
+                                <span class="ui-sc-val">${item.setLengkap ?? 0}</span>
+                            </div>
+                            <div class="ui-sc-row">
+                                <span class="ui-sc-lbl">Tidak Lengkap</span>
+                                <span class="ui-sc-val">${item.setTidakLengkap ?? 0}</span>
+                            </div>
+                            <div class="ui-sc-row">
+                                <span class="ui-sc-lbl">ERS Operasi</span>
+                                <span class="ui-sc-val">${item.ersOperasi ?? 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                `, { maxWidth: 220, minWidth: 180, closeButton: false });
+
+                markersLayer.addLayer(marker);
+                return;
+            }
+
+            let pinClass = activeTab === 'terpasang' ? 'terpasang' : 'tower';
+            let pinIcon = activeTab === 'terpasang' ? 'fa-tower-broadcast' : 'fa-tower-observation';
+
+            const customIcon = L.divIcon({
+                html: `<div class="ers-marker-pin ${pinClass}"><i class="fa-solid ${pinIcon}"></i></div>`,
+                className: 'custom-leaflet-pin',
+                iconSize: [28, 28],
+                iconAnchor: [14, 28],
+                popupAnchor: [0, -28]
+            });
+
+            const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+
+            marker.on('click', () => {
+                showInstallationDetail(item.id || item.no);
+            });
+
+            marker.bindPopup(`
+                <div style="font-family:'Inter',sans-serif; padding:8px 10px;">
+                    <div style="font-size:11px; font-weight:800; color:#0A58CA;">${item.unitInduk} - ${item.unitPelaksana}</div>
+                    <div style="font-size:11px; font-weight:700; color:#0f172a; margin:3px 0;">${item.penghantar}</div>
+                    <div style="font-size:9.5px; color:#64748b; margin-bottom:6px;">${item.tower} • ${item.merk}</div>
+                    <button style="width:100%; padding:4px 8px; background:#0A58CA; color:#fff; border:none; border-radius:5px; font-size:10px; font-weight:700; cursor:pointer;" onclick="showInstallationDetail('${item.id || item.no}')">
+                        Buka Detail Pemasangan
+                    </button>
+                </div>
+            `, { maxWidth: 230 });
+
+            markersLayer.addLayer(marker);
+        }
+
+        function renderSheetBody() {
+            const container = document.getElementById('grabSheetBody');
+            if (currentViewMode === 'detail' && activeSelectedItemId) {
+                renderInstallationDetailCard();
+            } else {
+                renderLocationListCards();
+            }
+        }
+
+        function renderLocationListCards() {
+            const container = document.getElementById('grabSheetBody');
+            const dataList = getCurrentData();
+
+            if (activeTab === 'set') {
+                container.innerHTML = dataList.map(item => `
+                    <div class="grab-loc-card ${String(item.id) === String(activeSelectedItemId) ? 'active-card' : ''}" 
+                         id="card_${item.id}" 
+                         onclick="focusLocation('${item.id}')">
+                        <div class="grab-card-head">
+                            <span class="grab-card-unit"><i class="fa-solid fa-building-columns"></i> ${item.unitInduk}</span>
+                            <span style="font-size:11px; font-weight:600; color:#475569;">${item.namaLengkap}</span>
+                        </div>
+                        <div class="ui-set-metrics-grid">
+                            <div class="ui-set-metric-box">
+                                <span class="metric-lbl">Set Lengkap</span>
+                                <span class="metric-val primary">${item.setLengkap}</span>
+                            </div>
+                            <div class="ui-set-metric-box">
+                                <span class="metric-lbl">Tidak Lengkap</span>
+                                <span class="metric-val warning">${item.setTidakLengkap}</span>
+                            </div>
+                            <div class="ui-set-metric-box">
+                                <span class="metric-lbl">ERS Operasi</span>
+                                <span class="metric-val accent">${item.ersOperasi}</span>
+                            </div>
+                        </div>
+                        <div class="grab-card-footer" style="margin-top:6px;">
+                            <span style="font-size:11px; font-weight:600; color:#475569;"><i class="fa-solid fa-map-pin" style="color:#0A58CA;"></i> ${item.functloc}</span>
+                            <button class="grab-btn-detail" type="button" onclick="event.stopPropagation(); focusLocation('${item.id}');">
+                                <i class="fa-solid fa-crosshairs"></i> Fokus Lokasi
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            container.innerHTML = dataList.map(item => `
+                <div class="grab-loc-card ${String(item.id || item.no) === String(activeSelectedItemId) ? 'active-card' : ''}" 
+                     id="card_${item.id || item.no}" 
+                     onclick="showInstallationDetail('${item.id || item.no}')">
+                    <div class="grab-card-head">
+                        <span class="grab-card-unit">${item.unitInduk} • ${item.unitPelaksana}</span>
+                        <span class="grab-card-badge">${item.status || item.statusSet || 'Terpasang'}</span>
+                    </div>
+                    <div class="grab-card-penghantar">${item.penghantar}</div>
+                    <div class="grab-card-specs">
+                        <span><i class="fa-solid fa-broadcast-tower"></i> ${item.tower}</span>
+                        <span><i class="fa-solid fa-layer-group"></i> ${item.jumlahSet} Set</span>
+                        <span>(${item.merk})</span>
+                        ${item.isMixed ? `<span style="color:#b45309; font-weight:700;"><i class="fa-solid fa-shuffle"></i> Mixed: ${item.mixedWith || item.mixedBrands[1]}</span>` : ''}
+                    </div>
+                    ${item.noPermit ? `
+                        <div class="grab-card-chips">
+                            <span class="grab-card-chip"><i class="fa-solid fa-file-shield"></i> ${item.noPermit}</span>
+                            <span class="grab-card-chip plan"><i class="fa-solid fa-clipboard-list"></i> ${item.noPerencanaan}</span>
+                        </div>
+                    ` : ''}
+                    <div class="grab-card-footer">
+                        <span><i class="fa-regular fa-calendar"></i> ${item.tanggal}</span>
+                        <button class="grab-btn-detail" type="button" onclick="event.stopPropagation(); showInstallationDetail('${item.id || item.no}');">
+                            <i class="fa-solid fa-file-lines"></i> Detail Proses
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function focusLocation(itemId) {
+            activeSelectedItemId = itemId;
+            const dataList = getCurrentData();
+            const target = dataList.find(it => String(it.id) === String(itemId));
+            if (target && map) {
+                map.setView([target.lat, target.lng], 8.5, { animate: true });
+                // Open popup on matching marker
+                markersLayer.eachLayer(layer => {
+                    if (layer.getLatLng && Math.abs(layer.getLatLng().lat - target.lat) < 0.001 && Math.abs(layer.getLatLng().lng - target.lng) < 0.001) {
+                        layer.openPopup();
+                    }
+                });
+            }
+            renderLocationListCards();
+            const cardEl = document.getElementById(`card_${itemId}`);
+            if (cardEl) {
+                cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function showInstallationDetail(itemId) {
+            if (activeTab === 'set') {
+                focusLocation(itemId);
+                return;
+            }
+            activeSelectedItemId = itemId;
+            currentViewMode = 'detail';
+            activeTowerPillIdx = 0;
+
+            // Push state for Android native back button support
+            if (window.history && window.history.pushState) {
+                window.history.pushState({ view: 'detail', id: itemId }, '');
+            }
+
+            // Auto expand to 50:50 so user can read complete details comfortably
+            expandTo50();
+
+            updateSheetHeader();
+            renderInstallationDetailCard();
+
+            // Pan map to location
+            const dataList = getCurrentData();
+            const target = dataList.find(it => String(it.id || it.no) === String(itemId));
+            if (target && map) {
+                map.setView([target.lat, target.lng], 9, { animate: true });
+            }
+        }
+
+        function backToList() {
+            currentViewMode = 'list';
+            updateSheetHeader();
+            renderSheetBody();
+
+            if (activeSelectedItemId) {
+                setTimeout(() => {
+                    const cardEl = document.getElementById(`card_${activeSelectedItemId}`);
+                    if (cardEl) {
+                        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+            }
+        }
+
+        // Support Android hardware/gesture back button
+        window.addEventListener('popstate', (e) => {
+            if (currentViewMode === 'detail') {
+                backToList();
+            }
+        });
+
+        function switchTowerTab(idx) {
+            activeTowerPillIdx = idx;
+            renderInstallationDetailCard();
+        }
+
+        function renderInstallationDetailCard() {
+            const container = document.getElementById('grabSheetBody');
+            const dataList = getCurrentData();
+            const item = dataList.find(it => String(it.id || it.no) === String(activeSelectedItemId));
+
+            if (!item) {
+                backToList();
+                return;
+            }
+
+            // Set ERS View matching exact user screenshot
+            if (activeTab === 'set') {
+                container.innerHTML = `
+                    <div class="pk-detail-container">
+                        <div class="pk-detail-top">
+                            <div class="pk-detail-title-area">
+                                <div class="pk-detail-penghantar">${item.namaLengkap}</div>
+                                <div class="pk-detail-sub">
+                                    <i class="fa-solid fa-building-flag"></i> ${item.unitInduk} &bull; Kode SAP: ${item.kodeSap}
+                                </div>
+                            </div>
+                            <div class="pk-detail-status-col">
+                                <span class="pk-detail-badge ${item.setTidakLengkap === 0 ? 'blue' : ''}">${item.setTidakLengkap === 0 ? 'Siap Operasi' : 'Perlu Pemenuhan'}</span>
+                                <button class="pk-btn-recenter" type="button" onclick="map.setView([${item.lat}, ${item.lng}], 10, {animate:true})" title="Pusatkan Lokasi di Peta">
+                                    <i class="fa-solid fa-crosshairs"></i> Pusatkan
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- EXACT SCREENSHOT CARD DESIGN -->
+                        <div class="ui-screenshot-card" style="margin: 8px 0;">
+                            <div class="ui-sc-header">
+                                <span class="ui-sc-title">${item.unitInduk}</span>
+                                <button class="ui-sc-close" type="button" onclick="backToList()" title="Tutup Detail">✕</button>
+                            </div>
+                            <div class="ui-sc-body">
+                                <div class="ui-sc-row">
+                                    <span class="ui-sc-lbl">Set Lengkap</span>
+                                    <span class="ui-sc-val">${item.setLengkap}</span>
+                                </div>
+                                <div class="ui-sc-row">
+                                    <span class="ui-sc-lbl">Tidak Lengkap</span>
+                                    <span class="ui-sc-val">${item.setTidakLengkap}</span>
+                                </div>
+                                <div class="ui-sc-row">
+                                    <span class="ui-sc-lbl">ERS Operasi</span>
+                                    <span class="ui-sc-val">${item.ersOperasi}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Spec Box -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; display:flex; flex-direction:column; gap:6px;">
+                            <div style="font-size:11px; font-weight:700; color:#334155;"><i class="fa-solid fa-layer-group"></i> Ringkasan Ketersediaan Set ERS</div>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#64748b;">
+                                <span>Total Alokasi Set:</span>
+                                <strong style="color:#0f172a;">${item.setLengkap + item.setTidakLengkap} Set</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#64748b;">
+                                <span>Persentase Kesiapan:</span>
+                                <strong style="color:#0A58CA;">${(item.setLengkap + item.setTidakLengkap) > 0 ? Math.round((item.setLengkap / (item.setLengkap + item.setTidakLengkap)) * 100) : 0}%</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#64748b;">
+                                <span>Functloc Unit Induk:</span>
+                                <span style="color:#475569; font-family:monospace; font-size:11px;">${item.functloc}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const towers = item.towers || [item.tower];
+            const functlocs = item.functlocs || ['-'];
+            const hasMultiTower = towers.length > 1;
+            const currentTowerName = towers[activeTowerPillIdx] || towers[0];
+            const currentFunctloc = functlocs[activeTowerPillIdx] || functlocs[0];
+
+            let towerPillsHtml = '';
+            if (hasMultiTower) {
+                towerPillsHtml = `
+                    <div class="pk-tower-pill-bar">
+                        ${towers.map((t, idx) => `
+                            <button type="button" class="pk-tower-pill ${idx === activeTowerPillIdx ? 'active' : ''}" onclick="switchTowerTab(${idx})">
+                                Tower ${idx + 1}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="pk-detail-container">
+                    <!-- Top Title Area -->
+                    <div class="pk-detail-top">
+                        <div class="pk-detail-title-area">
+                            <div class="pk-detail-penghantar">${item.penghantar}</div>
+                            <div class="pk-detail-sub">
+                                <i class="fa-solid fa-building"></i> ${item.unitPelaksana} • ${item.unitInduk}
+                            </div>
+                        </div>
+                        <div class="pk-detail-status-col">
+                            <span class="pk-detail-badge ${item.status === 'Operasi Aktif' ? 'blue' : ''}">${hasMultiTower ? `${towers.length} Tower` : (item.status || 'Terpasang')}</span>
+                            <button class="pk-btn-recenter" type="button" onclick="map.setView([${item.lat}, ${item.lng}], 10, {animate:true})" title="Pusatkan Lokasi di Peta">
+                                <i class="fa-solid fa-crosshairs"></i> Pusatkan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dual Ref Chips (No. Permit & No. Rencana) - Hanya untuk yang memiliki acuan perizinan/perencanaan -->
+                    ${(item.noPermit || item.noPerencanaan) ? `
+                        <div class="pk-id-chips">
+                            <div class="pk-id-chip permit" title="${item.noPermit || '-'}">
+                                <span class="pk-chip-lbl"><i class="fa-solid fa-file-shield"></i> No. Permit</span>
+                                <span class="pk-id-chip-val">${item.noPermit || '-'}</span>
+                            </div>
+                            <div class="pk-id-chip plan" title="${item.noPerencanaan || '-'}">
+                                <span class="pk-chip-lbl"><i class="fa-solid fa-clipboard-list"></i> No. Rencana</span>
+                                <span class="pk-id-chip-val">${item.noPerencanaan || '-'}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Multi Tower Selector (if > 1) -->
+                    ${towerPillsHtml}
+
+                    <!-- Active Tower Display Box -->
+                    <div class="pk-tower-active-box">
+                        <div class="pk-tower-active-row">
+                            <div class="pk-tower-active-name">
+                                <i class="fa-solid fa-tower-broadcast" style="color:#0A58CA;"></i> ${currentTowerName}
+                            </div>
+                            ${hasMultiTower ? `<span class="pk-tower-idx-tag">Tower ${activeTowerPillIdx + 1} dari ${towers.length}</span>` : ''}
+                        </div>
+                        <div class="pk-tower-active-sub">
+                            <i class="fa-solid fa-map-pin"></i> Functloc: ${currentFunctloc}
+                        </div>
+                    </div>
+
+                    <!-- 2x2 Specification Grid -->
+                    <div class="pk-spec-grid">
+                        <div class="pk-spec-box">
+                            <span class="pk-spec-lbl"><i class="fa-solid fa-wrench"></i> Merk & Tipe</span>
+                            <span class="pk-spec-val">
+                                ${item.rencanaErs || item.merk}
+                            </span>
+                        </div>
+                        <div class="pk-spec-box">
+                            <span class="pk-spec-lbl"><i class="fa-solid fa-layer-group"></i> Jumlah Set</span>
+                            <span class="pk-spec-val">${item.jumlahSet} Set ERS</span>
+                        </div>
+                        <div class="pk-spec-box">
+                            <span class="pk-spec-lbl"><i class="fa-solid fa-shield-halved"></i> Klasifikasi</span>
+                            <span class="pk-spec-val">${item.tipePemasangan || 'Tower Kritis'}</span>
+                        </div>
+                        <div class="pk-spec-box">
+                            <span class="pk-spec-lbl"><i class="fa-solid fa-code-branch"></i> Total Tower</span>
+                            <span class="pk-spec-val">${towers.length} Tower</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Detail Komponen Mixed (jika ada komponen merk campuran) -->
+                    ${item.isMixed ? `
+                        <div class="pk-mixed-card">
+                            <div class="pk-mixed-head">
+                                <div class="pk-mixed-badge"><i class="fa-solid fa-shuffle"></i> Komponen Mixed: ${item.mixedWith || 'Campuran'}</div>
+                                <span class="pk-mixed-subtitle">${item.mixedBrands ? item.mixedBrands.join(' + ') : 'Mixed'}</span>
+                            </div>
+                            <div class="pk-mixed-grid">
+                                <div class="pk-mixed-item">
+                                    <span class="pk-mixed-role"><i class="fa-solid fa-monument"></i> Merk Utama</span>
+                                    <span class="pk-mixed-val" title="${item.mixedMainBrand || item.merk}">${item.mixedMainBrand || item.merk}</span>
+                                </div>
+                                <div class="pk-mixed-item">
+                                    <span class="pk-mixed-role"><i class="fa-solid fa-link"></i> Merk Mixed (${item.mixedWith || 'Aksesoris'})</span>
+                                    <span class="pk-mixed-val" title="${item.mixedSecondaryBrand || item.mixedWith}">${item.mixedSecondaryBrand || item.mixedWith}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Timeline Progress Box -->
+                    <div class="pk-timeline-box">
+                        <div class="pk-timeline-dates">
+                            <span><i class="fa-regular fa-calendar-check"></i> ${item.tanggal}</span>
+                            <span class="pk-duration-tag"><i class="fa-solid fa-stopwatch"></i> ${item.durasi || 'Operasi'}</span>
+                            <span>${item.rencanaBongkar || '-'}</span>
+                        </div>
+                        <div class="pk-timeline-track">
+                            <div class="pk-timeline-fill"></div>
+                        </div>
+                        <div class="pk-timeline-labels">
+                            <span>Tanggal Pasang</span>
+                            <span>Rencana Bongkar</span>
+                        </div>
+                    </div>
+
+                    <!-- Penyebab Box -->
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:7px 9px; font-size:10px; color:#475569;">
+                        <strong style="color:#0f172a;"><i class="fa-solid fa-circle-info" style="color:#0A58CA;"></i> Penyebab:</strong> ${item.penyebab}
+                    </div>
+
+                    <!-- Detail Footer Actions -->
+                    <div class="pk-detail-footer">
+                        <div class="pk-detail-pic" title="${item.picPemasangan || 'TIM ERS'}">
+                            <i class="fa-solid fa-user-shield" style="color:#0A58CA;"></i> ${item.picPemasangan || 'TIM ERS'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initTheme() {
+            if (localStorage.getItem('pln_mobile_theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initMap();
+        });
+    </script>
+</body>
+
+</html>
