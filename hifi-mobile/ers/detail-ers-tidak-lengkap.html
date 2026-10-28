@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detail ERS Tidak Lengkap - PLN Power Inspect</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-blue: #0A58CA;
+            --primary-blue-dark: #084298;
+            --primary-blue-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
+            --danger-red: #dc2626;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+            --warning-amber: #d97706;
+            --warning-bg: #fffbeb;
+            --warning-border: #fde68a;
+            --success-green: #16a34a;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+            animation: pageFadeIn 0.2s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0.9;
+                transform: scale(0.996);
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #1e293b;
+            }
+        }
+
+        /* 1. iOS Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px 6px;
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 700;
+            background-color: #ffffff;
+            z-index: 20;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* 2. Top Header */
+        .header-section {
+            background: #ffffff;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 20;
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-with-back {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2px;
+        }
+
+        .back-home-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .back-home-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue);
+        }
+
+        .main-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+
+        .sub-title {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-left: 42px;
+        }
+
+        /* 3. Search and Filter Bar (Dividing border removed) */
+        .search-filter-section {
+            background: #ffffff;
+            padding: 12px 16px 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: none;
+        }
+
+        .search-input-box {
+            flex: 1;
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .search-input-box:focus-within {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.1);
+        }
+
+        .search-input-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 13px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .search-input-box input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-input-box i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .filter-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:active {
+            background: #f8fafc;
+        }
+
+        .filter-btn.has-filter {
+            background: var(--primary-blue-light);
+            border-color: #bfdbfe;
+            color: var(--primary-blue);
+        }
+
+        .filter-btn.has-filter::after {
+            content: '';
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #dc2626;
+            border: 1px solid #ffffff;
+        }
+
+        /* 4. Category Chips Horizontal Scroll (Identical to list-aset.html) */
+        .category-chips-scroll {
+            background: #ffffff;
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-chips-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(10, 88, 202, 0.25);
+        }
+
+        /* 5. App Body / Content Area */
+        .app-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 14px 16px 20px;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-canvas);
+            scrollbar-width: none;
+            gap: 12px;
+        }
+
+        .app-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* KPI Banner Strip */
+        .kpi-banner {
+            background: linear-gradient(135deg, #0A58CA 0%, #033c94 100%);
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: #ffffff;
+            box-shadow: 0 6px 18px rgba(10, 88, 202, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            min-height: 68px;
+            box-sizing: border-box;
+        }
+
+        .kpi-stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+        }
+
+        .kpi-stat-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            opacity: 0.85;
+        }
+
+        .kpi-stat-val {
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.1;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .kpi-stat-divider {
+            width: 1px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Total Data Strip under Recap */
+        .total-data-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            flex-shrink: 0;
+        }
+
+        .total-data-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .total-data-pulse {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(10, 88, 202, 0.2);
+        }
+
+        .total-data-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .total-data-badge {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Active Filter Bar Indicator */
+        .active-filter-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--primary-blue-light);
+            border: 1px solid #bfdbfe;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .btn-clear-filter {
+            background: transparent;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* List Cards */
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .detail-item-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .detail-item-card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .unit-badge-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unit-idx {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .unit-code {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.2px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Status Pills Row (Identical to list-aset.html) */
+        .asset-pills-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .asset-pill {
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.2;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .pill-red { background: #ef4444; }
+        .pill-navy { background: #334155; }
+        .pill-gray { background: #64748b; }
+        .pill-green { background: #059669; }
+        .pill-orange { background: #ea580c; }
+        .pill-blue-gray { background: #5786a8; }
+
+        .card-brand-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: -2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-brand-sub strong {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .card-body-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .spec-lbl {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .spec-val-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 190px;
+        }
+
+        .deficit-badge {
+            background: var(--danger-bg);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-border);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-footer-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-top: 2px;
+        }
+
+        .gap-indicator {
+            font-size: 11px;
+            color: var(--danger-red);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-view-detail {
+            background: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s ease;
+            text-decoration: none;
+        }
+
+        .btn-view-detail:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        /* Lazy Loader Footer Component */
+        .lazy-loader-pill {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* iOS Home Indicator */
+        .ios-bar {
+            width: 134px;
+            height: 5px;
+            background-color: #cbd5e1;
+            border-radius: 10px;
+            margin: 8px auto 6px auto;
+            flex-shrink: 0;
+        }
+
+        /* Bottom Sheet Modal Common */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(2px);
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-sheet {
+            background: #ffffff;
+            border-radius: 22px 22px 0 0;
+            padding: 16px 20px 24px;
+            max-height: 85%;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.25s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 4px;
+            margin: 0 auto 4px;
+        }
+
+        .sheet-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sheet-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-sheet-close {
+            background: #f1f5f9;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Form Filter Styles */
+        .filter-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-lbl {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .form-select {
+            width: 100%;
+            height: 40px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 12px;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.1);
+        }
+
+        /* Segmented Button Group (Single Select <= 3 opsi text-only) */
+        .segmented-btn-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background: var(--input-bg);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .seg-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .seg-btn.active {
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(10, 88, 202, 0.25);
+        }
+
+        .filter-actions-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-filter-reset {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-dark);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-filter-apply {
+            flex: 2;
+            padding: 10px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(10, 88, 202, 0.25);
+        }
+
+        .btn-filter-apply:hover {
+            background: var(--primary-blue-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- 1. iOS Status Bar -->
+        <div class="status-bar">
+            <span id="currentTime">09:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 2. Standard Header Section -->
+        <div class="header-section">
+            <div class="header-titles">
+                <div class="title-with-back">
+                    <a href="./home-mobile.html" class="back-home-btn" title="Kembali ke Dashboard">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                    <div class="main-title">Set ERS Tidak Lengkap</div>
+                </div>
+                <div class="sub-title" id="headerSubTitle">3 Unit Induk Memiliki Kekurangan Set</div>
+            </div>
+        </div>
+
+        <!-- 3. Search and Filter Bar -->
+        <div class="search-filter-section">
+            <div class="search-input-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Cari Unit Induk atau Merk..." oninput="handleSearch(this.value)">
+            </div>
+            <button class="filter-btn" id="filterBtn" title="Buka Filter Lengkap" onclick="openFilterSheet()">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
+
+        <!-- 4. Category Chips Horizontal Scroll (Identical to list-aset.html - Strictly Single Select, No "Semua") -->
+        <div class="category-chips-scroll" id="categoryChipsScroll">
+            <button type="button" class="category-chip" data-chip="70 kV" onclick="filterByTeganganChip('70 kV', this)">70 kV (1)</button>
+            <button type="button" class="category-chip active" data-chip="150 kV" onclick="filterByTeganganChip('150 kV', this)">150 kV (3)</button>
+            <button type="button" class="category-chip" data-chip="275 kV" onclick="filterByTeganganChip('275 kV', this)">275 kV (0)</button>
+            <button type="button" class="category-chip" data-chip="500 kV" onclick="filterByTeganganChip('500 kV', this)">500 kV (1)</button>
+        </div>
+
+        <!-- 5. App Body / Content Area (With Lazy Load Scroll Listener) -->
+        <div class="app-body" id="appBodyScroll" onscroll="handleAppBodyScroll(event)">
+            <!-- KPI Summary Banner -->
+            <div class="kpi-banner">
+                <div class="kpi-stat-item">
+                    <span class="kpi-stat-lbl">Total Kekurangan</span>
+                    <span class="kpi-stat-val" id="totalSetVal">30 Set</span>
+                </div>
+                <div class="kpi-stat-divider"></div>
+                <div class="kpi-stat-item">
+                    <span class="kpi-stat-lbl">Unit Induk</span>
+                    <span class="kpi-stat-val" id="totalUnitVal">3 Unit</span>
+                </div>
+                <div class="kpi-stat-divider"></div>
+                <div class="kpi-stat-item">
+                    <span class="kpi-stat-lbl">Merk ERS</span>
+                    <span class="kpi-stat-val" id="totalMerkVal">3 Merk</span>
+                </div>
+            </div>
+
+            <!-- Total Data Available Strip (Under Recap) -->
+            <div class="total-data-strip">
+                <div class="total-data-left">
+                    <span class="total-data-pulse"></span>
+                    <span class="total-data-text" id="totalDataCountText">Total 5 Data ERS Tersedia</span>
+                </div>
+
+            </div>
+
+            <!-- Active Filter Bar Indicator -->
+            <div class="active-filter-bar" id="activeFilterBar">
+                <span id="activeFilterDesc">Filter diterapkan</span>
+                <button type="button" class="btn-clear-filter" onclick="resetAllFilters()">Reset Filter</button>
+            </div>
+
+            <!-- Card List (Lazy Loaded, Replacing Desktop Table) -->
+            <div class="cards-list" id="cardsListContainer">
+                <!-- Dynamically rendered via JS batch -->
+            </div>
+
+            <!-- Lazy Loading Footer State Indicator -->
+            <div class="lazy-loader-pill" id="lazyLoader">
+                <i class="fa-solid fa-spinner fa-spin"></i> Memuat data...
+            </div>
+        </div>
+
+        <!-- iOS Indicator -->
+        <div class="ios-bar"></div>
+
+        <!-- 6. Filter Bottom Sheet Modal -->
+        <div class="modal-overlay" id="filterModalSheet" onclick="closeFilterSheet(event)">
+            <div class="modal-sheet" onclick="event.stopPropagation()">
+                <div class="sheet-handle"></div>
+                <div class="sheet-head">
+                    <div class="sheet-title">Filter Data ERS</div>
+                    <button type="button" class="btn-sheet-close" onclick="closeFilterSheetDirect()">✕</button>
+                </div>
+
+                <!-- 1. Filter Unit Induk (> 3 opsi -> Dropdown Combobox) -->
+                <div class="filter-form-group">
+                    <label class="form-lbl" for="filterUnitSelect">Unit Induk</label>
+                    <select class="form-select" id="filterUnitSelect">
+                        <option value="all">Semua Unit Induk</option>
+                        <option value="PPB">PPB - Papua & Papua Barat</option>
+                        <option value="NTB">NTB - Nusa Tenggara Barat</option>
+                        <option value="UITJBM">UITJBM - Jawa Bagian Madura</option>
+                    </select>
+                </div>
+
+                <!-- 2. Filter Merk (> 3 opsi -> Dropdown Combobox) -->
+                <div class="filter-form-group">
+                    <label class="form-lbl" for="filterMerkSelect">Merk ERS</label>
+                    <select class="form-select" id="filterMerkSelect">
+                        <option value="all">Semua Merk</option>
+                        <option value="SBB">SBB</option>
+                        <option value="Lindsey">Lindsey</option>
+                        <option value="Tower Solution">Tower Solution</option>
+                    </select>
+                </div>
+
+                <!-- 3. Filter Tegangan (> 3 opsi -> Dropdown Combobox, Single Select Tanpa Opsi Semua) -->
+                <div class="filter-form-group">
+                    <label class="form-lbl" for="filterTeganganSelect">Tegangan</label>
+                    <select class="form-select" id="filterTeganganSelect">
+                        <option value="70 kV">70 kV</option>
+                        <option value="150 kV" selected>150 kV</option>
+                        <option value="275 kV">275 kV</option>
+                        <option value="500 kV">500 kV</option>
+                    </select>
+                </div>
+
+                <!-- 4. Filter Tipe Tower (<= 3 opsi -> Segmented Pill Group text only) -->
+                <div class="filter-form-group">
+                    <label class="form-lbl">Tipe Tower</label>
+                    <div class="segmented-btn-group" id="filterTipeTowerGroup">
+                        <button type="button" class="seg-btn" data-val="all" onclick="selectTipeTower('all', this)">Semua</button>
+                        <button type="button" class="seg-btn" data-val="Suspension" onclick="selectTipeTower('Suspension', this)">Suspension</button>
+                        <button type="button" class="seg-btn active" data-val="Tension" onclick="selectTipeTower('Tension', this)">Tension</button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="filter-actions-row">
+                    <button type="button" class="btn-filter-reset" onclick="resetAllFilters()">Reset</button>
+                    <button type="button" class="btn-filter-apply" onclick="applySheetFilters()">Terapkan Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Exact Data matching reference desktop table with Tegangan & Tipe Tower metadata
+        const dataTidakLengkap = [
+            {
+                no: 1,
+                unitInduk: 'PPB',
+                namaUnit: 'PLN UIW Papua & Papua Barat',
+                merk: 'SBB',
+                tegangan: '150 kV',
+                tipeTower: 'Tension',
+                setTidakLengkap: 4,
+                gapItems: [
+                    { nama: 'Base Plate SBB 150kV', butuh: 4, kurang: 4, status: 'Pengadaan' },
+                    { nama: 'Guy Wire Guying Kit', butuh: 16, kurang: 12, status: 'Mutasi' },
+                    { nama: 'Column Section Mast', butuh: 24, kurang: 8, status: 'Pengadaan' }
+                ]
+            },
+            {
+                no: 2,
+                unitInduk: 'PPB',
+                namaUnit: 'PLN UIW Papua & Papua Barat',
+                merk: 'Lindsey',
+                tegangan: '70 kV',
+                tipeTower: 'Suspension',
+                setTidakLengkap: 6,
+                gapItems: [
+                    { nama: 'Lindsey Mast Column Module', butuh: 36, kurang: 14, status: 'Pengadaan' },
+                    { nama: 'Screw Anchor & Anchor Rod', butuh: 24, kurang: 18, status: 'Pengadaan' },
+                    { nama: 'Insulator String Assembly', butuh: 18, kurang: 6, status: 'Mutasi' }
+                ]
+            },
+            {
+                no: 3,
+                unitInduk: 'NTB',
+                namaUnit: 'PLN UIW Nusa Tenggara Barat',
+                merk: 'SBB',
+                tegangan: '150 kV',
+                tipeTower: 'Tension',
+                setTidakLengkap: 11,
+                gapItems: [
+                    { nama: 'Foundation Beam Module SBB', butuh: 22, kurang: 11, status: 'Pengadaan' },
+                    { nama: 'Crossarm Steel Section 150kV', butuh: 33, kurang: 18, status: 'Pengadaan' },
+                    { nama: 'Hardware Fitting & Shackles', butuh: 88, kurang: 42, status: 'Mutasi' }
+                ]
+            },
+            {
+                no: 4,
+                unitInduk: 'UITJBM',
+                namaUnit: 'UIT Jawa Bagian Madura',
+                merk: 'Tower Solution',
+                tegangan: '500 kV',
+                tipeTower: 'Tension',
+                setTidakLengkap: 7,
+                gapItems: [
+                    { nama: 'Base Pivot Joint TS', butuh: 14, kurang: 7, status: 'Pengadaan' },
+                    { nama: 'Guy Wire Tensioner 16mm', butuh: 28, kurang: 14, status: 'Pengadaan' },
+                    { nama: 'Gimbal Assembly Beam', butuh: 14, kurang: 6, status: 'Mutasi' }
+                ]
+            },
+            {
+                no: 5,
+                unitInduk: 'UITJBM',
+                namaUnit: 'UIT Jawa Bagian Madura',
+                merk: 'Lindsey',
+                tegangan: '150 kV',
+                tipeTower: 'Suspension',
+                setTidakLengkap: 2,
+                gapItems: [
+                    { nama: 'Lindsey Base Gimbal', butuh: 4, kurang: 2, status: 'Pengadaan' },
+                    { nama: 'Guy Grip Dead End LS', butuh: 16, kurang: 8, status: 'Pengadaan' }
+                ]
+            }
+        ];
+
+        // Filter state (Default: Tegangan 150 kV & Tipe Tower Tension)
+        let filterState = {
+            unit: 'all',
+            merk: 'all',
+            tegangan: '150 kV',
+            tipeTower: 'Tension',
+            search: ''
+        };
+
+        // Lazy load parameters
+        const BATCH_SIZE = 3;
+        let displayedCount = BATCH_SIZE;
+        let currentFilteredList = [];
+        let isBatchLoading = false;
+
+        // Update Top Banner Recap & Subtitle
+        function updateRecapBanner() {
+            // Count total kekurangan set
+            const totalSets = dataTidakLengkap.reduce((acc, curr) => acc + (curr.setTidakLengkap || 0), 0);
+            
+            // Strictly calculate unique unit induk that have setTidakLengkap > 0
+            const uniqueUnits = new Set(dataTidakLengkap.filter(x => x.setTidakLengkap > 0).map(x => x.unitInduk)).size;
+            
+            // Unique merks
+            const uniqueMerks = new Set(dataTidakLengkap.map(x => x.merk)).size;
+
+            document.getElementById('totalSetVal').innerText = `${totalSets} Set`;
+            document.getElementById('totalUnitVal').innerText = `${uniqueUnits} Unit`;
+            document.getElementById('totalMerkVal').innerText = `${uniqueMerks} Merk`;
+
+            // Subtitle
+            const subTitleEl = document.getElementById('headerSubTitle');
+            if (subTitleEl) {
+                subTitleEl.innerText = `${uniqueUnits} Unit Induk Memiliki Kekurangan Set`;
+            }
+
+            // Also update counts on Category Chips
+            updateChipCounts();
+        }
+
+        function updateChipCounts(autoSelectFallback = true) {
+            // Count matching data for each tegangan based on other active filters (unit, merk, tipeTower, search)
+            const getMatchingCount = (teganganVal) => {
+                return dataTidakLengkap.filter(item => {
+                    if (item.tegangan !== teganganVal) return false;
+                    if (filterState.unit !== 'all' && item.unitInduk !== filterState.unit) return false;
+                    if (filterState.merk !== 'all' && item.merk !== filterState.merk) return false;
+                    if (filterState.tipeTower !== 'all' && item.tipeTower !== filterState.tipeTower) return false;
+                    if (filterState.search) {
+                        const q = filterState.search.toLowerCase();
+                        const matchUnit = item.unitInduk.toLowerCase().includes(q) || item.namaUnit.toLowerCase().includes(q);
+                        const matchMerk = item.merk.toLowerCase().includes(q);
+                        const matchTipe = item.tipeTower.toLowerCase().includes(q);
+                        return matchUnit || matchMerk || matchTipe;
+                    }
+                    return true;
+                }).length;
+            };
+
+            const counts = {
+                '70 kV': getMatchingCount('70 kV'),
+                '150 kV': getMatchingCount('150 kV'),
+                '275 kV': getMatchingCount('275 kV'),
+                '500 kV': getMatchingCount('500 kV')
+            };
+
+            let visibleChips = [];
+            document.querySelectorAll('#categoryChipsScroll .category-chip').forEach(chip => {
+                const key = chip.getAttribute('data-chip');
+                const count = counts[key] !== undefined ? counts[key] : 0;
+                if (count === 0) {
+                    chip.style.display = 'none';
+                } else {
+                    chip.style.display = '';
+                    chip.innerText = `${key} (${count})`;
+                    visibleChips.push({ key, el: chip });
+                }
+            });
+
+            // Update bottom sheet options
+            const selectEl = document.getElementById('filterTeganganSelect');
+            if (selectEl) {
+                Array.from(selectEl.options).forEach(opt => {
+                    const c = counts[opt.value];
+                    if (c !== undefined) {
+                        opt.text = opt.value;
+                        opt.disabled = c === 0;
+                    }
+                });
+            }
+
+            // Fallback if current selected tegangan has 0 items and is hidden
+            if (autoSelectFallback && counts[filterState.tegangan] === 0 && visibleChips.length > 0) {
+                filterByTeganganChip(visibleChips[0].key, visibleChips[0].el);
+            }
+        }
+
+        function createCardHTML(item) {
+            return `
+                <div class="detail-item-card">
+                    <div class="card-header-row">
+                        <div class="unit-badge-group">
+                            <span class="unit-idx">${item.no}</span>
+                            <span class="unit-code">${item.unitInduk}</span>
+                        </div>
+                        <div class="asset-pills-row">
+                            <span class="asset-pill pill-red">Tidak Lengkap</span>
+                            <span class="asset-pill pill-navy">${item.tegangan}</span>
+                            <span class="asset-pill pill-gray">${item.tipeTower}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-brand-sub">
+                        <span>Merk ERS:</span>
+                        <strong>${item.merk}</strong>
+                    </div>
+
+                    <div class="card-body-box">
+                        <div class="spec-item">
+                            <span class="spec-lbl">Nama Unit Terdaftar</span>
+                            <span class="spec-val-name" title="${item.namaUnit}">${item.namaUnit}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                            <span class="spec-lbl">Set Tidak Lengkap</span>
+                            <div class="deficit-badge">
+                                <i class="fa-solid fa-triangle-exclamation" style="font-size: 11px;"></i>
+                                ${item.setTidakLengkap} Set
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer-row">
+                        <a href="./detail-set-komponen.html?unit=${encodeURIComponent(item.unitInduk)}&merk=${encodeURIComponent(item.merk)}&no=${item.no}" class="btn-view-detail">
+                            <span>Detail</span>
+                            <i class="fa-solid fa-arrow-right" style="font-size: 10.5px;"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBatch() {
+            const container = document.getElementById('cardsListContainer');
+            const loader = document.getElementById('lazyLoader');
+
+            if (currentFilteredList.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 16px; color: var(--text-muted);">
+                        <i class="fa-solid fa-filter-circle-xmark" style="font-size: 32px; opacity: 0.35; margin-bottom: 10px;"></i>
+                        <p style="font-size: 13px; font-weight: 700; color: var(--text-dark);">Data tidak ditemukan</p>
+                        <p style="font-size: 11.5px; opacity: 0.8; margin-top: 4px;">Coba ubah kombinasi filter atau kata kunci pencarian.</p>
+                        <button type="button" onclick="resetAllFilters()" style="margin-top: 12px; background: var(--primary-blue); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+                            Reset Filter
+                        </button>
+                    </div>
+                `;
+                loader.style.display = 'none';
+                return;
+            }
+
+            const visibleSlice = currentFilteredList.slice(0, displayedCount);
+            container.innerHTML = visibleSlice.map(item => createCardHTML(item)).join('');
+
+            // Update lazy loader status
+            if (displayedCount < currentFilteredList.length) {
+                loader.style.display = 'flex';
+                loader.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Scroll ke bawah untuk memuat data...`;
+            } else if (currentFilteredList.length > BATCH_SIZE) {
+                loader.style.display = 'flex';
+                loader.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--success-green);"></i> Semua data telah dimuat (${currentFilteredList.length})`;
+            } else {
+                loader.style.display = 'none';
+            }
+        }
+
+        function renderCards() {
+            const filtered = dataTidakLengkap.filter(item => {
+                // Unit Induk
+                if (filterState.unit !== 'all' && item.unitInduk !== filterState.unit) return false;
+                // Merk
+                if (filterState.merk !== 'all' && item.merk !== filterState.merk) return false;
+                // Tegangan (strictly single select, always has a value)
+                if (filterState.tegangan && item.tegangan !== filterState.tegangan) return false;
+                // Tipe Tower
+                if (filterState.tipeTower !== 'all' && item.tipeTower !== filterState.tipeTower) return false;
+                // Search
+                if (filterState.search) {
+                    const q = filterState.search.toLowerCase();
+                    const matchUnit = item.unitInduk.toLowerCase().includes(q) || item.namaUnit.toLowerCase().includes(q);
+                    const matchMerk = item.merk.toLowerCase().includes(q);
+                    const matchTegangan = item.tegangan.toLowerCase().includes(q);
+                    const matchTipe = item.tipeTower.toLowerCase().includes(q);
+                    return matchUnit || matchMerk || matchTegangan || matchTipe;
+                }
+                return true;
+            });
+
+            currentFilteredList = filtered;
+            displayedCount = BATCH_SIZE;
+
+            // Active Filter Bar indicator (Default: Tegangan 150 kV, Tipe Tension)
+            const isFilterActive = filterState.unit !== 'all' || 
+                                   filterState.merk !== 'all' || 
+                                   filterState.tegangan !== '150 kV' || 
+                                   filterState.tipeTower !== 'Tension';
+            const filterBar = document.getElementById('activeFilterBar');
+            const filterBtn = document.getElementById('filterBtn');
+
+            // Update Total Data Strip under Recap
+            const totalDataText = document.getElementById('totalDataCountText');
+            if (totalDataText) {
+                if (isFilterActive || filterState.search) {
+                    totalDataText.innerText = `Menampilkan ${filtered.length} dari ${dataTidakLengkap.length} Data Tersedia`;
+                } else {
+                    totalDataText.innerText = `Total ${dataTidakLengkap.length} Data ERS Tersedia`;
+                }
+            }
+
+            if (isFilterActive) {
+                filterBtn.classList.add('has-filter');
+                filterBar.style.display = 'flex';
+                let activeDesc = [];
+                if (filterState.unit !== 'all') activeDesc.push(`Unit: ${filterState.unit}`);
+                if (filterState.merk !== 'all') activeDesc.push(`Merk: ${filterState.merk}`);
+                if (filterState.tegangan) activeDesc.push(`Tegangan: ${filterState.tegangan}`);
+                if (filterState.tipeTower !== 'all') activeDesc.push(`Tipe: ${filterState.tipeTower}`);
+                document.getElementById('activeFilterDesc').innerText = activeDesc.join(' • ');
+            } else {
+                filterBtn.classList.remove('has-filter');
+                filterBar.style.display = 'none';
+            }
+
+            renderBatch();
+            updateChipCounts(false);
+        }
+
+        // Lazy load on scroll handler
+        function handleAppBodyScroll(e) {
+            const el = e.target;
+            if (displayedCount >= currentFilteredList.length || isBatchLoading) return;
+
+            // Trigger when reaching near bottom (40px threshold)
+            if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+                isBatchLoading = true;
+                const loader = document.getElementById('lazyLoader');
+                if (loader) {
+                    loader.style.display = 'flex';
+                    loader.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memuat data berikutnya...`;
+                }
+
+                setTimeout(() => {
+                    displayedCount = Math.min(displayedCount + BATCH_SIZE, currentFilteredList.length);
+                    renderBatch();
+                    isBatchLoading = false;
+                }, 300);
+            }
+        }
+
+        // Chip Filter for Tegangan (Identical to list-aset.html category-chip behavior)
+        function filterByTeganganChip(tegangan, btn) {
+            filterState.tegangan = tegangan;
+            document.querySelectorAll('#categoryChipsScroll .category-chip').forEach(el => el.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            // Sync with bottom sheet select
+            const teganganSelect = document.getElementById('filterTeganganSelect');
+            if (teganganSelect) teganganSelect.value = tegangan;
+
+            renderCards();
+        }
+
+        // Search Input
+        function handleSearch(val) {
+            filterState.search = val.trim();
+            renderCards();
+        }
+
+        // Filter Bottom Sheet Handlers
+        function openFilterSheet() {
+            // Sync values to form
+            document.getElementById('filterUnitSelect').value = filterState.unit;
+            document.getElementById('filterMerkSelect').value = filterState.merk;
+            document.getElementById('filterTeganganSelect').value = filterState.tegangan;
+            
+            // Sync Tipe Tower Segmented Group
+            document.querySelectorAll('#filterTipeTowerGroup .seg-btn').forEach(btn => {
+                if (btn.getAttribute('data-val') === filterState.tipeTower) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            document.getElementById('filterModalSheet').classList.add('active');
+        }
+
+        function closeFilterSheet(e) {
+            if (e.target.id === 'filterModalSheet') closeFilterSheetDirect();
+        }
+
+        function closeFilterSheetDirect() {
+            document.getElementById('filterModalSheet').classList.remove('active');
+        }
+
+        function selectTipeTower(val, btn) {
+            document.querySelectorAll('#filterTipeTowerGroup .seg-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+        }
+
+        function applySheetFilters() {
+            filterState.unit = document.getElementById('filterUnitSelect').value;
+            filterState.merk = document.getElementById('filterMerkSelect').value;
+            filterState.tegangan = document.getElementById('filterTeganganSelect').value;
+            
+            const activeTipeBtn = document.querySelector('#filterTipeTowerGroup .seg-btn.active');
+            filterState.tipeTower = activeTipeBtn ? activeTipeBtn.getAttribute('data-val') : 'all';
+
+            // Sync Category Chip
+            document.querySelectorAll('#categoryChipsScroll .category-chip').forEach(chip => {
+                const chipVal = chip.getAttribute('data-chip');
+                if (chipVal === filterState.tegangan) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+
+            closeFilterSheetDirect();
+            renderCards();
+        }
+
+        function resetAllFilters() {
+            filterState = {
+                unit: 'all',
+                merk: 'all',
+                tegangan: '150 kV',
+                tipeTower: 'Tension',
+                search: ''
+            };
+
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterUnitSelect').value = 'all';
+            document.getElementById('filterMerkSelect').value = 'all';
+            document.getElementById('filterTeganganSelect').value = '150 kV';
+            
+            document.querySelectorAll('#filterTipeTowerGroup .seg-btn').forEach(b => {
+                if (b.getAttribute('data-val') === 'Tension') b.classList.add('active');
+                else b.classList.remove('active');
+            });
+
+            document.querySelectorAll('#categoryChipsScroll .category-chip').forEach(chip => {
+                if (chip.getAttribute('data-chip') === '150 kV') chip.classList.add('active');
+                else chip.classList.remove('active');
+            });
+
+            closeFilterSheetDirect();
+            renderCards();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const el = document.getElementById('currentTime');
+            if (el) el.innerText = `${h}:${m}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRecapBanner();
+            renderCards();
+            updateClock();
+            setInterval(updateClock, 30000);
+        });
+    </script>
+</body>
+
+</html>
