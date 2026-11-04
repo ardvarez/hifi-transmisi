@@ -294,19 +294,38 @@
         .gi-badge-pill {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             background: #e0f2fe;
             color: #0369a1;
             border: 1px solid #bae6fd;
-            padding: 2px 7px;
+            padding: 2.5px 8px;
             border-radius: 20px;
             font-size: 10px;
             font-weight: 800;
-            cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Inter', sans-serif;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.1px;
             line-height: 1.2;
+            max-width: 220px;
+            white-space: nowrap;
+        }
+
+        .gi-badge-pill.static {
+            cursor: default;
+        }
+
+        .gi-badge-pill.clickable {
+            cursor: pointer;
+        }
+
+        .gi-badge-pill.clickable:hover {
+            background: #bae6fd;
+        }
+
+        .gi-badge-pill span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .gi-badge-pill:hover {
@@ -972,6 +991,88 @@
             opacity: 0.6;
         }
 
+        /* Mutasi Specific Location Box */
+        .mut-loc-card {
+            background: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 9px 11px;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .mut-loc-card {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        .mut-loc-transfer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .mut-loc-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .mut-loc-arrow {
+            font-size: 11px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            padding: 0 4px;
+        }
+
+        .mut-loc-single {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .mut-loc-badge {
+            font-size: 9.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mut-loc-badge.badge-sender {
+            color: #0284c7;
+        }
+
+        .mut-loc-badge.badge-receiver {
+            color: #059669;
+        }
+
+        .mut-loc-badge.badge-creator {
+            color: var(--primary-blue, #0b4884);
+        }
+
+        body.dark-mode .mut-loc-badge.badge-creator {
+            color: #38bdf8;
+        }
+
+        .mut-loc-name {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mutation-type-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
         .mutation-card-body {
             display: flex;
             flex-direction: column;
@@ -1632,19 +1733,27 @@
 </head>
 
 <body>
-    <!-- OUTER FLOATING UNIT TOGGLE (TOP RIGHT) -->
+    <!-- OUTER FLOATING UNIT / USER LEVEL TOGGLE (TOP RIGHT) -->
     <div class="outer-unit-toggle" id="outerUnitToggle">
         <div class="outer-unit-label">
             <i class="fa-solid fa-location-dot"></i> Lokasi Dinas
         </div>
         <div class="outer-toggle-pill">
-            <button class="outer-toggle-btn" id="btnModeUltg" onclick="switchUnitMode('ultg')"
-                title="Tampilan Unit ULTG">
-                <i class="fa-solid fa-building-shield"></i> Unit ULTG
+            <button class="outer-toggle-btn" id="btnModeUpt" onclick="switchUnitMode('upt')"
+                title="Lokasi Dinas: UPT Surabaya (Tanpa Bottom Sheet)">
+                <i class="fa-solid fa-building"></i> UPT
             </button>
-            <button class="outer-toggle-btn active" id="btnModeMultiGi" onclick="switchUnitMode('multigi')"
-                title="Tampilan Multi 14 GI">
-                <i class="fa-solid fa-bolt"></i> Multi GI
+            <button class="outer-toggle-btn active" id="btnModeUltg" onclick="switchUnitMode('ultg')"
+                title="Lokasi Dinas: ULTG Surabaya Utara (Tanpa Bottom Sheet)">
+                <i class="fa-solid fa-building-shield"></i> ULTG
+            </button>
+            <button class="outer-toggle-btn" id="btnModeGi" onclick="switchUnitMode('gi')"
+                title="Lokasi Dinas: Single GI (GI Waru 150kV - Tanpa Bottom Sheet)">
+                <i class="fa-solid fa-bolt"></i> Single GI
+            </button>
+            <button class="outer-toggle-btn" id="btnModeMultiGi" onclick="switchUnitMode('multigi')"
+                title="Lokasi Dinas: Multi GI (14 Gardu Induk - Buka Bottom Sheet)">
+                <i class="fa-solid fa-layer-group"></i> Multi GI
             </button>
         </div>
     </div>
@@ -1662,13 +1771,12 @@
                         <i class="fa-solid fa-circle-check" style="font-size: 11px; color: #1a65d6;"></i>
                     </div>
                     <div class="header-sub" id="headerUnitContainer">
-                        <i class="fa-solid fa-building-shield" style="font-size: 10px; color: #1a65d6;"></i>
-                        <button class="gi-badge-pill" id="btnMultipleGi" onclick="openGiDetailModal()"
-                            title="Klik untuk lihat rincian 14 Gardu Induk">
-                            <i class="fa-solid fa-bolt" id="unitIcon" style="font-size: 8px;"></i>
-                            <span id="unitBadgeLabel">14 - Gardu Induk</span>
-                            <i class="fa-solid fa-chevron-right" id="unitChevronIcon"
-                                style="font-size: 7px; opacity: 0.8;"></i>
+                        <button class="gi-badge-pill static" id="btnLocationPill" onclick="handleHeaderLocationClick()"
+                            title="Lokasi Dinas Terdaftar">
+                            <i class="fa-solid fa-building-shield" id="unitIcon" style="font-size: 8.5px;"></i>
+                            <span id="unitBadgeLabel">ULTG Surabaya Utara</span>
+                            <i class="fa-solid fa-chevron-down" id="unitChevronIcon"
+                                style="font-size: 7.5px; opacity: 0.8; display: none;"></i>
                         </button>
                     </div>
                 </div>
@@ -1726,6 +1834,12 @@
                         <span class="seg-count-badge" id="badgeCountMutasi">4</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- Banner info jika User Level GI (Mutasi tidak tampil) -->
+            <div id="levelGiNotice" style="display: none; font-size: 11px; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: 7px 10px; margin-top: 8px; margin-bottom: 12px; align-items: center; gap: 7px;">
+                <i class="fa-solid fa-circle-exclamation" style="font-size: 12px; flex-shrink: 0;"></i>
+                <span>Mode <strong>Level GI</strong>: Hanya menampilkan <strong>Asset Register</strong>. Mutasi Aset hanya tampil untuk User Level <strong>ULTG ke atas</strong>.</span>
             </div>
 
             <!-- Mini KPI Summary Section (Hidden as requested) -->
@@ -2077,7 +2191,9 @@
             <li><strong>Quick Filter:</strong> Kartu ringkasan metrik (Review / Waiting 2, Disetujui / Approved, Revisi
                 / Rejected) tetap dapat diklik untuk filter cepat status.</li>
             <li><strong>Status Approval Workflow:</strong> Menampilkan badge level persetujuan secara eksplisit: <em>Waiting 1</em> (Review TL/SPV ULTG), <em>Waiting 2</em> (Review Asman / Staff Pengelola), dan <em>Waiting 3</em> (Persetujuan Akhir MSB / Manager).</li>
-            <li><strong>Hierarki Lokasi Lengkap:</strong> Rincian lokasi dijembreng lengkap ke 5 level hierarki aset: Kantor Induk &rarr; UPT &rarr; ULTG / Gudang &rarr; GI / Koridor &rarr; Bay / Tower.</li>
+            <li><strong>Hierarki Lokasi:</strong> Pada <em>Asset Register</em> dijembreng 5 level lengkap (Kantor Induk &rarr; UPT &rarr; ULTG / Gudang &rarr; GI / Koridor &rarr; Bay / Tower). Pada <em>Mutasi Aset</em> hanya lokasi mutasi: Transfer (Pengirim & Penerima antar ULTG/UPT), Disposal (UPT Pembuat), Dismantle & Installation (Unit Pembuat sesuai creator).</li>
+            <li><strong>Hak Akses Mutasi Aset:</strong> Tab & daftar <em>Mutasi Aset</em> hanya akan tampil untuk <strong>User Level ULTG ke atas</strong> (Level ULTG, UPT, dan UIT/Kantor Induk). Untuk user level <strong>Gardu Induk (Single GI / Multi GI)</strong>, hanya fitur <em>Asset Register</em> yang dapat diakses.</li>
+            <li><strong>Interaksi Header Lokasi:</strong> Lokasi dinas <em>UPT</em>, <em>ULTG</em>, dan <em>Single GI</em> langsung menampilkan nama lokasi spesifik tanpa bottom sheet. Bottom sheet daftar gardu induk hanya aktif dan muncul jika dalam mode <strong>Multi GI</strong>.</li>
             <li><strong>User Creator:</strong> Staff GI, TL/SPV GI, Staff ULTG, TL/SPV ULTG, Staff Asdig UPT, Asman UPT,
                 TL Asdig UPT, Staff Manset UIT.</li>
         </ul>
@@ -2203,8 +2319,8 @@
                 bay: 'Bay Trafo #4 60MVA',
                 jenisMutasi: 'Pindah Unit',
                 cakupanMutasi: 'Antar UPT',
-                unitAsal: 'UPT Makassar',
-                unitTujuan: 'UPT Cawang',
+                uptAsal: 'UPT Makassar',
+                uptTujuan: 'UPT Cawang',
                 prefix: 'MTS',
                 totalAset: 4,
                 deskripsi: 'Perpindahan aset bay penghantar Antar UPT berdasarkan SK Direksi',
@@ -2226,8 +2342,8 @@
                 bay: 'Bay Penghantar Krian 1',
                 jenisMutasi: 'Pindah Unit',
                 cakupanMutasi: 'Antar ULTG',
-                unitAsal: 'UPT Surabaya',
-                unitTujuan: 'UPT Surabaya',
+                ultgAsal: 'ULTG Surabaya Utara',
+                ultgTujuan: 'ULTG Surabaya Barat',
                 prefix: 'MTS',
                 totalAset: 2,
                 deskripsi: 'Relokasi unit PMT cadangan operasional Antar ULTG untuk pemulihan Bay Penghantar Krian',
@@ -2249,13 +2365,14 @@
                 bay: 'Bay Line Maros - Daya',
                 jenisMutasi: 'Dismantle',
                 cakupanMutasi: '',
-                unit: 'UPT Makassar',
+                creatorLevel: 'ULTG',
+                creatorUnit: 'ULTG Maros',
                 lokasiPenempatan: 'Gudang UPT Makassar',
                 prefix: 'DIS',
                 totalAset: 4,
                 deskripsi: 'Pembongkaran PMT & PMS lama pada bay line penghantar Maros dan disimpan ke gudang UPT Makassar',
                 waitingLevel: 'Waiting 3',
-                applicant: 'Budi Santoso (Staff GI)',
+                applicant: 'Budi Santoso (Staff GI Maros)',
                 date: '02 Sep 2026',
                 docNo: 'BA-DISM/082/MRS/2026',
                 level5: 'Switchgear SF6 Circuit Breaker',
@@ -2272,7 +2389,7 @@
                 bay: 'Bay Trafo #2 150kV',
                 jenisMutasi: 'Disposal',
                 cakupanMutasi: '',
-                lokasiAset: 'Gudang Scrap PLN UIT JBTB',
+                uptPembuat: 'UPT Surabaya',
                 prefix: 'DPS',
                 totalAset: 1,
                 deskripsi: 'Penghapusan aset (Scrap/Disposal) trafo arus CT 150kV rusak total pasca pengujian lab',
@@ -2294,8 +2411,8 @@
                 bay: 'Bay Trafo #1 60MVA',
                 jenisMutasi: 'Installation',
                 cakupanMutasi: '',
-                unitAsal: 'UPT Surabaya',
-                unitTujuan: 'GI Krian 150kV',
+                creatorLevel: 'ULTG',
+                creatorUnit: 'ULTG Surabaya Selatan',
                 prefix: 'PSG',
                 totalAset: 3,
                 deskripsi: 'Instalasi baru Lightning Arrester LA 150kV dan Neutral Grounding Resistor NGR sistem GI Krian',
@@ -2317,7 +2434,7 @@
                 bay: 'Bay Kapasitor #2',
                 jenisMutasi: 'Disposal',
                 cakupanMutasi: '',
-                lokasiAset: 'Gudang Karantina Scrap UPT Cawang',
+                uptPembuat: 'UPT Cawang',
                 prefix: 'DPS',
                 totalAset: 2,
                 deskripsi: 'Pengajuan disposal kapasitor bank 150kV rusak berat pasca uji kelayakan teknis lab',
@@ -2339,7 +2456,8 @@
                 bay: 'Bay Penghantar Simpang 1',
                 jenisMutasi: 'Dismantle',
                 cakupanMutasi: '',
-                unit: 'UPT Surabaya',
+                creatorLevel: 'UPT',
+                creatorUnit: 'UPT Surabaya',
                 lokasiPenempatan: 'Tetap di Lokasi (GI Sawahan 150kV)',
                 prefix: 'DIS',
                 totalAset: 2,
@@ -2408,6 +2526,67 @@
             if (lvl.includes('1')) return 'w1';
             if (lvl.includes('3')) return 'w3';
             return 'w2';
+        }
+
+        // Render box lokasi khusus Mutasi Aset (Transfer, Disposal, Dismantle, Installation)
+        function renderMutasiLocationSnippet(item) {
+            if (item.jenisMutasi === 'Pindah Unit' || item.jenisMutasi === 'Transfer') {
+                const isAntarUltg = item.cakupanMutasi === 'Antar ULTG';
+                const sender = isAntarUltg ? (item.ultgAsal || item.ultg || 'ULTG Asal') : (item.uptAsal || item.unitAsal || item.upt || 'UPT Asal');
+                const receiver = isAntarUltg ? (item.ultgTujuan || 'ULTG Tujuan') : (item.uptTujuan || item.unitTujuan || 'UPT Tujuan');
+                const levelLabel = isAntarUltg ? 'ULTG' : 'UPT';
+
+                return `
+                    <div class="mut-loc-card">
+                        <div class="mut-loc-transfer">
+                            <div class="mut-loc-col">
+                                <span class="mut-loc-badge badge-sender"><i class="fa-solid fa-arrow-up-from-bracket"></i> Lokasi Pengirim (${levelLabel})</span>
+                                <span class="mut-loc-name">${sender}</span>
+                            </div>
+                            <div class="mut-loc-arrow">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                            <div class="mut-loc-col" style="text-align:right; align-items:flex-end;">
+                                <span class="mut-loc-badge badge-receiver"><i class="fa-solid fa-arrow-down-to-bracket"></i> Lokasi Penerima (${levelLabel})</span>
+                                <span class="mut-loc-name">${receiver}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.jenisMutasi === 'Disposal') {
+                const uptName = item.uptPembuat || item.upt || 'UPT Surabaya';
+                return `
+                    <div class="mut-loc-card">
+                        <div class="mut-loc-single">
+                            <span class="mut-loc-badge badge-creator"><i class="fa-solid fa-building"></i> Lokasi UPT Pembuat Disposal</span>
+                            <span class="mut-loc-name">${uptName}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (item.jenisMutasi === 'Dismantle') {
+                const creatorUnit = item.creatorUnit || item.ultg || item.upt || 'ULTG Maros';
+                const creatorLevel = item.creatorLevel || (creatorUnit.startsWith('ULTG') ? 'ULTG' : (creatorUnit.startsWith('UPT') ? 'UPT' : 'UIT'));
+                return `
+                    <div class="mut-loc-card">
+                        <div class="mut-loc-single">
+                            <span class="mut-loc-badge badge-creator"><i class="fa-solid fa-wrench"></i> Lokasi Unit Pembuat Dismantle (${creatorLevel})</span>
+                            <span class="mut-loc-name">${creatorUnit}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (item.jenisMutasi === 'Installation') {
+                const creatorUnit = item.creatorUnit || item.ultg || item.upt || 'ULTG Surabaya Selatan';
+                const creatorLevel = item.creatorLevel || (creatorUnit.startsWith('ULTG') ? 'ULTG' : (creatorUnit.startsWith('UPT') ? 'UPT' : 'UIT'));
+                return `
+                    <div class="mut-loc-card">
+                        <div class="mut-loc-single">
+                            <span class="mut-loc-badge badge-creator"><i class="fa-solid fa-screwdriver-wrench"></i> Lokasi Unit Pembuat Installation (${creatorLevel})</span>
+                            <span class="mut-loc-name">${creatorUnit}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
         }
 
         function renderApproval() {
@@ -2563,47 +2742,18 @@
                                         <div class="mutation-code">${item.code}</div>
                                         <span class="waiting-badge ${wClass}"><i class="fa-solid fa-clock"></i> ${statusLabel}</span>
                                     </div>
-                                    <div class="mutation-location">${item.gi}</div>
+                                    <div class="mutation-type-sub">${item.jenisMutasi}${item.cakupanMutasi ? ' • ' + item.cakupanMutasi : ''}</div>
                                 </div>
                                 <span style="font-size:10px; color:var(--text-muted); font-weight:600; white-space:nowrap; padding-top:2px;">${item.date}</span>
                             </div>
 
-                            <!-- JEMBRENGAN HIERARKI LOKASI MUTASI (5 LEVEL) -->
-                            <div class="loc-hierarchy-box">
-                                <div class="loc-tier-row">
-                                    <span class="loc-tier-label"><i class="fa-solid fa-landmark"></i> Kantor Induk</span>
-                                    <span class="loc-tier-val">${item.kantorInduk || 'PT PLN (Persero) UIT JBTB'}</span>
-                                </div>
-                                <div class="loc-tier-row">
-                                    <span class="loc-tier-label"><i class="fa-solid fa-building"></i> UPT</span>
-                                    <span class="loc-tier-val">${item.upt || 'UPT Surabaya'}</span>
-                                </div>
-                                <div class="loc-tier-row">
-                                    <span class="loc-tier-label"><i class="fa-solid fa-warehouse"></i> ULTG / Gudang</span>
-                                    <span class="loc-tier-val">${item.ultg || 'ULTG Surabaya Utara'}</span>
-                                </div>
-                                <div class="loc-tier-divider"></div>
-                                <div class="loc-tier-row">
-                                    <span class="loc-tier-label"><i class="fa-solid fa-bolt"></i> GI / Koridor</span>
-                                    <span class="loc-tier-val highlight">${item.gi}</span>
-                                </div>
-                                <div class="loc-tier-row">
-                                    <span class="loc-tier-label"><i class="fa-solid fa-diagram-project"></i> Bay / Tower</span>
-                                    <span class="loc-tier-val highlight">${item.bay || 'Bay Line Penghantar'}</span>
-                                </div>
-                            </div>
+                            <!-- LOKASI KHUSUS MUTASI SESUAI JENIS TRANSAKSI -->
+                            ${renderMutasiLocationSnippet(item)}
 
                             <div class="mutation-card-body">
-                                <div class="mutation-row" style="align-items:flex-start;">
-                                    <span class="mutation-label">Jenis Mutasi</span>
-                                    <div class="mutation-value font-bold" style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;">
-                                        <span>${item.jenisMutasi}</span>
-                                        ${item.cakupanMutasi ? `<span style="font-size:9.5px; font-weight:700; background:${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.12)' : 'rgba(168, 85, 247, 0.12)'}; color:${item.cakupanMutasi === 'Antar UPT' ? '#0284c7' : '#9333ea'}; border:1px solid ${item.cakupanMutasi === 'Antar UPT' ? 'rgba(14, 165, 233, 0.25)' : 'rgba(168, 85, 247, 0.25)'}; padding:1px 6px; border-radius:5px; letter-spacing:0.1px;">${item.cakupanMutasi}</span>` : ''}
-                                    </div>
-                                </div>
                                 <div class="mutation-row">
                                     <span class="mutation-label">Total Aset</span>
-                                    <span class="mutation-value font-bold">${item.totalAset}</span>
+                                    <span class="mutation-value font-bold">${item.totalAset} Aset</span>
                                 </div>
                                 <div class="mutation-row">
                                     <span class="mutation-label">Deskripsi</span>
@@ -3033,26 +3183,29 @@
                                     ${item.status === 'pending' ? (item.waitingLevel || 'Waiting 1') : item.status}
                                 </strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                <span style="color: var(--text-muted);">Kantor Induk:</span>
-                                <strong>${item.kantorInduk || 'PT PLN (Persero) UIT JBB'}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                <span style="color: var(--text-muted);">UPT:</span>
-                                <strong>${item.upt || 'UPT Cawang'}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                <span style="color: var(--text-muted);">ULTG / Gudang:</span>
-                                <strong>${item.ultg || 'ULTG Cawang'}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                <span style="color: var(--text-muted);">GI / Koridor:</span>
-                                <strong style="color: var(--primary-blue);">${item.gi}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                <span style="color: var(--text-muted);">Bay / Tower:</span>
-                                <strong style="color: var(--primary-blue);">${item.bay || '-'}</strong>
-                            </div>
+                            ${!isMutasi ? `
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
+                                    <span style="color: var(--text-muted);">Kantor Induk:</span>
+                                    <strong>${item.kantorInduk || 'PT PLN (Persero) UIT JBB'}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
+                                    <span style="color: var(--text-muted);">UPT:</span>
+                                    <strong>${item.upt || 'UPT Cawang'}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
+                                    <span style="color: var(--text-muted);">ULTG / Gudang:</span>
+                                    <strong>${item.ultg || 'ULTG Cawang'}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
+                                    <span style="color: var(--text-muted);">GI / Koridor:</span>
+                                    <strong style="color: var(--primary-blue);">${item.gi}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
+                                    <span style="color: var(--text-muted);">Bay / Tower:</span>
+                                    <strong style="color: var(--primary-blue);">${item.bay || '-'}</strong>
+                                </div>
+                            ` : ''}
+
                             ${isMutasi ? `
                                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
                                     <span style="color: var(--text-muted);">Jenis Mutasi:</span>
@@ -3063,35 +3216,27 @@
                                 </div>
                                 ${item.jenisMutasi === 'Disposal' ? `
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                    <span style="color: var(--text-muted);">Lokasi Aset:</span>
-                                    <strong style="color:var(--text-dark);">${item.lokasiAset || 'Gudang Scrap PLN'}</strong>
+                                    <span style="color: var(--text-muted);">Lokasi UPT Pembuat:</span>
+                                    <strong style="color:var(--text-dark);">${item.uptPembuat || item.upt || 'UPT Surabaya'}</strong>
                                 </div>
                                 ` : (item.jenisMutasi === 'Dismantle' ? `
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                     <span style="color: var(--text-muted);">Unit / UPT:</span>
-                                     <strong>${item.unit || item.unitAsal || '-'}</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                     <span style="color: var(--text-muted);">Penempatan Aset:</span>
-                                     <strong style="color:var(--text-dark);">${item.lokasiPenempatan || 'Gudang UPT'}</strong>
+                                     <span style="color: var(--text-muted);">Lokasi Unit Pembuat (${item.creatorLevel || 'ULTG'}):</span>
+                                     <strong>${item.creatorUnit || item.ultg || item.upt}</strong>
                                 </div>
                                 ` : (item.jenisMutasi === 'Installation' ? `
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                     <span style="color: var(--text-muted);">Unit Asal (UPT):</span>
-                                     <strong>${item.unitAsal || '-'}</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                     <span style="color: var(--text-muted);">Tujuan (Lokasi GI):</span>
-                                     <strong style="color:var(--primary-blue);">${item.unitTujuan || item.gi || '-'}</strong>
+                                     <span style="color: var(--text-muted);">Lokasi Unit Pembuat (${item.creatorLevel || 'ULTG'}):</span>
+                                     <strong>${item.creatorUnit || item.ultg || item.upt}</strong>
                                 </div>
                                 ` : `
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                    <span style="color: var(--text-muted);">Unit Asal:</span>
-                                    <strong>${item.unitAsal || '-'}</strong>
+                                    <span style="color: var(--text-muted);">Lokasi Pengirim (${item.cakupanMutasi === 'Antar ULTG' ? 'ULTG' : 'UPT'}):</span>
+                                    <strong>${item.cakupanMutasi === 'Antar ULTG' ? (item.ultgAsal || item.ultg) : (item.uptAsal || item.unitAsal || item.upt)}</strong>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
-                                    <span style="color: var(--text-muted);">Unit Tujuan:</span>
-                                    <strong>${item.unitTujuan || '-'}</strong>
+                                    <span style="color: var(--text-muted);">Lokasi Penerima (${item.cakupanMutasi === 'Antar ULTG' ? 'ULTG' : 'UPT'}):</span>
+                                    <strong>${item.cakupanMutasi === 'Antar ULTG' ? (item.ultgTujuan || 'ULTG Tujuan') : (item.uptTujuan || item.unitTujuan || 'UPT Tujuan')}</strong>
                                 </div>
                                 `))}
                                 <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;">
@@ -3207,40 +3352,129 @@
             }
         }
 
-        // LOKASI DINAS / UNIT MODE MANAGEMENT (ULTG vs MULTI GI)
+        // USER LEVEL & LOKASI DINAS MANAGEMENT (UPT, ULTG, SINGLE GI, MULTI GI)
+        // Aturan:
+        // - UPT, ULTG, dan Single GI: LANGSUNG nama lokasi, statis (TIDAK ADA bottom sheet).
+        // - KECUALI jika Multi GI: menampilkan '14 - Gardu Induk' dan BARU BISA buka bottom sheet daftar GI.
+        // - Mutasi Aset HANYA tampil untuk User Level ULTG ke atas!
         function applySavedUnitMode() {
-            const savedMode = localStorage.getItem('pln_new_pst_unit_mode') || 'multigi';
+            const savedMode = localStorage.getItem('pln_new_pst_unit_mode') || 'ultg';
             applyUnitMode(savedMode);
         }
 
         function switchUnitMode(mode) {
             localStorage.setItem('pln_new_pst_unit_mode', mode);
             applyUnitMode(mode);
-            showToast(mode === 'ultg' ? 'Tampilan: Unit ULTG Surabaya Utara' : 'Tampilan: Multi 14 Gardu Induk', 'fa-location-dot', '#38bdf8');
+
+            if (mode === 'gi') {
+                showToast('Lokasi: GI Waru 150kV (Single GI) • Tanpa Bottom Sheet', 'fa-bolt', '#f59e0b');
+            } else if (mode === 'multigi') {
+                showToast('Lokasi: Multi 14 Gardu Induk • Bottom Sheet Aktif', 'fa-layer-group', '#0284c7');
+            } else if (mode === 'upt') {
+                showToast('Lokasi: UPT Surabaya • Tanpa Bottom Sheet', 'fa-building', '#10b981');
+            } else {
+                showToast('Lokasi: ULTG Surabaya Utara • Tanpa Bottom Sheet', 'fa-building-shield', '#38bdf8');
+            }
+        }
+
+        function handleHeaderLocationClick() {
+            const currentMode = localStorage.getItem('pln_new_pst_unit_mode') || 'ultg';
+            if (currentMode === 'multigi') {
+                // Hanya mode Multi GI yang membuka bottom sheet daftar GI
+                openGiDetailModal();
+            } else {
+                // UPT, ULTG, dan Single GI tidak perlu ada bottom sheet
+                return;
+            }
         }
 
         function applyUnitMode(mode) {
-            const btnUltg = document.getElementById('btnModeUltg');
+            const btnGi = document.getElementById('btnModeGi');
             const btnMultiGi = document.getElementById('btnModeMultiGi');
+            const btnUltg = document.getElementById('btnModeUltg');
+            const btnUpt = document.getElementById('btnModeUpt');
+            const btnLocationPill = document.getElementById('btnLocationPill');
             const unitIcon = document.getElementById('unitIcon');
             const unitBadgeLabel = document.getElementById('unitBadgeLabel');
+            const unitChevronIcon = document.getElementById('unitChevronIcon');
+            const btnTypeMutasi = document.getElementById('btnTypeMutasi');
+            const levelGiNotice = document.getElementById('levelGiNotice');
 
-            if (btnUltg && btnMultiGi) {
-                if (mode === 'ultg') {
-                    btnUltg.classList.add('active');
-                    btnMultiGi.classList.remove('active');
-                } else {
-                    btnMultiGi.classList.add('active');
-                    btnUltg.classList.remove('active');
+            [btnGi, btnMultiGi, btnUltg, btnUpt].forEach(btn => { if (btn) btn.classList.remove('active'); });
+
+            if (mode === 'gi') {
+                // 1. SINGLE GI: langsung nama lokasi, statis (tanpa bottom sheet)
+                if (btnGi) btnGi.classList.add('active');
+                if (unitIcon) {
+                    unitIcon.className = 'fa-solid fa-bolt';
+                    unitIcon.style.color = '#0284c7';
                 }
-            }
+                if (unitBadgeLabel) unitBadgeLabel.innerText = 'GI Waru 150kV';
+                if (unitChevronIcon) unitChevronIcon.style.display = 'none';
+                if (btnLocationPill) {
+                    btnLocationPill.className = 'gi-badge-pill static';
+                    btnLocationPill.title = 'Lokasi: GI Waru 150kV (Single GI)';
+                }
 
-            if (mode === 'ultg') {
-                if (unitIcon) unitIcon.className = 'fa-solid fa-building-shield';
-                if (unitBadgeLabel) unitBadgeLabel.innerText = 'ULTG Sby Utara';
-            } else {
-                if (unitIcon) unitIcon.className = 'fa-solid fa-bolt';
+                // Level GI -> Mutasi Aset disembunyikan
+                if (btnTypeMutasi) btnTypeMutasi.style.display = 'none';
+                if (levelGiNotice) levelGiNotice.style.display = 'flex';
+                if (currentSection === 'mutasi') switchMainType('register');
+
+            } else if (mode === 'multigi') {
+                // 2. MULTI GI: '14 - Gardu Induk', chevron aktif, bisa klik buka bottom sheet
+                if (btnMultiGi) btnMultiGi.classList.add('active');
+                if (unitIcon) {
+                    unitIcon.className = 'fa-solid fa-layer-group';
+                    unitIcon.style.color = '#0284c7';
+                }
                 if (unitBadgeLabel) unitBadgeLabel.innerText = '14 - Gardu Induk';
+                if (unitChevronIcon) unitChevronIcon.style.display = 'inline-block';
+                if (btnLocationPill) {
+                    btnLocationPill.className = 'gi-badge-pill clickable';
+                    btnLocationPill.title = 'Klik untuk melihat rincian 14 Gardu Induk (Bottom Sheet)';
+                }
+
+                // Level GI -> Mutasi Aset disembunyikan
+                if (btnTypeMutasi) btnTypeMutasi.style.display = 'none';
+                if (levelGiNotice) levelGiNotice.style.display = 'flex';
+                if (currentSection === 'mutasi') switchMainType('register');
+
+            } else if (mode === 'upt') {
+                // 3. UPT: langsung nama lokasi, statis (tanpa bottom sheet)
+                if (btnUpt) btnUpt.classList.add('active');
+                if (unitIcon) {
+                    unitIcon.className = 'fa-solid fa-building';
+                    unitIcon.style.color = '#059669';
+                }
+                if (unitBadgeLabel) unitBadgeLabel.innerText = 'UPT Surabaya';
+                if (unitChevronIcon) unitChevronIcon.style.display = 'none';
+                if (btnLocationPill) {
+                    btnLocationPill.className = 'gi-badge-pill static';
+                    btnLocationPill.title = 'Lokasi: UPT Surabaya';
+                }
+
+                // Level UPT -> Mutasi Aset tampil
+                if (btnTypeMutasi) btnTypeMutasi.style.display = 'inline-flex';
+                if (levelGiNotice) levelGiNotice.style.display = 'none';
+
+            } else {
+                // 4. ULTG: langsung nama lokasi, statis (tanpa bottom sheet)
+                if (btnUltg) btnUltg.classList.add('active');
+                if (unitIcon) {
+                    unitIcon.className = 'fa-solid fa-building-shield';
+                    unitIcon.style.color = '#1a65d6';
+                }
+                if (unitBadgeLabel) unitBadgeLabel.innerText = 'ULTG Surabaya Utara';
+                if (unitChevronIcon) unitChevronIcon.style.display = 'none';
+                if (btnLocationPill) {
+                    btnLocationPill.className = 'gi-badge-pill static';
+                    btnLocationPill.title = 'Lokasi: ULTG Surabaya Utara';
+                }
+
+                // Level ULTG -> Mutasi Aset tampil
+                if (btnTypeMutasi) btnTypeMutasi.style.display = 'inline-flex';
+                if (levelGiNotice) levelGiNotice.style.display = 'none';
             }
         }
 
@@ -3265,18 +3499,16 @@
 
         function openGiDetailModal() {
             const content = document.getElementById('drawerContent');
-            const isUltg = localStorage.getItem('pln_new_pst_unit_mode') === 'ultg';
-            const title = isUltg ? 'Daftar GI di ULTG Surabaya Utara' : 'Daftar 14 Gardu Induk';
 
             content.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div style="width: 36px; height: 36px; border-radius: 10px; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                            <i class="fa-solid fa-bolt"></i>
+                            <i class="fa-solid fa-layer-group"></i>
                         </div>
                         <div>
-                            <div style="font-size: 15px; font-weight: 800; color: var(--text-dark, #0f172a); font-family: 'Inter', sans-serif;">${title}</div>
-                            <div style="font-size: 11px; color: var(--text-muted, #64748b);">Wilayah ULTG Surabaya Utara • 14 Gardu Induk</div>
+                            <div style="font-size: 15px; font-weight: 800; color: var(--text-dark, #0f172a); font-family: 'Inter', sans-serif;">Daftar 14 Gardu Induk</div>
+                            <div style="font-size: 11px; color: var(--text-muted, #64748b);">Wilayah Kerja ULTG Surabaya Utara • Mode Multi GI</div>
                         </div>
                     </div>
                     <button onclick="closeDrawer()" style="background: var(--bg-canvas, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: var(--text-muted, #64748b); display: flex; align-items: center; justify-content: center;">
@@ -3286,7 +3518,7 @@
 
                 <div style="position: relative; margin-bottom: 10px; flex-shrink: 0;">
                     <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-muted, #64748b);"></i>
-                    <input type="text" id="giSearchDrawerInput" placeholder="Cari gardu induk atau kode..."
+                    <input type="text" id="giSearchDrawerInput" placeholder="Cari nama Gardu Induk..."
                         oninput="filterGiDrawerList(this.value)"
                         style="width: 100%; padding: 9px 12px 9px 34px; border-radius: 12px; border: 1px solid var(--border-color, #e2e8f0); background: var(--bg-canvas, #f8fafc); color: var(--text-dark, #0f172a); font-size: 12px; outline: none; box-sizing: border-box;">
                 </div>
@@ -3320,7 +3552,7 @@
             container.innerHTML = items.map((gi, idx) => `
                 <div style="background: var(--bg-canvas, #f8fafc); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; transition: all 0.2s;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(26, 101, 214, 0.1); color: var(--primary-blue); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;">
+                        <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(2, 132, 199, 0.1); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;">
                             ${idx + 1}
                         </div>
                         <div>
@@ -3329,13 +3561,13 @@
                                 <span style="font-size: 9px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 1px 6px; border-radius: 4px;">${gi.status || 'Normal'}</span>
                             </div>
                             <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
-                                <strong>${gi.total || 42}</strong> Total Aset &bull; Kode: ${gi.code || '-'}
+                                Kode: <strong>${gi.code || '-'}</strong> &bull; ${gi.total || 42} Aset
                             </div>
                         </div>
                     </div>
-                    <button onclick="closeDrawer(); showToast('Memfilter pengajuan ' + '${gi.name}', 'fa-bolt', '#0284c7');" style="font-size: 10px; background: var(--primary-light, #eff6ff); color: var(--primary-blue, #1a65d6); border: 1px solid #bfdbfe; padding: 4px 8px; border-radius: 6px; font-weight: 700; cursor: pointer;">
-                        Pilih
-                    </button>
+                    <span style="font-size: 10px; color: #059669; font-weight: 700;">
+                        <i class="fa-solid fa-circle-check"></i> Terpantau
+                    </span>
                 </div>
             `).join('');
         }

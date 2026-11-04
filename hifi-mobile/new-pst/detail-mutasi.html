@@ -1435,8 +1435,8 @@
                 jenisMutasi: "Pindah Unit",
                 cakupanMutasi: "Antar ULTG",
                 prefix: "MTS",
-                unitAsal: "UPT Surabaya",
-                unitTujuan: "UPT Surabaya",
+                ultgAsal: "ULTG Surabaya Utara",
+                ultgTujuan: "ULTG Surabaya Barat",
                 alasan: "Penguatan Interkoneksi Krian 2 Antar ULTG",
                 deskripsi: "Relokasi unit PMT cadangan operasional Antar ULTG untuk percepatan pemulihan Bay Penghantar Krian.",
                 docNo: "099.PJ/DAN.02.01/UPT-SBY/2026",
@@ -1481,7 +1481,8 @@
                 jenisMutasi: "Dismantle",
                 cakupanMutasi: "",
                 prefix: "DIS",
-                unit: "UPT Makassar",
+                creatorLevel: "ULTG",
+                creatorUnit: "ULTG Maros",
                 lokasiPenempatan: "Gudang UPT Makassar",
                 alasan: "Decommissioning Bay Penghantar Lama",
                 deskripsi: "Pembongkaran (dismantle) peralatan switchgear SF6 & disconnecting switch lama pada bay penghantar Maros dan disimpan ke gudang UPT Makassar.",
@@ -1554,6 +1555,7 @@
                 code: "DPS202600000004",
                 jenisMutasi: "Disposal",
                 prefix: "DPS",
+                uptPembuat: "UPT Surabaya",
                 lokasiAset: "Gudang Scrap PLN UIT JBTB",
                 alasan: "Peralatan Rusak Total Pasca Pengujian Lab",
                 deskripsi: "Penghapusan aset (scrap/disposal) current transformer 150kV di Gudang Scrap UIT JBTB pasca uji lab dengan hasil breakdown isolasi.",
@@ -1584,7 +1586,8 @@
                 code: "PSG202600000005",
                 jenisMutasi: "Installation",
                 prefix: "PSG",
-                unitAsal: "UPT Surabaya",
+                creatorLevel: "ULTG",
+                creatorUnit: "ULTG Surabaya Selatan",
                 unitTujuan: "GI Krian 150kV",
                 alasan: "Pemasangan Aset Baru Penguatan Bay Trafo #3",
                 deskripsi: "Pemasangan/instalasi baru peralatan Lightning Arrester 150kV dan Neutral Grounding Resistor NGR pada Bay Trafo 3 GI Krian.",
@@ -1643,6 +1646,7 @@
                 code: "DPS202600000006",
                 jenisMutasi: "Disposal",
                 prefix: "DPS",
+                uptPembuat: "UPT Cawang",
                 lokasiAset: "Gudang Karantina Scrap UPT Cawang",
                 alasan: "Kapasitor Bank Habis Masa Pakai & Uji FAT Gagal",
                 deskripsi: "Pengajuan disposal kapasitor bank di Gudang Karantina Scrap UPT Cawang.",
@@ -1688,7 +1692,8 @@
                 jenisMutasi: "Dismantle",
                 cakupanMutasi: "",
                 prefix: "DIS",
-                unit: "UPT Surabaya",
+                creatorLevel: "UPT",
+                creatorUnit: "UPT Surabaya",
                 lokasiPenempatan: "Tetap di Lokasi (GI Sawahan 150kV)",
                 alasan: "Decommissioning Fungsi Bay Transmisi",
                 deskripsi: "Pembongkaran (dismantle) fungsi operasi bay GI Sawahan tanpa pemindahan fisik aset.",
@@ -1834,62 +1839,70 @@
                 if (rowUnitAsal) rowUnitAsal.style.display = 'none';
                 if (rowUnitTujuan) rowUnitTujuan.style.display = 'none';
                 if (rowPenempatanDismantle) rowPenempatanDismantle.style.display = 'none';
+                const uptPembuat = data.uptPembuat || data.upt || 'UPT Surabaya';
                 if (rowLokasiAset) {
                     rowLokasiAset.style.display = 'flex';
-                    valLokasiAset.textContent = data.lokasiAset || 'Gudang Scrap PLN';
+                    const labelLokasiAset = rowLokasiAset.querySelector('.info-label');
+                    if (labelLokasiAset) labelLokasiAset.textContent = 'Lokasi UPT Pembuat';
+                    valLokasiAset.textContent = uptPembuat;
                 }
-                if (daftarGroupTitle) daftarGroupTitle.textContent = data.lokasiAset || 'Gudang Scrap PLN';
-                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = 'Lokasi / Site Penghapusan';
-                document.getElementById('textLocationSub').textContent = `${data.lokasiAset || 'Gudang Scrap'} - Disposal Aset`;
+                if (daftarGroupTitle) daftarGroupTitle.textContent = uptPembuat;
+                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = 'UPT Pembuat Disposal';
+                document.getElementById('textLocationSub').textContent = `${uptPembuat} - Disposal Aset`;
             } else if (data.jenisMutasi === 'Dismantle') {
                 if (rowLokasiAset) rowLokasiAset.style.display = 'none';
                 if (rowUnitTujuan) rowUnitTujuan.style.display = 'none';
+                const creatorUnit = data.creatorUnit || data.ultg || data.upt || 'ULTG Maros';
+                const creatorLevel = data.creatorLevel || (creatorUnit.startsWith('ULTG') ? 'ULTG' : (creatorUnit.startsWith('UPT') ? 'UPT' : 'UIT'));
                 if (rowUnitAsal) {
                     rowUnitAsal.style.display = 'flex';
-                    if (labelUnitAsal) labelUnitAsal.textContent = 'Unit / UPT';
-                    document.getElementById('valUnitAsal').textContent = data.unit || data.unitAsal || 'UPT Makassar';
+                    if (labelUnitAsal) labelUnitAsal.textContent = `Lokasi Unit Pembuat (${creatorLevel})`;
+                    document.getElementById('valUnitAsal').textContent = creatorUnit;
                 }
                 if (rowPenempatanDismantle) {
                     rowPenempatanDismantle.style.display = 'flex';
                     valPenempatanDismantle.textContent = data.lokasiPenempatan || 'Gudang UPT';
                 }
-                if (daftarGroupTitle) daftarGroupTitle.textContent = data.lokasiPenempatan || data.unit || 'UPT Makassar';
-                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = 'Penempatan Aset Dismantle';
-                document.getElementById('textLocationSub').textContent = `${data.unit || data.unitAsal || 'UPT'} - Dismantle Aset`;
+                if (daftarGroupTitle) daftarGroupTitle.textContent = creatorUnit;
+                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = `Unit Pembuat Dismantle (${creatorLevel})`;
+                document.getElementById('textLocationSub').textContent = `${creatorUnit} - Dismantle Aset`;
             } else if (data.jenisMutasi === 'Installation') {
                 if (rowLokasiAset) rowLokasiAset.style.display = 'none';
                 if (rowPenempatanDismantle) rowPenempatanDismantle.style.display = 'none';
+                if (rowUnitTujuan) rowUnitTujuan.style.display = 'none';
+                const creatorUnit = data.creatorUnit || data.ultg || data.upt || 'ULTG Surabaya Selatan';
+                const creatorLevel = data.creatorLevel || (creatorUnit.startsWith('ULTG') ? 'ULTG' : (creatorUnit.startsWith('UPT') ? 'UPT' : 'UIT'));
                 if (rowUnitAsal) {
                     rowUnitAsal.style.display = 'flex';
-                    if (labelUnitAsal) labelUnitAsal.textContent = 'Unit Asal (UPT)';
-                    document.getElementById('valUnitAsal').textContent = data.unitAsal || 'UPT Surabaya';
+                    if (labelUnitAsal) labelUnitAsal.textContent = `Lokasi Unit Pembuat (${creatorLevel})`;
+                    document.getElementById('valUnitAsal').textContent = creatorUnit;
                 }
-                if (rowUnitTujuan) {
-                    rowUnitTujuan.style.display = 'flex';
-                    const labelUnitTujuan = document.getElementById('labelUnitTujuan');
-                    if (labelUnitTujuan) labelUnitTujuan.textContent = 'Tujuan (Lokasi GI)';
-                    document.getElementById('valUnitTujuan').textContent = data.unitTujuan || 'GI Krian 150kV';
-                }
-                if (daftarGroupTitle) daftarGroupTitle.textContent = data.unitTujuan || 'GI Krian 150kV';
-                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = 'Lokasi / GI Pemasangan';
-                document.getElementById('textLocationSub').textContent = `${data.unitTujuan || 'GI Pemasangan'} - Instalasi Aset`;
+                if (daftarGroupTitle) daftarGroupTitle.textContent = creatorUnit;
+                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = `Unit Pembuat Installation (${creatorLevel})`;
+                document.getElementById('textLocationSub').textContent = `${creatorUnit} - Instalasi Aset`;
             } else {
+                // Transfer / Pindah Unit
                 if (rowLokasiAset) rowLokasiAset.style.display = 'none';
                 if (rowPenempatanDismantle) rowPenempatanDismantle.style.display = 'none';
+                const isAntarUltg = data.cakupanMutasi === 'Antar ULTG';
+                const sender = isAntarUltg ? (data.ultgAsal || data.unitAsal || 'ULTG Surabaya Utara') : (data.uptAsal || data.unitAsal || 'UPT Makassar');
+                const receiver = isAntarUltg ? (data.ultgTujuan || data.unitTujuan || 'ULTG Surabaya Barat') : (data.uptTujuan || data.unitTujuan || 'UPT Cawang');
+                const levelLabel = isAntarUltg ? 'ULTG' : 'UPT';
+
                 if (rowUnitAsal) {
                     rowUnitAsal.style.display = 'flex';
-                    if (labelUnitAsal) labelUnitAsal.textContent = 'Unit Asal';
-                    document.getElementById('valUnitAsal').textContent = data.unitAsal || '-';
+                    if (labelUnitAsal) labelUnitAsal.textContent = `Lokasi Pengirim (${levelLabel})`;
+                    document.getElementById('valUnitAsal').textContent = sender;
                 }
                 if (rowUnitTujuan) {
                     rowUnitTujuan.style.display = 'flex';
                     const labelUnitTujuan = document.getElementById('labelUnitTujuan');
-                    if (labelUnitTujuan) labelUnitTujuan.textContent = 'Unit Tujuan';
-                    document.getElementById('valUnitTujuan').textContent = data.unitTujuan || '-';
+                    if (labelUnitTujuan) labelUnitTujuan.textContent = `Lokasi Penerima (${levelLabel})`;
+                    document.getElementById('valUnitTujuan').textContent = receiver;
                 }
-                if (daftarGroupTitle) daftarGroupTitle.textContent = data.unitTujuan || 'Tujuan Mutasi';
-                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = 'Tujuan Mutasi';
-                document.getElementById('textLocationSub').textContent = `${data.unitAsal} - Mutasi Aset`;
+                if (daftarGroupTitle) daftarGroupTitle.textContent = receiver;
+                if (daftarGroupSubtitle) daftarGroupSubtitle.textContent = `Lokasi Penerima (${levelLabel})`;
+                document.getElementById('textLocationSub').textContent = `${sender} ➔ ${receiver}`;
             }
 
             document.getElementById('valAlasan').textContent = data.alasan;

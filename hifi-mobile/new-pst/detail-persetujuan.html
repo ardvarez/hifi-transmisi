@@ -668,24 +668,32 @@
             border-left-color: #475569;
         }
 
-        /* Tab Switcher: [Perubahan] vs [Umum] vs [Spesifikasi] */
+        /* Tab Switcher: [Perubahan] vs [Umum] vs [Spesifikasi] vs [History] */
         .form-tabs-container {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             background: var(--card-bg);
             padding: 4px;
-            border-radius: 14px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-bottom: 14px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .form-tabs-container::-webkit-scrollbar {
+            display: none;
         }
 
         .form-tab-btn {
             flex: 1;
-            padding: 9px 4px;
+            min-width: 0;
+            padding: 8px 4px;
             border: 1px solid transparent;
-            border-radius: 10px;
-            font-size: 12.5px;
+            border-radius: 8px;
+            font-size: 11.5px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -693,8 +701,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
             white-space: nowrap;
+            text-align: center;
         }
 
         .form-tab-btn.active {
@@ -1385,22 +1393,22 @@
                 </div>
             </div>
 
-            <!-- Navigation Tabs: [Perubahan] vs [Umum] vs [Spesifikasi] vs [History Approval] -->
+            <!-- Navigation Tabs: [Perubahan] vs [Umum] vs [Spesifikasi] vs [History] -->
             <div class="form-tabs-container" id="mainTabsContainer">
                 <button type="button" class="form-tab-btn active" id="tabBtnPerubahan"
                     onclick="switchFormTab('perubahan')" style="display: none;">
-                    <i class="fa-solid fa-code-compare"></i> Perubahan
+                    Perubahan
                 </button>
                 <button type="button" class="form-tab-btn" id="tabBtnUmum" onclick="switchFormTab('umum')">
-                    <i class="fa-solid fa-table-list"></i> Umum
+                    Umum
                 </button>
                 <button type="button" class="form-tab-btn" id="tabBtnSpesifikasi"
                     onclick="switchFormTab('spesifikasi')">
-                    <i class="fa-solid fa-sliders"></i> Spesifikasi
+                    Spesifikasi
                 </button>
                 <button type="button" class="form-tab-btn" id="tabBtnHistory"
                     onclick="switchFormTab('history')">
-                    <i class="fa-solid fa-clock-rotate-left"></i> History Approval
+                    History
                 </button>
             </div>
 
@@ -1764,7 +1772,7 @@
                     <div class="history-be-note">
                         <i class="fa-solid fa-circle-info"></i>
                         <div>
-                            <strong>Catatan Dinamis Backend:</strong> Tahapan alur persetujuan setelah Creator dapat berjumlah 1 s.d. 3 tahap verifikasi sesuai konfigurasi master approval workflow. Data di bawah menampilkan simulasi <strong>4 Step Total</strong> (1 Step Creator + 3 Step Approval).
+                            <strong>Catatan Dinamis Backend:</strong> Step 1 menyesuaikan jenis pengajuan (Penambahan / Perubahan). Tahapan persetujuan berikutnya (Tingkat 1 s.d. 3) disesuaikan konfigurasi master backend. Simulasi demo menampilkan <strong>4 Step Total</strong>.
                         </div>
                     </div>
 
@@ -2321,26 +2329,30 @@
 
             const currentUpt = currentActiveItem ? (currentActiveItem.upt || 'UPT Cawang') : 'UPT Cawang';
             const currentUltg = currentActiveItem ? (currentActiveItem.ultg || 'ULTG Cawang') : 'ULTG Cawang';
+            const currentTipe = currentActiveItem ? (currentActiveItem.tipePengajuan || 'Penambahan') : 'Penambahan';
 
-            // Default 4 Step workflow: Step 1 Creator, Step 2-4 Approvals
-            // Catatan: Pada step 'not_yet', informasi cukup menampilkan Jabatan & Unit target (tanpa nama orang & jam)
+            // Default 4 Step workflow: Step 1 Penambahan/Perubahan, Step 2-4 Approvals
+            // Catatan: Step 1 dinamis sesuai tipe pengajuan (Penambahan atau Perubahan). Step 2-4: Persetujuan Tingkat 1, 2, dan 3.
+            // Pada step 'not_yet', informasi cukup menampilkan Jabatan & Unit target (tanpa nama orang & jam)
             const steps = stepsData || [
                 {
                     stepNumber: 1,
-                    role: 'Creator (Pembuat Pengajuan)',
-                    title: 'Perekaman & Pengajuan Aset',
+                    title: currentTipe,
+                    role: '',
                     jabatan: 'TL / SPV Operasi & Pemeliharaan',
                     unit: currentUltg,
                     actor: currentActiveItem ? currentActiveItem.applicant : 'Daniandra Ersya (TL/SPV ULTG)',
                     time: currentActiveItem ? currentActiveItem.date : 'Hari ini, 08:30 WIB',
                     status: 'done', // done | waiting | not_yet
                     statusLabel: 'Done',
-                    note: 'Dokumen dan parameter aset telah lengkap diajukan ke sistem.'
+                    note: currentTipe === 'Perubahan'
+                        ? 'Dokumen usulan perubahan parameter aset telah diajukan ke sistem.'
+                        : 'Dokumen dan parameter aset telah lengkap diajukan ke sistem.'
                 },
                 {
                     stepNumber: 2,
-                    role: 'Approval 1 (Verifikator Lapangan)',
-                    title: 'Verifikasi Fisik & Spesifikasi Lapangan',
+                    title: 'Persetujuan Tingkat 1',
+                    role: '',
                     jabatan: 'Staff Verifikator / Asman ULTG',
                     unit: currentUltg,
                     actor: 'Rian Pratama (Staff / Asman ULTG)',
@@ -2351,20 +2363,20 @@
                 },
                 {
                     stepNumber: 3,
-                    role: 'Approval 2 (Review Bidang Transmisi)',
-                    title: 'Review Manajemen Aset UPT',
+                    title: 'Persetujuan Tingkat 2',
+                    role: '',
                     jabatan: 'Asman Pemeliharaan & Aset Transmisi',
                     unit: currentUpt,
                     actor: '-',
                     time: '-',
                     status: 'not_yet',
                     statusLabel: 'Not Yet',
-                    note: 'Tahap berikutnya setelah Approval 1 disetujui.'
+                    note: 'Tahap berikutnya setelah Persetujuan Tingkat 1 disetujui.'
                 },
                 {
                     stepNumber: 4,
-                    role: 'Approval 3 (Persetujuan Akhir)',
-                    title: 'Pengesahan Registrasi Aset',
+                    title: 'Persetujuan Tingkat 3',
+                    role: '',
                     jabatan: 'Manager UPT / Senior Manager (MSB)',
                     unit: currentUpt,
                     actor: '-',
@@ -2419,7 +2431,7 @@
                                 </div>
                                 <span class="stepper-status-badge ${badgeClass}">${step.statusLabel}</span>
                             </div>
-                            <div class="stepper-role-text">${step.role}</div>
+                            ${step.role ? `<div class="stepper-role-text">${step.role}</div>` : ''}
                             
                             ${isNotYet ? `
                                 <!-- TAMPILAN NOT YET: CUKUP JABATAN & UNIT TARGET -->
@@ -2934,7 +2946,7 @@
             Notes & Validasi Persetujuan
         </h3>
         <ul>
-            <li><strong>Tahapan Approval Fleksibel:</strong> Step setelah Creator bersifat dinamis (1 s.d. 3 tahap persetujuan) menyesuaikan konfigurasi master proses backend. Simulasi demo menyajikan total 4 Step.</li>
+            <li><strong>Tahapan Approval Fleksibel:</strong> Step 1 menyesuaikan jenis pengajuan (Penambahan / Perubahan). Step setelahnya menggunakan penamaan umum (Persetujuan Tingkat 1, 2, dan 3) dan dinamis (1 s.d. 3 tahap) menyesuaikan konfigurasi master backend.</li>
             <li><strong>Indikator Warna Stepper:</strong>
                 <ul>
                     <li><strong style="color:#059669;">Hijau (Done):</strong> Tahap sudah selesai dilewati.</li>
