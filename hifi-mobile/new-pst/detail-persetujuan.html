@@ -2319,12 +2319,18 @@
             const pillEl = document.getElementById('historyCurrentPill');
             if (!container) return;
 
-            // Default 4 Step workflow if not provided: Step 1 Creator, Step 2-4 Approvals
+            const currentUpt = currentActiveItem ? (currentActiveItem.upt || 'UPT Cawang') : 'UPT Cawang';
+            const currentUltg = currentActiveItem ? (currentActiveItem.ultg || 'ULTG Cawang') : 'ULTG Cawang';
+
+            // Default 4 Step workflow: Step 1 Creator, Step 2-4 Approvals
+            // Catatan: Pada step 'not_yet', informasi cukup menampilkan Jabatan & Unit target (tanpa nama orang & jam)
             const steps = stepsData || [
                 {
                     stepNumber: 1,
                     role: 'Creator (Pembuat Pengajuan)',
                     title: 'Perekaman & Pengajuan Aset',
+                    jabatan: 'TL / SPV Operasi & Pemeliharaan',
+                    unit: currentUltg,
                     actor: currentActiveItem ? currentActiveItem.applicant : 'Daniandra Ersya (TL/SPV ULTG)',
                     time: currentActiveItem ? currentActiveItem.date : 'Hari ini, 08:30 WIB',
                     status: 'done', // done | waiting | not_yet
@@ -2335,27 +2341,33 @@
                     stepNumber: 2,
                     role: 'Approval 1 (Verifikator Lapangan)',
                     title: 'Verifikasi Fisik & Spesifikasi Lapangan',
+                    jabatan: 'Staff Verifikator / Asman ULTG',
+                    unit: currentUltg,
                     actor: 'Rian Pratama (Staff / Asman ULTG)',
-                    time: 'Dalam Proses Review',
+                    time: 'Sedang Berlangsung',
                     status: 'waiting',
                     statusLabel: 'Waiting',
                     note: 'Menunggu validasi hasil uji lapangan dan kesesuaian nameplate.'
                 },
                 {
                     stepNumber: 3,
-                    role: 'Approval 2 (Persetujuan Bidang Transmisi)',
+                    role: 'Approval 2 (Review Bidang Transmisi)',
                     title: 'Review Manajemen Aset UPT',
-                    actor: 'Bagus Prasetyo (Asman Pemeliharaan UPT)',
+                    jabatan: 'Asman Pemeliharaan & Aset Transmisi',
+                    unit: currentUpt,
+                    actor: '-',
                     time: '-',
                     status: 'not_yet',
                     statusLabel: 'Not Yet',
-                    note: 'Menunggu persetujuan Step 2 sebelum verifikasi data sistem.'
+                    note: 'Tahap berikutnya setelah Approval 1 disetujui.'
                 },
                 {
                     stepNumber: 4,
                     role: 'Approval 3 (Persetujuan Akhir)',
                     title: 'Pengesahan Registrasi Aset',
-                    actor: 'Hendra Kusuma (Manager UPT / MSB)',
+                    jabatan: 'Manager UPT / Senior Manager (MSB)',
+                    unit: currentUpt,
+                    actor: '-',
                     time: '-',
                     status: 'not_yet',
                     statusLabel: 'Not Yet',
@@ -2393,6 +2405,8 @@
                     nodeIconHtml = `<span>${step.stepNumber}</span>`;
                 }
 
+                const isNotYet = step.status === 'not_yet';
+
                 return `
                     <div class="stepper-item ${itemClass}">
                         <div class="stepper-node ${nodeClass}">
@@ -2406,13 +2420,30 @@
                                 <span class="stepper-status-badge ${badgeClass}">${step.statusLabel}</span>
                             </div>
                             <div class="stepper-role-text">${step.role}</div>
-                            <div class="stepper-actor-text">
-                                <i class="fa-solid fa-user-check" style="font-size:10px; color:var(--text-muted);"></i>
-                                <span>${step.actor}</span>
-                            </div>
-                            <div class="stepper-time-text">
-                                <i class="fa-regular fa-clock"></i> ${step.time}
-                            </div>
+                            
+                            ${isNotYet ? `
+                                <!-- TAMPILAN NOT YET: CUKUP JABATAN & UNIT TARGET -->
+                                <div style="display:flex; flex-direction:column; gap:3px; margin-top:2px;">
+                                    <div class="stepper-actor-text" style="color:var(--text-dark); font-weight:700;">
+                                        <i class="fa-solid fa-user-tag" style="font-size:10.5px; color:var(--primary-blue);"></i>
+                                        <span>${step.jabatan}</span>
+                                    </div>
+                                    <div class="stepper-time-text" style="color:var(--text-muted); font-size:11px;">
+                                        <i class="fa-solid fa-building" style="font-size:10px;"></i>
+                                        <span>Unit: <strong style="color:var(--text-dark);">${step.unit}</strong></span>
+                                    </div>
+                                </div>
+                            ` : `
+                                <!-- TAMPILAN DONE / WAITING: NAMA PERSONIL & WAKTU -->
+                                <div class="stepper-actor-text">
+                                    <i class="fa-solid fa-user-check" style="font-size:10px; color:var(--text-muted);"></i>
+                                    <span>${step.actor}</span>
+                                </div>
+                                <div class="stepper-time-text">
+                                    <i class="fa-regular fa-clock"></i> ${step.time}
+                                </div>
+                            `}
+                            
                             ${step.note ? `<div class="stepper-note-text">${step.note}</div>` : ''}
                         </div>
                     </div>
@@ -2908,7 +2939,7 @@
                 <ul>
                     <li><strong style="color:#059669;">Hijau (Done):</strong> Tahap sudah selesai dilewati.</li>
                     <li><strong style="color:#ea580c;">Oranye (Waiting):</strong> Posisi tahapan berjalan (Current Step).</li>
-                    <li><strong style="color:#64748b;">Abu Gelap (Not Yet):</strong> Tahapan berikutnya yang belum tercapai.</li>
+                    <li><strong style="color:#64748b;">Abu Gelap (Not Yet):</strong> Tahapan berikutnya yang belum tercapai (hanya menampilkan Jabatan & Unit tujuan).</li>
                 </ul>
             </li>
             <li><strong>Current Step Tracker:</strong> Pill status di header stepper mengidentifikasi posisi tahap aktif saat ini secara langsung.</li>
