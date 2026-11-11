@@ -36,6 +36,24 @@
 
             --shadow-sm:       0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
             --shadow-md:       0 4px 12px rgba(0,0,0,.08);
+
+            --chip-proses-bg:   #FFF7ED;
+            --chip-proses-text: #C2410C;
+            --chip-proses-dot:  #F97316;
+            --chip-kirim-bg:    #EFF6FF;
+            --chip-kirim-text:  #1D4ED8;
+            --chip-kirim-dot:   #3B82F6;
+            --chip-tunggu-bg:   #FEFCE8;
+            --chip-tunggu-text: #854D0E;
+            --chip-tunggu-dot:  #EAB308;
+            --chip-review-bg:   #FDF4FF;
+            --chip-review-text: #7E22CE;
+            --chip-review-dot:  #A855F7;
+            --chip-approval-bg: #F0FDF4;
+            --chip-approval-text: #166534;
+            --chip-approval-dot: #22C55E;
+            --danger:           #DC2626;
+            --danger-light:     #FEE2E2;
         }
 
         /* ===== BASE ===== */
@@ -649,6 +667,147 @@
             color: var(--pln-blue);
             font-weight: 600;
         }
+
+        /* Simulation Controls */
+        .sim-pill-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #CBD5E1;
+            background: #FFFFFF;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .sim-pill-btn:hover {
+            background: #E2E8F0;
+            color: #0F172A;
+        }
+
+        .sim-pill-btn.active {
+            background: #003B8E;
+            color: #FFFFFF;
+            border-color: #003B8E;
+            box-shadow: 0 2px 6px rgba(0,59,142,0.25);
+        }
+
+        .btn-kembalikan-data {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #FCA5A5;
+            background: #FEF2F2;
+            color: #DC2626;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .btn-kembalikan-data:hover {
+            background: #FEE2E2;
+            border-color: #EF4444;
+            color: #B91C1C;
+        }
+
+        /* Chip / Status Badge */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .chip-green {
+            background: var(--chip-approval-bg);
+            color: var(--chip-approval-text);
+            border: 1px solid #BBF7D0;
+        }
+        .chip-green .chip-dot { background: var(--chip-approval-dot); }
+
+        .chip-blue {
+            background: var(--chip-kirim-bg);
+            color: var(--chip-kirim-text);
+            border: 1px solid #BFDBFE;
+        }
+        .chip-blue .chip-dot { background: var(--chip-kirim-dot); }
+
+        .chip-orange {
+            background: var(--chip-proses-bg);
+            color: var(--chip-proses-text);
+            border: 1px solid #FED7AA;
+        }
+        .chip-orange .chip-dot { background: var(--chip-proses-dot); }
+
+        .chip-red {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid #FCA5A5;
+        }
+        .chip-red .chip-dot { background: var(--danger); }
+
+        /* Tooltip for Frozen Inputs during Pemenuhan */
+        .field.has-pemenuhan-tooltip {
+            position: relative;
+        }
+        .field.has-pemenuhan-tooltip:hover::after {
+            content: "tidak bisa diubah karean sedang pemenuhan komponen";
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background: #0F172A;
+            color: #F8FAFC;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        /* Rejected Component Row Highlight */
+        .row-component-rejected.is-active-rejected {
+            background: #FEF2F2 !important;
+        }
+        .row-component-rejected.is-active-rejected td {
+            background: #FEF2F2 !important;
+            border-top: 1.5px solid #FCA5A5 !important;
+            border-bottom: 1.5px solid #FCA5A5 !important;
+        }
+        .row-component-rejected.is-active-rejected td:first-child {
+            border-left: 4px solid #DC2626 !important;
+        }
+        .row-component-rejected.is-active-rejected td:last-child {
+            border-right: 1.5px solid #FCA5A5 !important;
+        }
+        .row-component-rejected.is-active-rejected .kotak-komponen-rejected {
+            border: 1.5px solid #DC2626;
+            background: #FFF1F2;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);
+        }
     </style>
 
 </head>
@@ -699,11 +858,19 @@
                             stroke-width="2">
                             <path d="M9 18l6-6-6-6" />
                         </svg>
-                        <span>Verifikasi MSB Fashar</span>
+                        <span id="breadcrumb-status">Waiting review MSB FASHAR</span>
                     </div>
                 </div>
             </div>
             <div class="topbar-right">
+                <div style="display:flex; align-items:center; gap:8px; background:#F1F5F9; border:1px solid #CBD5E1; padding:4px 12px; border-radius:20px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#003B8E" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    <span style="font-size:12px; font-weight:600; color:#003B8E; white-space:nowrap;">Simulasi Status:</span>
+                    <select id="simulasi-status-select" onchange="updateSimulasiStatus(this.value)" style="background:transparent; border:none; font-size:12.5px; font-weight:600; color:#0F172A; cursor:pointer; outline:none;">
+                        <option value="Waiting review MSB FASHAR" selected>1. Waiting review MSB FASHAR</option>
+                        <option value="Sedang Menunggu Pemenuhan Material">2. Sedang Menunggu Pemenuhan Material (Tab 4)</option>
+                    </select>
+                </div>
                 <button class="btn-log" onclick="openLog()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path
@@ -728,12 +895,24 @@
         <!-- CONTENT -->
         <main class="content">
 
+            <!-- SIMULATION PILL BAR (INTERACTIVE STATUS TOGGLE) -->
+            <div style="margin-bottom:16px; padding:14px 18px; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:#003B8E; white-space:nowrap;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    Simulasi Status:
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="sim-pill-btn active" onclick="setSimulasiStatus('Waiting review MSB FASHAR', this)">1. Waiting review MSB FASHAR</button>
+                    <button type="button" class="sim-pill-btn" onclick="setSimulasiStatus('Sedang Menunggu Pemenuhan Material', this)">2. Sedang Menunggu Pemenuhan Material (Tab 4)</button>
+                </div>
+            </div>
+
             <!-- MAIN TABS -->
             <div class="main-tabs">
-                <button class="main-tab-btn active" onclick="switchMainTab('tab-informasi')">Informasi
-                    Pemasangan</button>
-                <button class="main-tab-btn" onclick="switchMainTab('tab-Komponen')">Daftar Komponen</button>
-                <button class="main-tab-btn" onclick="switchMainTab('tab-pemetaan')">Pemetaan Material</button>
+                <button id="tab-btn-1" class="main-tab-btn active" onclick="switchMainTab('tab-informasi')">Informasi Pemasangan</button>
+                <button id="tab-btn-2" class="main-tab-btn" onclick="switchMainTab('tab-Komponen')">Daftar Komponen</button>
+                <button id="tab-btn-3" class="main-tab-btn" onclick="switchMainTab('tab-pemetaan')">Pemetaan Material</button>
+                <button id="tab-btn-4" class="main-tab-btn" onclick="switchMainTab('tab-mutasi')" style="display:none;">Proses Mutasi & Pemenuhan Material</button>
             </div>
 
             <!-- TAB: INFORMASI PEMASANGAN (NEW) -->
@@ -869,8 +1048,9 @@
                         style="padding:16px 20px; font-size:14px; font-weight:600; cursor:pointer; background:var(--card); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; transition:background .15s;"
                         onmouseover="this.style.background='var(--surface)'"
                         onmouseout="this.style.background='var(--card)'">
-                        <div style="display:flex; align-items:center;">
-                            Daftar Komponen - Tower ERS 1
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span>Daftar Komponen - Tower ERS 1</span>
+                            <span id="badge-acc-1" class="chip chip-green badge-acc-status" style="font-size:11.5px; padding:3px 10px;"><span class="chip-dot"></span>Sudah Lengkap</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:16px;">
                             <div style="display:flex; gap:8px;">
@@ -914,8 +1094,14 @@
                         <div
                             style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; margin-bottom:16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                             <div class="section-header" style="margin-bottom:16px;">
-                                <div class="section-label" style="margin-bottom:0">Informasi Pemasangan - Tower ERS 1
-                                </div>
+                                <div class="section-label" style="margin-bottom:0">Informasi Pemasangan - Tower ERS 1</div>
+                                <button type="button" class="btn-kembalikan-data" id="btn-kembalikan-1" style="display:none;" onclick="openModalKembalikanData(1)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="1 4 1 10 7 10"></polyline>
+                                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                    </svg>
+                                    Kembalikan Data
+                                </button>
                             </div>
 
                             <div class="form-row cols-3" style="margin-bottom:16px">
@@ -927,7 +1113,7 @@
                                 </div>
                                 <div class="field">
                                     <label>Tegangan Tower</label>
-                                    <select id="tegangan-tower" onchange="updateTemplateTower()">
+                                    <select id="tegangan-tower" class="input-header-freeze" onchange="updateTemplateTower()">
                                         <option>70 kV</option>
                                         <option selected>150 kV</option>
                                         <option>275 kV</option>
@@ -936,7 +1122,7 @@
                                 </div>
                                 <div class="field">
                                     <label>Merk</label>
-                                    <select id="merk-tower" onchange="updateTemplateTower()">
+                                    <select id="merk-tower" class="input-header-freeze" onchange="updateTemplateTower()">
                                         <option selected>Lindsey</option>
                                         <option>Tower Solution</option>
                                         <option>SBB</option>
@@ -947,14 +1133,14 @@
                             <div class="form-row cols-3" style="margin-bottom:16px">
                                 <div class="field">
                                     <label>Tipe Tower</label>
-                                    <select id="tipe-tower" onchange="updateTemplateTower()">
+                                    <select id="tipe-tower" class="input-header-freeze" onchange="updateTemplateTower()">
                                         <option>Tension</option>
                                         <option selected>Suspension</option>
                                     </select>
                                 </div>
                                 <div class="field">
                                     <label>Template Tower</label>
-                                    <input type="text" id="template-tower" value="150 kV - 60m - Lindsey - Suspension"
+                                    <input type="text" id="template-tower" class="input-header-freeze" value="150 kV - 60m - Lindsey - Suspension"
                                         disabled
                                         style="width:100%; border:1px solid var(--border); border-radius:4px; padding:8px 12px; background:var(--card); font-size:13px; color:var(--text-secondary);">
                                 </div>
@@ -973,7 +1159,7 @@
                                 </div>
                                 <div class="field">
                                     <label>Total Set ERS</label>
-                                    <input type="number" value="2" min="1">
+                                    <input type="number" id="total-set-tower" class="input-header-freeze" value="2" min="1">
                                 </div>
                                 <div class="field">
                                     <label>Pengganti Tower</label>
@@ -1684,7 +1870,738 @@
                     </div>
                 </div>
 
-                <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                <!-- ACCORDION 2: TOWER ERS 2 (Sedang Pemenuhan Komponen) -->
+                <div class="section-card"
+                    style="padding:0; overflow:hidden; border:1px solid var(--border); margin-bottom: 16px;">
+                    <div onclick="const content = this.nextElementSibling; const icon = this.querySelector('.chevron-icon'); if(content.style.display === 'none'){content.style.display='block'; icon.style.transform='rotate(180deg)';}else{content.style.display='none'; icon.style.transform='rotate(0deg)';}"
+                        style="padding:16px 20px; font-size:14px; font-weight:600; cursor:pointer; background:var(--card); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; transition:background .15s;"
+                        onmouseover="this.style.background='var(--surface)'"
+                        onmouseout="this.style.background='var(--card)'">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span>Daftar Komponen - Tower ERS 2</span>
+                            <span id="badge-acc-2" class="chip chip-blue badge-acc-status" style="font-size:11.5px; padding:3px 10px;"><span class="chip-dot"></span>Sedang Pemenuhan Komponen</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn-outline"
+                                    style="font-size:11.5px; padding:4px 10px; display:flex; align-items:center; gap:6px;"
+                                    onclick="event.stopPropagation()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="8" y1="13" x2="16" y2="13" />
+                                        <line x1="8" y1="17" x2="16" y2="17" />
+                                        <line x1="10" y1="9" x2="8" y2="9" />
+                                    </svg>
+                                    Export Excel
+                                </button>
+                                <button class="btn-outline"
+                                    style="font-size:11.5px; padding:4px 10px; display:flex; align-items:center; gap:6px;"
+                                    onclick="event.stopPropagation()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <path d="M16 13H8M16 17H8M10 9H8" />
+                                    </svg>
+                                    Export PDF
+                                </button>
+                            </div>
+                            <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                style="transition:transform .2s; transform:rotate(0deg); color:var(--text-secondary);">
+                                <path d="M18 15l-6-6-6 6" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Content 2 -->
+                    <div style="padding:20px 22px; background:var(--surface); display:none;">
+                        <!-- Box Informasi Pemasangan -->
+                        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; margin-bottom:16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div class="section-header" style="margin-bottom:16px;">
+                                <div class="section-label" style="margin-bottom:0">Informasi Pemasangan - Tower ERS 2</div>
+                                <button type="button" class="btn-kembalikan-data" id="btn-kembalikan-2" style="display:none;" onclick="openModalKembalikanData(2)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="1 4 1 10 7 10"></polyline>
+                                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                    </svg>
+                                    Kembalikan Data
+                                </button>
+                            </div>
+
+                            <div class="form-row cols-3" style="margin-bottom:16px">
+                                <div class="field">
+                                    <label>Set Tersedia</label>
+                                    <button class="btn-outline"
+                                        style="text-align:center; background:var(--pln-blue-light); color:var(--pln-blue); border-color:var(--pln-blue); width:100%;"
+                                        onclick="openSidePanelKetersediaan()">Ketersediaan Set</button>
+                                </div>
+                                <div class="field">
+                                    <label>Tegangan Tower</label>
+                                    <select class="input-header-freeze">
+                                        <option>70 kV</option>
+                                        <option selected>150 kV</option>
+                                        <option>275 kV</option>
+                                        <option>500 kV</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Merk</label>
+                                    <select class="input-header-freeze">
+                                        <option selected>Lindsey</option>
+                                        <option>Tower Solution</option>
+                                        <option>SBB</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-3" style="margin-bottom:16px">
+                                <div class="field">
+                                    <label>Tipe Tower</label>
+                                    <select class="input-header-freeze">
+                                        <option selected>Tension</option>
+                                        <option>Suspension</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Template Tower</label>
+                                    <input type="text" class="input-header-freeze" value="150 kV - 60m - Lindsey - Tension"
+                                        disabled
+                                        style="width:100%; border:1px solid var(--border); border-radius:4px; padding:8px 12px; background:var(--card); font-size:13px; color:var(--text-secondary);">
+                                </div>
+                                <div class="field">
+                                    <label>Rencana Tanggal Pasang</label>
+                                    <input type="date" value="2026-04-05">
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-3">
+                                <div class="field">
+                                    <label>Rencana Pasang</label>
+                                    <button class="btn-outline"
+                                        style="width:100%; text-align:center; transition:all 0.2s;"
+                                        onclick="openSidePanelDokumen()">Lihat File</button>
+                                </div>
+                                <div class="field">
+                                    <label>Total Set ERS</label>
+                                    <input type="number" class="input-header-freeze" value="1" min="1">
+                                </div>
+                                <div class="field">
+                                    <label>Pengganti Tower</label>
+                                    <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:6px 12px; display:flex; flex-wrap:wrap; gap:6px; min-height:38px; align-items:center; background:var(--card);">
+                                        <div style="background:var(--pln-blue-light); color:var(--pln-blue); font-size:12px; padding:2px 8px; border-radius:12px; display:flex; align-items:center; gap:4px;">
+                                            TOWER.177
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub Tabs: Komponen Tower 2 -->
+                        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div class="sub-tabs-wrap">
+                                <button class="sub-tab-btn active" onclick="switchSubTab('sub-komponen-2', this)">Daftar Komponen</button>
+                                <button class="sub-tab-btn" onclick="switchSubTab('sub-konfigurasi-2', this)">Daftar Konfigurasi</button>
+                            </div>
+
+                            <div id="sub-komponen-2" class="sub-tab-content">
+                                <div class="note-text">* Komponen berwarna <span class="blue">Biru</span> adalah Mandatory</div>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center" style="width:40px">No</th>
+                                                <th rowspan="2">Section</th>
+                                                <th rowspan="2">Komponen</th>
+                                                <th rowspan="2" class="text-center">Foto</th>
+                                                <th rowspan="2" class="text-center">Kebutuhan<br>Minimal</th>
+                                                <th rowspan="2" class="text-center">Jumlah<br>Kekurangan</th>
+                                                <th rowspan="2" class="text-center">Jumlah<br>Tersedia</th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MAKASSAR</div>
+                                                    <div>GUDANG A <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT MAKASSAR&#10;ULTG SIDRAP">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MANADO</div>
+                                                    <div>GUDANG B <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT MANADO&#10;ULTG MANADO">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT PALU</div>
+                                                    <div>GUDANG C <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT PALU&#10;ULTG PALU">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT KENDARI</div>
+                                                    <div>GUDANG D <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT KENDARI&#10;ULTG KENDARI">i</span></div>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center">1</td>
+                                                <td>Foundation Section</td>
+                                                <td style="color:var(--pln-blue); font-weight:500;">Tower Articulation Section</td>
+                                                <td class="text-center">
+                                                    <div style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--pln-blue-light); color:var(--pln-blue); cursor:pointer;" onclick="openSidePanel(this)">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">1</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="1" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">1</td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">1</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="1" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">2</td>
+                                                <td>Mast Section</td>
+                                                <td>Standard Mast Section 3m</td>
+                                                <td class="text-center">
+                                                    <div style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--pln-blue-light); color:var(--pln-blue); cursor:pointer;" onclick="openSidePanel(this)">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">8</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="4" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">4</td>
+                                                <td class="text-center bg-blue-light">2</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="2" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">2</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="2" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">3</td>
+                                                <td>Guy Wire Section</td>
+                                                <td>Guy Grip Dead End 1/2"</td>
+                                                <td class="text-center">
+                                                    <div style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--pln-blue-light); color:var(--pln-blue); cursor:pointer;" onclick="openSidePanel(this)">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">12</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="6" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">6</td>
+                                                <td class="text-center bg-blue-light">4</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="4" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">2</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="2" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div id="sub-konfigurasi-2" class="sub-tab-content" style="display:none;">
+                                <div class="note-text">* Komponen berwarna <span class="blue">Biru</span> adalah Mandatory</div>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center" style="width:40px">No</th>
+                                                <th rowspan="2">Nama Konfigurasi</th>
+                                                <th rowspan="2">Tipe Konfigurasi</th>
+                                                <th rowspan="2">Merk</th>
+                                                <th rowspan="2">Komponen</th>
+                                                <th rowspan="2" class="text-center">Pilih</th>
+                                                <th rowspan="2" class="text-center">Kebutuhan<br>Minimal</th>
+                                                <th rowspan="2" class="text-center">Jumlah<br>Kebutuhan</th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MAKASSAR</div>
+                                                    <div>GUDANG A <span class="info-icon" data-tooltip="Gudang A ada di GI, parentnya adalah:&#10;UPT MAKASSAR&#10;ULTG SIDRAP">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MANADO</div>
+                                                    <div>GUDANG B <span class="info-icon" data-tooltip="Gudang B ada di GI, parentnya adalah:&#10;UPT MANADO&#10;ULTG MANADO">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT PALU</div>
+                                                    <div>GUDANG C <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT PALU&#10;ULTG PALU">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT KENDARI</div>
+                                                    <div>GUDANG D <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT KENDARI&#10;ULTG KENDARI">i</span></div>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td rowspan="4" class="text-center">1</td>
+                                                <td rowspan="4">Guyed Tension Assembly</td>
+                                                <td rowspan="4">Tension</td>
+                                                <td rowspan="2">Lindsey</td>
+                                                <td>Triple Eye Adaptor</td>
+                                                <td rowspan="2" class="text-center"><input type="checkbox" checked onchange="toggleKonfigurasi(this)"></td>
+                                                <td class="text-center">3</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="3" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">3</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="3" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">3</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Plain Extension 5ft Length</td>
+                                                <td class="text-center">3</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="3" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">3</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="3" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">3</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td rowspan="2">Tower Solution</td>
+                                                <td>Tension Anchor Section</td>
+                                                <td rowspan="2" class="text-center"><input type="checkbox" onchange="toggleKonfigurasi(this)"></td>
+                                                <td class="text-center">3</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="3" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Guy Clamp Tension TS</td>
+                                                <td class="text-center">3</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="3" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCORDION 3: TOWER ERS 3 (Terdapat Komponen yang ditolak) -->
+                <div class="section-card"
+                    style="padding:0; overflow:hidden; border:1px solid var(--border); margin-bottom: 16px;">
+                    <div onclick="const content = this.nextElementSibling; const icon = this.querySelector('.chevron-icon'); if(content.style.display === 'none'){content.style.display='block'; icon.style.transform='rotate(180deg)';}else{content.style.display='none'; icon.style.transform='rotate(0deg)';}"
+                        style="padding:16px 20px; font-size:14px; font-weight:600; cursor:pointer; background:var(--card); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; transition:background .15s;"
+                        onmouseover="this.style.background='var(--surface)'"
+                        onmouseout="this.style.background='var(--card)'">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span>Daftar Komponen - Tower ERS 3</span>
+                            <span id="badge-acc-3" class="chip chip-red badge-acc-status" style="font-size:11.5px; padding:3px 10px;"><span class="chip-dot"></span>Terdapat Komponen yang ditolak</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn-outline"
+                                    style="font-size:11.5px; padding:4px 10px; display:flex; align-items:center; gap:6px;"
+                                    onclick="event.stopPropagation()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="8" y1="13" x2="16" y2="13" />
+                                        <line x1="8" y1="17" x2="16" y2="17" />
+                                        <line x1="10" y1="9" x2="8" y2="9" />
+                                    </svg>
+                                    Export Excel
+                                </button>
+                                <button class="btn-outline"
+                                    style="font-size:11.5px; padding:4px 10px; display:flex; align-items:center; gap:6px;"
+                                    onclick="event.stopPropagation()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <path d="M16 13H8M16 17H8M10 9H8" />
+                                    </svg>
+                                    Export PDF
+                                </button>
+                            </div>
+                            <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                style="transition:transform .2s; transform:rotate(180deg); color:var(--text-secondary);">
+                                <path d="M18 15l-6-6-6 6" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Content 3 -->
+                    <div style="padding:20px 22px; background:var(--surface); display:block;">
+                        <!-- Box Informasi Pemasangan -->
+                        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; margin-bottom:16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div class="section-header" style="margin-bottom:16px;">
+                                <div class="section-label" style="margin-bottom:0">Informasi Pemasangan - Tower ERS 3</div>
+                                <button type="button" class="btn-kembalikan-data" id="btn-kembalikan-3" style="display:none;" onclick="openModalKembalikanData(3)">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="1 4 1 10 7 10"></polyline>
+                                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                    </svg>
+                                    Kembalikan Data
+                                </button>
+                            </div>
+
+                            <div class="form-row cols-3" style="margin-bottom:16px">
+                                <div class="field">
+                                    <label>Set Tersedia</label>
+                                    <button class="btn-outline"
+                                        style="text-align:center; background:var(--pln-blue-light); color:var(--pln-blue); border-color:var(--pln-blue); width:100%;"
+                                        onclick="openSidePanelKetersediaan()">Ketersediaan Set</button>
+                                </div>
+                                <div class="field">
+                                    <label>Tegangan Tower</label>
+                                    <select class="input-header-freeze">
+                                        <option>70 kV</option>
+                                        <option selected>150 kV</option>
+                                        <option>275 kV</option>
+                                        <option>500 kV</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Merk</label>
+                                    <select class="input-header-freeze">
+                                        <option>Lindsey</option>
+                                        <option selected>Tower Solution</option>
+                                        <option>SBB</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-3" style="margin-bottom:16px">
+                                <div class="field">
+                                    <label>Tipe Tower</label>
+                                    <select class="input-header-freeze">
+                                        <option>Tension</option>
+                                        <option selected>Suspension</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Template Tower</label>
+                                    <input type="text" class="input-header-freeze" value="150 kV - 50m - Tower Solution - Suspension"
+                                        disabled
+                                        style="width:100%; border:1px solid var(--border); border-radius:4px; padding:8px 12px; background:var(--card); font-size:13px; color:var(--text-secondary);">
+                                </div>
+                                <div class="field">
+                                    <label>Rencana Tanggal Pasang</label>
+                                    <input type="date" value="2026-04-12">
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-3">
+                                <div class="field">
+                                    <label>Rencana Pasang</label>
+                                    <button class="btn-outline"
+                                        style="width:100%; text-align:center; transition:all 0.2s;"
+                                        onclick="openSidePanelDokumen()">Lihat File</button>
+                                </div>
+                                <div class="field">
+                                    <label>Total Set ERS</label>
+                                    <input type="number" class="input-header-freeze" value="1" min="1">
+                                </div>
+                                <div class="field">
+                                    <label>Pengganti Tower</label>
+                                    <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:6px 12px; display:flex; flex-wrap:wrap; gap:6px; min-height:38px; align-items:center; background:var(--card);">
+                                        <div style="background:var(--pln-blue-light); color:var(--pln-blue); font-size:12px; padding:2px 8px; border-radius:12px; display:flex; align-items:center; gap:4px;">
+                                            TOWER.178
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub Tabs: Komponen Tower 3 -->
+                        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <div class="sub-tabs-wrap">
+                                <button class="sub-tab-btn active" onclick="switchSubTab('sub-komponen-3', this)">Daftar Komponen</button>
+                                <button class="sub-tab-btn" onclick="switchSubTab('sub-konfigurasi-3', this)">Daftar Konfigurasi</button>
+                            </div>
+
+                            <div id="sub-komponen-3" class="sub-tab-content">
+                                <div class="note-text">* Komponen berwarna <span class="blue">Biru</span> adalah Mandatory. Terdapat komponen yang ditolak peminjamannya oleh unit pemilik.</div>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center" style="width:40px">No</th>
+                                                <th rowspan="2">Section</th>
+                                                <th rowspan="2">Komponen</th>
+                                                <th rowspan="2" class="text-center">Foto</th>
+                                                <th rowspan="2" class="text-center">Kebutuhan<br>Minimal</th>
+                                                <th rowspan="2" class="text-center">Jumlah<br>Kekurangan</th>
+                                                <th rowspan="2" class="text-center">Jumlah<br>Tersedia</th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MAKASSAR</div>
+                                                    <div>GUDANG A <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT MAKASSAR&#10;ULTG SIDRAP">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MANADO</div>
+                                                    <div>GUDANG B <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT MANADO&#10;ULTG MANADO">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT PALU</div>
+                                                    <div>GUDANG C <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT PALU&#10;ULTG PALU">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT KENDARI</div>
+                                                    <div>GUDANG D <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT KENDARI&#10;ULTG KENDARI">i</span></div>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Row 1: Normal Component -->
+                                            <tr>
+                                                <td class="text-center">1</td>
+                                                <td>Foundation Section</td>
+                                                <td style="color:var(--pln-blue); font-weight:500;">Tower Articulation Section</td>
+                                                <td class="text-center">
+                                                    <div style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--pln-blue-light); color:var(--pln-blue); cursor:pointer;" onclick="openSidePanel(this)">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">1</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">1</td>
+                                                <td class="text-center bg-blue-light">1</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="1" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+
+                                            <!-- Row 2: REJECTED COMPONENT (Highlighted in Red) -->
+                                            <tr class="row-component-rejected is-active-rejected">
+                                                <td class="text-center" style="font-weight:700; color:#DC2626;">2</td>
+                                                <td><span style="font-weight:600; color:#991B1B;">Foundation Section</span></td>
+                                                <td>
+                                                    <span style="font-weight:600; color:#DC2626;">Base Plate ERS 150kV</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:#FEE2E2; color:#DC2626; cursor:pointer;" onclick="openSidePanel(this)">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center" style="font-weight:600;">2</td>
+                                                <!-- Quantity kekurangan disable -->
+                                                <td class="text-center">
+                                                    <input type="number" class="input-qty-komponen" value="2" min="0" disabled style="width:70px; text-align:center; border:1px solid #FCA5A5; background:#FEF2F2; font-weight:700; color:#DC2626; cursor:not-allowed;" title="Kuantiti kekurangan dihitung otomatis">
+                                                </td>
+                                                <td class="text-center" style="color:#DC2626; font-weight:600;">0</td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light">
+                                                    <input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center; border:1px solid #CBD5E1;">
+                                                </td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center">
+                                                    <input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center; border:1px solid #CBD5E1;">
+                                                </td>
+                                                <td class="text-center bg-blue-light" style="color:#DC2626; font-weight:600;">0</td>
+                                                <td class="text-center bg-blue-light">
+                                                    <input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center; border:1.5px solid #EF4444; background:#FEF2F2;" title="Ditolak UPT PALU (Stok 0)">
+                                                </td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center">
+                                                    <input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center; border:1px solid #CBD5E1;">
+                                                </td>
+                                            </tr>
+
+                                            <!-- Row 3: Normal Component -->
+                                            <tr>
+                                                <td class="text-center">3</td>
+                                                <td>Mast Section</td>
+                                                <td>Standard Mast Section 3m</td>
+                                                <td class="text-center">
+                                                    <div style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:var(--pln-blue-light); color:var(--pln-blue); cursor:pointer;" onclick="openSidePanel(this)">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">6</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">6</td>
+                                                <td class="text-center bg-blue-light">6</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="6" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div id="sub-konfigurasi-3" class="sub-tab-content" style="display:none;">
+                                <div class="note-text">* Komponen berwarna <span class="blue">Biru</span> adalah Mandatory. Terdapat konfigurasi dengan komponen yang ditolak.</div>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center" style="width:40px">No</th>
+                                                <th rowspan="2">Nama Konfigurasi</th>
+                                                <th rowspan="2">Tipe Konfigurasi</th>
+                                                <th rowspan="2">Merk</th>
+                                                <th rowspan="2">Komponen</th>
+                                                <th rowspan="2" class="text-center">Pilih</th>
+                                                <th rowspan="2" class="text-center">Kebutuhan<br>Minimal</th>
+                                                <th rowspan="2" class="text-center">Jumlah<br>Kebutuhan</th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MAKASSAR</div>
+                                                    <div>GUDANG A <span class="info-icon" data-tooltip="Gudang A ada di GI, parentnya adalah:&#10;UPT MAKASSAR&#10;ULTG SIDRAP">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT MANADO</div>
+                                                    <div>GUDANG B <span class="info-icon" data-tooltip="Gudang B ada di GI, parentnya adalah:&#10;UPT MANADO&#10;ULTG MANADO">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center bg-blue-light" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT PALU</div>
+                                                    <div>GUDANG C <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT PALU&#10;ULTG PALU">i</span></div>
+                                                </th>
+                                                <th colspan="2" class="text-center" style="padding-top:4px; padding-bottom:4px;">
+                                                    <div style="font-size:10px; font-weight:600; color:var(--text-secondary); margin-bottom:2px; line-height:1;">UPT KENDARI</div>
+                                                    <div>GUDANG D <span class="info-icon" data-tooltip="Parent Unit :&#10;UPT KENDARI&#10;ULTG KENDARI">i</span></div>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center bg-blue-light" style="font-size:10.5px">Rencana Operasi</th>
+                                                <th class="text-center" style="font-size:10.5px">Stock Standby</th>
+                                                <th class="text-center" style="font-size:10.5px">Rencana Operasi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td rowspan="4" class="text-center">1</td>
+                                                <td rowspan="4">Yoke Plate & Attachment</td>
+                                                <td rowspan="4">Suspension</td>
+                                                <td rowspan="2">Tower Solution</td>
+                                                <td>yoke plate for 2 Bundle Conductor</td>
+                                                <td rowspan="2" class="text-center"><input type="checkbox" checked onchange="toggleKonfigurasi(this)"></td>
+                                                <td class="text-center">6</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="6" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">6</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="6" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                            <!-- Row 2: REJECTED COMPONENT IN CONFIGURATION -->
+                                            <tr class="row-component-rejected is-active-rejected">
+                                                <td>
+                                                    <span style="font-weight:600; color:#DC2626;">Base Plate Attachment ERS</span>
+                                                </td>
+                                                <td class="text-center" style="font-weight:600;">2</td>
+                                                <td class="text-center">
+                                                    <input type="number" class="input-qty-komponen" value="2" min="0" disabled style="width:70px; text-align:center; border:1px solid #FCA5A5; background:#FEF2F2; font-weight:700; color:#DC2626; cursor:not-allowed;" title="Kuantiti kebutuhan dihitung otomatis">
+                                                </td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                                <td class="text-center bg-blue-light" style="color:#DC2626; font-weight:600;">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center; border:1.5px solid #EF4444; background:#FEF2F2;" title="Ditolak UPT PALU"></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td rowspan="2">Lindsey</td>
+                                                <td>Yoke plate rectangular</td>
+                                                <td rowspan="2" class="text-center"><input type="checkbox" onchange="toggleKonfigurasi(this)"></td>
+                                                <td class="text-center">6</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="6" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">6</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">6</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jumper Mount For 4 Bundle Conductor</td>
+                                                <td class="text-center">2</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="2" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">2</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">2</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center bg-blue-light">0</td>
+                                                <td class="text-center bg-blue-light"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                                <td class="text-center">0</td>
+                                                <td class="text-center"><input type="number" class="input-qty-komponen" value="0" min="0" style="width:70px; text-align:center;" disabled></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="container-btn-tambah-tower" style="display:flex; justify-content:flex-end; margin-top:16px;">
                     <button class="btn-tambah" style="padding:10px 24px; font-weight:600;">+ Tambah List Tower ERS
                         Baru</button>
                 </div>
@@ -1934,6 +2851,90 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- TAB: PROSES MUTASI & PEMENUHAN MATERIAL (NEW TAB 4 FOR SIMULATION) -->
+            <div id="tab-mutasi" class="tab-content">
+                <div class="section-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <div>
+                            <div class="section-label" style="margin-bottom:2px; font-size:15px; color:var(--text-primary);">Status Mutasi & Respon Peminjaman Unit</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Monitoring real-time permintaan pemenuhan material antar Unit Induk & Vendor (Provided / Pending / Rejected)</div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <select id="filter-respon-mutasi" onchange="filterResponMutasi(this.value)" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:12.5px; background:#fff;">
+                                <option value="">Semua Status Respon</option>
+                                <option value="Disetujui">Disetujui Unit Pengirim</option>
+                                <option value="Menunggu">Dalam Proses Approval Unit</option>
+                                <option value="Ditolak">Ditolak Unit Pengirim</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container" style="margin-top:0;">
+                        <table id="table-mutasi-respon">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;" class="text-center">No</th>
+                                    <th>Kategori</th>
+                                    <th>Item Material / Set ERS</th>
+                                    <th>Unit Pengirim / Pemilik</th>
+                                    <th>Unit Peminjam / Tujuan</th>
+                                    <th class="text-center">Qty Request</th>
+                                    <th class="text-center">Qty Diprovide</th>
+                                    <th class="text-center">Status Respon Unit</th>
+                                    <th>Catatan / Keterangan Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td><span class="chip chip-blue" style="font-size:11px;">Set ERS</span></td>
+                                    <td><strong>SBB - 150kV - Suspension</strong></td>
+                                    <td>UIP3B Sumatera</td>
+                                    <td>UITJBT (Pengelola)</td>
+                                    <td class="text-center">1 Set</td>
+                                    <td class="text-center"><strong>1 Set</strong></td>
+                                    <td class="text-center"><span class="chip chip-green" style="font-size:11.5px;"><span class="chip-dot"></span>Disetujui Unit</span></td>
+                                    <td><span style="font-size:12px; color:var(--text-secondary);">Stok ERS standby & siap dikirim via darat.</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">2</td>
+                                    <td><span class="chip chip-orange" style="font-size:11px;">Aksesoris</span></td>
+                                    <td><strong>Tower Articulation Section</strong></td>
+                                    <td>UITJBTB</td>
+                                    <td>UITJBT (Pengelola)</td>
+                                    <td class="text-center">5 Pcs</td>
+                                    <td class="text-center"><strong>5 Pcs</strong></td>
+                                    <td class="text-center"><span class="chip chip-green" style="font-size:11.5px;"><span class="chip-dot"></span>Disetujui Unit</span></td>
+                                    <td><span style="font-size:12px; color:var(--text-secondary);">Material dalam persiapan di Gudang B.</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">3</td>
+                                    <td><span class="chip chip-orange" style="font-size:11px;">Aksesoris</span></td>
+                                    <td><strong>Base Plate ERS 150kV</strong></td>
+                                    <td>UPT PALU</td>
+                                    <td>UITJBT (Pengelola)</td>
+                                    <td class="text-center">2 Pcs</td>
+                                    <td class="text-center"><strong>0 Pcs</strong></td>
+                                    <td class="text-center"><span class="chip chip-red" style="font-size:11.5px;"><span class="chip-dot"></span>Ditolak Unit</span></td>
+                                    <td><span style="font-size:12px; color:var(--danger);">Stok terbatas untuk penanganan anomali lokal.</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">4</td>
+                                    <td><span class="chip chip-orange" style="font-size:11px;">Aksesoris</span></td>
+                                    <td><strong>Bolt Assembly M16 x 65</strong></td>
+                                    <td>UPT MANADO</td>
+                                    <td>UITJBT (Pengelola)</td>
+                                    <td class="text-center">10 Pcs</td>
+                                    <td class="text-center"><strong>10 Pcs</strong></td>
+                                    <td class="text-center"><span class="chip chip-orange" style="font-size:11.5px;"><span class="chip-dot"></span>Menunggu Approval</span></td>
+                                    <td><span style="font-size:12px; color:var(--text-secondary);">Menunggu verifikasi Asman RENEV UPT.</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- SIDE PANEL OVERLAY -->
@@ -2567,7 +3568,11 @@
 
         <!-- FOOTER -->
         <footer class="form-footer"
-            style="padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--card); position:sticky; bottom:0; z-index:100; box-shadow:0 -4px 10px rgba(0,0,0,0.02);">
+            style="padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--card); position:sticky; bottom:0; z-index:100; box-shadow:0 -4px 10px rgba(0,0,0,0.02);">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:13px; font-weight:600; color:var(--text-secondary);">Status Transaksi:</span>
+                <span id="verifikasi-status-badge" class="chip chip-orange" style="font-size:12.5px; font-weight:600; padding:4px 12px;"><span class="chip-dot"></span>Waiting review MSB FASHAR</span>
+            </div>
             <div style="display:flex; gap:12px;">
                 <button id="btn-sebelumnya" class="btn-outline" style="display:none;"
                     onclick="goPreviousTab()">Sebelumnya</button>
@@ -2673,6 +3678,51 @@
                     <button onclick="closeModalDisposisi()"
                         style="padding:8px 16px; border:none; border-radius:6px; background:var(--pln-blue); color:#fff; font-size:13px; font-weight:600; cursor:pointer">Ya,
                         Disposisi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Kembalikan Data (Roleback Unit Tidak Tersedia) -->
+        <div id="modal-kembalikan-backdrop"
+            style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9000; display:none; align-items:center; justify-content:center;">
+            <div
+                style="background:var(--card); width:100%; max-width:460px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden">
+                <div
+                    style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between">
+                    <div style="font-size:15px; font-weight:700; color:#DC2626; display:flex; align-items:center; gap:8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                        Kembalikan Data (Rollback)
+                    </div>
+                    <button onclick="closeModalKembalikanData()"
+                        style="background:none; border:none; cursor:pointer; color:var(--text-secondary)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div style="padding:22px 24px">
+                    <div id="modal-kembalikan-desc" style="font-size:13.5px; color:var(--text-primary); line-height:1.5; margin-bottom:14px;">
+                        Apakah Anda yakin ingin mengembalikan data ini untuk diedit kembali karena unit tidak tersedia?
+                    </div>
+                    <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:6px; padding:12px 14px; font-size:12.5px; color:#991B1B; line-height:1.45; margin-bottom:14px;">
+                        <strong>Catatan Rollback:</strong> Semua inputan & kuantiti tabel pada tower terkait akan di-enable kembali sehingga dapat diubah dan disubmit ulang.
+                    </div>
+                    <div style="margin-bottom:6px; font-size:12.5px; font-weight:600; color:var(--text-primary)">
+                        Alasan Pengembalian Data <span style="color:#DC2626">*</span>
+                    </div>
+                    <textarea id="input-alasan-kembalikan" rows="3" placeholder="Contoh: Unit material ERS tidak tersedia di gudang tujuan..."
+                        style="width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:13px; outline:none; resize:vertical;"></textarea>
+                </div>
+                <div
+                    style="padding:16px 24px; border-top:1px solid var(--border); background:#F8FAFC; display:flex; justify-content:flex-end; gap:10px">
+                    <button onclick="closeModalKembalikanData()"
+                        style="padding:8px 16px; border:1px solid var(--border); border-radius:6px; background:#fff; color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer">Batal</button>
+                    <button onclick="confirmKembalikanData()"
+                        style="padding:8px 16px; border:none; border-radius:6px; background:#DC2626; color:#fff; font-size:13px; font-weight:600; cursor:pointer">Ya, Kembalikan Data</button>
                 </div>
             </div>
         </div>
@@ -2980,11 +4030,12 @@
     </div>
 
     <script>
-        const TABS = ['tab-informasi', 'tab-Komponen', 'tab-pemetaan'];
+        const TABS = ['tab-informasi', 'tab-Komponen', 'tab-pemetaan', 'tab-mutasi'];
         let currentTabIndex = 0;
 
         function switchMainTab(tabId) {
             currentTabIndex = TABS.indexOf(tabId);
+            if (currentTabIndex === -1) currentTabIndex = 0;
 
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -2992,52 +4043,321 @@
             document.querySelectorAll('.main-tab-btn').forEach(el => el.classList.remove('active'));
 
             // Show selected tab content
-            document.getElementById(tabId).classList.add('active');
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
 
             // Try to activate the tab button
-            const tabBtn = document.querySelector(`.main-tab-btn[onclick="switchMainTab('${tabId}')"]`);
+            const tabBtn = document.getElementById(`tab-btn-${currentTabIndex + 1}`) || document.querySelector(`.main-tab-btn[onclick*="${tabId}"]`);
             if (tabBtn) tabBtn.classList.add('active');
 
-            if (tabId === 'tab-informasi' && mapInformasi) {
+            if (tabId === 'tab-informasi' && typeof mapInformasi !== 'undefined' && mapInformasi) {
                 setTimeout(() => mapInformasi.invalidateSize(), 350);
             }
 
-            // Update footer buttons
+            // Update footer buttons based on currently visible tabs
             const btnSeb = document.getElementById('btn-sebelumnya');
             const btnSel = document.getElementById('btn-selanjutnya');
             const btnRej = document.getElementById('btn-reject');
             const btnSub = document.getElementById('btn-submit');
 
-            if (tabId === 'tab-informasi') {
-                btnSeb.style.display = 'none';
-                btnSel.style.display = 'block';
-                btnRej.style.display = 'none';
-                btnSub.style.display = 'none';
-            } else if (tabId === 'tab-Komponen') {
-                btnSeb.style.display = 'block';
-                btnSel.style.display = 'block';
-                btnRej.style.display = 'none';
-                btnSub.style.display = 'none';
-            } else if (tabId === 'tab-pemetaan') {
-                btnSeb.style.display = 'block';
-                btnSel.style.display = 'none';
-                btnRej.style.display = 'block';
-                btnSub.style.display = 'block';
-            }
+            const visibleTabs = TABS.filter((t, idx) => {
+                const btn = document.getElementById(`tab-btn-${idx + 1}`);
+                return btn && btn.style.display !== 'none';
+            });
+
+            const isFirst = visibleTabs[0] === tabId;
+            const isLast = visibleTabs[visibleTabs.length - 1] === tabId;
+
+            if (btnSeb) btnSeb.style.display = isFirst ? 'none' : 'inline-flex';
+            if (btnSel) btnSel.style.display = isLast ? 'none' : 'inline-flex';
+            if (btnRej) btnRej.style.display = isLast ? 'inline-flex' : 'none';
+            if (btnSub) btnSub.style.display = isLast ? 'inline-flex' : 'none';
         }
 
         function goNextTab() {
-            if (currentTabIndex < TABS.length - 1) {
-                switchMainTab(TABS[currentTabIndex + 1]);
+            const visibleTabs = TABS.filter((t, idx) => {
+                const btn = document.getElementById(`tab-btn-${idx + 1}`);
+                return btn && btn.style.display !== 'none';
+            });
+            const currentVisIdx = visibleTabs.indexOf(TABS[currentTabIndex]);
+            if (currentVisIdx >= 0 && currentVisIdx < visibleTabs.length - 1) {
+                switchMainTab(visibleTabs[currentVisIdx + 1]);
                 window.scrollTo(0, 0);
             }
         }
 
         function goPreviousTab() {
-            if (currentTabIndex > 0) {
-                switchMainTab(TABS[currentTabIndex - 1]);
+            const visibleTabs = TABS.filter((t, idx) => {
+                const btn = document.getElementById(`tab-btn-${idx + 1}`);
+                return btn && btn.style.display !== 'none';
+            });
+            const currentVisIdx = visibleTabs.indexOf(TABS[currentTabIndex]);
+            if (currentVisIdx > 0) {
+                switchMainTab(visibleTabs[currentVisIdx - 1]);
                 window.scrollTo(0, 0);
             }
+        }
+
+        function setSimulasiStatus(statusVal, btnEl) {
+            document.querySelectorAll('.sim-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) {
+                btnEl.classList.add('active');
+            }
+            const sel = document.getElementById('simulasi-status-select');
+            if (sel) sel.value = statusVal;
+
+            updateSimulasiStatus(statusVal);
+        }
+
+        function updateSimulasiStatus(status) {
+            const badge = document.getElementById('verifikasi-status-badge');
+            const breadcrumbStatus = document.getElementById('breadcrumb-status');
+            const tabBtn4 = document.getElementById('tab-btn-4');
+
+            const isWaitingReview = status.includes('Waiting review MSB FASHAR') || status.includes('Waiting Verifikasi MSB');
+
+            let tabToActivate = TABS[currentTabIndex] || 'tab-informasi';
+
+            if (isWaitingReview) {
+                // Tab 1, 2, 3 visible, Tab 4 hidden
+                if (tabBtn4) tabBtn4.style.display = 'none';
+                if (badge) {
+                    badge.className = 'chip chip-orange';
+                    badge.innerHTML = '<span class="chip-dot"></span>Waiting review MSB FASHAR';
+                }
+                if (breadcrumbStatus) breadcrumbStatus.textContent = 'Waiting review MSB FASHAR';
+                if (currentTabIndex >= 3) tabToActivate = 'tab-informasi';
+                applyPemenuhanCondition(false);
+            } else {
+                // Sedang Menunggu Pemenuhan Material: Tab 1, 2, 3, 4 all visible
+                if (tabBtn4) tabBtn4.style.display = '';
+                if (badge) {
+                    badge.className = 'chip chip-blue';
+                    badge.innerHTML = '<span class="chip-dot"></span>Sedang Menunggu Pemenuhan Material';
+                }
+                if (breadcrumbStatus) breadcrumbStatus.textContent = 'Sedang Menunggu Pemenuhan Material';
+                applyPemenuhanCondition(true);
+            }
+
+            switchMainTab(tabToActivate);
+        }
+
+        function applyPemenuhanCondition(isPemenuhan) {
+            // 1. Takeout Tombol "+ Tambah List Tower ERS Baru"
+            const btnTambah = document.getElementById('container-btn-tambah-tower');
+            if (btnTambah) btnTambah.style.display = isPemenuhan ? 'none' : 'flex';
+
+            // 2. Status Badges on Accordion Headers
+            const badge1 = document.getElementById('badge-acc-1');
+            const badge2 = document.getElementById('badge-acc-2');
+            const badge3 = document.getElementById('badge-acc-3');
+            if (isPemenuhan) {
+                if (badge1) {
+                    badge1.className = 'chip chip-green badge-acc-status';
+                    badge1.innerHTML = '<span class="chip-dot"></span>Sudah Lengkap';
+                }
+                if (badge2) {
+                    badge2.className = 'chip chip-blue badge-acc-status';
+                    badge2.innerHTML = '<span class="chip-dot"></span>Sedang Pemenuhan Komponen';
+                }
+                if (badge3) {
+                    badge3.className = 'chip chip-red badge-acc-status';
+                    badge3.innerHTML = '<span class="chip-dot"></span>Terdapat Komponen yang ditolak';
+                }
+            } else {
+                const waitingHtml = '<span class="chip-dot"></span>Waiting review MSB FASHAR';
+                if (badge1) {
+                    badge1.className = 'chip chip-orange badge-acc-status';
+                    badge1.innerHTML = waitingHtml;
+                }
+                if (badge2) {
+                    badge2.className = 'chip chip-orange badge-acc-status';
+                    badge2.innerHTML = waitingHtml;
+                }
+                if (badge3) {
+                    badge3.className = 'chip chip-orange badge-acc-status';
+                    badge3.innerHTML = waitingHtml;
+                }
+            }
+
+            // 3. Freeze Header Inputs (Tegangan, Merk, Tipe, Template, Total Set) with Tooltip
+            document.querySelectorAll('.input-header-freeze').forEach(el => {
+                el.disabled = isPemenuhan;
+                if (isPemenuhan) {
+                    el.style.background = '#F1F5F9';
+                    el.style.cursor = 'not-allowed';
+                    el.title = 'tidak bisa diubah karean sedang pemenuhan komponen';
+                    el.closest('.field')?.classList.add('has-pemenuhan-tooltip');
+                } else {
+                    el.style.background = '';
+                    el.style.cursor = '';
+                    el.title = '';
+                    el.closest('.field')?.classList.remove('has-pemenuhan-tooltip');
+                }
+            });
+
+            // 4. Quantity inputs in warehouse list & components disabled, except rejected component
+            const allQtyInputs = document.querySelectorAll('#tab-Komponen table input[type="number"], .input-qty-komponen');
+            allQtyInputs.forEach(el => {
+                const isRejectedRow = el.closest('.row-component-rejected');
+                const cellIndex = el.closest('td')?.cellIndex;
+                const isKekuranganCol = cellIndex === 5 || cellIndex === 2; // Kolom Jumlah Kekurangan / Kebutuhan
+
+                if (isKekuranganCol) {
+                    // Kolom Jumlah Kekurangan selalu disabled/readonly
+                    el.disabled = true;
+                    el.style.cursor = 'not-allowed';
+                    if (isRejectedRow) {
+                        el.style.background = '#FEF2F2';
+                        el.style.borderColor = '#FCA5A5';
+                        el.style.color = '#DC2626';
+                        el.title = 'Kuantiti kekurangan dihitung otomatis';
+                    } else {
+                        el.style.background = isPemenuhan ? '#F1F5F9' : '#F8FAFC';
+                        el.style.borderColor = '#CBD5E1';
+                        el.style.color = 'var(--text-primary)';
+                        el.title = 'Kuantiti kekurangan dihitung otomatis';
+                    }
+                } else if (isRejectedRow) {
+                    // Komponen yang direject TETAP ENABLE agar bisa disesuaikan
+                    el.disabled = false;
+                    el.style.cursor = '';
+                    if (isPemenuhan) {
+                        el.style.borderColor = '#EF4444';
+                        el.style.background = '#FFFFFF';
+                        el.title = 'Komponen ditolak - silakan sesuaikan kuantiti atau sumber pemenuhan';
+                    } else {
+                        el.style.borderColor = '';
+                        el.style.background = '';
+                        el.title = '';
+                    }
+                } else {
+                    el.disabled = isPemenuhan;
+                    el.style.background = isPemenuhan ? '#F8FAFC' : '';
+                    el.style.cursor = isPemenuhan ? 'not-allowed' : '';
+                    el.title = isPemenuhan ? 'tidak bisa diubah karean sedang pemenuhan komponen' : '';
+                }
+            });
+
+            // 5. Highlight rejected row in red box
+            const rejRows = document.querySelectorAll('.row-component-rejected');
+            rejRows.forEach(row => {
+                if (isPemenuhan) {
+                    row.classList.add('is-active-rejected');
+                } else {
+                    row.classList.remove('is-active-rejected');
+                }
+            });
+
+            // 6. Tombol "Kembalikan Data" hanya tersedia untuk status sedang dan ditolak
+            // Accordion 2: Sedang Pemenuhan Komponen
+            // Accordion 3: Terdapat Komponen yang ditolak
+            // Accordion 1: Sudah Lengkap (tidak muncul)
+            const btnKembalikan1 = document.getElementById('btn-kembalikan-1');
+            const btnKembalikan2 = document.getElementById('btn-kembalikan-2');
+            const btnKembalikan3 = document.getElementById('btn-kembalikan-3');
+
+            if (btnKembalikan1) btnKembalikan1.style.display = 'none'; // Tower 1 status Sudah Lengkap
+            if (btnKembalikan2) btnKembalikan2.style.display = isPemenuhan ? 'inline-flex' : 'none'; // Status Sedang Pemenuhan
+            if (btnKembalikan3) btnKembalikan3.style.display = isPemenuhan ? 'inline-flex' : 'none'; // Status Terdapat Ditolak
+        }
+
+        let currentRollbackTowerIdx = null;
+
+        function openModalKembalikanData(towerIdx) {
+            currentRollbackTowerIdx = towerIdx;
+            const descEl = document.getElementById('modal-kembalikan-desc');
+            const statusLabel = towerIdx === 2 ? 'Sedang Pemenuhan Komponen' : 'Terdapat Komponen yang ditolak';
+            if (descEl) {
+                descEl.innerHTML = `Apakah Anda yakin ingin mengembalikan data pada <strong>Tower ERS ${towerIdx}</strong> (Status: <em>${statusLabel}</em>) karena unit material tidak tersedia?`;
+            }
+            const alasanInput = document.getElementById('input-alasan-kembalikan');
+            if (alasanInput) alasanInput.value = '';
+            document.getElementById('modal-kembalikan-backdrop').style.display = 'flex';
+        }
+
+        function closeModalKembalikanData() {
+            document.getElementById('modal-kembalikan-backdrop').style.display = 'none';
+            currentRollbackTowerIdx = null;
+        }
+
+        function confirmKembalikanData() {
+            const towerIdx = currentRollbackTowerIdx;
+            if (!towerIdx) {
+                closeModalKembalikanData();
+                return;
+            }
+
+            // Target accordion box for this tower
+            let targetCard = null;
+            if (towerIdx === 1) targetCard = document.querySelector('#tab-Komponen .section-card:nth-of-type(1)');
+            else if (towerIdx === 2) targetCard = document.querySelector('#tab-Komponen .section-card:nth-of-type(2)');
+            else if (towerIdx === 3) targetCard = document.querySelector('#tab-Komponen .section-card:nth-of-type(3)');
+
+            if (targetCard) {
+                // 1. Enable semua header inputs di dalam card ini
+                targetCard.querySelectorAll('.input-header-freeze').forEach(el => {
+                    el.disabled = false;
+                    el.style.background = '#FFFFFF';
+                    el.style.cursor = '';
+                    el.title = '';
+                    el.closest('.field')?.classList.remove('has-pemenuhan-tooltip');
+                });
+
+                // 2. Enable semua number/qty inputs di dalam card ini
+                targetCard.querySelectorAll('input[type="number"], .input-qty-komponen').forEach(el => {
+                    el.disabled = false;
+                    el.style.background = '#FFFFFF';
+                    el.style.cursor = '';
+                    el.title = '';
+                });
+
+                // 3. Update status badge di accordion header
+                const badge = document.getElementById(`badge-acc-${towerIdx}`);
+                if (badge) {
+                    badge.className = 'chip chip-orange badge-acc-status';
+                    badge.innerHTML = '<span class="chip-dot"></span>Dikeluarkan untuk Revisi (Draft)';
+                }
+
+                // 4. Sembunyikan tombol kembalikan data karena sudah di-rollback
+                const btnKembalikan = document.getElementById(`btn-kembalikan-${towerIdx}`);
+                if (btnKembalikan) btnKembalikan.style.display = 'none';
+
+                // 5. Tambahkan notifikasi banner informasi rollback
+                let banner = targetCard.querySelector('.banner-rollback-active');
+                if (!banner) {
+                    banner = document.createElement('div');
+                    banner.className = 'banner-rollback-active';
+                    banner.style.cssText = 'background:#FFFBEB; border:1px solid #FDE68A; border-radius:6px; padding:10px 14px; margin-bottom:14px; font-size:12.5px; color:#92400E; display:flex; align-items:center; gap:8px;';
+                    banner.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <span><strong>Data Berhasil Dikembalikan:</strong> Tabel dan informasi pemasangan telah di-enable kembali. Anda dapat mengubah alokasi unit material lalu submit ulang.</span>
+                    `;
+                    const innerBox = targetCard.querySelector('.section-header')?.parentElement;
+                    if (innerBox) innerBox.insertBefore(banner, innerBox.children[1]);
+                }
+            }
+
+            closeModalKembalikanData();
+            alert(`Data Tower ERS ${towerIdx} berhasil dikembalikan. Semua tabel dan field kini dapat diubah untuk disubmit ulang.`);
+        }
+
+        function filterResponMutasi(val) {
+            const table = document.getElementById('table-mutasi-respon');
+            if (!table) return;
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(r => {
+                if (!val) {
+                    r.style.display = '';
+                } else {
+                    const text = r.children[7]?.textContent || '';
+                    r.style.display = text.toLowerCase().includes(val.toLowerCase()) ? '' : 'none';
+                }
+            });
         }
 
         function openModalReject() {
@@ -3061,16 +4381,20 @@
             document.getElementById('modal-disposisi-backdrop').style.display = 'none';
         }
 
-        function switchSubTab(tabId) {
-            // Hide all sub tab contents
-            document.querySelectorAll('.sub-tab-content').forEach(el => el.style.display = 'none');
-            // Deactivate all sub tab buttons
-            document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+        function switchSubTab(tabId, btnElement) {
+            const btn = btnElement || (window.event ? window.event.currentTarget : null);
+            const parentWrap = btn ? btn.closest('.section-card') : document;
+            if (parentWrap) {
+                parentWrap.querySelectorAll('.sub-tab-content').forEach(el => el.style.display = 'none');
+                parentWrap.querySelectorAll('.sub-tab-btn:not(.chip-tegangan)').forEach(el => el.classList.remove('active'));
+            } else {
+                document.querySelectorAll('.sub-tab-content').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.sub-tab-btn:not(.chip-tegangan)').forEach(el => el.classList.remove('active'));
+            }
 
-            // Show selected sub tab content
-            document.getElementById(tabId).style.display = 'block';
-            // Activate clicked sub tab button
-            event.currentTarget.classList.add('active');
+            const target = document.getElementById(tabId);
+            if (target) target.style.display = 'block';
+            if (btn) btn.classList.add('active');
         }
         function openSidePanel(btnElement) {
             if (btnElement) {
@@ -3635,6 +4959,7 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             initMaps();
+            updateSimulasiStatus('Waiting review MSB FASHAR');
         });
     </script>
 

@@ -17,4 +17,3 @@ Ini probis yang digunakan untuk membuat perencanaan pembangunan Tower ERS
 9. (Create Data) User ASMAN Kons membuat pengajuan pengembalian base on Perizinan Pengembalian.
 10. (Entry Data) User ASMAN PDKB akan menginput realisasi keberangkatan dan tibanya komponen digudang transit dengan perangkat mobile. Lalu setelah itu mengisi karantina hasil operasi dengan melihat kelengkapan dan kondisi komponen yang sudah datang.
 11. (Verifikasi & Reject) ASMAN Kons akan memverifikasi hasil pengecekan dan kondisi komponen yang sudah datang. Jika sudah sesuai maka akan dilanjutkan ke proses pengembalian. 
-
