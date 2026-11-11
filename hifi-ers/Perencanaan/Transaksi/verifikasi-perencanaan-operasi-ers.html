@@ -3727,6 +3727,27 @@
             </div>
         </div>
 
+        <!-- Pop-up Alert Sukses Kembalikan Data -->
+        <div id="modal-alert-kembalikan-success"
+            style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9100; display:none; align-items:center; justify-content:center;">
+            <div
+                style="background:var(--card); width:100%; max-width:420px; border-radius:12px; box-shadow:0 15px 35px rgba(0,0,0,0.25); overflow:hidden; text-align:center; padding:28px 24px;">
+                <div style="width:56px; height:56px; border-radius:50%; background:#DCFCE7; color:#16A34A; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <div style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:8px;">Data Berhasil Dikembalikan!</div>
+                <div id="alert-kembalikan-success-msg" style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:22px;">
+                    Data tower ERS telah berhasil di-rollback. Seluruh tabel dan inputan kini dapat diubah untuk disesuaikan dan disubmit ulang.
+                </div>
+                <button type="button" onclick="closeAlertKembalikanSuccess()"
+                    style="padding:9px 24px; border:none; border-radius:6px; background:var(--pln-blue); color:#fff; font-size:13px; font-weight:600; cursor:pointer; width:100%;">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+
         <!-- SIDE PANEL OVERLAY: LOG PENGEMBALIAN -->
         <div id="side-panel-log-overlay"
             style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001; display:none;"
@@ -4343,7 +4364,19 @@
             }
 
             closeModalKembalikanData();
-            alert(`Data Tower ERS ${towerIdx} berhasil dikembalikan. Semua tabel dan field kini dapat diubah untuk disubmit ulang.`);
+            
+            // Pop-up alert konfirmasi sukses kembalikan data
+            const msgEl = document.getElementById('alert-kembalikan-success-msg');
+            if (msgEl) {
+                msgEl.innerHTML = `Data <strong>Tower ERS ${towerIdx}</strong> berhasil dikembalikan ke status revisi/draft. Seluruh tabel dan inputan telah di-enable kembali untuk disesuaikan lalu disubmit ulang.`;
+            }
+            const modalAlert = document.getElementById('modal-alert-kembalikan-success');
+            if (modalAlert) modalAlert.style.display = 'flex';
+        }
+
+        function closeAlertKembalikanSuccess() {
+            const modalAlert = document.getElementById('modal-alert-kembalikan-success');
+            if (modalAlert) modalAlert.style.display = 'none';
         }
 
         function filterResponMutasi(val) {
