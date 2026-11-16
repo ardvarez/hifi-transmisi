@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landing Page - Back Office New PST | PLN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    :root {
+      --pln-blue: #0A58CA;
+      --pln-blue-mid: #1d6fdc;
+      --pln-blue-light: #E7F1FF;
+      --pln-yellow: #F7A800;
+      --bg-main: #F8FAFC;
+      --bg-surface: #F1F5F9;
+      --card-bg: #FFFFFF;
+      --border-color: #E2E8F0;
+      --text-main: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --success: #16A34A;
+      --success-bg: #DCFCE7;
+      --danger: #DC2626;
+      --danger-bg: #FEE2E2;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --sidebar-w: 64px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar (Seragam PLN HiFi) */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: rgba(10, 30, 60, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 10px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar .logo {
+      width: 40px;
+      height: 40px;
+      background: var(--pln-yellow);
+      color: #0F172A;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .nav-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-icon:hover, .nav-icon.active {
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+    }
+
+    .nav-icon.active {
+      box-shadow: inset 3px 0 0 var(--pln-yellow);
+    }
+
+    /* Main Content */
+    .main-wrap {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 64px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px 6px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--pln-blue);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-pill-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .user-pill-email {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-outline {
+      background: #FFFFFF;
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-surface);
+    }
+
+    .btn-danger-outline {
+      background: #FFFFFF;
+      border-color: #FCA5A5;
+      color: var(--danger);
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger-bg);
+    }
+
+    .content {
+      padding: 28px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, #0A58CA 0%, #1d6fdc 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .welcome-sub {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    /* Grid Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .module-card {
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-main);
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .module-card:hover {
+      border-color: var(--pln-blue);
+      background: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .module-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--pln-blue-light);
+      color: var(--pln-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .module-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .module-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .device-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .device-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+    }
+
+    .device-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .device-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    @media (max-width: 900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .module-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">PLN</div>
+      <a href="landing.html" class="nav-icon active" title="Landing Page">
+        <i class="ri-home-5-line"></i>
+      </a>
+      <a href="master-adminisasi.html" class="nav-icon" title="Master Adminisasi">
+        <i class="ri-user-settings-line"></i>
+      </a>
+      <a href="master-api-client.html" class="nav-icon" title="Master API Client">
+        <i class="ri-key-2-line"></i>
+      </a>
+      <a href="../Asset-Register/Mainpage.html" class="nav-icon" title="Asset Register">
+        <i class="ri-database-2-line"></i>
+      </a>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-wrap">
+      <header class="topbar">
+        <div>
+          <div class="topbar-title">Back Office New PST</div>
+          <div class="topbar-sub">Landing Page Administrasi Transmisi</div>
+        </div>
+        <div class="topbar-right">
+          <div class="user-pill">
+            <div class="avatar" id="topAvatar">BS</div>
+            <div>
+              <div class="user-pill-name" id="topName">Budi Santoso</div>
+              <div class="user-pill-email" id="topEmail">budi.santoso@pln.co.id</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-danger-outline" onclick="handleLogout()">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="welcome-banner">
+          <div>
+            <div class="welcome-badge">
+              <i class="ri-shield-check-line"></i>
+              <span>Sesi IAM SSO Terverifikasi</span>
+            </div>
+            <h1 class="welcome-title">Selamat Datang, <span id="heroName">Budi Santoso</span></h1>
+            <p class="welcome-sub">Anda berhasil masuk ke Back Office New PST. Pilih modul yang ingin dikelola.</p>
+          </div>
+        </section>
+
+        <!-- Modul Back Office -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Modul Back Office New PST</h2>
+          </div>
+          <div class="module-grid">
+            <a href="master-adminisasi.html" class="module-card">
+              <div class="module-icon"><i class="ri-user-settings-line"></i></div>
+              <div class="module-name">Master Adminisasi</div>
+              <div class="module-desc">CRUD akun adminisasi &amp; soft delete (Aktif/Tidak Aktif).</div>
+            </a>
+            <a href="master-api-client.html" class="module-card">
+              <div class="module-icon"><i class="ri-key-2-line"></i></div>
+              <div class="module-name">Master API Client</div>
+              <div class="module-desc">CRUD API Client, rate limit, re-send password &amp; soft delete.</div>
+            </a>
+            <a href="../Asset-Register/Mainpage.html" class="module-card">
+              <div class="module-icon"><i class="ri-database-2-line"></i></div>
+              <div class="module-name">Asset Register</div>
+              <div class="module-desc">Kelola data aset transmisi &amp; mapping sirkit.</div>
+            </a>
+            <a href="../Master Level 5/master-unit-level-5.html" class="module-card">
+              <div class="module-icon"><i class="ri-node-tree"></i></div>
+              <div class="module-name">Master Unit Level 5</div>
+              <div class="module-desc">Pengaturan master unit &amp; kontrol GI.</div>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const defaultUser = {
+      name: "Budi Santoso",
+      initials: "BS",
+      email: "budi.santoso@pln.co.id"
+    };
+
+    let user = defaultUser;
+    try {
+      const saved = sessionStorage.getItem("backOfficeUser");
+      if (saved) user = JSON.parse(saved);
+    } catch (e) {}
+
+    document.getElementById("topAvatar").textContent = user.initials || "US";
+    document.getElementById("topName").textContent = user.name;
+    document.getElementById("topEmail").textContent = user.email;
+    document.getElementById("heroName").textContent = user.name;
+
+    function handleLogout() {
+      sessionStorage.removeItem("backOfficeUser");
+      window.location.href = "login.html";
+    }
+  </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Sesi Aktif:</strong> Data nama, email IAM PLN, dan perangkat TOTP diteruskan dari halaman login via <code>sessionStorage</code>.</li>
+        <li><strong>Navigasi:</strong> Tersedia shortcut ke modul Asset Register, Master Unit Level 5, Master Sub-Sistem, dan Peta Koridor/GI.</li>
+        <li><strong>Logout:</strong> Tombol Logout menghapus sesi dan mengarahkan kembali ke halaman Login SSO.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+
+</html>

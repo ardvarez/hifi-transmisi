@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Adminisasi - Back Office New PST | PLN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    :root {
+      --pln-blue: #0A58CA;
+      --pln-blue-mid: #1d6fdc;
+      --pln-blue-dark: #084298;
+      --pln-blue-light: #E7F1FF;
+      --pln-yellow: #F7A800;
+      --bg-main: #F8FAFC;
+      --bg-surface: #F1F5F9;
+      --card-bg: #FFFFFF;
+      --border-color: #E2E8F0;
+      --border-input: #CBD5E1;
+      --text-main: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --success: #16A34A;
+      --success-bg: #DCFCE7;
+      --danger: #DC2626;
+      --danger-bg: #FEE2E2;
+      --warning: #D97706;
+      --warning-bg: #FEF3C7;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --sidebar-w: 64px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: rgba(10, 30, 60, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 10px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar .logo {
+      width: 40px;
+      height: 40px;
+      background: var(--pln-yellow);
+      color: #0F172A;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .nav-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-icon:hover, .nav-icon.active {
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+    }
+
+    .nav-icon.active {
+      box-shadow: inset 3px 0 0 var(--pln-yellow);
+    }
+
+    /* Main */
+    .main-wrap {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 64px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px 5px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--pln-blue);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content {
+      padding: 24px 28px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Header Row */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .page-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--pln-blue);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: var(--pln-blue-dark);
+    }
+
+    .btn-outline {
+      background: #FFFFFF;
+      border-color: var(--border-input);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-surface);
+    }
+
+    .btn-sm {
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger-outline {
+      background: #FFFFFF;
+      border-color: #FCA5A5;
+      color: var(--danger);
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger-bg);
+    }
+
+    .btn-success-outline {
+      background: #FFFFFF;
+      border-color: #86EFAC;
+      color: var(--success);
+    }
+
+    .btn-success-outline:hover {
+      background: var(--success-bg);
+    }
+
+    /* Card & Toolbar */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .toolbar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      width: 280px;
+      max-width: 100%;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px 0 34px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--pln-blue);
+      box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.12);
+    }
+
+    /* Segmented Pill (<= 3 opsi, text only) */
+    .segmented-group {
+      display: inline-flex;
+      background: var(--bg-surface);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      gap: 2px;
+    }
+
+    .segmented-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .segmented-btn.active {
+      background: #FFFFFF;
+      color: var(--pln-blue);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #F8FAFC;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-active {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .badge-inactive {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-toggle-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #CBD5E1;
+      transition: .25s;
+      border-radius: 999px;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #FFFFFF;
+      transition: .25s;
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .slider {
+      background-color: var(--success);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(16px);
+    }
+
+    .empty-row {
+      text-align: center;
+      padding: 36px 16px !important;
+      color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .req {
+      color: var(--danger);
+    }
+
+    .form-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--pln-blue);
+      box-shadow: 0 0 0 3px rgba(10, 88, 202, 0.12);
+    }
+
+    .form-input.error {
+      border-color: var(--danger);
+    }
+
+    .error-text {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .error-text.show {
+      display: block;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: var(--bg-main);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">PLN</div>
+      <a href="landing.html" class="nav-icon" title="Landing Page">
+        <i class="ri-home-5-line"></i>
+      </a>
+      <a href="master-adminisasi.html" class="nav-icon active" title="Master Adminisasi">
+        <i class="ri-user-settings-line"></i>
+      </a>
+      <a href="master-api-client.html" class="nav-icon" title="Master API Client">
+        <i class="ri-key-2-line"></i>
+      </a>
+      <a href="../Asset-Register/Mainpage.html" class="nav-icon" title="Asset Register">
+        <i class="ri-database-2-line"></i>
+      </a>
+    </aside>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <div>
+          <div class="topbar-title">Back Office New PST</div>
+          <div class="topbar-sub">Master Adminisasi (<code>m_adminisasi</code>)</div>
+        </div>
+        <div class="topbar-right">
+          <div class="user-pill">
+            <div class="avatar" id="topAvatar">BS</div>
+            <span id="topName">Budi Santoso</span>
+          </div>
+          <a href="login.html" class="btn btn-outline btn-sm" onclick="sessionStorage.removeItem('backOfficeUser')">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Master Adminisasi</h1>
+            <p class="page-desc">Kelola akun admin Back Office (tanpa menampilkan kredensial/password). Penghapusan menggunakan konsep soft delete (Aktif / Tidak Aktif).</p>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="openFormModal()">
+            <i class="ri-add-line"></i>
+            <span>Tambah Adminisasi</span>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="ri-search-line"></i>
+              <input type="text" id="searchInput" class="search-input" placeholder="Cari email atau nama..." oninput="renderTable()" />
+            </div>
+
+            <div class="segmented-group" id="statusFilter">
+              <button type="button" class="segmented-btn active" data-val="all" onclick="setFilter('all')">Semua</button>
+              <button type="button" class="segmented-btn" data-val="true" onclick="setFilter('true')">Aktif</button>
+              <button type="button" class="segmented-btn" data-val="false" onclick="setFilter('false')">Tidak Aktif</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 56px;">No</th>
+                  <th>Email</th>
+                  <th>Nama</th>
+                  <th style="width: 140px;">Status</th>
+                  <th style="width: 210px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH / EDIT -->
+  <div class="modal-backdrop" id="formModal" onclick="if(event.target===this) closeFormModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Tambah Adminisasi</h3>
+        <button type="button" class="modal-close" onclick="closeFormModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editId" />
+
+        <div class="form-group">
+          <label class="form-label" for="inputEmail">Email <span class="req">*</span></label>
+          <input type="email" id="inputEmail" class="form-input" placeholder="nama@pln.co.id" />
+          <div class="error-text" id="errEmail">Email wajib diisi dengan format valid.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputNama">Nama <span class="req">*</span></label>
+          <input type="text" id="inputNama" class="form-input" placeholder="Masukkan nama lengkap" />
+          <div class="error-text" id="errNama">Nama wajib diisi.</div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Status (<code>is_active</code>) <span class="req">*</span></label>
+          <div class="segmented-group" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr;" id="formStatusGroup">
+            <button type="button" class="segmented-btn active" data-active="true" onclick="setFormActive(true)">Aktif</button>
+            <button type="button" class="segmented-btn" data-active="false" onclick="setFormActive(false)">Tidak Aktif</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeFormModal()">Batal</button>
+        <button type="button" class="btn btn-primary" onclick="saveData()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIRMASI SOFT DELETE -->
+  <div class="modal-backdrop" id="confirmModal" onclick="if(event.target===this) closeConfirmModal()">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="confirmTitle">Konfirmasi Status</h3>
+        <button type="button" class="modal-close" onclick="closeConfirmModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmText" style="font-size: 13px; color: var(--text-secondary);"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeConfirmModal()">Batal</button>
+        <button type="button" class="btn btn-primary" id="confirmBtn" onclick="executeToggleStatus()">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="ri-checkbox-circle-line" style="color: #4ADE80; font-size: 16px;"></i>
+    <span id="toastMsg"></span>
+  </div>
+
+  <script>
+    let rows = [
+      { id: 1, email: "budi.santoso@pln.co.id", nama: "Budi Santoso", is_active: true },
+      { id: 2, email: "siti.aminah@pln.co.id", nama: "Siti Aminah", is_active: true },
+      { id: 3, email: "andi.wijaya@pln.co.id", nama: "Andi Wijaya", is_active: true },
+      { id: 4, email: "rudi.hartono@pln.co.id", nama: "Rudi Hartono", is_active: false }
+    ];
+
+    let filterStatus = "all";
+    let formIsActive = true;
+    let pendingToggleId = null;
+
+    // Load user topbar
+    try {
+      const saved = sessionStorage.getItem("backOfficeUser");
+      if (saved) {
+        const u = JSON.parse(saved);
+        document.getElementById("topAvatar").textContent = u.initials || "US";
+        document.getElementById("topName").textContent = u.name || "User";
+      }
+    } catch (e) {}
+
+    function setFilter(val) {
+      filterStatus = val;
+      document.querySelectorAll("#statusFilter .segmented-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.val === val);
+      });
+      renderTable();
+    }
+
+    function setFormActive(val) {
+      formIsActive = val;
+      document.querySelectorAll("#formStatusGroup .segmented-btn").forEach(b => {
+        b.classList.toggle("active", (b.dataset.active === "true") === val);
+      });
+    }
+
+    function renderTable() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const filtered = rows.filter(r => {
+        const matchQ = !q || r.email.toLowerCase().includes(q) || r.nama.toLowerCase().includes(q);
+        const matchStatus = filterStatus === "all" || String(r.is_active) === filterStatus;
+        return matchQ && matchStatus;
+      });
+
+      const tbody = document.getElementById("tableBody");
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Data adminisasi tidak ditemukan.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((r, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td style="font-weight: 500;">${escapeHtml(r.email)}</td>
+          <td>${escapeHtml(r.nama)}</td>
+          <td>
+            <label class="switch" title="${r.is_active ? 'Aktif (klik untuk nonaktifkan)' : 'Tidak Aktif (klik untuk aktifkan)'}">
+              <input type="checkbox" ${r.is_active ? 'checked' : ''} onchange="askToggleStatus(${r.id})" />
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td>
+            <div class="actions-cell">
+              <button type="button" class="btn btn-outline btn-sm" onclick="openFormModal(${r.id})">
+                <i class="ri-edit-line"></i> Edit
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function openFormModal(id = null) {
+      clearErrors();
+      if (id !== null) {
+        const item = rows.find(r => r.id === id);
+        if (!item) return;
+        document.getElementById("modalTitle").textContent = "Edit Adminisasi";
+        document.getElementById("editId").value = item.id;
+        document.getElementById("inputEmail").value = item.email;
+        document.getElementById("inputNama").value = item.nama;
+        setFormActive(item.is_active);
+      } else {
+        document.getElementById("modalTitle").textContent = "Tambah Adminisasi";
+        document.getElementById("editId").value = "";
+        document.getElementById("inputEmail").value = "";
+        document.getElementById("inputNama").value = "";
+        setFormActive(true);
+      }
+      document.getElementById("formModal").classList.add("open");
+    }
+
+    function closeFormModal() {
+      document.getElementById("formModal").classList.remove("open");
+    }
+
+    function clearErrors() {
+      document.getElementById("inputEmail").classList.remove("error");
+      document.getElementById("inputNama").classList.remove("error");
+      document.getElementById("errEmail").classList.remove("show");
+      document.getElementById("errNama").classList.remove("show");
+    }
+
+    function saveData() {
+      clearErrors();
+      const editId = document.getElementById("editId").value;
+      const emailEl = document.getElementById("inputEmail");
+      const namaEl = document.getElementById("inputNama");
+
+      const email = emailEl.value.trim();
+      const nama = namaEl.value.trim();
+      let valid = true;
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailEl.classList.add("error");
+        document.getElementById("errEmail").textContent = "Email wajib diisi dengan format valid.";
+        document.getElementById("errEmail").classList.add("show");
+        valid = false;
+      } else if (rows.some(r => r.email.toLowerCase() === email.toLowerCase() && String(r.id) !== editId)) {
+        emailEl.classList.add("error");
+        document.getElementById("errEmail").textContent = "Email sudah terdaftar.";
+        document.getElementById("errEmail").classList.add("show");
+        valid = false;
+      }
+
+      if (!nama) {
+        namaEl.classList.add("error");
+        document.getElementById("errNama").classList.add("show");
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      if (editId) {
+        const idx = rows.findIndex(r => String(r.id) === editId);
+        if (idx !== -1) {
+          rows[idx] = { ...rows[idx], email, nama, is_active: formIsActive };
+          showToast("Data adminisasi berhasil diperbarui.");
+        }
+      } else {
+        const nextId = rows.length ? Math.max(...rows.map(r => r.id)) + 1 : 1;
+        rows.unshift({ id: nextId, email, nama, is_active: formIsActive });
+        showToast("Data adminisasi berhasil ditambahkan.");
+      }
+
+      closeFormModal();
+      renderTable();
+    }
+
+    function askToggleStatus(id) {
+      const item = rows.find(r => r.id === id);
+      if (!item) return;
+      pendingToggleId = id;
+      const nextAction = item.is_active ? "menonaktifkan" : "mengaktifkan kembali";
+      document.getElementById("confirmTitle").textContent = item.is_active ? "Nonaktifkan Adminisasi" : "Aktifkan Adminisasi";
+      document.getElementById("confirmText").textContent = `Apakah Anda yakin ingin ${nextAction} akun "${item.nama}" (${item.email})?`;
+      document.getElementById("confirmModal").classList.add("open");
+    }
+
+    function closeConfirmModal() {
+      pendingToggleId = null;
+      document.getElementById("confirmModal").classList.remove("open");
+      renderTable();
+    }
+
+    function executeToggleStatus() {
+      if (pendingToggleId === null) return;
+      const item = rows.find(r => r.id === pendingToggleId);
+      if (item) {
+        item.is_active = !item.is_active;
+        showToast(`Status ${item.nama} diubah menjadi ${item.is_active ? 'Aktif' : 'Tidak Aktif'}.`);
+      }
+      closeConfirmModal();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      document.getElementById("toastMsg").textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2600);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m]));
+    }
+
+    renderTable();
+  </script>
+
+    <!-- NOTES FEATURE (INJECTED) -->
+    <style>
+      .notes-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 88px;
+        width: 56px;
+        height: 56px;
+        background: var(--pln-blue, #0A58CA);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(10, 88, 202, 0.4);
+        z-index: 9999;
+        transition: all 0.3s;
+      }
+      .notes-fab:hover {
+        transform: scale(1.05);
+        background: var(--pln-blue-mid, #0d6efd);
+      }
+      .notes-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 88px;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .notes-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .notes-panel h3 {
+        margin: 0 0 12px 0;
+        font-family: 'Outfit', sans-serif;
+        color: var(--pln-blue, #0A58CA);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .notes-panel ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 13px;
+        color: var(--text-secondary, #475569);
+        line-height: 1.6;
+      }
+      .notes-panel li {
+        margin-bottom: 8px;
+      }
+    </style>
+    
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+    </div>
+    
+    <div class="notes-panel" id="notesPanel">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Notes & Validasi
+      </h3>
+      <ul>
+        <li><strong>Tabel &amp; Kolom:</strong> Mengacu ke <code>m_adminisasi</code> dengan kolom tampil: <code>email</code>, <code>nama</code>, dan <code>is_active</code> (kredensial/password dikecualikan).</li>
+        <li><strong>Soft Delete:</strong> Tombol Nonaktifkan/Aktifkan mengubah status <code>is_active</code> tanpa menghapus data permanen.</li>
+        <li><strong>Validasi:</strong> Email wajib format valid &amp; unik; Nama dan status <code>is_active</code> wajib diisi.</li>
+      </ul>
+    </div>
+    <!-- END NOTES FEATURE -->
+</body>
+
+</html>
