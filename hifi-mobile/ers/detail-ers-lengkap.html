@@ -1072,11 +1072,12 @@
         let currentFilteredList = [];
         let isBatchLoading = false;
 
-        // Update Top Banner Recap & Subtitle
-        function updateRecapBanner() {
-            const totalSets = dataLengkap.reduce((acc, curr) => acc + (curr.setLengkap || 0), 0);
-            const uniqueUnits = new Set(dataLengkap.map(x => x.unitInduk)).size;
-            const uniqueMerks = new Set(dataLengkap.map(x => x.merk)).size;
+        // Update Top Banner Recap & Subtitle (Dinamis menyesuaikan list data hasil filter)
+        function updateRecapBanner(targetList = null) {
+            const list = targetList !== null ? targetList : (currentFilteredList && currentFilteredList.length > 0 ? currentFilteredList : dataLengkap);
+            const totalSets = list.reduce((acc, curr) => acc + (curr.setLengkap || 0), 0);
+            const uniqueUnits = new Set(list.map(x => x.unitInduk)).size;
+            const uniqueMerks = new Set(list.map(x => x.merk)).size;
 
             document.getElementById('totalSetVal').innerText = `${totalSets} Set`;
             document.getElementById('totalUnitVal').innerText = `${uniqueUnits} Unit`;
@@ -1283,6 +1284,7 @@
             }
 
             renderBatch();
+            updateRecapBanner(filtered);
             updateChipCounts(false);
         }
 
@@ -1508,8 +1510,8 @@
       <ul>
         <!-- TODO: UPDATE NOTES HERE -->
         <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
-        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
-        <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
+        <li><strong>Rules:</strong> Pada card rekap atas, angka Total Set Lengkap, Unit Induk, dan Merk ERS menyesuaikan total data set yang tersedia per unit induk dan merk, dan nilainya dinamis menyesuaikan data yang sedang difilter pada list.</li>
+        <li><strong>Info:</strong> Menampilkan ringkasan ketersediaan set ERS berstatus Lengkap siap pakai.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->

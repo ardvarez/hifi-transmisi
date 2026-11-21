@@ -233,6 +233,72 @@
             background: #dbeafe;
         }
 
+        /* File Lampiran Styling (V2) */
+        .file-group-section {
+            margin-bottom: 14px;
+        }
+
+        .file-group-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .file-item-card {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .file-item-card:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .file-item-left {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .file-item-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-item-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .file-dl-btn {
+            color: var(--primary-blue);
+            font-size: 15px;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+            margin-left: 8px;
+        }
+
+        .file-dl-btn:hover {
+            background: var(--primary-light);
+        }
+
         /* In-App Toast Alert */
         .toast-notification {
             position: absolute;
@@ -713,9 +779,8 @@
                     <span class="header-sub-code" id="headerCode">ASM20250000001</span>
                 </div>
             </div>
-            <button type="button" class="btn-file-rencana" onclick="openFileRencana()">
-                <i class="fa-regular fa-file-lines"></i>
-                <span>File Rencana</span>
+            <button type="button" class="btn-file-rencana" onclick="openFileLampiran()">
+                <span>File Lampiran</span>
             </button>
         </div>
 
@@ -1647,28 +1712,115 @@
             window.open('https://maps.google.com/?q=-7.2575,109.1866', '_blank');
         }
 
-        // File Rencana Bottom Sheet
-        function openFileRencana() {
+        // File Lampiran Bottom Sheet (Grouped, multi-file)
+        const fileLampiranData = [
+            {
+                groupName: "1. File Rencana Pasang",
+                files: [
+                    {
+                        name: "Rencana_Pemasangan_SUTT150kV.pdf",
+                        size: "2.8 MB",
+                        info: "Disetujui 25 Jan 2025"
+                    },
+                    {
+                        name: "Skema_Perakitan_Tower_ERS_Rev1.pdf",
+                        size: "1.9 MB",
+                        info: "Disetujui 26 Jan 2025"
+                    }
+                ]
+            },
+            {
+                groupName: "2. File BA Peminjaman",
+                files: [
+                    {
+                        name: "BA_Peminjaman_Tower_ERS_001.pdf",
+                        size: "1.8 MB",
+                        info: "Terkonfirmasi UPT 15 Jan 2025"
+                    }
+                ]
+            },
+            {
+                groupName: "3. File Engineering Design",
+                files: [
+                    {
+                        name: "Engineering_Design_Calculation_150kV.pdf",
+                        size: "3.7 MB",
+                        info: "Revisi 2 • Tim Enjiniring"
+                    },
+                    {
+                        name: "Analisa_Fondasi_Guyed_Mast.pdf",
+                        size: "2.1 MB",
+                        info: "Lampiran Teknis • Tim Enjiniring"
+                    }
+                ]
+            },
+            {
+                groupName: "4. File Lampiran Perizinan",
+                files: [
+                    {
+                        name: "Surat_Izin_Crossing_Jalan_Tol.pdf",
+                        size: "950 KB",
+                        info: "Disahkan Dinas Terkait"
+                    },
+                    {
+                        name: "Izin_Lingkungan_Area_Tower.pdf",
+                        size: "1.2 MB",
+                        info: "Disahkan Pemda Setempat"
+                    }
+                ]
+            }
+        ];
+
+        function openFileLampiran() {
+            const availableGroups = fileLampiranData.filter(g => g.files && g.files.length > 0);
+            const codeText = document.getElementById('headerCode') ? document.getElementById('headerCode').innerText : '';
+
+            let groupsHtml = '';
+            if (availableGroups.length === 0) {
+                groupsHtml = `
+                    <div style="text-align: center; padding: 24px 12px; color: var(--text-muted);">
+                        <p style="font-size: 13px; margin: 0;">Belum ada file lampiran yang tersedia</p>
+                    </div>
+                `;
+            } else {
+                groupsHtml = availableGroups.map(group => `
+                    <div class="file-group-section">
+                        <div class="file-group-title">${group.groupName}</div>
+                        ${group.files.map(file => `
+                            <div class="file-item-card">
+                                <div class="file-item-left">
+                                    <div style="min-width: 0;">
+                                        <div class="file-item-name" title="${file.name}">${file.name}</div>
+                                        <div class="file-item-meta">${file.size} • ${file.info}</div>
+                                    </div>
+                                </div>
+                                <div class="file-dl-btn" title="Unduh File" onclick="showToast('Unduh Berhasil', 'File ${file.name} berhasil diunduh.')">
+                                    <i class="fa-solid fa-download"></i>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('');
+            }
+
             document.getElementById('drawerModalContent').innerHTML = `
                 <div style="padding: 4px 0 10px; text-align: left;">
-                    <h2 style="font-size: 16.5px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">File Rencana Pemasangan</h2>
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Dokumen teknis dan skema pemasangan Tower ERS (${document.getElementById('headerCode').innerText}).</p>
+                    <h2 style="font-size: 16.5px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px;">File Lampiran</h2>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Daftar dokumen lampiran teknis dan perizinan pemasangan Tower ERS (${codeText}).</p>
 
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <i class="fa-regular fa-file-pdf" style="font-size: 24px; color: #ef4444;"></i>
-                            <div>
-                                <div style="font-size: 12.5px; font-weight: 700; color: #0f172a;">Rencana_Pemasangan_SUTT150kV.pdf</div>
-                                <div style="font-size: 11px; color: #64748b;">2.8 MB • Disetujui 25 Jan 2025</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-download" style="color: var(--primary-blue); font-size: 16px; cursor: pointer;" onclick="showToast('Unduh Berhasil', 'File PDF rencana berhasil diunduh.')"></i>
+                    <div style="max-height: 58vh; overflow-y: auto; padding-right: 2px;">
+                        ${groupsHtml}
                     </div>
 
-                    <button type="button" class="btn-submit-action" style="height: 44px;" onclick="closeFilterModalDirect()">Tutup</button>
+                    <button type="button" class="btn-submit-action" style="margin-top: 14px; height: 44px;" onclick="closeFilterModalDirect()">Tutup</button>
                 </div>
             `;
             openFilterModal();
+        }
+
+        // Alias for backwards compatibility
+        function openFileRencana() {
+            openFileLampiran();
         }
 
         // View Lokasi Bottom Sheet
@@ -2090,8 +2242,10 @@
       </h3>
       <ul>
         <!-- TODO: UPDATE NOTES HERE -->
+        <li><strong>File Lampiran:</strong> Tombol header dan modal bottom sheet menampilkan dokumen terkelompok
+            (1. File Rencana Pasang, 2. File BA Peminjaman, 3. File Engineering Design, 4. File Lampiran Perizinan)
+            dengan dukungan multi-file. Jika grup tidak memiliki file, grup otomatis diskip/tidak ditampilkan.</li>
         <li><strong>Validasi:</strong> Semua field bertanda bintang (*) wajib diisi.</li>
-        <li><strong>Rules:</strong> Tulis aturan bisnis halaman ini di sini.</li>
         <li><strong>Info:</strong> Informasi tambahan untuk user.</li>
       </ul>
     </div>
