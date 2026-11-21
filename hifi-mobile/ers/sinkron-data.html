@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sinkron Data - ERS Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-canvas: #f4f6fc;
+            --card-bg: #ffffff;
+            --primary-blue: #1a65d6;
+            --primary-blue-dark: #134db0;
+            --primary-light: #eef4ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f1f5f9;
+            --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px 0;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-canvas);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25);
+        }
+
+        @media (min-width: 440px) {
+            .mobile-container {
+                height: 870px;
+                max-height: 94vh;
+                border-radius: 40px;
+                border: 8px solid #0f172a;
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            padding: 10px 22px 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        /* Header */
+        .header-section {
+            background: #ffffff;
+            padding: 10px 16px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+
+        .header-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* Search + Filter Bar */
+        .search-filter-bar {
+            background: #ffffff;
+            padding: 4px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background: var(--input-bg);
+            padding: 0 38px 0 14px;
+            font-size: 13px;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            background: #ffffff;
+        }
+
+        .search-input-icon {
+            position: absolute;
+            right: 13px;
+            color: #94a3b8;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .btn-filter-funnel {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .btn-filter-funnel:hover {
+            background: var(--primary-light);
+        }
+
+        /* Module Chips Row */
+        .module-chips-bar {
+            background: #ffffff;
+            padding: 2px 16px 14px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-shrink: 0;
+        }
+
+        .module-chips-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .module-chip {
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .module-chip.active {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--primary-light);
+        }
+
+        .chip-count {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .module-chip.active .chip-count {
+            background: var(--primary-blue);
+            color: #ffffff;
+        }
+
+        /* App Body */
+        .app-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 14px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scrollbar-width: none;
+        }
+
+        .app-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Permit Card */
+        .permit-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .permit-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .permit-no {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .permit-tower-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        /* Status Badge Variants (Status Terakhir Pengerjaan Permit) */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-siap {
+            background: #eff6ff;
+            color: #1a65d6;
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-siap-solid {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .badge-berlangsung,
+        .badge-sedang,
+        .badge-selesai-lokal,
+        .badge-dikirim {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-karantina-orange {
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #ffedd5;
+        }
+
+        .badge-selesai {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        /* Pemasangan V2 Meta Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .meta-label {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-val {
+            font-size: 12px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        /* Pembongkaran & Karantina Detail Rows */
+        .permit-meta-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .permit-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            gap: 10px;
+        }
+
+        .permit-meta-lbl {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .permit-meta-val {
+            color: var(--text-dark);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Sync Progress Box (Per Card & Batch) */
+        .sync-progress-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sync-progress-box.done {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+
+        .sync-progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .sync-progress-box.done .sync-progress-top {
+            color: #059669;
+        }
+
+        .sync-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(26, 101, 214, 0.15);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .sync-progress-box.done .sync-progress-track {
+            background: rgba(5, 150, 105, 0.18);
+        }
+
+        .sync-progress-fill {
+            height: 100%;
+            background: var(--primary-blue);
+            border-radius: 999px;
+            transition: width 0.25s ease;
+        }
+
+        .sync-progress-box.done .sync-progress-fill {
+            background: #10b981;
+        }
+
+        .permit-card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: 2px;
+        }
+
+        .btn-card-outline {
+            height: 40px;
+            border-radius: 10px;
+            border: 1.5px solid var(--primary-blue);
+            background: #ffffff;
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-card-outline:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-card-solid {
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-card-solid:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        .btn-card-solid:disabled {
+            background: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .btn-card-solid.synced-btn {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Bottom Sticky Bar */
+        .bottom-sticky-bar {
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            padding: 12px 16px 16px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-bottom-sync {
+            width: 100%;
+            height: 46px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-bottom-sync:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        .btn-bottom-sync:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Empty State (No Action Buttons) */
+        .empty-state-box {
+            background: var(--card-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 32px 18px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .empty-state-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Filter Modal Drawer */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 200;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-drawer {
+            width: 100%;
+            background: var(--card-bg);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 14px 20px 24px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active .modal-drawer {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            margin: 0 auto 14px;
+            cursor: pointer;
+        }
+
+        .filter-opt-btn {
+            width: 100%;
+            text-align: left;
+            padding: 11px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-dark);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .filter-opt-btn.active {
+            border-color: var(--primary-blue);
+            background: var(--primary-light);
+            color: var(--primary-blue);
+        }
+
+        /* Toast */
+        .toast-msg {
+            position: absolute;
+            bottom: 86px;
+            left: 16px;
+            right: 16px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 500;
+        }
+
+        .toast-msg.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Floating Dev Sim Outside Viewport */
+        .dev-sim-bar {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11.5px;
+            z-index: 9999;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .dev-sim-btn {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            padding: 4px 10px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Dark Mode */
+        body.dark-mode .mobile-container {
+            --bg-canvas: #0b1329;
+            --card-bg: #1e293b;
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --primary-light: rgba(59, 130, 246, 0.16);
+        }
+
+        body.dark-mode .status-bar,
+        body.dark-mode .header-section,
+        body.dark-mode .search-filter-bar,
+        body.dark-mode .module-chips-bar,
+        body.dark-mode .bottom-sticky-bar {
+            background: #0f172a;
+        }
+
+        body.dark-mode .meta-grid {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        body.dark-mode .btn-filter-funnel,
+        body.dark-mode .module-chip,
+        body.dark-mode .btn-card-outline {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .module-chip.active,
+        body.dark-mode .btn-card-outline {
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+
+        body.dark-mode .permit-card-header {
+            border-bottom-color: #334155;
+        }
+
+        body.dark-mode .sync-progress-box {
+            background: rgba(59, 130, 246, 0.14);
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+
+        body.dark-mode .sync-progress-top {
+            color: #93c5fd;
+        }
+
+        /* Notes FAB & Panel */
+        .notes-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 88px;
+            width: 52px;
+            height: 52px;
+            background: #1a65d6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26, 101, 214, 0.4);
+            z-index: 9999;
+        }
+
+        .notes-panel {
+            position: fixed;
+            bottom: 86px;
+            left: 88px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            z-index: 9998;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .notes-panel.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notes-panel h3 {
+            margin: 0 0 10px;
+            color: #1a65d6;
+            font-size: 15px;
+        }
+
+        .notes-panel ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12.5px;
+            color: #475569;
+            line-height: 1.55;
+        }
+
+        .notes-panel li {
+            margin-bottom: 6px;
+        }
+
+        /* Sync Success Alert Modal */
+        .sync-alert-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .sync-alert-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sync-alert-card {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 22px 18px 18px;
+            text-align: center;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+            transform: scale(0.94);
+            transition: transform 0.25s ease;
+        }
+
+        .sync-alert-overlay.active .sync-alert-card {
+            transform: scale(1);
+        }
+
+        .sync-alert-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            color: #10b981;
+            border: 2px solid #a7f3d0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+
+        .sync-alert-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .sync-alert-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            line-height: 1.45;
+        }
+
+        .sync-alert-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sync-stat-box {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 8px;
+        }
+
+        .sync-stat-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            line-height: 1.2;
+        }
+
+        .sync-stat-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .sync-alert-detail-list {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 11.5px;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            max-height: 120px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sync-alert-detail-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .btn-alert-close {
+            width: 100%;
+            height: 42px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-blue);
+            color: #ffffff;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        body.dark-mode .sync-stat-val {
+            color: #60a5fa;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dev-sim-bar">
+        <span>Simulasi Lokal:</span>
+        <button type="button" class="dev-sim-btn" onclick="resetDemoPermits()">Reset Data</button>
+        <button type="button" class="dev-sim-btn" onclick="toggleTheme()">Tema</button>
+    </div>
+
+    <div class="mobile-container">
+        <div class="status-bar">
+            <span>9:41 AM</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <div class="header-section">
+            <div class="header-left">
+                <a href="./home-mobile.html" class="back-btn" title="Kembali ke Dashboard ERS">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <div class="header-title">Sinkron Data</div>
+                    <div class="header-sub" id="headerModuleSub">Pemasangan</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-filter-bar">
+            <div class="search-input-wrap">
+                <input type="text" class="search-input" id="searchInput" placeholder="Cari" oninput="renderPermitList()">
+                <i class="fa-solid fa-magnifying-glass search-input-icon"></i>
+            </div>
+            <button type="button" class="btn-filter-funnel" onclick="openStatusFilterModal()" title="Filter Status">
+                <i class="fa-solid fa-filter"></i>
+            </button>
+        </div>
+
+        <!-- Module Chips (Dedicated per Tipe Perizinan) -->
+        <div class="module-chips-bar">
+            <button type="button" class="module-chip active" data-module="Pemasangan" onclick="selectModule('Pemasangan', this)">
+                <span>Pemasangan</span>
+                <span class="chip-count" id="countPemasangan">2</span>
+            </button>
+            <button type="button" class="module-chip" data-module="Pembongkaran" onclick="selectModule('Pembongkaran', this)">
+                <span>Pembongkaran</span>
+                <span class="chip-count" id="countPembongkaran">2</span>
+            </button>
+            <button type="button" class="module-chip" data-module="Karantina" onclick="selectModule('Karantina', this)">
+                <span>Karantina</span>
+                <span class="chip-count" id="countKarantina">2</span>
+            </button>
+        </div>
+
+        <div class="app-body" id="permitListBody"></div>
+
+        <div class="bottom-sticky-bar">
+            <div class="sync-progress-box" id="batchProgressBox" style="display: none;">
+                <div class="sync-progress-top">
+                    <span id="batchProgressLabel">Menyinkronkan data...</span>
+                    <span id="batchProgressPct">0%</span>
+                </div>
+                <div class="sync-progress-track">
+                    <div class="sync-progress-fill" id="batchProgressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+            <button type="button" class="btn-bottom-sync" id="btnBottomSync" onclick="syncCurrentModule()">
+                Sinkron Data Pemasangan
+            </button>
+        </div>
+
+        <!-- Filter Modal -->
+        <div class="modal-overlay" id="statusFilterModal" onclick="if(event.target===this) closeStatusFilterModal()">
+            <div class="modal-drawer">
+                <div class="drawer-handle" onclick="closeStatusFilterModal()"></div>
+                <div style="font-size: 15px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px;">Filter Status Sinkronisasi</div>
+                <button type="button" class="filter-opt-btn active" onclick="applyStatusFilter('all', this)">Semua Status</button>
+                <button type="button" class="filter-opt-btn" onclick="applyStatusFilter('pending', this)">Menunggu Sinkron</button>
+                <button type="button" class="filter-opt-btn" onclick="applyStatusFilter('synced', this)">Sudah Tersinkron</button>
+            </div>
+        </div>
+
+        <!-- Sync Success Alert Modal -->
+        <div class="sync-alert-overlay" id="syncSuccessModal" onclick="if(event.target===this) closeSyncSuccessAlert()">
+            <div class="sync-alert-card">
+                <div class="sync-alert-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="sync-alert-title" id="syncAlertTitle">Sinkronisasi Berhasil</div>
+                <div class="sync-alert-sub" id="syncAlertSub">Data lokal berhasil dikirim ke server.</div>
+
+                <div class="sync-alert-stats">
+                    <div class="sync-stat-box">
+                        <div class="sync-stat-val" id="syncAlertDataCount">0 Data</div>
+                        <div class="sync-stat-lbl">Data Permit</div>
+                    </div>
+                    <div class="sync-stat-box">
+                        <div class="sync-stat-val" id="syncAlertTowerCount">0 Tower</div>
+                        <div class="sync-stat-lbl">Tower Disinkron</div>
+                    </div>
+                </div>
+
+                <div class="sync-alert-detail-list" id="syncAlertDetailList"></div>
+
+                <button type="button" class="btn-alert-close" onclick="closeSyncSuccessAlert()">Tutup</button>
+            </div>
+        </div>
+
+        <div class="toast-msg" id="toastMsg"></div>
+    </div>
+
+    <div class="notes-fab" onclick="document.getElementById('notesPanel').classList.toggle('active')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </div>
+
+    <div class="notes-panel" id="notesPanel">
+        <h3>Notes & Validasi</h3>
+        <ul>
+            <li><strong>Card Per Tab Modul:</strong> Layout card mengikuti format masing-masing modul (Pemasangan, Pembongkaran, Karantina).</li>
+            <li><strong>Status Chip Permit:</strong> Badge di kanan nomor permit menampilkan status terakhir pengerjaan permit.</li>
+            <li><strong>Progress Sinkronisasi:</strong> Klik Sinkron (per permit atau per tipe perizinan) menampilkan progress bar dan tahapan upload secara real-time.</li>
+        </ul>
+    </div>
+
+    <script>
+        const DEFAULT_PERMITS = [
+            // TAB PEMASANGAN (referensi V1 list-pemasangan.html)
+            {
+                id: 'ASM20250000001-01',
+                module: 'Pemasangan',
+                subtitle: 'TRS 150kV UNGARAN-WELERI #0085',
+                statusText: 'Siap Pasang',
+                badgeClass: 'badge-siap-solid',
+                targetPemasangan: '10 Juli 2025',
+                slaPemasangan: '7 Hari',
+                targetOperasi: '17 Juli 2025',
+                lokasi: '8',
+                detailUrl: './Pemasangan/pemasangan-action.html?id=ASM20250000001-01',
+                synced: false
+            },
+            {
+                id: 'ASM20250000001-02',
+                module: 'Pemasangan',
+                subtitle: 'TRS 150kV KENDARI #0014',
+                statusText: 'Sedang Dipasang',
+                badgeClass: 'badge-berlangsung',
+                targetPemasangan: '11 Juli 2025',
+                slaPemasangan: '5 Hari',
+                targetOperasi: '16 Juli 2025',
+                lokasi: '8',
+                detailUrl: './Pemasangan/pemasangan-action.html?id=ASM20250000001-02',
+                synced: false
+            },
+            // TAB PEMBONGKARAN (referensi list-pembongkaran.html)
+            {
+                id: 'DIS20250000001-01',
+                module: 'Pembongkaran',
+                subtitle: 'TRS 500kV UNGARAN #0011',
+                statusText: 'Siap Bongkar',
+                badgeClass: 'badge-siap-solid',
+                tanggalAwal: '12 Juli 2025',
+                slaPembongkaran: '7 Hari',
+                tanggalAkhir: '19 Juli 2025',
+                lokasi: 'UPT Semarang',
+                detailUrl: './Pembongkaran/pembongkaran-action.html?id=DIS20250000001-01',
+                synced: false
+            },
+            {
+                id: 'DIS20250000001-02',
+                module: 'Pembongkaran',
+                subtitle: 'TRS 150kV KENDARI #0014',
+                statusText: 'Selesai Lokal',
+                badgeClass: 'badge-selesai-lokal',
+                tanggalAwal: '14 Juli 2025',
+                slaPembongkaran: '5 Hari',
+                tanggalAkhir: '19 Juli 2025',
+                lokasi: 'UPT Kendari',
+                detailUrl: './Pembongkaran/pembongkaran-action.html?id=DIS20250000001-02',
+                synced: false
+            },
+            // TAB KARANTINA (referensi list-karantina.html)
+            {
+                id: 'RTR20250000001-01',
+                module: 'Karantina',
+                subtitle: 'Gudang Kaligawe • Set ERS #03',
+                statusText: 'Sedang Dikirim',
+                badgeClass: 'badge-karantina-orange',
+                selesaiBongkar: '10 Juli 2025',
+                estBerangkat: '12 Juli 2025',
+                estTiba: '14 Juli 2025',
+                totalSet: '2 Set',
+                detailUrl: './Karantina & Pengembalian/karantina-action.html?id=RTR20250000001-01',
+                synced: false
+            },
+            {
+                id: 'RTR20250000001-02',
+                module: 'Karantina',
+                subtitle: 'Gudang Cikarang • Set ERS #07',
+                statusText: 'Siap Karantina',
+                badgeClass: 'badge-karantina-orange',
+                selesaiBongkar: '11 Juli 2025',
+                estBerangkat: '13 Juli 2025',
+                estTiba: '15 Juli 2025',
+                totalSet: '3 Set',
+                detailUrl: './Karantina & Pengembalian/karantina-action.html?id=RTR20250000001-02',
+                synced: false
+            }
+        ];
+
+        let permitsData = [];
+        let activeModule = 'Pemasangan';
+        let activeStatusFilter = 'all';
+        let syncingMap = {}; // { id: { pct: 0, label: '' } }
+        let isBatchSyncing = false;
+
+        function loadPermits() {
+            try {
+                const raw = localStorage.getItem('ers_local_sync_permits');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].targetPemasangan !== undefined && String(parsed[0].id).startsWith('ASM')) {
+                        permitsData = parsed;
+                        return;
+                    }
+                }
+            } catch (e) {}
+            permitsData = JSON.parse(JSON.stringify(DEFAULT_PERMITS));
+            savePermits();
+        }
+
+        function savePermits() {
+            try {
+                localStorage.setItem('ers_local_sync_permits', JSON.stringify(permitsData));
+            } catch (e) {}
+        }
+
+        function selectModule(mod, btnEl) {
+            if (isBatchSyncing) return;
+            activeModule = mod;
+            document.getElementById('headerModuleSub').textContent = mod;
+            document.querySelectorAll('.module-chip').forEach(c => c.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            renderPermitList();
+        }
+
+        function updateChipCounts() {
+            ['Pemasangan', 'Pembongkaran', 'Karantina'].forEach(mod => {
+                const pending = permitsData.filter(p => p.module === mod && !p.synced).length;
+                const el = document.getElementById('count' + mod);
+                if (el) el.textContent = pending;
+            });
+        }
+
+        function buildCardMetaHtml(item) {
+            if (item.module === 'Pemasangan') {
+                return `
+                    <div class="permit-meta-list">
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Target Pemasangan</span>
+                            <span class="permit-meta-val">${item.targetPemasangan}</span>
+                        </div>
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">SLA Pemasangan</span>
+                            <span class="permit-meta-val">${item.slaPemasangan}</span>
+                        </div>
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Target Operasi</span>
+                            <span class="permit-meta-val">${item.targetOperasi}</span>
+                        </div>
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Lokasi</span>
+                            <span class="permit-meta-val">${item.lokasi}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            if (item.module === 'Pembongkaran') {
+                return `
+                    <div class="permit-meta-list">
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Tanggal Awal</span>
+                            <span class="permit-meta-val">${item.tanggalAwal}</span>
+                        </div>
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">SLA Pembongkaran</span>
+                            <span class="permit-meta-val">${item.slaPembongkaran}</span>
+                        </div>
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Tanggal Akhir</span>
+                            <span class="permit-meta-val">${item.tanggalAkhir}</span>
+                        </div>
+                        <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Lokasi</span>
+                            <span class="permit-meta-val">${item.lokasi}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            // Karantina
+            return `
+                <div class="permit-meta-list">
+                    <div class="permit-meta-row">
+                        <span class="permit-meta-lbl">Selesai Bongkar</span>
+                        <span class="permit-meta-val">${item.selesaiBongkar}</span>
+                    </div>
+                    <div class="permit-meta-row">
+                        <span class="permit-meta-lbl">Est. Berangkat</span>
+                        <span class="permit-meta-val">${item.estBerangkat}</span>
+                    </div>
+                    <div class="permit-meta-row">
+                        <span class="permit-meta-lbl">Est. Tiba</span>
+                        <span class="permit-meta-val">${item.estTiba}</span>
+                    </div>
+                    <div class="permit-meta-row">
+                        <span class="permit-meta-lbl">Total Set</span>
+                        <span class="permit-meta-val">${item.totalSet}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPermitList() {
+            updateChipCounts();
+            const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+            const modulePermits = permitsData.filter(p => p.module === activeModule);
+            const pendingInModule = modulePermits.filter(p => !p.synced).length;
+
+            const btnBottom = document.getElementById('btnBottomSync');
+            if (!isBatchSyncing) {
+                btnBottom.disabled = pendingInModule === 0;
+                btnBottom.textContent = pendingInModule === 0
+                    ? 'Data ' + activeModule + ' Tersinkron'
+                    : 'Sinkron Data ' + activeModule + ' (' + pendingInModule + ')';
+            }
+
+            const filtered = modulePermits.filter(p => {
+                const matchSearch = !q || p.id.toLowerCase().includes(q) || p.subtitle.toLowerCase().includes(q) || p.statusText.toLowerCase().includes(q);
+                const matchStatus = activeStatusFilter === 'all'
+                    || (activeStatusFilter === 'pending' && !p.synced)
+                    || (activeStatusFilter === 'synced' && p.synced);
+                return matchSearch && matchStatus;
+            });
+
+            const container = document.getElementById('permitListBody');
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-box">
+                        <div class="empty-state-title">Tidak Ada Data ${activeModule}</div>
+                        <div class="empty-state-desc">Tidak terdapat data permit lokal pada filter yang dipilih.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const progress = syncingMap[item.id];
+                const progressHtml = progress ? `
+                    <div class="sync-progress-box ${progress.pct === 100 ? 'done' : ''}">
+                        <div class="sync-progress-top">
+                            <span>${progress.label}</span>
+                            <span>${progress.pct}%</span>
+                        </div>
+                        <div class="sync-progress-track">
+                            <div class="sync-progress-fill" style="width: ${progress.pct}%;"></div>
+                        </div>
+                    </div>
+                ` : '';
+
+                const isSyncing = Boolean(progress && progress.pct < 100);
+                const syncBtnClass = item.synced ? 'btn-card-solid synced-btn' : 'btn-card-solid';
+                const syncBtnText = isSyncing
+                    ? '<i class="fa-solid fa-spinner fa-spin"></i><span>Sinkron...</span>'
+                    : (item.synced ? '<i class="fa-solid fa-check"></i><span>Tersinkron</span>' : 'Sinkron');
+
+                return `
+                    <div class="permit-card">
+                        <div class="permit-card-header">
+                            <div>
+                                <div class="permit-no">${item.id}</div>
+                                <div class="permit-tower-sub">${item.subtitle}</div>
+                            </div>
+                            <span class="status-badge ${item.badgeClass}">${item.statusText}</span>
+                        </div>
+
+                        ${buildCardMetaHtml(item)}
+
+                        ${progressHtml}
+
+                        <div class="permit-card-actions">
+                            <button type="button" class="${syncBtnClass}" ${(item.synced || isSyncing || isBatchSyncing) ? 'disabled' : ''} onclick="syncSinglePermit('${item.id}')">
+                                ${syncBtnText}
+                            </button>
+                            <a href="${item.detailUrl}" class="btn-card-outline">Lihat Detail</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function runPermitSyncSteps(id, onDone) {
+            const steps = [
+                { pct: 25, label: 'Memvalidasi data form lokal...' },
+                { pct: 60, label: 'Mengunggah foto evidence...' },
+                { pct: 90, label: 'Konfirmasi server...' },
+                { pct: 100, label: 'Sinkronisasi selesai' }
+            ];
+            let idx = 0;
+            function next() {
+                syncingMap[id] = steps[idx];
+                renderPermitList();
+                idx++;
+                if (idx < steps.length) {
+                    setTimeout(next, 350);
+                } else {
+                    const target = permitsData.find(p => p.id === id);
+                    if (target) target.synced = true;
+                    savePermits();
+                    setTimeout(() => {
+                        delete syncingMap[id];
+                        renderPermitList();
+                        if (onDone) onDone();
+                    }, 500);
+                }
+            }
+            next();
+        }
+
+        function getTowerCount(item) {
+            if (typeof item.towerCount === 'number') return item.towerCount;
+            const raw = item.lokasi || item.totalSet || '1';
+            const num = parseInt(String(raw).replace(/\D/g, ''), 10);
+            return Number.isNaN(num) || num <= 0 ? 1 : num;
+        }
+
+        function showSyncSuccessAlert(syncedItems, scopeLabel) {
+            const totalData = syncedItems.length;
+            const totalTower = syncedItems.reduce((sum, item) => sum + getTowerCount(item), 0);
+
+            document.getElementById('syncAlertTitle').textContent = 'Sinkronisasi Berhasil';
+            document.getElementById('syncAlertSub').textContent = scopeLabel
+                ? `Data ${scopeLabel} di lokal berhasil disinkronkan ke server.`
+                : 'Data lokal berhasil disinkronkan ke server.';
+            document.getElementById('syncAlertDataCount').textContent = totalData + ' Data';
+            document.getElementById('syncAlertTowerCount').textContent = totalTower + ' Tower';
+
+            document.getElementById('syncAlertDetailList').innerHTML = syncedItems.map(item => `
+                <div class="sync-alert-detail-item">
+                    <span><strong>${item.id}</strong></span>
+                    <span style="color: var(--text-muted);">${getTowerCount(item)} Tower</span>
+                </div>
+            `).join('');
+
+            document.getElementById('syncSuccessModal').classList.add('active');
+        }
+
+        function closeSyncSuccessAlert() {
+            document.getElementById('syncSuccessModal').classList.remove('active');
+        }
+
+        function syncSinglePermit(id) {
+            if (syncingMap[id] || isBatchSyncing) return;
+            const target = permitsData.find(p => p.id === id);
+            runPermitSyncSteps(id, () => {
+                if (target) {
+                    showSyncSuccessAlert([target], target.module + ' (' + target.id + ')');
+                }
+            });
+        }
+
+        function syncCurrentModule() {
+            if (isBatchSyncing) return;
+            const pendingList = permitsData.filter(p => p.module === activeModule && !p.synced);
+            if (pendingList.length === 0) return;
+
+            const syncedSnapshot = [...pendingList];
+            isBatchSyncing = true;
+            const btnBottom = document.getElementById('btnBottomSync');
+            const batchBox = document.getElementById('batchProgressBox');
+            const batchLabel = document.getElementById('batchProgressLabel');
+            const batchPct = document.getElementById('batchProgressPct');
+            const batchFill = document.getElementById('batchProgressFill');
+
+            btnBottom.disabled = true;
+            btnBottom.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Menyinkronkan ' + activeModule + '...</span>';
+            batchBox.style.display = 'flex';
+            batchBox.classList.remove('done');
+
+            let i = 0;
+            function processNext() {
+                if (i >= pendingList.length) {
+                    batchLabel.textContent = 'Semua data ' + activeModule + ' tersinkron';
+                    batchPct.textContent = '100%';
+                    batchFill.style.width = '100%';
+                    batchBox.classList.add('done');
+                    setTimeout(() => {
+                        isBatchSyncing = false;
+                        batchBox.style.display = 'none';
+                        renderPermitList();
+                        showSyncSuccessAlert(syncedSnapshot, activeModule);
+                    }, 700);
+                    return;
+                }
+
+                const currentItem = pendingList[i];
+                const overallStart = Math.round((i / pendingList.length) * 100);
+                batchLabel.textContent = `Menyinkronkan ${currentItem.id} (${i + 1}/${pendingList.length})...`;
+                batchPct.textContent = overallStart + '%';
+                batchFill.style.width = overallStart + '%';
+
+                runPermitSyncSteps(currentItem.id, () => {
+                    i++;
+                    const overallDone = Math.round((i / pendingList.length) * 100);
+                    batchPct.textContent = overallDone + '%';
+                    batchFill.style.width = overallDone + '%';
+                    processNext();
+                });
+            }
+            processNext();
+        }
+
+        function openStatusFilterModal() {
+            document.getElementById('statusFilterModal').classList.add('active');
+        }
+
+        function closeStatusFilterModal() {
+            document.getElementById('statusFilterModal').classList.remove('active');
+        }
+
+        function applyStatusFilter(statusKey, btnEl) {
+            activeStatusFilter = statusKey;
+            document.querySelectorAll('.filter-opt-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            closeStatusFilterModal();
+            renderPermitList();
+        }
+
+        function resetDemoPermits() {
+            if (isBatchSyncing) return;
+            syncingMap = {};
+            permitsData = JSON.parse(JSON.stringify(DEFAULT_PERMITS));
+            savePermits();
+            renderPermitList();
+            showToast('Data simulasi lokal direset.');
+        }
+
+        function showToast(msg) {
+            const el = document.getElementById('toastMsg');
+            el.textContent = msg;
+            el.classList.add('active');
+            clearTimeout(el._t);
+            el._t = setTimeout(() => el.classList.remove('active'), 2200);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('pln_mobile_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('pln_mobile_theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            loadPermits();
+            renderPermitList();
+        });
+    </script>
+</body>
+
+</html>
