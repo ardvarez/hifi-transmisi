@@ -3097,31 +3097,58 @@
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Kantor Pusat</label>
-                    <select class="filter-select" id="filterKantorPusat">
-                        <option value="ALL">Semua Kantor Pusat</option>
-                        <option value="PLN_PUSAT" selected>PT PLN (Persero) Kantor Pusat</option>
+                    <label class="filter-label">Regional</label>
+                    <select class="filter-select" id="filterRegional" onchange="onRegionalFilterChange()">
+                        <option value="ALL">Semua Regional</option>
+                        <option value="SUMATERA">Regional Sumatera</option>
+                        <option value="JMB">Regional Jawa, Madura, dan Bali</option>
+                        <option value="KALIMANTAN">Regional Kalimantan</option>
+                        <option value="SULMAPANA">Regional Sulawesi, Maluku, Papua &amp; Nusa Tenggara</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Unit Induk (UIT / UIW)</label>
-                    <select class="filter-select" id="filterUnitInduk">
+                    <label class="filter-label">Unit Induk</label>
+                    <select class="filter-select" id="filterUnitInduk" onchange="onUnitIndukFilterChange()">
                         <option value="ALL">Semua Unit Induk</option>
-                        <option value="NTB">NTB (UIW NTB)</option>
                         <option value="P3BS">P3BS (UIP3B Sumatera)</option>
-                        <option value="UITJBM">UITJBM (UIT Jawa Bagian Madura)</option>
-                        <option value="UITJBT">UITJBT (UIT Jawa Bagian Tengah)</option>
                         <option value="UITJBB">UITJBB (UIT Jawa Bagian Barat)</option>
+                        <option value="UITJBT">UITJBT (UIT Jawa Bagian Tengah)</option>
+                        <option value="UITJBM">UITJBM (UIT Jawa Bagian Madura)</option>
+                        <option value="UIKL KALIMANTAN">UIKL Kalimantan</option>
+                        <option value="UIP3BSUL">UIP3BSUL / UIKL Sulawesi</option>
+                        <option value="NTB">UIW NTB</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Status Kelengkapan</label>
-                    <select class="filter-select" id="filterStatusSet">
-                        <option value="ALL">Semua Status</option>
-                        <option value="Lengkap">Set ERS Lengkap</option>
-                        <option value="Tidak Lengkap">Set ERS Tidak Lengkap</option>
+                    <label class="filter-label">Unit Pelaksana</label>
+                    <select class="filter-select" id="filterUnitPelaksana">
+                        <option value="ALL">Semua Unit Pelaksana</option>
+                        <option value="UPT BANDA ACEH">UPT Banda Aceh</option>
+                        <option value="UPT PEMATANG SIANTAR">UPT Pematang Siantar</option>
+                        <option value="UPT PADANG">UPT Padang</option>
+                        <option value="UPT TANJUNG KARANG">UPT Tanjung Karang</option>
+                        <option value="UPT SEMARANG">UPT Semarang</option>
+                        <option value="UPT SURABAYA">UPT Surabaya</option>
+                        <option value="UPT PONTIANAK">UPT Pontianak</option>
+                        <option value="UPT KENDARI">UPT Kendari</option>
+                        <option value="UPT MAKASSAR">UPT Makassar</option>
+                        <option value="UPT MATARAM">UPT Mataram</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Tegangan - Tipe Tower</label>
+                    <select class="filter-select" id="filterTeganganTipe">
+                        <option value="ALL">Semua Tegangan - Tipe Tower</option>
+                        <option value="70kV Tension">70kV Tension</option>
+                        <option value="70kV Suspension">70kV Suspension</option>
+                        <option value="150kV Tension">150kV Tension</option>
+                        <option value="150kV Suspension">150kV Suspension</option>
+                        <option value="275kV Tension">275kV Tension</option>
+                        <option value="500kV Tension">500kV Tension</option>
+                        <option value="500kV Suspension">500kV Suspension</option>
                     </select>
                 </div>
 
@@ -3728,13 +3755,88 @@
         function closeFilterModal(e) { if (e.target.id === 'filterModal') document.getElementById('filterModal').classList.remove('active'); }
         function closeFilterModalDirect() { document.getElementById('filterModal').classList.remove('active'); }
 
-        function applyFilterDrawer() {
+        const UNIT_HIRARKI_MAP = {
+            SUMATERA: [
+                { val: 'P3BS', label: 'P3BS (UIP3B Sumatera)', pelaksana: ['UPT BANDA ACEH', 'UPT PEMATANG SIANTAR', 'UPT PADANG', 'UPT TANJUNG KARANG'] }
+            ],
+            JMB: [
+                { val: 'UITJBB', label: 'UITJBB (UIT Jawa Bagian Barat)', pelaksana: [] },
+                { val: 'UITJBT', label: 'UITJBT (UIT Jawa Bagian Tengah)', pelaksana: ['UPT SEMARANG'] },
+                { val: 'UITJBM', label: 'UITJBM (UIT Jawa Bagian Madura)', pelaksana: ['UPT SURABAYA'] }
+            ],
+            KALIMANTAN: [
+                { val: 'UIKL KALIMANTAN', label: 'UIKL Kalimantan', pelaksana: ['UPT PONTIANAK'] }
+            ],
+            SULMAPANA: [
+                { val: 'UIP3BSUL', label: 'UIP3BSUL / UIKL Sulawesi', pelaksana: ['UPT KENDARI', 'UPT MAKASSAR'] },
+                { val: 'NTB', label: 'UIW NTB', pelaksana: ['UPT MATARAM'] }
+            ]
+        };
+
+        function getItemRegional(item) {
+            if (item.regional) return item.regional;
+            const ui = (item.unitInduk || '').toUpperCase();
+            if (ui === 'P3BS' || (item.unitPelaksana || '').includes('TANJUNG KARANG')) return 'SUMATERA';
+            if (ui.includes('UIT')) return 'JMB';
+            if (ui.includes('KALIMANTAN')) return 'KALIMANTAN';
+            return 'SULMAPANA';
+        }
+
+        function getItemUnitIndukNorm(item) {
+            const ui = (item.unitInduk || '').toUpperCase();
+            if (ui === 'UIT JBT') return 'UITJBT';
+            if (ui === 'UIW NTB') return 'NTB';
+            if (ui === 'UIKL SULAWESI') return 'UIP3BSUL';
+            return ui;
+        }
+
+        function getItemTeganganTipe(item) {
+            if (item.teganganTipe) return item.teganganTipe;
+            const p = (item.penghantar || '').toUpperCase();
+            if (p.includes('500')) return '500kV Suspension';
+            if (p.includes('275')) return '275kV Tension';
+            if (p.includes('70')) return '70kV Tension';
+            return '150kV Tension';
+        }
+
+        function onRegionalFilterChange() {
+            const reg = document.getElementById('filterRegional').value;
+            const uiSel = document.getElementById('filterUnitInduk');
+            const list = reg === 'ALL'
+                ? Object.values(UNIT_HIRARKI_MAP).flat()
+                : (UNIT_HIRARKI_MAP[reg] || []);
+            uiSel.innerHTML = '<option value="ALL">Semua Unit Induk</option>' +
+                list.map(u => `<option value="${u.val}">${u.label}</option>`).join('');
+            onUnitIndukFilterChange();
+        }
+
+        function onUnitIndukFilterChange() {
+            const reg = document.getElementById('filterRegional').value;
             const ui = document.getElementById('filterUnitInduk').value;
-            const status = document.getElementById('filterStatusSet').value;
-            filteredData = ersMasterData.filter(item => {
-                let matchUI = (ui === 'ALL' || item.unitInduk === ui);
-                let matchStatus = (status === 'ALL' || item.statusSet === status);
-                return matchUI && matchStatus;
+            const upSel = document.getElementById('filterUnitPelaksana');
+            const allUnits = reg === 'ALL'
+                ? Object.values(UNIT_HIRARKI_MAP).flat()
+                : (UNIT_HIRARKI_MAP[reg] || []);
+            const pelaksanaList = ui === 'ALL'
+                ? allUnits.flatMap(u => u.pelaksana)
+                : (allUnits.find(u => u.val === ui)?.pelaksana || []);
+            upSel.innerHTML = '<option value="ALL">Semua Unit Pelaksana</option>' +
+                [...new Set(pelaksanaList)].map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+
+        function applyFilterDrawer() {
+            const reg = document.getElementById('filterRegional').value;
+            const ui = document.getElementById('filterUnitInduk').value;
+            const up = document.getElementById('filterUnitPelaksana').value;
+            const tt = document.getElementById('filterTeganganTipe').value;
+            const currentSource = activeMapTab === 'set' ? ersMasterData : (activeMapTab === 'tower' ? towerOperasiData : towerTerpasangData);
+
+            filteredData = currentSource.filter(item => {
+                const matchReg = (reg === 'ALL' || getItemRegional(item) === reg);
+                const matchUI = (ui === 'ALL' || getItemUnitIndukNorm(item) === ui);
+                const matchUP = (up === 'ALL' || (item.unitPelaksana || '').toUpperCase() === up);
+                const matchTT = (tt === 'ALL' || getItemTeganganTipe(item) === tt);
+                return matchReg && matchUI && matchUP && matchTT;
             });
             currentPage = 1;
             renderDetailList();
@@ -3742,9 +3844,9 @@
         }
 
         function resetFilters() {
-            document.getElementById('filterKantorPusat').value = 'PLN_PUSAT';
-            document.getElementById('filterUnitInduk').value = 'ALL';
-            document.getElementById('filterStatusSet').value = 'ALL';
+            document.getElementById('filterRegional').value = 'ALL';
+            onRegionalFilterChange();
+            document.getElementById('filterTeganganTipe').value = 'ALL';
             document.getElementById('searchInput').value = '';
             const currentSource = activeMapTab === 'set' ? ersMasterData : (activeMapTab === 'tower' ? towerOperasiData : towerTerpasangData);
             filteredData = [...currentSource];
