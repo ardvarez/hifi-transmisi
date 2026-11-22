@@ -1061,85 +1061,87 @@
 
     <script>
         const DEFAULT_PERMITS = [
-            // TAB PEMASANGAN (referensi V1 list-pemasangan.html)
+            // TAB PEMASANGAN (referensi Pemasangan/home-mobile.html)
             {
-                id: 'ASM20250000001-01',
+                id: 'ASM20250000001',
                 module: 'Pemasangan',
-                subtitle: 'TRS 150kV UNGARAN-WELERI #0085',
                 statusText: 'Siap Pasang',
                 badgeClass: 'badge-siap-solid',
                 targetPemasangan: '10 Juli 2025',
                 slaPemasangan: '7 Hari',
                 targetOperasi: '17 Juli 2025',
+                jumlahTE: '4 TE',
                 lokasi: '8',
-                detailUrl: './Pemasangan/pemasangan-action.html?id=ASM20250000001-01',
+                towerCount: 4,
+                detailUrl: './Pemasangan/list-pemasangan.html?id=ASM20250000001',
                 synced: false
             },
             {
-                id: 'ASM20250000001-02',
+                id: 'ASM20250000002',
                 module: 'Pemasangan',
-                subtitle: 'TRS 150kV KENDARI #0014',
                 statusText: 'Sedang Dipasang',
                 badgeClass: 'badge-berlangsung',
                 targetPemasangan: '11 Juli 2025',
                 slaPemasangan: '5 Hari',
                 targetOperasi: '16 Juli 2025',
+                jumlahTE: '6 TE',
                 lokasi: '8',
-                detailUrl: './Pemasangan/pemasangan-action.html?id=ASM20250000001-02',
+                towerCount: 6,
+                detailUrl: './Pemasangan/list-pemasangan.html?id=ASM20250000002',
                 synced: false
             },
-            // TAB PEMBONGKARAN (referensi list-pembongkaran.html)
+            // TAB PEMBONGKARAN (referensi Pembongkaran/home-mobile.html)
             {
-                id: 'DIS20250000001-01',
+                id: 'DIS20250000001',
                 module: 'Pembongkaran',
-                subtitle: 'TRS 500kV UNGARAN #0011',
                 statusText: 'Siap Bongkar',
                 badgeClass: 'badge-siap-solid',
                 tanggalAwal: '12 Juli 2025',
                 slaPembongkaran: '7 Hari',
                 tanggalAkhir: '19 Juli 2025',
-                lokasi: 'UPT Semarang',
-                detailUrl: './Pembongkaran/pembongkaran-action.html?id=DIS20250000001-01',
+                jumlahTE: '4 TE',
+                towerCount: 4,
+                detailUrl: './Pembongkaran/list-pembongkaran.html?id=DIS20250000001',
                 synced: false
             },
             {
-                id: 'DIS20250000001-02',
+                id: 'DIS20250000002',
                 module: 'Pembongkaran',
-                subtitle: 'TRS 150kV KENDARI #0014',
                 statusText: 'Selesai Lokal',
                 badgeClass: 'badge-selesai-lokal',
                 tanggalAwal: '14 Juli 2025',
                 slaPembongkaran: '5 Hari',
                 tanggalAkhir: '19 Juli 2025',
-                lokasi: 'UPT Kendari',
-                detailUrl: './Pembongkaran/pembongkaran-action.html?id=DIS20250000001-02',
+                jumlahTE: '6 TE',
+                towerCount: 6,
+                detailUrl: './Pembongkaran/list-pembongkaran.html?id=DIS20250000002',
                 synced: false
             },
-            // TAB KARANTINA (referensi list-karantina.html)
+            // TAB KARANTINA (referensi Karantina & Pengembalian/home-mobile.html)
             {
-                id: 'RTR20250000001-01',
+                id: 'RTR20250000001',
                 module: 'Karantina',
-                subtitle: 'Gudang Kaligawe • Set ERS #03',
                 statusText: 'Sedang Dikirim',
                 badgeClass: 'badge-karantina-orange',
-                selesaiBongkar: '10 Juli 2025',
                 estBerangkat: '12 Juli 2025',
                 estTiba: '14 Juli 2025',
-                totalSet: '2 Set',
-                detailUrl: './Karantina & Pengembalian/karantina-action.html?id=RTR20250000001-01',
+                jumlahTE: '2 TE',
+                merk: 'LINDSEY',
+                towerCount: 2,
+                detailUrl: './Karantina & Pengembalian/list-karantina.html?id=RTR20250000001',
                 synced: false
             },
             {
-                id: 'RTR20250000001-02',
+                id: 'RTR20250000002',
                 module: 'Karantina',
-                subtitle: 'Gudang Cikarang • Set ERS #07',
                 statusText: 'Siap Karantina',
                 badgeClass: 'badge-karantina-orange',
-                selesaiBongkar: '11 Juli 2025',
                 estBerangkat: '13 Juli 2025',
                 estTiba: '15 Juli 2025',
-                totalSet: '3 Set',
-                detailUrl: './Karantina & Pengembalian/karantina-action.html?id=RTR20250000001-02',
+                jumlahTE: '3 TE',
+                merk: 'SBB',
+                towerCount: 3,
+                detailUrl: './Karantina & Pengembalian/list-karantina.html?id=RTR20250000002',
                 synced: false
             }
         ];
@@ -1155,7 +1157,7 @@
                 const raw = localStorage.getItem('ers_local_sync_permits');
                 if (raw) {
                     const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].targetPemasangan !== undefined && String(parsed[0].id).startsWith('ASM')) {
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].jumlahTE !== undefined && String(parsed[0].id).startsWith('ASM') && !String(parsed[0].id).includes('-')) {
                         permitsData = parsed;
                         return;
                     }
@@ -1205,6 +1207,10 @@
                             <span class="permit-meta-val">${item.targetOperasi}</span>
                         </div>
                         <div class="permit-meta-row">
+                            <span class="permit-meta-lbl">Jumlah TE</span>
+                            <span class="permit-meta-val">${item.jumlahTE}</span>
+                        </div>
+                        <div class="permit-meta-row">
                             <span class="permit-meta-lbl">Lokasi</span>
                             <span class="permit-meta-val">${item.lokasi}</span>
                         </div>
@@ -1227,8 +1233,8 @@
                             <span class="permit-meta-val">${item.tanggalAkhir}</span>
                         </div>
                         <div class="permit-meta-row">
-                            <span class="permit-meta-lbl">Lokasi</span>
-                            <span class="permit-meta-val">${item.lokasi}</span>
+                            <span class="permit-meta-lbl">Jumlah TE</span>
+                            <span class="permit-meta-val">${item.jumlahTE}</span>
                         </div>
                     </div>
                 `;
@@ -1236,10 +1242,6 @@
             // Karantina
             return `
                 <div class="permit-meta-list">
-                    <div class="permit-meta-row">
-                        <span class="permit-meta-lbl">Selesai Bongkar</span>
-                        <span class="permit-meta-val">${item.selesaiBongkar}</span>
-                    </div>
                     <div class="permit-meta-row">
                         <span class="permit-meta-lbl">Est. Berangkat</span>
                         <span class="permit-meta-val">${item.estBerangkat}</span>
@@ -1249,8 +1251,12 @@
                         <span class="permit-meta-val">${item.estTiba}</span>
                     </div>
                     <div class="permit-meta-row">
-                        <span class="permit-meta-lbl">Total Set</span>
-                        <span class="permit-meta-val">${item.totalSet}</span>
+                        <span class="permit-meta-lbl">Jumlah TE</span>
+                        <span class="permit-meta-val">${item.jumlahTE}</span>
+                    </div>
+                    <div class="permit-meta-row">
+                        <span class="permit-meta-lbl">Merk</span>
+                        <span class="permit-meta-val">${item.merk}</span>
                     </div>
                 </div>
             `;
@@ -1272,7 +1278,7 @@
             }
 
             const filtered = modulePermits.filter(p => {
-                const matchSearch = !q || p.id.toLowerCase().includes(q) || p.subtitle.toLowerCase().includes(q) || p.statusText.toLowerCase().includes(q);
+                const matchSearch = !q || p.id.toLowerCase().includes(q) || p.statusText.toLowerCase().includes(q) || (p.merk && p.merk.toLowerCase().includes(q));
                 const matchStatus = activeStatusFilter === 'all'
                     || (activeStatusFilter === 'pending' && !p.synced)
                     || (activeStatusFilter === 'synced' && p.synced);
@@ -1312,11 +1318,8 @@
 
                 return `
                     <div class="permit-card">
-                        <div class="permit-card-header">
-                            <div>
-                                <div class="permit-no">${item.id}</div>
-                                <div class="permit-tower-sub">${item.subtitle}</div>
-                            </div>
+                        <div class="permit-card-header" style="align-items: center;">
+                            <div class="permit-no">${item.id}</div>
                             <span class="status-badge ${item.badgeClass}">${item.statusText}</span>
                         </div>
 
