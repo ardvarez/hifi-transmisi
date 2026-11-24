@@ -838,6 +838,7 @@ body {
                 <button id="tab-btn-2" class="main-tab-btn" onclick="switchMainTab('tab-Komponen')">Daftar Komponen</button>
                 <button id="tab-btn-3" class="main-tab-btn" onclick="switchMainTab('tab-pemetaan')">Pemetaan Material</button>
                 <button id="tab-btn-4" class="main-tab-btn" onclick="switchMainTab('tab-mutasi')" style="display:none;">Proses Mutasi & Pemenuhan Material</button>
+                <button id="tab-btn-5" class="main-tab-btn" onclick="switchMainTab('tab-hasil-permit')">Hasil Permit</button>
             </div>
 
             <!-- TAB: INFORMASI PEMASANGAN (NEW) -->
@@ -2118,6 +2119,50 @@ body {
                 </div>
             </div>
 
+            <!-- TAB: HASIL PERMIT (PEMASANGAN, PEMBONGKARAN & PENGEMBALIAN KARANTINA) -->
+            <div id="tab-hasil-permit" class="tab-content">
+                <div class="section-card" style="padding:20px 22px; border:1px solid var(--border);">
+                    <div class="section-header" style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <div class="section-label" style="margin-bottom:4px;">Informasi Hasil Permit (Pemasangan, Pembongkaran, Pengembalian &amp; Karantina)</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">Data dasar mengacu pada spesifikasi Tower ERS di tab Daftar Komponen.</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:6px; background:#f1f5f9; padding:4px; border-radius:8px; border:1px solid var(--border);">
+                                <span style="font-size:11px; font-weight:700; color:var(--text-secondary); padding:0 6px;">Simulasi Status:</span>
+                                <button type="button" class="sim-permit-btn" data-stage="terpasang" onclick="setPermitSimStage('terpasang', this)" style="border:none; background:transparent; color:var(--text-secondary); font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:6px; cursor:pointer;">Sudah Terpasang</button>
+                                <button type="button" class="sim-permit-btn" data-stage="terbongkar" onclick="setPermitSimStage('terbongkar', this)" style="border:none; background:transparent; color:var(--text-secondary); font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:6px; cursor:pointer;">Sudah Terbongkar</button>
+                                <button type="button" class="sim-permit-btn active" data-stage="karantina" onclick="setPermitSimStage('karantina', this)" style="border:none; background:#fff; color:var(--pln-blue); font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.08);">Sudah Karantina</button>
+                            </div>
+                            <span class="chip chip-blue" style="font-size:11.5px; padding:4px 10px;">2 Tower ERS Terdaftar</span>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap" style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-md);">
+                        <table class="data-table" style="min-width: 1320px; width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center; width:44px;">No</th>
+                                    <th>Merk</th>
+                                    <th>Tegangan</th>
+                                    <th>Tipe Tower</th>
+                                    <th>Template Tower</th>
+                                    <th style="text-align:center;">Total Set</th>
+                                    <th>List Pengganti Tower</th>
+                                    <th>Nomor Pemasangan</th>
+                                    <th>Nomor Pembongkaran</th>
+                                    <th>Nomor Pengembalian &amp; Karantina</th>
+                                    <th style="min-width: 280px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hasilPermitTableBody">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- SIDE PANEL OVERLAY -->
             <div id="side-panel-overlay"
                 style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:999; display:none;"
@@ -2998,7 +3043,7 @@ body {
     </div>
 
     <script>
-        const TABS = ['tab-informasi', 'tab-Komponen', 'tab-pemetaan', 'tab-mutasi'];
+        const TABS = ['tab-informasi', 'tab-Komponen', 'tab-pemetaan', 'tab-mutasi', 'tab-hasil-permit'];
         let currentTabIndex = 0;
 
         function switchMainTab(tabId) {
@@ -3946,9 +3991,314 @@ body {
         <li><strong>Internal PLN:</strong> Peminjaman ke UIT lain dapat memilih &gt;1 UIT. Jarak dihitung garis lurus pada maps.</li>
         <li><strong>Mitra PLN:</strong> Peminjaman mitra PLN mewajibkan upload file kontrak & memilih Master Vendor ERS.</li>
         <li><strong>Konfirmasi Perubahan:</strong> Perubahan spesifikasi Set ERS (Merk/Tipe) yang dipasang membutuhkan konfirmasi penimpaan data.</li>
+        <li><strong>Hasil Permit:</strong> Tab Hasil Permit merangkum hasil Pemasangan, Pembongkaran, serta Pengembalian &amp; Karantina berbasis data Daftar Komponen dengan drawer detail per nomor permit.</li>
       </ul>
     </div>
     <!-- END NOTES FEATURE -->
+
+    <!-- MODAL VIEW MORE PENGGANTI TOWER -->
+    <div id="penggantiTowerModalOverlay" onclick="if(event.target===this) closePenggantiTowerModal()"
+        style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); backdrop-filter:blur(2px); z-index:9990; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:#fff; border-radius:12px; width:100%; max-width:440px; padding:20px 22px; box-shadow:0 20px 45px rgba(15,23,42,0.22);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+                <h4 style="margin:0; font-size:15px; font-weight:700; color:var(--text-primary);">List Pengganti Tower</h4>
+                <button type="button" onclick="closePenggantiTowerModal()" style="border:none; background:transparent; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button>
+            </div>
+            <div id="penggantiTowerModalSubtitle" style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;"></div>
+            <div id="penggantiTowerModalList" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;"></div>
+            <div style="display:flex; justify-content:flex-end;">
+                <button type="button" class="btn-outline" onclick="closePenggantiTowerModal()" style="padding:7px 18px;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT DRAWER OVERLAY: DETAIL PERMIT (PEMASANGAN / PEMBONGKARAN / KARANTINA) -->
+    <div id="detailPermitOverlay" onclick="if(event.target===this) closePermitDetailDrawer()"
+        style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.48); backdrop-filter:blur(2px); z-index:9991;">
+        <div id="detailPermitDrawer"
+            style="position:fixed; top:0; right:-640px; width:100%; max-width:600px; height:100vh; background:#fff; box-shadow:-10px 0 35px rgba(15,23,42,0.18); display:flex; flex-direction:column; transition:right 0.28s cubic-bezier(0.22,1,0.36,1);">
+            <div style="padding:18px 22px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; gap:12px; background:#fff;">
+                <div>
+                    <div id="dpDrawerTitle" style="font-size:16px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:8px;">Detail Permit</div>
+                    <div id="dpDrawerSubtitle" style="font-size:12px; color:var(--text-secondary); margin-top:3px;"></div>
+                </div>
+                <button type="button" onclick="closePermitDetailDrawer()" style="border:none; background:#f1f5f9; width:32px; height:32px; border-radius:8px; font-size:18px; cursor:pointer; color:var(--text-secondary);">&times;</button>
+            </div>
+            <div id="dpDrawerBody" style="flex:1; overflow-y:auto; padding:18px 22px; background:#f8fafc; display:flex; flex-direction:column; gap:14px;"></div>
+            <div style="padding:12px 22px; border-top:1px solid var(--border); background:#fff; display:flex; justify-content:flex-end;">
+                <button type="button" class="btn-outline" onclick="closePermitDetailDrawer()" style="padding:8px 20px;">Tutup Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const hasilPermitRows = [
+            {
+                no: 1,
+                towerErs: 'Tower ERS 1',
+                merk: 'Lindsey',
+                tegangan: '150 kV',
+                tipeTower: 'Suspension',
+                templateTower: '150 kV - 60m - Lindsey - Suspension',
+                totalSet: 2,
+                penggantiTower: ['TOWER.176', 'TOWER.177', 'TOWER.178'],
+                noPemasangan: 'ASM20250000001',
+                noPembongkaran: 'DIS20250000001',
+                noKarantina: 'RTR20250000001',
+                tapak: 'TOWER SUTT 150kV UNGARAN-WELERI #0085',
+                koordinat: '-7.2575, 109.1866',
+                upt: 'UPT Semarang / ULTG Weleri'
+            },
+            {
+                no: 2,
+                towerErs: 'Tower ERS 2',
+                merk: 'SBB',
+                tegangan: '150 kV',
+                tipeTower: 'Tension',
+                templateTower: '150 kV - 55m - SBB - Tension',
+                totalSet: 1,
+                penggantiTower: ['TOWER.180'],
+                noPemasangan: 'ASM20250000002',
+                noPembongkaran: 'DIS20250000002',
+                noKarantina: 'RTR20250000002',
+                tapak: 'TOWER SUTT 150kV UNGARAN-WELERI #0086',
+                koordinat: '-7.2610, 109.1902',
+                upt: 'UPT Semarang / ULTG Weleri'
+            }
+        ];
+
+        let activePermitSimStage = 'karantina'; // 'terpasang' | 'terbongkar' | 'karantina'
+
+        function setPermitSimStage(stage, btnEl) {
+            activePermitSimStage = stage;
+            document.querySelectorAll('.sim-permit-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = 'transparent';
+                b.style.color = 'var(--text-secondary)';
+                b.style.boxShadow = 'none';
+            });
+            if (btnEl) {
+                btnEl.classList.add('active');
+                btnEl.style.background = '#fff';
+                btnEl.style.color = 'var(--pln-blue)';
+                btnEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+            }
+            renderHasilPermitTable();
+        }
+
+        function renderHasilPermitTable() {
+            const tbody = document.getElementById('hasilPermitTableBody');
+            if (!tbody) return;
+
+            const hasPasang = true;
+            const hasBongkar = (activePermitSimStage === 'terbongkar' || activePermitSimStage === 'karantina');
+            const hasKarantina = (activePermitSimStage === 'karantina');
+
+            tbody.innerHTML = hasilPermitRows.map((row, idx) => {
+                const firstTower = row.penggantiTower[0] || '-';
+                const extraCount = row.penggantiTower.length - 1;
+                const towerHtml = extraCount > 0
+                    ? `<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                           <span style="background:var(--pln-blue-light); color:var(--pln-blue); font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:12px;">${firstTower}</span>
+                           <button type="button" onclick="openPenggantiTowerModal(${idx})" style="border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; font-size:11px; font-weight:700; padding:2px 8px; border-radius:12px; cursor:pointer;">+${extraCount} View More</button>
+                       </div>`
+                    : `<span style="background:var(--pln-blue-light); color:var(--pln-blue); font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:12px;">${firstTower}</span>`;
+
+                const noPasangHtml = hasPasang
+                    ? `<span style="font-family:monospace; font-weight:700; color:var(--pln-blue);">${row.noPemasangan}</span>`
+                    : `<span style="color:var(--text-secondary);">-</span>`;
+
+                const noBongkarHtml = hasBongkar
+                    ? `<span style="font-family:monospace; font-weight:700; color:#d97706;">${row.noPembongkaran}</span>`
+                    : `<span style="color:var(--text-secondary); font-size:12px;">- (Belum Bongkar)</span>`;
+
+                const noKarantinaHtml = hasKarantina
+                    ? `<span style="font-family:monospace; font-weight:700; color:#059669;">${row.noKarantina}</span>`
+                    : `<span style="color:var(--text-secondary); font-size:12px;">- (Belum Karantina)</span>`;
+
+                const disabledBtnStyle = 'font-size:11px; padding:4px 9px; opacity:0.45; cursor:not-allowed; background:#f1f5f9; color:#64748b; border-color:#cbd5e1;';
+
+                return `
+                    <tr>
+                        <td style="text-align:center;">${row.no}</td>
+                        <td><strong>${row.merk}</strong></td>
+                        <td>${row.tegangan}</td>
+                        <td>${row.tipeTower}</td>
+                        <td><span style="font-size:12px; color:var(--text-secondary);">${row.templateTower}</span></td>
+                        <td style="text-align:center;"><strong>${row.totalSet} Set</strong></td>
+                        <td>${towerHtml}</td>
+                        <td>${noPasangHtml}</td>
+                        <td>${noBongkarHtml}</td>
+                        <td>${noKarantinaHtml}</td>
+                        <td>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                <button type="button" class="btn-outline" style="font-size:11px; padding:4px 9px;" onclick="openSidePanelDokumen()">View File Rencana Pasang</button>
+                                <button type="button" class="btn-outline" style="font-size:11px; padding:4px 9px; color:#1d4ed8; border-color:#93c5fd; background:#eff6ff;" onclick="openPermitDetailDrawer('pemasangan', ${idx})">Lihat Pemasangan</button>
+                                <button type="button" class="btn-outline" ${hasBongkar ? '' : 'disabled'} style="${hasBongkar ? 'font-size:11px; padding:4px 9px; color:#b45309; border-color:#fcd34d; background:#fffbeb;' : disabledBtnStyle}" onclick="openPermitDetailDrawer('pembongkaran', ${idx})">Lihat Pembongkaran</button>
+                                <button type="button" class="btn-outline" ${hasKarantina ? '' : 'disabled'} style="${hasKarantina ? 'font-size:11px; padding:4px 9px; color:#047857; border-color:#6ee7b7; background:#ecfdf5;' : disabledBtnStyle}" onclick="openPermitDetailDrawer('karantina', ${idx})">Lihat Pengembalian &amp; Karantina</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openPenggantiTowerModal(idx) {
+            const row = hasilPermitRows[idx];
+            if (!row) return;
+            document.getElementById('penggantiTowerModalSubtitle').textContent = `${row.towerErs} • ${row.templateTower}`;
+            document.getElementById('penggantiTowerModalList').innerHTML = row.penggantiTower.map(t =>
+                `<span style="background:var(--pln-blue-light); color:var(--pln-blue); font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:999px; border:1px solid #bfdbfe;">${t}</span>`
+            ).join('');
+            document.getElementById('penggantiTowerModalOverlay').style.display = 'flex';
+        }
+
+        function closePenggantiTowerModal() {
+            document.getElementById('penggantiTowerModalOverlay').style.display = 'none';
+        }
+
+        function openPermitDetailDrawer(type, idx) {
+            const row = hasilPermitRows[idx];
+            if (!row) return;
+
+            const titleEl = document.getElementById('dpDrawerTitle');
+            const subEl = document.getElementById('dpDrawerSubtitle');
+            const bodyEl = document.getElementById('dpDrawerBody');
+
+            const cellStyle = 'background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px;';
+            const lblStyle = 'font-size:11px; color:#64748b; margin-bottom:3px;';
+            const valStyle = 'font-size:12.5px; font-weight:700; color:#0f172a;';
+            const secStyle = 'background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px;';
+            const secHdrStyle = 'font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;';
+
+            if (type === 'pemasangan') {
+                titleEl.textContent = 'Detail Permit Pemasangan';
+                subEl.textContent = 'Data historis pelaksanaan ereksi & instalasi tower darurat ERS di lapangan';
+                bodyEl.innerHTML = `
+                    <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#2563EB; color:#fff; font-size:12px; font-weight:700;">OK</span>
+                            <div>
+                                <div style="font-size:12px; font-weight:700; color:#1E40AF;">Status: Sukses Beroperasi (Selesai Pasang)</div>
+                                <div style="font-size:11px; color:#3B82F6;">Pemasangan berhasil diselesaikan tepat waktu sesuai SLA</div>
+                            </div>
+                        </div>
+                        <span style="background:#DBEAFE; color:#1D4ED8; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;">${row.noPemasangan}</span>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Identitas Pekerjaan &amp; Lokasi Tapak</span><span style="font-size:11px; color:#64748b; font-weight:500;">${row.noPemasangan}</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle} grid-column:span 2;"><div style="${lblStyle}">Nomor Permit Pasang / Kode Kerja Mobile</div><div style="${valStyle} color:#1d4ed8; font-family:monospace;">${row.noPemasangan}</div></div>
+                            <div style="${cellStyle} grid-column:span 2;"><div style="${lblStyle}">Nama Tapak Tower / Sirkit</div><div style="${valStyle}">${row.tapak}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Koordinat GPS (Lat, Long)</div><div style="${valStyle}">${row.koordinat}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Unit Pengelola (UPT)</div><div style="${valStyle}">${row.upt}</div></div>
+                        </div>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Waktu Pelaksanaan &amp; Personil</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle}"><div style="${lblStyle}">Waktu Mulai Pemasangan</div><div style="${valStyle}">10 Mei 2025, 08:06 WIB</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Waktu Selesai Pemasangan</div><div style="${valStyle}">20 Mei 2025, 16:30 WIB</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">PIC Pelaksana (Mobile ERS)</div><div style="${valStyle}">Luis Andreas BGS</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">PIC</div><div style="${valStyle}">Rahmat Hidayat (Spv PDKB)</div></div>
+                            <div style="${cellStyle} grid-column:span 2;"><div style="${lblStyle}">Target Operasi (SLA)</div><div style="${valStyle}">10 Maret 2025 (SLA: 30 Hari)</div></div>
+                        </div>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Spesifikasi Konfigurasi Tower ERS</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle}"><div style="${lblStyle}">Tegangan Sistem</div><div style="${valStyle}">${row.tegangan}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Merk Utama Tower</div><div style="${valStyle}">${row.merk}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Tipe Tower</div><div style="${valStyle}">${row.tipeTower}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Total Set Terpasang</div><div style="${valStyle}">${row.totalSet} Set</div></div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'pembongkaran') {
+                titleEl.textContent = 'Detail Permit Pembongkaran';
+                subEl.textContent = 'Data historis pembongkaran (dismantling) tower darurat ERS di lapangan';
+                bodyEl.innerHTML = `
+                    <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:10px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#D97706; color:#fff; font-size:12px; font-weight:700;">OK</span>
+                            <div>
+                                <div style="font-size:12px; font-weight:700; color:#92400E;">Status: Selesai Pembongkaran</div>
+                                <div style="font-size:11px; color:#B45309;">Material ERS telah dibongkar &amp; siap menuju karantina</div>
+                            </div>
+                        </div>
+                        <span style="background:#FEF3C7; color:#92400E; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;">${row.noPembongkaran}</span>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Identitas Pembongkaran &amp; Referensi Pasang</span><span style="font-size:11px; color:#64748b; font-weight:500;">${row.noPembongkaran}</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle}"><div style="${lblStyle}">Nomor Permit Pembongkaran</div><div style="${valStyle} color:#b45309; font-family:monospace;">${row.noPembongkaran}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Referensi Nomor Pemasangan</div><div style="${valStyle} color:#1d4ed8; font-family:monospace;">${row.noPemasangan}</div></div>
+                            <div style="${cellStyle} grid-column:span 2;"><div style="${lblStyle}">Nama Tapak Tower / Sirkit</div><div style="${valStyle}">${row.tapak}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Unit Pengelola (UPT)</div><div style="${valStyle}">${row.upt}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Total Set Dibongkar</div><div style="${valStyle}">${row.totalSet} Set</div></div>
+                        </div>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Waktu Pelaksanaan &amp; Personil</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle}"><div style="${lblStyle}">Waktu Mulai Pembongkaran</div><div style="${valStyle}">01 Juni 2025, 08:30 WIB</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Waktu Selesai Pembongkaran</div><div style="${valStyle}">08 Juni 2025, 15:45 WIB</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">PIC Pelaksana</div><div style="${valStyle}">Budi Santoso (Tim PDKB)</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">SLA Pembongkaran</div><div style="${valStyle}">7 Hari (Tepat Waktu)</div></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                titleEl.textContent = 'Detail Pengembalian & Karantina';
+                subEl.textContent = 'Data pengembalian material ke gudang & hasil pengecekan QC karantina';
+                bodyEl.innerHTML = `
+                    <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:10px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#059669; color:#fff; font-size:12px; font-weight:700;">OK</span>
+                            <div>
+                                <div style="font-size:12px; font-weight:700; color:#065F46;">Status: Selesai Karantina (Siap Pakai)</div>
+                                <div style="font-size:11px; color:#047857;">Seluruh komponen utama &amp; aksesoris telah diverifikasi</div>
+                            </div>
+                        </div>
+                        <span style="background:#D1FAE5; color:#065F46; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;">${row.noKarantina}</span>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Identitas Pengembalian &amp; Gudang Tujuan</span><span style="font-size:11px; color:#64748b; font-weight:500;">${row.noKarantina}</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle}"><div style="${lblStyle}">Nomor Pengembalian &amp; Karantina</div><div style="${valStyle} color:#047857; font-family:monospace;">${row.noKarantina}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Referensi Pembongkaran</div><div style="${valStyle} color:#b45309; font-family:monospace;">${row.noPembongkaran}</div></div>
+                            <div style="${cellStyle} grid-column:span 2;"><div style="${lblStyle}">Gudang Tujuan Karantina</div><div style="${valStyle}">Gudang Kaligawe • ${row.upt}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Merk / Tipe Tower</div><div style="${valStyle}">${row.merk} • ${row.tipeTower}</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Total Set Dikembalikan</div><div style="${valStyle}">${row.totalSet} Set</div></div>
+                        </div>
+                    </div>
+                    <div style="${secStyle}">
+                        <div style="${secHdrStyle}"><span>Jadwal &amp; Hasil QC Karantina</span></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div style="${cellStyle}"><div style="${lblStyle}">Tanggal Berangkat</div><div style="${valStyle}">09 Juni 2025</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Tanggal Tiba di Gudang</div><div style="${valStyle}">10 Juni 2025</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Hasil Check Sheet QC</div><div style="${valStyle} color:#059669;">100% Lolos QC</div></div>
+                            <div style="${cellStyle}"><div style="${lblStyle}">Verifikator Gudang</div><div style="${valStyle}">Asman Fashar UPT</div></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const overlay = document.getElementById('detailPermitOverlay');
+            const drawer = document.getElementById('detailPermitDrawer');
+            overlay.style.display = 'block';
+            setTimeout(() => { drawer.style.right = '0'; }, 10);
+        }
+
+        function closePermitDetailDrawer() {
+            const overlay = document.getElementById('detailPermitOverlay');
+            const drawer = document.getElementById('detailPermitDrawer');
+            drawer.style.right = '-640px';
+            setTimeout(() => { overlay.style.display = 'none'; }, 280);
+        }
+
+        document.addEventListener('DOMContentLoaded', renderHasilPermitTable);
+    </script>
 </body>
 
 </html>
