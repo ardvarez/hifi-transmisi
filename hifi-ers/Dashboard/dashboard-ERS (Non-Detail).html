@@ -2218,7 +2218,7 @@
           </div>
 
           <div class="table-action-btns">
-            <button class="btn-table-filter" onclick="openFilterModal()">
+            <button class="btn-table-filter" onclick="openTableFilterModal()">
               <i class="ri-filter-line"></i> Filter
             </button>
           </div>
@@ -2351,6 +2351,49 @@
       <div class="dialog-footer">
         <button class="btn-reset" onclick="resetFilterForm()">Reset</button>
         <button class="btn-apply" onclick="applyFilterForm()">Terapkan Filter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE FILTER MODAL (Penghantar, Tower, ID Functloc, Merk) -->
+  <div class="modal-overlay" id="tableFilterModalOverlay">
+    <div class="filter-dialog" style="max-width: 640px;">
+      <div class="dialog-header">
+        <h3><i class="ri-filter-line" style="margin-right: 6px; color: var(--pln-blue);"></i>Filter</h3>
+        <button class="dialog-close" onclick="closeTableFilterModal()"><i class="ri-close-line"></i></button>
+      </div>
+
+      <div class="dialog-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Penghantar</label>
+          <select id="tableFilterPenghantar" class="form-select" onchange="handleTablePenghantarChange()">
+            <option value="">Pilih Penghantar</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Tower</label>
+          <select id="tableFilterTower" class="form-select" disabled style="opacity: 0.6; cursor: not-allowed;">
+            <option value="">Pilih Tower</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">ID Functloc</label>
+          <input type="text" id="tableFilterFunctloc" class="form-input" placeholder="Masukkan ID Functloc">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Merk</label>
+          <select id="tableFilterMerk" class="form-select">
+            <option value="">Pilih Merk</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="dialog-footer" style="justify-content: flex-end; gap: 14px;">
+        <button class="btn-reset" onclick="resetTableFilterForm()" style="color: #ef4444; font-weight: 700;">RESET</button>
+        <button class="btn-apply" onclick="applyTableFilterForm()">CARI DATA</button>
       </div>
     </div>
   </div>
@@ -4061,12 +4104,95 @@
           return false;
         }
 
+        // Table Filter: Penghantar, Tower, ID Functloc, Merk
+        if (activeFilter.penghantar && item.penghantar !== activeFilter.penghantar) {
+          return false;
+        }
+        if (activeFilter.tower && item.tower !== activeFilter.tower) {
+          return false;
+        }
+        if (activeFilter.functloc && !String(item.idFunctloc || '').toLowerCase().includes(activeFilter.functloc.toLowerCase())) {
+          return false;
+        }
+        if (activeFilter.tableMerk && String(item.merk || '').toLowerCase() !== activeFilter.tableMerk.toLowerCase()) {
+          return false;
+        }
+
         return true;
       });
 
       currentPage = 1;
       renderTable();
       renderMapMarkers();
+    }
+
+    function openTableFilterModal() {
+      const sourceData = activeMapTab === 'terpasang' ? towerTerpasangData : rawErsData;
+      const penghantarSel = document.getElementById('tableFilterPenghantar');
+      const merkSel = document.getElementById('tableFilterMerk');
+
+      const penghantars = [...new Set(sourceData.map(i => i.penghantar).filter(Boolean))];
+      penghantarSel.innerHTML = '<option value="">Pilih Penghantar</option>' +
+        penghantars.map(p => `<option value="${p}">${p}</option>`).join('');
+      penghantarSel.value = activeFilter.penghantar || '';
+
+      const merks = [...new Set(sourceData.map(i => i.merk).filter(Boolean))];
+      merkSel.innerHTML = '<option value="">Pilih Merk</option>' +
+        merks.map(m => `<option value="${m}">${m}</option>`).join('');
+      merkSel.value = activeFilter.tableMerk || '';
+
+      document.getElementById('tableFilterFunctloc').value = activeFilter.functloc || '';
+      handleTablePenghantarChange(activeFilter.tower);
+      document.getElementById('tableFilterModalOverlay').classList.add('active');
+    }
+
+    function closeTableFilterModal() {
+      document.getElementById('tableFilterModalOverlay').classList.remove('active');
+    }
+
+    function handleTablePenghantarChange(presetTower) {
+      const penghantar = document.getElementById('tableFilterPenghantar').value;
+      const towerSel = document.getElementById('tableFilterTower');
+      if (!penghantar) {
+        towerSel.innerHTML = '<option value="">Pilih Tower</option>';
+        towerSel.value = '';
+        towerSel.disabled = true;
+        towerSel.style.opacity = '0.6';
+        towerSel.style.cursor = 'not-allowed';
+        return;
+      }
+      const sourceData = activeMapTab === 'terpasang' ? towerTerpasangData : rawErsData;
+      const towers = [...new Set(sourceData.filter(i => i.penghantar === penghantar).map(i => i.tower).filter(Boolean))];
+      towerSel.innerHTML = '<option value="">Pilih Tower</option>' +
+        towers.map(t => `<option value="${t}">${t}</option>`).join('');
+      towerSel.disabled = false;
+      towerSel.style.opacity = '1';
+      towerSel.style.cursor = 'pointer';
+      if (presetTower && towers.includes(presetTower)) {
+        towerSel.value = presetTower;
+      }
+    }
+
+    function applyTableFilterForm() {
+      activeFilter.penghantar = document.getElementById('tableFilterPenghantar').value;
+      activeFilter.tower = document.getElementById('tableFilterTower').value;
+      activeFilter.functloc = document.getElementById('tableFilterFunctloc').value.trim();
+      activeFilter.tableMerk = document.getElementById('tableFilterMerk').value;
+      applyAllFilters();
+      closeTableFilterModal();
+    }
+
+    function resetTableFilterForm() {
+      activeFilter.penghantar = '';
+      activeFilter.tower = '';
+      activeFilter.functloc = '';
+      activeFilter.tableMerk = '';
+      document.getElementById('tableFilterPenghantar').value = '';
+      document.getElementById('tableFilterFunctloc').value = '';
+      document.getElementById('tableFilterMerk').value = '';
+      handleTablePenghantarChange();
+      applyAllFilters();
+      closeTableFilterModal();
     }
 
     function openFilterModal() {
