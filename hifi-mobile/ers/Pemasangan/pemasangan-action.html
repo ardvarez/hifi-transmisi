@@ -525,6 +525,74 @@
             background: #eff6ff;
         }
 
+        /* Geotagging Otomatis / Manual UI */
+        .geo-toggle-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .geo-toggle-btn {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 10px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .geo-toggle-btn.active {
+            background: #ffffff;
+            color: #0a58ca;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1);
+        }
+
+        .geo-auto-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .geo-coord-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .geo-coord-input {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .geo-mini-map {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            z-index: 1;
+        }
+
         /* Success Overlay */
         .success-overlay-container {
             position: absolute;
@@ -665,6 +733,27 @@
         body.dark-mode .file-dl-btn:hover,
         html.dark-mode .file-dl-btn:hover {
             background: rgba(59, 130, 246, 0.15) !important;
+        }
+
+        body.dark-mode .geo-toggle-group,
+        html.dark-mode .geo-toggle-group {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .geo-toggle-btn.active,
+        html.dark-mode .geo-toggle-btn.active {
+            background: #1e293b !important;
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .geo-auto-box,
+        body.dark-mode .geo-coord-input,
+        html.dark-mode .geo-auto-box,
+        html.dark-mode .geo-coord-input {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
         }
 
         /* Status Bar & Headers */
@@ -2540,6 +2629,114 @@
             window.open('https://maps.google.com/?q=-7.2575,109.1866', '_blank');
         }
 
+        function buildGeotaggingBlock(prefix) {
+            return `
+                <div>
+                    <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Titik Koordinat Tower (Geotagging) *</label>
+                    <div class="geo-toggle-group">
+                        <button type="button" class="geo-toggle-btn active" id="${prefix}GeoBtnAuto" onclick="switchGeoMode('${prefix}', 'auto')">Otomatis</button>
+                        <button type="button" class="geo-toggle-btn" id="${prefix}GeoBtnManual" onclick="switchGeoMode('${prefix}', 'manual')">Manual</button>
+                    </div>
+
+                    <div id="${prefix}GeoAutoBox" class="geo-auto-box">
+                        <div>
+                            <div style="font-size: 12px; font-weight: 700; color: #0f172a;" id="${prefix}GeoAutoCoord">-7.257500, 109.186600</div>
+                            <div style="font-size: 10.5px; color: #64748b; margin-top: 2px;">GPS Terkunci Otomatis • Akurasi ±4m</div>
+                        </div>
+                        <button type="button" onclick="refreshAutoGeo('${prefix}')" style="border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 8px; cursor: pointer;">Perbarui</button>
+                    </div>
+
+                    <div id="${prefix}GeoManualBox" style="display: none;">
+                        <div id="${prefix}GeoMiniMap" class="geo-mini-map"></div>
+                        <div style="font-size: 10.5px; color: #64748b; margin-top: 5px;">Ketuk peta atau geser pin untuk menentukan titik tower secara manual.</div>
+                        <div class="geo-coord-grid">
+                            <div>
+                                <label style="font-size: 10.5px; font-weight: 600; color: #64748b; display: block; margin-bottom: 3px;">Latitude *</label>
+                                <input type="text" id="${prefix}GeoLat" class="geo-coord-input" value="-7.257500" oninput="syncGeoMarkerFromInput('${prefix}')">
+                            </div>
+                            <div>
+                                <label style="font-size: 10.5px; font-weight: 600; color: #64748b; display: block; margin-bottom: 3px;">Longitude *</label>
+                                <input type="text" id="${prefix}GeoLng" class="geo-coord-input" value="109.186600" oninput="syncGeoMarkerFromInput('${prefix}')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let geoMiniMaps = {};
+        let geoMiniMarkers = {};
+
+        function switchGeoMode(prefix, mode) {
+            const btnAuto = document.getElementById(prefix + 'GeoBtnAuto');
+            const btnManual = document.getElementById(prefix + 'GeoBtnManual');
+            const boxAuto = document.getElementById(prefix + 'GeoAutoBox');
+            const boxManual = document.getElementById(prefix + 'GeoManualBox');
+
+            if (mode === 'manual') {
+                btnAuto.classList.remove('active');
+                btnManual.classList.add('active');
+                boxAuto.style.display = 'none';
+                boxManual.style.display = 'block';
+                setTimeout(() => initGeoMiniMap(prefix), 80);
+            } else {
+                btnManual.classList.remove('active');
+                btnAuto.classList.add('active');
+                boxManual.style.display = 'none';
+                boxAuto.style.display = 'flex';
+            }
+        }
+
+        function refreshAutoGeo(prefix) {
+            const el = document.getElementById(prefix + 'GeoAutoCoord');
+            if (el) el.textContent = '-7.257500, 109.186600';
+            if (typeof showToast === 'function') showToast('Koordinat GPS otomatis diperbarui.');
+        }
+
+        function initGeoMiniMap(prefix) {
+            const containerId = prefix + 'GeoMiniMap';
+            const container = document.getElementById(containerId);
+            if (!container || typeof L === 'undefined') return;
+
+            const latVal = parseFloat(document.getElementById(prefix + 'GeoLat').value) || -7.2575;
+            const lngVal = parseFloat(document.getElementById(prefix + 'GeoLng').value) || 109.1866;
+
+            if (geoMiniMaps[prefix]) {
+                geoMiniMaps[prefix].remove();
+            }
+
+            const miniMap = L.map(containerId, { zoomControl: true }).setView([latVal, lngVal], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OSM'
+            }).addTo(miniMap);
+
+            const marker = L.marker([latVal, lngVal], { draggable: true }).addTo(miniMap);
+            marker.on('dragend', (e) => {
+                const pos = e.target.getLatLng();
+                document.getElementById(prefix + 'GeoLat').value = pos.lat.toFixed(6);
+                document.getElementById(prefix + 'GeoLng').value = pos.lng.toFixed(6);
+            });
+
+            miniMap.on('click', (e) => {
+                marker.setLatLng(e.latlng);
+                document.getElementById(prefix + 'GeoLat').value = e.latlng.lat.toFixed(6);
+                document.getElementById(prefix + 'GeoLng').value = e.latlng.lng.toFixed(6);
+            });
+
+            geoMiniMaps[prefix] = miniMap;
+            geoMiniMarkers[prefix] = marker;
+            setTimeout(() => miniMap.invalidateSize(), 150);
+        }
+
+        function syncGeoMarkerFromInput(prefix) {
+            const lat = parseFloat(document.getElementById(prefix + 'GeoLat').value);
+            const lng = parseFloat(document.getElementById(prefix + 'GeoLng').value);
+            if (!Number.isNaN(lat) && !Number.isNaN(lng) && geoMiniMaps[prefix] && geoMiniMarkers[prefix]) {
+                geoMiniMarkers[prefix].setLatLng([lat, lng]);
+                geoMiniMaps[prefix].panTo([lat, lng]);
+            }
+        }
+
         function submitSelesaiPemasangan() {
             const timeStr = '10 Mei 2025, 16:30 WIB';
 
@@ -2556,6 +2753,8 @@
                                 <i class="fa-regular fa-clock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px;"></i>
                             </div>
                         </div>
+
+                        ${buildGeotaggingBlock('selesai')}
 
                         <div>
                             <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Evidence Foto Penyelesaian *</label>
@@ -2790,6 +2989,8 @@
                                 <i class="fa-regular fa-clock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px;"></i>
                             </div>
                         </div>
+
+                        ${buildGeotaggingBlock('mulai')}
 
                         <div>
                             <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">Evidence Foto Lapangan *</label>
@@ -3108,8 +3309,10 @@
                 jika ada yang gagal terunduh.</li>
             <li><strong>Subtitle Panduan:</strong> Memberi instruksi saat koneksi bermasalah sehingga foto belum tampil
                 sempurna.</li>
-            <li><strong>Validasi Form:</strong> Semua field bertanda bintang (*) pada modal mulai/selesai wajib diisi.
-            </li>
+            <li><strong>Geotagging Titik Tower:</strong> Pada modal Mulai &amp; Selesai Pemasangan tersedia opsi
+                <strong>Otomatis</strong> (default GPS) dan <strong>Manual</strong> (pilih titik di peta atau input Latitude/Longitude)
+                untuk mendukung input backdate kondisi emergency.</li>
+            <li><strong>Validasi Form:</strong> Semua field bertanda bintang (*) pada modal mulai/selesai wajib diisi.</li>
         </ul>
     </div>
     <!-- END NOTES FEATURE -->
