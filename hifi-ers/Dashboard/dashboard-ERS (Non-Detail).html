@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 
   <style>
     :root {
@@ -3838,7 +3838,66 @@
       }
     }
 
-    function exportTableToExcel() {
+    function formatExportTimestamp() {
+      const now = new Date();
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const pad = n => String(n).padStart(2, '0');
+      return `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
+
+    function getPlnLogoBase64() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 220;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      // Blue badge + PLN / Power Inspect branding
+      ctx.fillStyle = '#005B94';
+      ctx.fillRect(0, 8, 48, 48);
+      ctx.fillStyle = '#FACC15';
+      ctx.beginPath();
+      ctx.moveTo(28, 14);
+      ctx.lineTo(14, 34);
+      ctx.lineTo(24, 34);
+      ctx.lineTo(20, 50);
+      ctx.lineTo(34, 30);
+      ctx.lineTo(24, 30);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 18px Inter, Arial, sans-serif';
+      ctx.fillText('PT PLN (Persero)', 60, 30);
+      ctx.fillStyle = '#005B94';
+      ctx.font = 'bold 13px Inter, Arial, sans-serif';
+      ctx.fillText('POWER INSPECT • ERS', 60, 49);
+      return canvas.toDataURL('image/png');
+    }
+
+    async function exportTableToExcel() {
+      const tabTitleMap = {
+        set: 'Dashboard ERS - Set ERS',
+        tower: 'Dashboard ERS - Tower Operasi',
+        terpasang: 'Dashboard ERS - Tower Operasi Terpasang'
+      };
+      const exportTitle = tabTitleMap[activeMapTab] || 'Dashboard ERS';
+      const downloadTime = formatExportTimestamp();
+
+      const tglRange = (activeFilter.tglMulai || activeFilter.tglSelesai)
+        ? `${activeFilter.tglMulai || '-'} s/d ${activeFilter.tglSelesai || '-'}`
+        : '-';
+
+      const filterMetaRows = [
+        ['Unit Induk', activeFilter.unitInduk || '-'],
+        ['Unit Pelaksana', activeFilter.unitPelaksana || '-'],
+        ['Merk (Global)', activeFilter.merk || '-'],
+        ['Status', activeFilter.status || '-'],
+        ['Tanggal Pemasangan', tglRange],
+        ['Penghantar', activeFilter.penghantar || '-'],
+        ['Tower', activeFilter.tower || '-'],
+        ['ID Functloc', activeFilter.functloc || '-'],
+        ['Merk (Tabel)', activeFilter.tableMerk || '-'],
+        ['Cari Data', activeFilter.search || '-']
+      ];
+
       const headers = [
         'No.', 'Unit Induk', 'Unit Pelaksana', 'Penghantar', 'Tower', 'ID Functloc',
         'Latitude', 'Longitude', 'Jumlah Set Terpasang', 'Merk Terpasang',
@@ -3868,19 +3927,98 @@
         ];
       });
 
-      if (typeof XLSX !== 'undefined') {
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-        ws['!cols'] = headers.map((h, i) => ({ wch: i === 4 || i === 3 ? 28 : 18 }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Data ERS');
-        XLSX.writeFile(wb, 'Data_ERS_Dashboard.xlsx');
+      if (typeof ExcelJS !== 'undefined') {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Data ERS');
+
+        // Logo in rows 1-4
+        try {
+          const logoBase64 = getPlnLogoBase64();
+          const imgId = wb.addImage({ base64: logoBase64, extension: 'png' });
+          ws.addImage(imgId, {
+            tl: { col: 0, row: 0 },
+            ext: { width: 210, height: 60 }
+          });
+        } catch (e) {}
+
+        // Row 5: Title
+        ws.getCell('A5').value = exportTitle;
+        ws.mergeCells('A5:C5');
+        ws.getCell('A5').font = { name: 'Inter', size: 14, bold: true, color: { argb: 'FF0F172A' } };
+
+        // Row 7: Diunduh Pada
+        ws.getCell('A7').value = 'Diunduh Pada';
+        ws.mergeCells('A7:B7');
+        ws.getCell('A7').font = { name: 'Inter', size: 10, bold: true, color: { argb: 'FF475569' } };
+        ws.getCell('C7').value = downloadTime;
+        ws.getCell('C7').font = { name: 'Inter', size: 10, color: { argb: 'FF0F172A' } };
+
+        // Rows 9+: Active Filters
+        let rIdx = 9;
+        filterMetaRows.forEach(([lbl, val]) => {
+          ws.getCell(`A${rIdx}`).value = lbl;
+          ws.mergeCells(`A${rIdx}:B${rIdx}`);
+          ws.getCell(`A${rIdx}`).font = { name: 'Inter', size: 10, bold: true, color: { argb: 'FF475569' } };
+          ws.getCell(`C${rIdx}`).value = val;
+          ws.getCell(`C${rIdx}`).font = { name: 'Inter', size: 10, color: { argb: 'FF0F172A' } };
+          rIdx++;
+        });
+
+        // Blank row then Table Header
+        rIdx += 1;
+        const headerRow = ws.getRow(rIdx);
+        headers.forEach((h, colIdx) => {
+          const cell = headerRow.getCell(colIdx + 1);
+          cell.value = h;
+          cell.font = { name: 'Inter', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1565C0' } };
+          cell.alignment = { vertical: 'middle', horizontal: colIdx === 0 || colIdx === 8 ? 'center' : 'left' };
+          cell.border = {
+            top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+            bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+            left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+            right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+          };
+        });
+        headerRow.height = 24;
+
+        // Data Rows
+        rows.forEach((rData) => {
+          rIdx++;
+          const row = ws.getRow(rIdx);
+          rData.forEach((val, colIdx) => {
+            const cell = row.getCell(colIdx + 1);
+            cell.value = val;
+            cell.font = { name: 'Inter', size: 10, color: { argb: 'FF0F172A' } };
+            cell.alignment = { vertical: 'top', horizontal: colIdx === 0 || colIdx === 8 ? 'center' : 'left', wrapText: true };
+            cell.border = {
+              top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+              bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+              left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+              right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+            };
+          });
+        });
+
+        // Column widths
+        const widths = [6, 14, 20, 30, 32, 24, 14, 14, 18, 16, 28, 20, 22, 24, 14];
+        ws.columns.forEach((col, i) => { col.width = widths[i] || 18; });
+
+        const buf = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const safeTs = downloadTime.replace(/[:\s]/g, '-');
+        a.download = `Dashboard-ERS - ${safeTs}.xlsx`;
+        a.click();
       } else {
-        // Fallback Excel XML/HTML download
-        const tableHtml = `<table><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</table>`;
+        const metaHtml = `<tr><td colspan="3"><strong>${exportTitle}</strong></td></tr><tr><td colspan="2">Diunduh Pada</td><td>${downloadTime}</td></tr>` +
+          filterMetaRows.map(([l, v]) => `<tr><td colspan="2">${l}</td><td>${v}</td></tr>`).join('') + '<tr><td colspan="15"></td></tr>';
+        const tableHtml = `<table>${metaHtml}<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</table>`;
         const blob = new Blob(['\ufeff', tableHtml], { type: 'application/vnd.ms-excel' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'Data_ERS_Dashboard.xls';
+        a.download = 'Dashboard-ERS.xls';
         a.click();
       }
     }
